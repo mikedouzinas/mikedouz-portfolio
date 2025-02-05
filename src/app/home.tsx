@@ -6,11 +6,11 @@ export default function HomeSection() {
         <h1 className="text-5xl md:text-8xl font-bold text-gray-800">
           Hi, I'm{" "}
           <span className="inline-block align-middle mx-3">
-            <div className="w-[9rem] h-[9rem] rounded-2xl border-4 border shadow-lg inline-flex items-center justify-center">
+            <div className="w-[9rem] h-[9rem] rounded-3xl border-4 border shadow-lg inline-flex items-center justify-center">
               <img
                 src="/profile.png"
                 alt="Mike Veson"
-                className="w-[8rem] h-[8rem] rounded-xl"
+                className="w-[8rem] h-[8rem] rounded-2xl"
               />
             </div>
           </span>
