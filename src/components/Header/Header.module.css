@@ -1,0 +1,20 @@
+/* src/components/Header/Header.module.css */
+.header {
+  @apply fixed top-0 w-full bg-white shadow-md z-50;
+}
+
+.headerInner {
+  @apply flex justify-between items-center p-4;
+}
+
+.nav {
+  @apply flex space-x-8;
+}
+
+.link {
+  @apply text-gray-700 hover:text-blue-500;
+}
+
+.icons {
+  @apply flex space-x-4;
+}
