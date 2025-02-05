@@ -4,17 +4,17 @@
 }
 
 .headerInner {
-  @apply flex justify-between items-center p-4;
+  @apply flex justify-between items-center p-8;
 }
 
 .nav {
   @apply flex space-x-8;
 }
 
-.link {
-  @apply text-gray-700 hover:text-blue-500;
-}
-
 .icons {
   @apply flex space-x-4;
+}
+
+.link {
+  @apply text-gray-700 hover:text-blue-500 text-xl;
 }

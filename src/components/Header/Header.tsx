@@ -1,20 +1,54 @@
 // src/components/Header/Header.tsx
-import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
-import styles from './Header.module.css';
+"use client";
+
+import React from "react";
+import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
+import styles from "./Header.module.css";
 
 export default function Header() {
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <header className={styles.header}>
       <div className="w-full pl-4 pr-4">
         <div className={styles.headerInner}>
-          {/* Left side: Navigation links */}
-            <nav className={styles.nav}>
-            <a href="#home" className={`${styles.link} font-bold`}>Home</a>
-            <a href="#about" className={`${styles.link} font-bold`}>About</a>
-            <a href="#experience" className={`${styles.link} font-bold`}>Experience</a>
-            <a href="#projects" className={`${styles.link} font-bold`}>Projects</a>
-            <a href="#blogs" className={`${styles.link} font-bold`}>Blogs</a>
-            </nav>
+          <nav className={styles.nav}>
+            <button
+              onClick={() => scrollToSection("top")}
+              className={`${styles.link} font-bold`}
+            >
+              Home
+            </button>
+            <button
+              onClick={() => scrollToSection("about")}
+              className={`${styles.link} font-bold`}
+            >
+              About
+            </button>
+            <button
+              onClick={() => scrollToSection("experience")}
+              className={`${styles.link} font-bold`}
+            >
+              Experience
+            </button>
+            <button
+              onClick={() => scrollToSection("projects")}
+              className={`${styles.link} font-bold`}
+            >
+              Projects
+            </button>
+            <button
+              onClick={() => scrollToSection("blogs")}
+              className={`${styles.link} font-bold`}
+            >
+              Blogs
+            </button>
+          </nav>
 
           {/* Right side: Social icons */}
           <div className={styles.icons}>
@@ -34,10 +68,7 @@ export default function Header() {
             >
               <FaLinkedin size={30} />
             </a>
-            <a
-              href="mailto:mike@douzinas.com"
-              className={styles.link}
-            >
+            <a href="mailto:mike@douzinas.com" className={styles.link}>
               <FaEnvelope size={30} />
             </a>
           </div>
