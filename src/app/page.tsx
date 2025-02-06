@@ -4,7 +4,7 @@ import Header from '../components/Header/Header';
 import Footer from '../components/Footer';
 import HomeSection from './home';
 import About from './about';
-import Experience from './experience';
+import Experience from './work_experience/work_experiences';
 import Projects from './projects';
 import Blogs from './blogs';
 
