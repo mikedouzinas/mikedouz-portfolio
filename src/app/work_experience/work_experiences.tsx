@@ -8,14 +8,10 @@ import { workExperiences } from "@/data/workExperiences";
 
 const ITEMS_PER_VIEW = 2;
 
-/**
- * Variants for direction-based animation:
- * - When moving to the next page, the card slides in from the right.
- * - When moving to the previous page, the card slides in from the left.
- */
+// Direction-based variants for horizontal slide
 const slideVariants = {
   enter: (direction: number) => ({
-    x: direction > 0 ? 50 : -50,
+    x: direction > 0 ? 150 : -150,
     opacity: 0,
   }),
   center: {
@@ -23,14 +19,13 @@ const slideVariants = {
     opacity: 1,
   },
   exit: (direction: number) => ({
-    x: direction < 0 ? 50 : -50,
+    x: direction < 0 ? 150 : -150,
     opacity: 0,
   }),
 };
 
 export default function ExperienceGallery() {
   const [currentPage, setCurrentPage] = useState(0);
-  // direction = +1 (next), -1 (prev)
   const [direction, setDirection] = useState(0);
 
   const totalPages = Math.ceil(workExperiences.length / ITEMS_PER_VIEW);
@@ -72,7 +67,7 @@ export default function ExperienceGallery() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
           className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6"
         >
           {currentItems.map((exp) => (
@@ -96,7 +91,11 @@ export default function ExperienceGallery() {
           {Array.from({ length: totalPages }).map((_, idx) => (
             <button
               key={idx}
-              onClick={() => setCurrentPage(idx)}
+              onClick={() => {
+                // Decide slide direction based on position
+                setDirection(idx > currentPage ? 1 : -1);
+                setCurrentPage(idx);
+              }}
               className={`w-3 h-3 rounded-full transition-colors ${
                 currentPage === idx ? "bg-blue-500" : "bg-gray-400"
               }`}
