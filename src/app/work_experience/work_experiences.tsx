@@ -45,9 +45,10 @@ export default function ExperienceGallery() {
 
   return (
     <section
-      id="experience"
-      className="min-h-screen bg-gray-50 text-gray-800 py-16 px-4 flex flex-col items-center"
-    >
+  id="experience"
+  className="min-h-[80vh] bg-gray-50 text-gray-800 py-16 px-3 flex flex-col items-center"
+>
+
       <motion.h2
         initial={{ opacity: 0, y: 15 }}
         whileInView={{ opacity: 1, y: 0 }}

@@ -110,7 +110,11 @@ export default function About() {
   };
 
   return (
-    <section id="about" className="min-h-screen py-16 bg-gray-50 flex flex-col items-center">
+    <section
+  id="about"
+  className="min-h-[80vh] py-16 bg-gray-50 flex flex-col items-center"
+>
+
       {/* Centered Header */}
       <h1 className="text-4xl font-bold mb-4 text-center">About Me</h1>
 
