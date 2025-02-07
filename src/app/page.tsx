@@ -1,7 +1,6 @@
 // src/app/page.tsx
 import Head from 'next/head';
 import Header from '../components/Header/Header';
-import Footer from '../components/Footer';
 import HomeSection from './home';
 import About from './about';
 import Experience from './work_experience/work_experiences';
