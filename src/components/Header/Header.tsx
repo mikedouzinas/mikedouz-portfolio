@@ -42,12 +42,6 @@ export default function Header() {
             >
               Projects
             </button>
-            <button
-              onClick={() => scrollToSection("blogs")}
-              className={`${styles.link} font-bold`}
-            >
-              Blogs
-            </button>
           </nav>
 
           {/* Right side: Social icons */}

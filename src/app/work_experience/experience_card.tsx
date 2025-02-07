@@ -41,7 +41,7 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
         {item.description}
       </p> */}
 
-      {/* Skills (tags)
+      {/* Skills (tags) */}
       <div className="flex flex-wrap gap-2">
         {item.skills.map((skill) => (
           <span
@@ -50,8 +50,9 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
           >
             {skill}
           </span>
-        ))} */}
-      {/* </div> */}
+        ))} 
+        
+     </div>
     </motion.div>
   );
 }

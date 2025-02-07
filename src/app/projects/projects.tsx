@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import ExperienceCard from "./experience_card";
-import { workExperiences } from "@/data/workExperiences";
+import ProjectCard from "./project_card";
+import { projects } from "@/data/projects";
 
-const ITEMS_PER_VIEW = 2;
+const ITEMS_PER_PAGE = 2;
 
-// Direction-based variants for horizontal slide
 const slideVariants = {
   enter: (direction: number) => ({
     x: direction > 0 ? 150 : -150,
@@ -24,11 +23,11 @@ const slideVariants = {
   }),
 };
 
-export default function ExperienceGallery() {
+export default function ProjectsSection() {
   const [currentPage, setCurrentPage] = useState(0);
   const [direction, setDirection] = useState(0);
 
-  const totalPages = Math.ceil(workExperiences.length / ITEMS_PER_VIEW);
+  const totalPages = Math.ceil(projects.length / ITEMS_PER_PAGE);
 
   const nextPage = () => {
     setDirection(1);
@@ -40,12 +39,12 @@ export default function ExperienceGallery() {
     setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
   };
 
-  const pageStart = currentPage * ITEMS_PER_VIEW;
-  const currentItems = workExperiences.slice(pageStart, pageStart + ITEMS_PER_VIEW);
+  const pageStart = currentPage * ITEMS_PER_PAGE;
+  const currentItems = projects.slice(pageStart, pageStart + ITEMS_PER_PAGE);
 
   return (
     <section
-  id="experience"
+  id="projects"
   className="min-h-[10vh] bg-gray-50 text-gray-800 py-16 px-6 flex flex-col items-center"
 >
 
@@ -56,10 +55,9 @@ export default function ExperienceGallery() {
         viewport={{ once: true }}
         className="text-4xl font-bold mb-8 text-center"
       >
-        Work Experience
+        Projects
       </motion.h2>
 
-      {/* Animated Card Grid */}
       <AnimatePresence mode="wait" custom={direction}>
         <motion.div
           key={currentPage}
@@ -71,13 +69,12 @@ export default function ExperienceGallery() {
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6"
         >
-          {currentItems.map((exp) => (
-            <ExperienceCard key={exp.id} item={exp} />
+          {currentItems.map((project) => (
+            <ProjectCard key={project.id} project={project} />
           ))}
         </motion.div>
       </AnimatePresence>
 
-      {/* Pagination Controls */}
       <div className="flex justify-center items-center mt-8 space-x-6">
         <button
           onClick={prevPage}
@@ -87,13 +84,11 @@ export default function ExperienceGallery() {
           <ChevronLeft className="w-5 h-5 text-gray-600" />
         </button>
 
-        {/* Dots */}
         <div className="flex space-x-2">
           {Array.from({ length: totalPages }).map((_, idx) => (
             <button
               key={idx}
               onClick={() => {
-                // Decide slide direction based on position
                 setDirection(idx > currentPage ? 1 : -1);
                 setCurrentPage(idx);
               }}

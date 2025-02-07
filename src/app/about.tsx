@@ -142,7 +142,7 @@ export default function About() {
             className="flex flex-col md:flex-row items-center justify-center px-4"
           >
             {/* Left: "Widget" style for the image */}
-            <div className="w-full md:w-1/2 flex items-center justify-center mb-8 md:mb-0">
+            <div className="w-full md:w-1/2 flex items-center py-4 justify-center mb-8 md:mb-0">
               <div className="inline-block align-middle mx-3">
                 <div className="w-[20rem] h-[20rem] rounded-3xl border-4 border shadow-lg inline-flex items-center justify-center">
                   <img
