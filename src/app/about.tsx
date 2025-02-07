@@ -110,16 +110,13 @@ export default function About() {
   };
 
   return (
-    <section
-  id="about"
-  className="min-h-[80vh] py-16 bg-gray-50 flex flex-col items-center"
->
+    <section id="about" className="min-h-[80vh] py-16 bg-gray-50 dark:bg-gray-900 flex flex-col items-center">
 
       {/* Centered Header */}
-      <h1 className="text-4xl font-bold mb-4 text-center">About Me</h1>
+      <h1 className="text-4xl font-bold mb-4 text-center text-gray-800 dark:text-gray-200">About Me</h1>
 
       {/* Static Intro Text */}
-      <p className="mb-10 text-lg text-gray-700 max-w-3xl text-center">
+      <p className="mb-10 text-lg text-gray-700 dark:text-gray-300 max-w-3xl text-center">
         I’m Mike Veson, a computer science student, entrepreneur, and data-driven thinker devoted to building impactful technology. 
         My journey has taken me through software engineering, machine learning, and product development, all driven by my curiosity and 
         love for problem-solving.
@@ -156,7 +153,7 @@ export default function About() {
 
             {/* Right: Dynamic Text */}
             <div className="md:w-1/2 px-4">
-              <p className="text-xl text-gray-700">{slides[currentSlide].text}</p>
+            <p className="text-xl text-gray-700 dark:text-gray-300">{slides[currentSlide].text}</p>
             </div>
           </motion.div>
         </AnimatePresence>

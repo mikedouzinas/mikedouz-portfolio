@@ -43,10 +43,7 @@ export default function ProjectsSection() {
   const currentItems = projects.slice(pageStart, pageStart + ITEMS_PER_PAGE);
 
   return (
-    <section
-  id="projects"
-  className="min-h-[10vh] bg-gray-50 text-gray-800 py-16 px-6 flex flex-col items-center"
->
+    <section id="projects" className="min-h-[10vh] bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 py-16 px-6 flex flex-col items-center">
 
       <motion.h2
         initial={{ opacity: 0, y: 15 }}

@@ -1,19 +1,19 @@
 // app/layout.tsx
-import '../styles/globals.css'
+"use client";
+import { ThemeProvider } from "next-themes";
+import "../styles/globals.css";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <title>Mike Veson Portfolio</title>
+        <title>My Portfolio</title>
       </head>
       <body>
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="light">
+          {children}
+        </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }

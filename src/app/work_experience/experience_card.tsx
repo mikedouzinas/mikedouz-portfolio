@@ -16,30 +16,30 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col p-6 rounded-lg bg-white shadow-md border border-gray-200 hover:shadow-xl hover:border-blue-300 transition-all ease-in-out"
+      className="flex flex-col p-6 rounded-lg bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:border-blue-300 transition-all ease-in-out"
       style={{ maxWidth: "800px" , maxHeight: "300px"}}
     >
-       <div className="relative w-[300px] h-[150px] mx-auto mb-4">
+       {/* <div className="relative w-[300px] h-[150px] mx-auto mb-4">
         <Image
           src={item.imageUrl}
           alt={`${item.company} logo`}
           fill
           className="rounded-md object-contain"
         />
-      </div>
+      </div> */}
       {/* Top Row: Title + Period/ */}
       <div className="flex flex-col gap-2 mb-4">
-        <h3 className="text-xl font-semibold text-gray-900">{item.title}</h3>
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200">{item.title}</h3>
         <div className="flex items-center text-sm text-gray-500 justify-between">
           <p>{item.period}</p>
         </div>
       </div>
 
 
-      {/* Description
-      <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+      {/* Description */}
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
         {item.description}
-      </p> */}
+      </p>
 
       {/* Skills (tags) */}
       <div className="flex flex-wrap gap-2">

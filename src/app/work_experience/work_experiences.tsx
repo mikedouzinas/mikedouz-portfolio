@@ -44,10 +44,7 @@ export default function ExperienceGallery() {
   const currentItems = workExperiences.slice(pageStart, pageStart + ITEMS_PER_VIEW);
 
   return (
-    <section
-  id="experience"
-  className="min-h-[10vh] bg-gray-50 text-gray-800 py-16 px-6 flex flex-col items-center"
->
+    <section id="experience" className="min-h-[10vh] bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 py-16 px-6 flex flex-col items-center">
 
       <motion.h2
         initial={{ opacity: 0, y: 15 }}

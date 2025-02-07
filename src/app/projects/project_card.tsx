@@ -16,7 +16,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.3 }}
-      className="relative p-4 rounded-lg bg-white shadow-md border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all ease-in-out"
+      className="relative p-4 rounded-lg bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-blue-300 transition-all ease-in-out"
     >
       {/* Top Right Icon Group */}
       <div className="absolute top-2 right-2 flex space-x-2">
@@ -41,12 +41,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       </div>
 
       {/* Project Title */}
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-2">
         {project.title}
       </h3>
 
       {/* Description */}
-      <p className="text-sm text-gray-700 mb-4">{project.description}</p>
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">{project.description}</p>
 
       {/* Skills (tags) */}
       {project.skills && (

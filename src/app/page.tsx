@@ -5,6 +5,7 @@ import HomeSection from './home';
 import About from './about';
 import Experience from './work_experience/work_experiences';
 import Projects from './projects/projects';
+import ThemeToggle from '@/components/theme_toggle';
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
         <Experience />
         <Projects />
       </main>
+      <ThemeToggle />
     </div>
   );
 }

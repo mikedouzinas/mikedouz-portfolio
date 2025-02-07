@@ -1,9 +1,7 @@
-// src/components/Header/Header.tsx
 "use client";
 
 import React from "react";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
-import styles from "./Header.module.css";
 
 export default function Header() {
   const scrollToSection = (sectionId: string) => {
@@ -14,43 +12,43 @@ export default function Header() {
   };
 
   return (
-    <header className={styles.header}>
+    <header className="fixed top-0 w-full bg-white dark:bg-gray-900 shadow-xl z-50">
       <div className="w-full pl-4 pr-4">
-        <div className={styles.headerInner}>
-          <nav className={styles.nav}>
+        <div className="flex justify-between items-center p-8">
+          <nav className="flex space-x-8">
             <button
               onClick={() => scrollToSection("top")}
-              className={`${styles.link} font-bold`}
+              className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] text-xl font-bold"
             >
               Home
             </button>
             <button
               onClick={() => scrollToSection("about")}
-              className={`${styles.link} font-bold`}
+              className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] text-xl font-bold"
             >
               About
             </button>
             <button
               onClick={() => scrollToSection("experience")}
-              className={`${styles.link} font-bold`}
+              className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] text-xl font-bold"
             >
               Experience
             </button>
             <button
               onClick={() => scrollToSection("projects")}
-              className={`${styles.link} font-bold`}
+              className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] text-xl font-bold"
             >
               Projects
             </button>
           </nav>
 
           {/* Right side: Social icons */}
-          <div className={styles.icons}>
+          <div className="flex space-x-4">
             <a
               href="https://github.com/mikedouzinas"
               target="_blank"
               rel="noopener noreferrer"
-              className={styles.link}
+              className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32]"
             >
               <FaGithub size={30} />
             </a>
@@ -58,11 +56,14 @@ export default function Header() {
               href="https://www.linkedin.com/in/mikedouzinas"
               target="_blank"
               rel="noopener noreferrer"
-              className={styles.link}
+              className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32]"
             >
               <FaLinkedin size={30} />
             </a>
-            <a href="mailto:mike@douzinas.com" className={styles.link}>
+            <a
+              href="mailto:mike@douzinas.com"
+              className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32]"
+            >
               <FaEnvelope size={30} />
             </a>
           </div>
