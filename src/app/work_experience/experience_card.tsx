@@ -1,8 +1,7 @@
 // src/components/ExperienceCard.tsx
 "use client";
 
-import { motion } from "framer-motion";
-import Image from "next/image";
+import BaseCard from "@/components/base_card";
 import { WorkExperience } from "@/data/workExperiences";
 
 interface ExperienceCardProps {
@@ -11,48 +10,40 @@ interface ExperienceCardProps {
 
 export default function ExperienceCard({ item }: ExperienceCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 0 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -15 }}
-      transition={{ duration: 0.3 }}
-      className="flex flex-col p-6 rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:border-blue-300 dark:hover:border-orange-500 transition-all ease-in-out"
-      style={{ maxWidth: "800px" , maxHeight: "300px"}}
-    >
-       {/* <div className="relative w-[300px] h-[150px] mx-auto mb-4">
-        <Image
-          src={item.imageUrl}
-          alt={`${item.company} logo`}
-          fill
-          className="rounded-md object-contain"
-        />
-      </div> */}
-      {/* Top Row: Title + Period/ */}
-      <div className="flex flex-col gap-2 mb-4">
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200">{item.title}</h3>
-        <div className="flex items-center text-sm text-gray-500 justify-between">
-          <p>{item.period}</p>
+    <BaseCard>
+      {/* Use flex-1 instead of h-full */}
+      <div className="flex flex-col flex-1">
+        {/* TOP CONTENT */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200">
+            {item.title}
+          </h3>
+          <div className="flex items-center text-sm my-2">
+            <span className="text-blue-600 dark:text-blue-400 font-medium">
+              {item.company}
+            </span>
+            <span className="mx-2 text-gray-500 dark:text-gray-400">•</span>
+            <span className="text-gray-500 dark:text-gray-400">{item.period}</span>
+          </div>
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            {item.description}
+          </p>
+        </div>
+
+        {/* BOTTOM CONTENT pinned to bottom */}
+        <div className="mt-auto pt-2">
+          <div className="flex flex-wrap gap-2">
+            {item.skills.map((skill) => (
+              <span
+                key={skill}
+                className="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-lg"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
-
-
-      {/* Description */}
-      <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-        {item.description}
-      </p>
-
-      {/* Skills (tags) */}
-      <div className="flex flex-wrap gap-2">
-        {item.skills.map((skill) => (
-          <span
-            key={skill}
-            className="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full"
-          >
-            {skill}
-          </span>
-        ))} 
-        
-     </div>
-    </motion.div>
+    </BaseCard>
   );
 }

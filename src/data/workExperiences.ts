@@ -19,7 +19,7 @@ export interface WorkExperience {
       id: "1",
       title: "Software Engineer in Residence",
       company: "Liu Idea Lab for Innovation & Entrepreneurship",
-      period: "Feb 2024 - Nov 2024",
+      period: "Feb - Nov 2024",
       description:
         "Led full-stack software solutions at Lilie, implementing robust front-end and back-end systems to foster innovation among Rice University students. Focused on scalable architecture, streamlined user experiences, and mobile integration to meet diverse user needs.",
       imageUrl: "/lilie_logo.png",
@@ -28,8 +28,8 @@ export interface WorkExperience {
     {
       id: "2",
       title: "Software Engineering Intern",
-      company: "Veson Nautical · Internship",
-      period: "Jun 2024 - Sep 2024",
+      company: "Veson Nautical",
+      period: "Jun - Sep 2024",
       description:
         "Created automated laytime calculations using Google Document AI, drastically cutting multi-day manual processes to minutes. Collaborated with major clients to refine shipping workflows, ensuring accurate demurrage cost calculations and maritime compliance.",
       imageUrl: "/veson.png",
@@ -39,7 +39,7 @@ export interface WorkExperience {
       id: "3",
       title: "Data Science Intern",
       company: "VesselsValue",
-      period: "May 2024 - Jun 2024",
+      period: "May - Jun 2024",
       description:
         "Developed advanced NLP solutions using BERT sentence transformers, accurately categorizing over 100,000 contact job titles. Optimized directory merging with FAISS-based similarity searches, boosting match precision by over 20%.",
       imageUrl: "/vessels_value.png",

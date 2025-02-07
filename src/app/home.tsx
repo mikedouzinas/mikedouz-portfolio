@@ -6,8 +6,8 @@ export default function HomeSection() {
   const glareRef = useRef<HTMLDivElement>(null);
   // Flag to indicate if this is the first mouse move after entering
   const isFirstHover = useRef(true);
-  
-  const maxTilt = 7; // Maximum tilt angle (subtle)
+
+  const maxTilt = 8; // Maximum tilt angle (subtle)
   const scaleFactor = 1.03; // Forward pop effect
 
   const handleMouseEnter = () => {
@@ -30,7 +30,7 @@ export default function HomeSection() {
     const centerY = rect.height / 2;
     const rotateY = ((x - centerX) / centerX) * maxTilt;
     const rotateX = -((y - centerY) / centerY) * maxTilt;
-    
+
     // On the first movement, let the 300ms transition run.
     // For subsequent moves, switch to a 75ms transition for faster updates.
     if (!isFirstHover.current) {
@@ -43,9 +43,9 @@ export default function HomeSection() {
     } else {
       isFirstHover.current = false;
     }
-    
+
     containerRef.current.style.transform = `perspective(1000px) scale(${scaleFactor}) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    
+
     if (glareRef.current) {
       glareRef.current.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.2), transparent 60%)`;
       glareRef.current.style.opacity = "1";
@@ -75,21 +75,24 @@ export default function HomeSection() {
             onMouseEnter={handleMouseEnter}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            className="w-[16.5rem] h-[16.5rem] rounded-full border-4 dark:border-orange-600 shadow-xl inline-flex items-center justify-center"
+            className="rounded-full p-1 bg-gradient-to-br from-orange-500 to-gray-100 dark:from-gray-800 dark:to-gray-700 inline-flex items-center justify-center shadow-xl"
           >
-            <img
-              src="/profile.png"
-              alt="Mike Veson"
-              className="w-[16rem] h-[16rem] rounded-full"
-            />
-            {/* Glare overlay */}
-            <div
-              ref={glareRef}
-              className="absolute inset-0 rounded-full pointer-events-none"
-              style={{ opacity: 0 }}
-            />
+            <div className="w-[16.5rem] h-[16.5rem] rounded-full border-4 border-transparent relative inline-flex items-center justify-center">
+              <img
+                src="/profile.png"
+                alt="Mike Veson"
+                className="w-[16rem] h-[16rem] rounded-full"
+              />
+              {/* Glare overlay */}
+              <div
+                ref={glareRef}
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{ opacity: 0 }}
+              />
+            </div>
           </div>
         </span>
+
         <div className="py-8" />
         <h1 className="text-5xl md:text-8xl font-bold text-gray-800 dark:text-gray-200">
           Hi, I'm Mike Veson.

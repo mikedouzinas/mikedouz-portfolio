@@ -1,8 +1,8 @@
 // src/app/page.tsx
 import Head from 'next/head';
-import Header from '../components/Header/Header';
+import Header from '../components/Header';
 import HomeSection from './home';
-import About from './about';
+import About from './about/about_section';
 import Experience from './work_experience/work_experiences';
 import Projects from './projects/projects';
 import ThemeToggle from '@/components/theme_toggle';

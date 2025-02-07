@@ -16,7 +16,7 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 w-full bg-white dark:bg-gray-900 shadow-xl z-50">
+    <header className="fixed top-0 w-full bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-700 shadow-xl z-50">
       <div className="w-full px-4">
         {/* Top row */}
         <div className="flex justify-between items-center p-8">
@@ -86,23 +86,22 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Navigation (pull-down menu) in an absolutely positioned container
-          so it won't expand page height */}
+      {/* Mobile Navigation */}
       <div
         className={`
-          md:hidden 
-          absolute 
-          left-0 
-          w-full 
-          bg-white dark:bg-gray-900 
-          overflow-hidden 
-          transition-all 
-          duration-300 
-          ease-in-out 
-          z-40
-          ${isOpen ? "max-h-72 opacity-100" : "max-h-0 opacity-0"} 
-        `}
-        style={{ top: "88px" }} // Adjust to match header height if needed
+      md:hidden 
+      absolute 
+      left-0 
+      w-full 
+      bg-white dark:bg-gray-900 
+      overflow-hidden 
+      transition-all 
+      duration-300 
+      ease-in-out 
+      z-40
+      ${isOpen ? "max-h-72 opacity-100" : "max-h-0 opacity-0"} 
+    `}
+        style={{ top: "88px" }}
       >
         <div className="flex flex-col space-y-4 p-4">
           <button
