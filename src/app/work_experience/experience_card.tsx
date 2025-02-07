@@ -16,7 +16,7 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col p-6 rounded-lg bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:border-blue-300 transition-all ease-in-out"
+      className="flex flex-col p-6 rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:border-blue-300 dark:hover:border-orange-500 transition-all ease-in-out"
       style={{ maxWidth: "800px" , maxHeight: "300px"}}
     >
        {/* <div className="relative w-[300px] h-[150px] mx-auto mb-4">

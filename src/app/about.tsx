@@ -20,7 +20,7 @@ const slides = [
       <>
         I grew up in a <span className="font-semibold">startup environment</span>, watching my parents build{" "}
         <span className="font-semibold">Veson Nautical</span> from an idea into a global company. Being surrounded by{" "}
-        <span className="font-semibold">problem-solving</span> and <span className="font-semibold">iteration</span> 
+        <span className="font-semibold">problem-solving</span> and <span className="font-semibold">iteration</span>
         {" "}from a young age taught me that <span className="font-semibold">great products come from real-world understanding, not just code.</span>
       </>
     ),
@@ -31,8 +31,8 @@ const slides = [
     text: (
       <>
         Being <span className="font-semibold">Greek</span> isn’t just heritage—it’s <span className="font-semibold">identity</span>.
-        Summers in <span className="font-semibold">Greece</span>, speaking the language, and immersing in traditions 
-        shaped how I see the world. My background influences my <span className="font-semibold">perspective, my connections, and my approach to challenges</span>, 
+        Summers in <span className="font-semibold">Greece</span>, speaking the language, and immersing in traditions
+        shaped how I see the world. My background influences my <span className="font-semibold">perspective, my connections, and my approach to challenges</span>,
         always balancing <span className="font-semibold">logic with storytelling.</span>
       </>
     ),
@@ -42,8 +42,8 @@ const slides = [
     alt: "Photo 3",
     text: (
       <>
-        I've always been passionate about <span className="font-semibold">soccer</span>—playing, watching, and analyzing it. 
-        As a <span className="font-semibold">Barcelona fan</span>, I love the <span className="font-semibold">strategy and precision</span> behind the game. 
+        I've always been passionate about <span className="font-semibold">soccer</span>—playing, watching, and analyzing it.
+        As a <span className="font-semibold">Barcelona fan</span>, I love the <span className="font-semibold">strategy and precision</span> behind the game.
         That passion led me to <span className="font-semibold">sports analytics</span>, where I use{" "}
         <span className="font-semibold">software to evaluate player performance</span> and optimize tactics.
       </>
@@ -57,7 +57,7 @@ const slides = [
         This is <span className="font-semibold">Poros</span>, the island where my{" "}
         <span className="font-semibold">grandfather was born</span>. Coming here always gives me{" "}
         <span className="font-semibold">perspective</span>—a place to{" "}
-        <span className="font-semibold">reflect, reset, and think big. </span> 
+        <span className="font-semibold">reflect, reset, and think big. </span>
         Some of my best ideas have come from moments like this, away from screens and in{" "}
         <span className="font-semibold">deep thought.</span>
       </>
@@ -68,9 +68,9 @@ const slides = [
     alt: "Photo 5",
     text: (
       <>
-        I’ve always been a <span className="font-semibold">morning person</span>. 
-        There’s something about the quiet energy of the morning, the fresh start, and the time to think before the world fully wakes up. 
-        Whether I’m walking to work, grabbing coffee, or planning my day, mornings give me clarity and focus. 
+        I’ve always been a <span className="font-semibold">morning person</span>.
+        There’s something about the quiet energy of the morning, the fresh start, and the time to think before the world fully wakes up.
+        Whether I’m walking to work, grabbing coffee, or planning my day, mornings give me clarity and focus.
         That daily rhythm—moving through the city, setting intentions—keeps me <span className="font-semibold">driven and ready to build.</span>
       </>
     ),
@@ -117,8 +117,8 @@ export default function About() {
 
       {/* Static Intro Text */}
       <p className="mb-10 text-lg text-gray-700 dark:text-gray-300 max-w-3xl text-center">
-        I’m Mike Veson, a computer science student, entrepreneur, and data-driven thinker devoted to building impactful technology. 
-        My journey has taken me through software engineering, machine learning, and product development, all driven by my curiosity and 
+        I’m Mike Veson, a computer science student, entrepreneur, and data-driven thinker devoted to building impactful technology.
+        My journey has taken me through software engineering, machine learning, and product development, all driven by my curiosity and
         love for problem-solving.
         <br />
         <br />
@@ -139,21 +139,18 @@ export default function About() {
             className="flex flex-col md:flex-row items-center justify-center px-4"
           >
             {/* Left: "Widget" style for the image */}
-            <div className="w-full md:w-1/2 flex items-center py-4 justify-center mb-8 md:mb-0">
-              <div className="inline-block align-middle mx-3">
-                <div className="w-[20rem] h-[20rem] rounded-3xl border-4 border shadow-lg inline-flex items-center justify-center">
-                  <img
-                    src={slides[currentSlide].img}
-                    alt={slides[currentSlide].alt}
-                    className="w-[19rem] h-[19rem] rounded-2xl object-cover"
-                  />
-                </div>
-              </div>
+            <div className="w-full md:w-1/2 flex items-center py-4 justify-center mb-8 md:mb-0 bg-transparent">
+              <img
+                src={slides[currentSlide].img}
+                alt={slides[currentSlide].alt}
+                className="w-[19rem] h-[19rem] rounded-2xl object-cover shadow-lg"
+              />
             </div>
+
 
             {/* Right: Dynamic Text */}
             <div className="md:w-1/2 px-4">
-            <p className="text-xl text-gray-700 dark:text-gray-300">{slides[currentSlide].text}</p>
+              <p className="text-xl text-gray-700 dark:text-gray-300">{slides[currentSlide].text}</p>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -188,9 +185,8 @@ export default function About() {
                 setDirection(idx > currentSlide ? 1 : -1);
                 setCurrentSlide(idx);
               }}
-              className={`w-3 h-3 rounded-full transition-colors ${
-                currentSlide === idx ? "bg-blue-500" : "bg-gray-400"
-              }`}
+              className={`w-3 h-3 rounded-full transition-colors ${currentSlide === idx ? "bg-blue-500" : "bg-gray-400"
+                }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
           ))}

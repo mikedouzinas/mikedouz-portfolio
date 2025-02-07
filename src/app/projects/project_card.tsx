@@ -16,7 +16,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.3 }}
-      className="relative p-4 rounded-lg bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-blue-300 transition-all ease-in-out"
+      className="relative flex flex-col p-6 rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:border-blue-300 dark:hover:border-orange-500 transition-all ease-in-out"
     >
       {/* Top Right Icon Group */}
       <div className="absolute top-2 right-2 flex space-x-2">
@@ -26,7 +26,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           rel="noopener noreferrer"
           aria-label="GitHub"
         >
-          <FaGithub className="w-5 h-5 text-blue-500 hover:text-blue-700" />
+          <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
         </a>
         {project.projectLink && project.projectLink.length > 0 && (
           <a
@@ -35,7 +35,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             rel="noopener noreferrer"
             aria-label="Live Project"
           >
-            <ExternalLink className="w-5 h-5 text-blue-500 hover:text-blue-700" />
+            <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
           </a>
         )}
       </div>
@@ -46,7 +46,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       </h3>
 
       {/* Description */}
-      <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">{project.description}</p>
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
+        {project.description}
+      </p>
 
       {/* Skills (tags) */}
       {project.skills && (
@@ -62,5 +64,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </div>
       )}
     </motion.div>
+
   );
 }

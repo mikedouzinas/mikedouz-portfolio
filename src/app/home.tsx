@@ -7,7 +7,7 @@ export default function HomeSection() {
   // Flag to indicate if this is the first mouse move after entering
   const isFirstHover = useRef(true);
   
-  const maxTilt = 6; // Maximum tilt angle (subtle)
+  const maxTilt = 7; // Maximum tilt angle (subtle)
   const scaleFactor = 1.03; // Forward pop effect
 
   const handleMouseEnter = () => {
