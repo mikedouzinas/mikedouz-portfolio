@@ -8,19 +8,16 @@ export default function AboutSection() {
     >
       <div className="max-w-2xl px-4 text-left leading-relaxed">
         <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
-          I’m Mike Veson, a <strong className="font-semibold">passionate developer</strong> dedicated to transforming ideas into <strong className="font-semibold">impactful solutions</strong>. With years of experience in front-end development and a love for <strong className="font-semibold">clean, efficient code</strong>, I strive to create digital experiences that are both aesthetically pleasing and highly functional.
+          I’m Mike Veson, a proud <strong className="font-semibold">Greek-American</strong> currently pursuing a degree in <strong className="font-semibold">Computer Science</strong> with a focus on <strong className="font-semibold">design</strong> and <strong className="font-semibold">entrepreneurship</strong>. My heritage has shaped my perspective, fueling my passion for <strong className="font-semibold">community</strong> and <strong className="font-semibold">innovation</strong>. 
         </p>
         <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
-          My journey began in the early days of the web, where I discovered that coding was not just a career but a form of art. Over time, I have honed my skills in HTML, CSS, JavaScript, and various frameworks. I believe that <strong className="font-semibold">innovation</strong> and <strong className="font-semibold">creativity</strong> are the keys to success in this industry.
+          Outside the classroom, I’m an avid <strong className="font-semibold">football (soccer)</strong> enthusiast and FC Barcelona fan who loves the teamwork and dedication the sport demands. This spirit carries over into my coding projects, where I enjoy collaborating with others to design solutions that are both <strong className="font-semibold">user-centric</strong> and <strong className="font-semibold">visually compelling</strong>.
         </p>
         <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
-          Throughout my career, I have collaborated with diverse teams and worked on projects ranging from small startups to large-scale enterprise solutions. Each project has taught me invaluable lessons about <strong className="font-semibold">teamwork</strong>, <strong className="font-semibold">problem-solving</strong>, and the importance of a great <strong className="font-semibold">user experience</strong>.
-        </p>
-        <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
-          When I’m not immersed in code, I enjoy exploring new technologies, writing technical articles, and mentoring aspiring developers. I’m always eager to share my knowledge and contribute to the community through open-source projects, talks, and workshops.
+          My studies in <strong className="font-semibold">front-end development</strong> and <strong className="font-semibold">product design</strong> allow me to merge creativity with technical know-how, building tools and experiences that solve real-world problems. I’m particularly drawn to opportunities that blend <strong className="font-semibold">entrepreneurial thinking</strong> with hands-on development, as it encourages me to push boundaries and deliver meaningful results.
         </p>
         <p className="mb-0 text-md font-light text-gray-600 dark:text-gray-400">
-          Looking ahead, I am excited about the future of web development and the endless possibilities it offers. I continuously seek to learn, grow, and push the boundaries of what is possible while maintaining a strong commitment to <strong className="font-semibold">quality</strong> and <strong className="font-semibold">innovation</strong>.
+          Moving forward, I’m eager to keep expanding my knowledge and skill set, taking on projects where I can create <strong className="font-semibold">impactful</strong> digital experiences. Whether through coding, designing, or leading new ventures, I’m always ready to learn, grow, and collaborate with others who share my passion for <strong className="font-semibold">innovation</strong>.
         </p>
       </div>
     </section>

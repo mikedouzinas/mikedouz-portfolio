@@ -17,16 +17,12 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
       onClick={openCompanyUrl}
       role="link"
       tabIndex={0}
-      className="max-w-[42rem] mx-auto w-full rounded-xl transition-all duration-300 ease-in-out 
-        hover:shadow-lg mb-6 cursor-pointer
-        hover:bg-gradient-to-br hover:from-gray-100 hover:to-gray-200 hover:bg-opacity-80 
-        dark:hover:from-gray-800 dark:hover:to-gray-700 dark:hover:bg-opacity-80"
+      className="max-w-[42rem] mx-auto w-full relative rounded-xl transition-all duration-300 ease-in-out md:hover:shadow-lg mb-6 cursor-pointer md:hover:bg-gradient-to-br md:hover:from-gray-100 md:hover:to-gray-200 md:hover:bg-opacity-80 dark:md:hover:from-gray-800 dark:md:hover:to-gray-700 dark:md:hover:bg-opacity-80"
     >
       {/* Inner container: limited width and padded to align with About/Experience sections */}
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <div className="flex">
-          {/* Date column (left-aligned) */}
-          <div className="w-32 flex-shrink-0 pr-6 mt-2 text-sm text-gray-400">
+        <div className="flex flex-col md:flex-row">
+          <div className="w-full md:w-32 flex-shrink-0 pr-0 md:pr-6 mt-2 text-xs text-gray-400 text-left md:text-left">
             {item.period}
           </div>
           {/* Main content */}

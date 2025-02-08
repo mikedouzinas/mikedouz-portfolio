@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { ExternalLink } from "lucide-react";
 import { Project } from "@/data/projects";
@@ -9,22 +9,33 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  // Clicking anywhere on the card (except inner links) will open the GitHub URL
-  const openGithub = (e: React.MouseEvent<HTMLDivElement>) => {
-    window.open(project.githubLink, "_blank");
-  };
+  const [imageWidth, setImageWidth] = useState(280);
+  const textRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkTextLines = () => {
+      if (textRef.current) {
+        const computedStyle = window.getComputedStyle(textRef.current);
+        const lineHeight = parseFloat(computedStyle.lineHeight);
+        const textHeight = textRef.current.clientHeight;
+        const lines = textHeight / lineHeight;
+        // If text wraps more than 5 lines, shrink the image column
+        setImageWidth(lines > 7 ? 200 : 280);
+      }
+    };
+
+    checkTextLines();
+    window.addEventListener("resize", checkTextLines);
+    return () => window.removeEventListener("resize", checkTextLines);
+  }, [project.description]);
 
   return (
     <div
-      onClick={openGithub}
+      onClick={(e) => window.open(project.githubLink, "_blank")}
       role="link"
       tabIndex={0}
-      className="max-w-[42rem] mx-auto w-full relative rounded-xl transition-all duration-300 ease-in-out 
-        hover:shadow-lg mb-6 cursor-pointer
-        hover:bg-gradient-to-br hover:from-gray-100 hover:to-gray-200 hover:bg-opacity-80 
-        dark:hover:from-gray-800 dark:hover:to-gray-700 dark:hover:bg-opacity-80"
+      className="max-w-[42rem] mx-auto w-full relative rounded-xl transition-all duration-300 ease-in-out md:hover:shadow-lg mb-6 cursor-pointer md:hover:bg-gradient-to-br md:hover:from-gray-100 md:hover:to-gray-200 md:hover:bg-opacity-80 dark:md:hover:from-gray-800 dark:md:hover:to-gray-700 dark:md:hover:bg-opacity-80"
     >
-      {/* Icons: Absolutely positioned in the top-right */}
       <div className="absolute top-2 right-2 flex space-x-2">
         <a
           href={project.githubLink}
@@ -33,7 +44,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           aria-label="GitHub"
           onClick={(e) => e.stopPropagation()}
         >
-          <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
+          <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 mt-5 hover:text-blue-700 dark:hover:text-orange-500" />
         </a>
         {project.projectLink && project.projectLink.length > 0 && (
           <a
@@ -43,24 +54,25 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             aria-label="Live Project"
             onClick={(e) => e.stopPropagation()}
           >
-            <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
+            <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-300 mt-5 hover:text-blue-700 dark:hover:text-orange-500" />
           </a>
         )}
       </div>
-
-      {/* Inner container: limited width and padded to align with About/Experience sections */}
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-[280px,1fr] gap-x-4 items-start">
-          {/* Left Column: Project Image */}
-          <div>
+        <div
+          className="flex flex-col-reverse md:grid gap-x-4 items-start"
+          style={{
+            gridTemplateColumns: `minmax(0, ${imageWidth}px) 1fr`,
+          }}
+        >
+          <div className="mt-6 md:mt-0">
             <img
               src={project.imageUrl}
               alt={project.title}
-              className="w-[280px] h-[160px] object-cover rounded-md"
+              className="w-full h-auto object-cover rounded-md"
             />
           </div>
-          {/* Right Column: Project Details */}
-          <div className="flex flex-col">
+          <div className="flex flex-col" ref={textRef}>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-2">
               {project.title}
             </h3>

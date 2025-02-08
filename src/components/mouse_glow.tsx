@@ -20,7 +20,7 @@ export default function MouseGlow() {
         transform: `translate(${position.x - 50}px, ${position.y - 50}px)`
       }}
     >
-      <div className="w-20 h-20 bg-blue-300 dark:bg-blue-500 opacity-50 rounded-full filter blur-3xl" />
+      <div className="w-20 h-20 bg-blue-300 dark:bg-blue-500 opacity-50 rounded-full filter blur-3xl mix-blend-screen" />
     </div>
   );
 }

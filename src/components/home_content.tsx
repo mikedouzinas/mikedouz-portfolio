@@ -26,7 +26,7 @@ export default function HomeContent({
   const containerRef = useRef<HTMLDivElement>(null);
   const glareRef = useRef<HTMLDivElement>(null);
   const isFirstHover = useRef(true);
-  const maxTilt = 8;
+  const maxTilt = 10;
   const scaleFactor = 1.03;
 
   const handleMouseEnter = () => {
@@ -110,11 +110,6 @@ export default function HomeContent({
           Elevating <strong>Ideas into Impact.</strong>
         </p>
       </div>
-      {showSeeMore && (
-        <button onClick={handleSeeMoreClick} className="mt-8 px-4 py-2 bg-blue-500 text-white rounded">
-          See more
-        </button>
-      )}
     </section>
   );
 }

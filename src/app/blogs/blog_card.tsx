@@ -16,20 +16,16 @@ export default function BlogCard({ blog }: BlogCardProps) {
       onClick={openBlog}
       role="link"
       tabIndex={0}
-      className="max-w-[42rem] mx-auto w-full relative rounded-xl transition-all duration-300 ease-in-out 
-                 hover:shadow-lg mb-6 cursor-pointer
-                 hover:bg-gradient-to-br hover:from-gray-100 hover:to-gray-200 hover:bg-opacity-80 
-                 dark:hover:from-gray-800 dark:hover:to-gray-700 dark:hover:bg-opacity-80"
+      className="max-w-[42rem] mx-auto w-full relative rounded-xl transition-all duration-300 ease-in-out md:hover:shadow-lg mb-6 cursor-pointer md:hover:bg-gradient-to-br md:hover:from-gray-100 md:hover:to-gray-200 md:hover:bg-opacity-80 dark:md:hover:from-gray-800 dark:md:hover:to-gray-700 dark:md:hover:bg-opacity-80"
     >
-      {/* Inner container: limited width and padded to align with About/Experience */}
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-[280px,1fr] gap-x-4 items-center">
+        <div className="flex flex-col-reverse md:grid md:grid-cols-[minmax(0,280px),1fr] gap-x-4 items-start">
           {/* Left Column: Blog Image */}
           <div>
             <img
               src={blog.imageUrl}
               alt={blog.title}
-              className="w-[280px] h-[160px] object-cover rounded-md"
+              className="w-full h-auto object-cover rounded-md"
             />
           </div>
           {/* Right Column: Date and Title */}

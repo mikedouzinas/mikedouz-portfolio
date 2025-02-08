@@ -54,7 +54,7 @@ export default function SidebarHome() {
     };
 
     return (
-        <div className="flex flex-col h-full justify-between p-8">
+        <div className="flex flex-col h-full justify-between p-8 text-center md:text-left">
             <div>
                 {/* Profile container: fixed width and centered */}
                 <div className="w-48 mx-auto">
@@ -62,14 +62,14 @@ export default function SidebarHome() {
                         imageContainerSize="w-[13.5rem] h-[13.5rem]"
                         imageSize="w-[13rem] h-[13rem]"
                         headingSize="text-4xl"
-                        subTextSize="mt-2 text-lg"
+                        subTextSize="mt-2FaGithub text-lg"
                         showSeeMore={false}
                         containerClass="flex flex-col items-start justify-start py-8"
                         textWrapperClass="mt-4 text-left"
                     />
                 </div>
                 {/* Navigation links aligned with the profile container */}
-                <nav className="mt-8 w-48 mx-auto">
+                <nav className="mt-8 w-48 mx-auto hidden md:block">
                     <ul className="space-y-4 text-left">
                         {navItems.map((item) => {
                             const isActive = activeSection === item.id;
