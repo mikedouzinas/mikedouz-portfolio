@@ -1,33 +1,28 @@
-// src/app/about/about_section.tsx
 "use client";
-
-import Carousel from "@/components/carousel";
-import AboutCard from "@/app/about/about_card";
-import { aboutSlides } from "@/data/about";
 
 export default function AboutSection() {
   return (
     <section
       id="about"
-      className="min-h-[80vh] py-16 bg-gray-50 dark:bg-gray-900 flex flex-col items-center"
+      className="min-h-[50vh] py-4 bg-gray-50 dark:bg-gray-900 flex flex-col items-center"
     >
-      {/* Centered Header */}
-      <h1 className="text-4xl font-bold mb-4 text-center text-gray-800 dark:text-gray-200">
-        About Me
-      </h1>
-
-      {/* Static Intro Text */}
-      <p className="mb-10 text-lg text-gray-700 dark:text-gray-300 max-w-3xl text-center">
-        I’m Mike Veson...
-      </p>
-
-      {/* Reusable Carousel for the “slides” portion */}
-      <Carousel
-        items={aboutSlides}
-        itemsPerPage={1}
-        renderItem={(slide) => <AboutCard slide={slide} />}
-        // we won't pass sectionTitle so it doesn’t render the heading again
-      />
+      <div className="max-w-2xl px-4 text-left leading-relaxed">
+        <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
+          I’m Mike Veson, a <strong className="font-semibold">passionate developer</strong> dedicated to transforming ideas into <strong className="font-semibold">impactful solutions</strong>. With years of experience in front-end development and a love for <strong className="font-semibold">clean, efficient code</strong>, I strive to create digital experiences that are both aesthetically pleasing and highly functional.
+        </p>
+        <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
+          My journey began in the early days of the web, where I discovered that coding was not just a career but a form of art. Over time, I have honed my skills in HTML, CSS, JavaScript, and various frameworks. I believe that <strong className="font-semibold">innovation</strong> and <strong className="font-semibold">creativity</strong> are the keys to success in this industry.
+        </p>
+        <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
+          Throughout my career, I have collaborated with diverse teams and worked on projects ranging from small startups to large-scale enterprise solutions. Each project has taught me invaluable lessons about <strong className="font-semibold">teamwork</strong>, <strong className="font-semibold">problem-solving</strong>, and the importance of a great <strong className="font-semibold">user experience</strong>.
+        </p>
+        <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
+          When I’m not immersed in code, I enjoy exploring new technologies, writing technical articles, and mentoring aspiring developers. I’m always eager to share my knowledge and contribute to the community through open-source projects, talks, and workshops.
+        </p>
+        <p className="mb-0 text-md font-light text-gray-600 dark:text-gray-400">
+          Looking ahead, I am excited about the future of web development and the endless possibilities it offers. I continuously seek to learn, grow, and push the boundaries of what is possible while maintaining a strong commitment to <strong className="font-semibold">quality</strong> and <strong className="font-semibold">innovation</strong>.
+        </p>
+      </div>
     </section>
   );
 }

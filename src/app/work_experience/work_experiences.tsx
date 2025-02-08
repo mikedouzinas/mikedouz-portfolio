@@ -1,18 +1,16 @@
-// src/app/work_experience/work_experiences.tsx
 "use client";
-
-import Carousel from "@/components/carousel";
+import React from "react";
 import ExperienceCard from "@/app/work_experience/experience_card";
 import { workExperiences } from "@/data/workExperiences";
 
-export default function ExperienceGallery() {
+export default function ExperienceSection() {
   return (
-    <Carousel
-      sectionId="experience"
-      sectionTitle="Work Experience"
-      items={workExperiences}
-      itemsPerPage={2}
-      renderItem={(exp) => <ExperienceCard key={exp.id} item={exp} />}
-    />
+    <section id="experience" className="py-16 bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-3xl mx-auto px-4 space-y-6">
+        {workExperiences.map((exp) => (
+          <ExperienceCard key={exp.id} item={exp} />
+        ))}
+      </div>
+    </section>
   );
 }

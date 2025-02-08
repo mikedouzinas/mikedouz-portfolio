@@ -5,7 +5,10 @@ import SidebarHome from './sidebar_content'; // The sidebar component for the sp
 import About from './about/about_section';
 import Experience from './work_experience/work_experiences';
 import Projects from './projects/projects';
+import Blogs from './blogs/blogs_section';
 import ThemeToggle from '@/components/theme_toggle';
+import MouseGlow from '@/components/mouse_glow';
+
   
 export default function Home() {
   const [layout, setLayout] = useState<'landing' | 'split'>('landing');
@@ -24,6 +27,7 @@ export default function Home() {
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <MouseGlow />
       {layout === 'landing' ? (
         <div className="relative">
           <HomeSection onSeeMore={handleSeeMore} />
@@ -45,6 +49,9 @@ export default function Home() {
             </section>
             <section id="projects" className="mt-16">
               <Projects />
+            </section>
+            <section id="blogs" className="mt-16">
+              <Blogs />
             </section>
             <ThemeToggle />
           </main>

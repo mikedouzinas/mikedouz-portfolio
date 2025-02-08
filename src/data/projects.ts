@@ -2,6 +2,7 @@
 
 export interface Project {
     id: string;
+    imageUrl?: string;
     title: string;
     description: string;
     githubLink: string;
@@ -12,6 +13,7 @@ export interface Project {
   export const projects: Project[] = [
     {
       id: "1",
+      imageUrl: "/project1.png",
       title: "Euros 2024 Predictor",
       description:
         "I developed a machine learning project to predict outcomes for Euro 2024 matches by web scraping comprehensive datasets and processing them with Pandas. Using a RandomForestClassifier, the model forecasts expected goals and final scores, landing in the top ~3% of UEFA predictions.",
@@ -21,6 +23,7 @@ export interface Project {
     },
     {
       id: "2",
+      imageUrl: "/project2.png",
       title: "BB&N's Knight Life",
       description:
         "I developed and launched BB&N's Knight Life, a mobile app that streamlines school scheduling for Buckingham Browne & Nichols School. Built in Swift with an intuitive interface, the app quickly gained traction—over half of the high school students adopted it and it earned a 4.9-star rating on the App Store.",

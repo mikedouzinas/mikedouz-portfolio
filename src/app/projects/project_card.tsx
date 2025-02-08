@@ -1,7 +1,5 @@
-// src/components/ProjectCard.tsx
 "use client";
-
-import BaseCard from "@/components/base_card";
+import React from "react";
 import { FaGithub } from "react-icons/fa";
 import { ExternalLink } from "lucide-react";
 import { Project } from "@/data/projects";
@@ -12,57 +10,66 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project }: ProjectCardProps) {
   return (
-    <BaseCard>
-      {/* We wrap everything in another flex-col that consumes the full height */}
-      <div className="flex flex-col h-full">
-        {/* ICONS: Absolutely position them if you like them in the top-right corner */}
-        <div className="absolute top-2 right-2 flex space-x-2">
+    <div className="max-w-[42rem] mx-auto w-full relative rounded-xl transition-all duration-300 ease-in-out 
+      hover:shadow-lg mb-6 
+      hover:bg-gradient-to-br hover:from-gray-100 hover:to-gray-200 hover:bg-opacity-80 
+      dark:hover:from-gray-800 dark:hover:to-gray-700 dark:hover:bg-opacity-80">
+      {/* Icons: Absolutely positioned in the top-right */}
+      <div className="absolute top-2 right-2 flex space-x-2">
+        <a
+          href={project.githubLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub"
+        >
+          <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 mt-5 hover:text-blue-700 dark:hover:text-orange-500" />
+        </a>
+        {project.projectLink && project.projectLink.length > 0 && (
           <a
-            href={project.githubLink}
+            href={project.projectLink}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="GitHub"
+            aria-label="Live Project"
           >
-            <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
+            <ExternalLink className="w-5 h-5 text-blue-500 mt-5 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
           </a>
-          {project.projectLink && project.projectLink.length > 0 && (
-            <a
-              href={project.projectLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Live Project"
-            >
-              <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
-            </a>
-          )}
-        </div>
-
-        {/* TOP CONTENT: pinned to the top */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-2">
-            {project.title}
-          </h3>
-          <p className="text-sm text-gray-700 dark:text-gray-300">
-            {project.description}
-          </p>
-        </div>
-
-        {/* BOTTOM CONTENT: pinned to bottom using `mt-auto` */}
-        {project.skills && (
-          <div className="mt-auto pt-2">
-            <div className="flex flex-wrap gap-2">
-              {project.skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full"
-                >
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
         )}
       </div>
-    </BaseCard>
+
+      {/* Inner container: limited width and padded to align with About/Experience sections */}
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-[280px,1fr] gap-x-4 items-start">
+          {/* Left Column: Project Image */}
+          <div>
+            <img
+              src={project.imageUrl}
+              alt={project.title}
+              className="w-[280px] h-[160px] object-cover rounded-md"
+            />
+          </div>
+          {/* Right Column: Project Details */}
+          <div className="flex flex-col">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-2">
+              {project.title}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {project.description}
+            </p>
+            {project.skills && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {project.skills.map((skill) => (
+                  <span
+                    key={skill}
+                    className="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
