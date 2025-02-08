@@ -9,11 +9,21 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
+  // Clicking anywhere on the card (except inner links) will open the GitHub URL
+  const openGithub = (e: React.MouseEvent<HTMLDivElement>) => {
+    window.open(project.githubLink, "_blank");
+  };
+
   return (
-    <div className="max-w-[42rem] mx-auto w-full relative rounded-xl transition-all duration-300 ease-in-out 
-      hover:shadow-lg mb-6 
-      hover:bg-gradient-to-br hover:from-gray-100 hover:to-gray-200 hover:bg-opacity-80 
-      dark:hover:from-gray-800 dark:hover:to-gray-700 dark:hover:bg-opacity-80">
+    <div
+      onClick={openGithub}
+      role="link"
+      tabIndex={0}
+      className="max-w-[42rem] mx-auto w-full relative rounded-xl transition-all duration-300 ease-in-out 
+        hover:shadow-lg mb-6 cursor-pointer
+        hover:bg-gradient-to-br hover:from-gray-100 hover:to-gray-200 hover:bg-opacity-80 
+        dark:hover:from-gray-800 dark:hover:to-gray-700 dark:hover:bg-opacity-80"
+    >
       {/* Icons: Absolutely positioned in the top-right */}
       <div className="absolute top-2 right-2 flex space-x-2">
         <a
@@ -21,8 +31,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="GitHub"
+          onClick={(e) => e.stopPropagation()}
         >
-          <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 mt-5 hover:text-blue-700 dark:hover:text-orange-500" />
+          <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
         </a>
         {project.projectLink && project.projectLink.length > 0 && (
           <a
@@ -30,8 +41,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Live Project"
+            onClick={(e) => e.stopPropagation()}
           >
-            <ExternalLink className="w-5 h-5 text-blue-500 mt-5 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
+            <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
           </a>
         )}
       </div>

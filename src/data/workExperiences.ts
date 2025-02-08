@@ -22,7 +22,7 @@ export interface WorkExperience {
       period: "FEB - NOV 2024",
       description:
         "Led full-stack software solutions at Lilie, implementing robust front-end and back-end systems to foster innovation among Rice University students. Focused on scalable architecture, streamlined user experiences, and mobile integration to meet diverse user needs.",
-      companyUrl: "/lilie_logo.png",
+      companyUrl: "https://entrepreneurship.rice.edu/",
       skills: ["Entrepreneurship", "Innovation", "Full Stack", "Node.js", "React"],
     },
     {
@@ -32,7 +32,7 @@ export interface WorkExperience {
       period: "JUN - SEP 2024",
       description:
         "Created automated laytime calculations using Google Document AI, drastically cutting multi-day manual processes to minutes. Collaborated with major clients to refine shipping workflows, ensuring accurate demurrage cost calculations and maritime compliance.",
-      companyUrl: "/veson.png",
+      companyUrl: "https://veson.com/",
       skills: ["Python", "FastAPI", "Document AI", "Docker", "Client Engagement"],
     },
     {
@@ -42,7 +42,7 @@ export interface WorkExperience {
       period: "MAY - JUN 2024",
       description:
         "Developed advanced NLP solutions using BERT sentence transformers, accurately categorizing over 100,000 contact job titles. Optimized directory merging with FAISS-based similarity searches, boosting match precision by over 20%.",
-      companyUrl: "/vessels_value.png",
+      companyUrl: "https://www.vesselsvalue.com/",
       skills: ["Machine Learning", "NLP", "BERT", "FAISS", "Python"],
     },
     {
@@ -52,7 +52,7 @@ export interface WorkExperience {
       period: "2021 - 2023",
       description:
         "Helped build Veson Nautical’s first mobile app in Swift, providing real-time shipping data to enterprise clients. Gathered feedback in sprints, integrated changes quickly, and ensured a smooth user experience throughout development.",
-      companyUrl: "/veson.png",
+      companyUrl: "https://veson.com/",
       skills: ["Swift", "Xcode", "Mobile Dev", "Agile", "Atlassian Suite"],
     },
   ];
