@@ -79,9 +79,6 @@ export default function Header() {
             <button onClick={() => setIsOpen(!isOpen)} aria-label="Toggle Menu">
               {isOpen ? <HiOutlineX size={30} /> : <HiOutlineMenu size={30} />}
             </button>
-            <span className="text-gray-700 dark:text-gray-200 text-xl font-bold">
-              Mike Veson
-            </span>
           </div>
         </div>
       </div>
