@@ -1,13 +1,12 @@
 "use client";
 import React, { useRef, useState } from 'react';
+import Image from "next/image";
 
 type HomeContentProps = {
   imageContainerSize: string;
   imageSize: string;
   headingSize: string;
   subTextSize: string;
-  showSeeMore?: boolean;
-  onSeeMore?: () => void;
   containerClass?: string;
   textWrapperClass?: string;
 };
@@ -17,12 +16,10 @@ export default function HomeContent({
   imageSize,
   headingSize,
   subTextSize,
-  showSeeMore = false,
-  onSeeMore,
   containerClass = "flex flex-col items-center justify-start py-8 text-center",
   textWrapperClass = ""
 }: HomeContentProps) {
-  const [fadeOut, setFadeOut] = useState(false);
+  const [fadeOut] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const glareRef = useRef<HTMLDivElement>(null);
   const isFirstHover = useRef(true);
@@ -77,13 +74,6 @@ export default function HomeContent({
     isFirstHover.current = true;
   };
 
-  const handleSeeMoreClick = () => {
-    setFadeOut(true);
-    setTimeout(() => {
-      if (onSeeMore) onSeeMore();
-    }, 300);
-  };
-
   return (
     <section
       id="home"
@@ -98,7 +88,7 @@ export default function HomeContent({
           className="rounded-full p-1 bg-gradient-to-br from-orange-500 to-gray-100 dark:from-gray-800 dark:to-gray-700 inline-flex items-center justify-center shadow-xl"
         >
           <div className={`${imageContainerSize} rounded-full border-4 border-transparent relative inline-flex items-center justify-center`}>
-            <img src="/profile.png" alt="Mike Veson" className={`${imageSize} rounded-full`} />
+            <Image src="/profile.png" alt="Mike Veson" className={`${imageSize} rounded-full`} />
             <div ref={glareRef} className="absolute inset-0 rounded-full pointer-events-none" style={{ opacity: 0 }} />
           </div>
         </div>

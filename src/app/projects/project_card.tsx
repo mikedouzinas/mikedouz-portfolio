@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { ExternalLink } from "lucide-react";
 import { Project } from "@/data/projects";
+import Image from "next/image";
 
 interface ProjectCardProps {
   project: Project;
@@ -31,7 +32,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
   return (
     <div
-      onClick={(e) => window.open(project.githubLink, "_blank")}
+      onClick={() => window.open(project.githubLink, "_blank")}
       role="link"
       tabIndex={0}
       className="max-w-[42rem] mx-auto w-full relative rounded-xl transition-all duration-300 ease-in-out md:hover:shadow-lg mb-6 cursor-pointer md:hover:bg-gradient-to-br md:hover:from-gray-100 md:hover:to-gray-200 md:hover:bg-opacity-80 dark:md:hover:from-gray-800 dark:md:hover:to-gray-700 dark:md:hover:bg-opacity-80"
@@ -66,8 +67,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           }}
         >
           <div className="mt-6 md:mt-0">
-            <img
-              src={project.imageUrl}
+            <Image
+              src={project.imageUrl || "/path/to/default/image.jpg"}
               alt={project.title}
               className="w-full h-auto object-cover rounded-md"
             />

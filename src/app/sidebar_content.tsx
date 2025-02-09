@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import HomeContent from '../components/home_content';
-import { FaLinkedin, FaGithub, FaEnvelope, FaArrowRight } from 'react-icons/fa';
+import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 
 // Hook to detect the currently active section using Intersection Observer
 const useActiveSection = (sectionIds: string[]): string => {
@@ -63,7 +63,6 @@ export default function SidebarHome() {
                         imageSize="w-[13rem] h-[13rem]"
                         headingSize="text-4xl"
                         subTextSize="mt-2FaGithub text-lg"
-                        showSeeMore={false}
                         containerClass="flex flex-col items-start justify-start py-8"
                         textWrapperClass="mt-4 text-left"
                     />

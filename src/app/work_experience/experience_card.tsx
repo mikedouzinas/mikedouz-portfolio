@@ -8,7 +8,7 @@ interface ExperienceCardProps {
 
 export default function ExperienceCard({ item }: ExperienceCardProps) {
   // Clicking anywhere on the card (except on inner links) will open the company URL
-  const openCompanyUrl = (e: React.MouseEvent<HTMLDivElement>) => {
+  const openCompanyUrl = () => {
     window.open(item.companyUrl, "_blank");
   };
 

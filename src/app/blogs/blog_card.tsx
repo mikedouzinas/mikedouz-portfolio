@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import { Blog } from "@/data/blogs";
 
 interface BlogCardProps {
@@ -7,7 +8,7 @@ interface BlogCardProps {
 }
 
 export default function BlogCard({ blog }: BlogCardProps) {
-  const openBlog = (e: React.MouseEvent<HTMLDivElement>) => {
+  const openBlog = () => {
     window.open(blog.link, "_blank");
   };
 
@@ -22,7 +23,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
         <div className="flex flex-col-reverse md:grid md:grid-cols-[minmax(0,280px),1fr] gap-x-4 items-start">
           {/* Left Column: Blog Image */}
           <div>
-            <img
+            <Image 
               src={blog.imageUrl}
               alt={blog.title}
               className="w-full h-auto object-cover rounded-md"
