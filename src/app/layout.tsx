@@ -10,7 +10,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <title>My Portfolio</title>
       </head>
       <body>
-        <ThemeProvider attribute="class" defaultTheme="light">
+        <ThemeProvider attribute="class" defaultTheme="dark">
           {children}
         </ThemeProvider>
       </body>
