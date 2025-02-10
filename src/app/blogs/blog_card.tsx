@@ -23,10 +23,12 @@ export default function BlogCard({ blog }: BlogCardProps) {
         <div className="flex flex-col-reverse md:grid md:grid-cols-[minmax(0,280px),1fr] gap-x-4 items-start">
           {/* Left Column: Blog Image */}
           <div>
-            <Image 
+            <Image
               src={blog.imageUrl}
               alt={blog.title}
-              className="w-full h-auto object-cover rounded-md"
+              width={400}  // Adjust as needed
+              height={300} // Adjust as needed
+              className="rounded-md object-cover"
             />
           </div>
           {/* Right Column: Date and Title */}

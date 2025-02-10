@@ -70,7 +70,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <Image
               src={project.imageUrl || "/path/to/default/image.jpg"}
               alt={project.title}
-              className="w-full h-auto object-cover rounded-md"
+              width={400}
+              height={300}
+              className="rounded-md object-cover"
             />
           </div>
           <div className="flex flex-col" ref={textRef}>

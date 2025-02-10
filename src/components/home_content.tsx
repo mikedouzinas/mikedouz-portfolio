@@ -88,7 +88,13 @@ export default function HomeContent({
           className="rounded-full p-1 bg-gradient-to-br from-orange-500 to-gray-100 dark:from-gray-800 dark:to-gray-700 inline-flex items-center justify-center shadow-xl"
         >
           <div className={`${imageContainerSize} rounded-full border-4 border-transparent relative inline-flex items-center justify-center`}>
-            <Image src="/profile.png" alt="Mike Veson" className={`${imageSize} rounded-full`} />
+            <Image
+              src="/profile.png"
+              alt="Mike Veson"
+              width={150} // Adjust as needed
+              height={150} // Adjust as needed
+              className={`${imageSize} rounded-full`}
+            />
             <div ref={glareRef} className="absolute inset-0 rounded-full pointer-events-none" style={{ opacity: 0 }} />
           </div>
         </div>
