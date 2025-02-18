@@ -80,11 +80,10 @@ export default function SidebarHome() {
                                         className={`
               group flex items-center transition-all duration-300 ease-in-out 
               text-xs uppercase tracking-wide 
-              ${isActive ? 'text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-300'}`}>
-                                        <div
-                                            className={`transition-all duration-300 ease-in-out bg-gray-900 dark:bg-white 
-                ${isActive ? 'w-4 mr-4' : 'w-2 mr-2 group-hover:w-4 group-hover:mr-4'} h-4
-              `}
+              ${isActive ? 'text-[#ff7f32]' : 'text-gray-500 hover:text-gray-300'}`}>
+                                        <div className={`transition-all duration-300 ease-in-out ${isActive
+                                            ? 'bg-[#ff7f32] w-4 mr-4'
+                                            : 'bg-gray-900 dark:bg-white w-2 mr-2 group-hover:w-4 group-hover:mr-4'} h-4`}
                                         ></div>
                                         <span>{item.label}</span>
                                     </a>
@@ -96,28 +95,28 @@ export default function SidebarHome() {
             </div>
             {/* Social media icons aligned with the profile container */}
             <div className="w-48 mx-auto flex space-x-4">
-            <a
-              href="https://github.com/mikedouzinas"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
-            >
-              <FaGithub size={24} />
-            </a>
-            <a
-              href="https://www.linkedin.com/in/mikedouzinas"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
-            >
-              <FaLinkedin size={24} />
-            </a>
-            <a
-              href="mailto:mike@douzinas.com"
-              className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
-            >
-              <FaEnvelope size={24} />
-            </a>
+                <a
+                    href="https://github.com/mikedouzinas"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
+                >
+                    <FaGithub size={24} />
+                </a>
+                <a
+                    href="https://www.linkedin.com/in/mikedouzinas"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
+                >
+                    <FaLinkedin size={24} />
+                </a>
+                <a
+                    href="mailto:mike@douzinas.com"
+                    className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
+                >
+                    <FaEnvelope size={24} />
+                </a>
             </div>
         </div>
     );
