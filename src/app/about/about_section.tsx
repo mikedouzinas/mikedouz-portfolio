@@ -8,17 +8,18 @@ export default function AboutSection() {
     >
       <div className="max-w-2xl px-4 text-left leading-relaxed">
         <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
-          I’m Mike Veson, a proud <strong className="font-semibold">Greek-American</strong> currently pursuing a degree in <strong className="font-semibold">Computer Science</strong> with a focus on <strong className="font-semibold">design</strong> and <strong className="font-semibold">entrepreneurship</strong>. My heritage has shaped my perspective, fueling my passion for <strong className="font-semibold">community</strong> and <strong className="font-semibold">innovation</strong>. 
+          I’m <strong className="font-semibold">Mike Veson</strong>, a proud <strong className="font-semibold">Greek-American</strong> pursuing <strong className="font-semibold">Computer Science</strong> at Rice University with a focus on <strong className="font-semibold">design</strong> and <strong className="font-semibold">entrepreneurship</strong>. My family has inspired my passion for <strong className="font-semibold">community</strong> and <strong className="font-semibold">innovation</strong>, inspiring me to build collaborative, user-focused solutions.
         </p>
         <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
-          Outside the classroom, I’m an avid <strong className="font-semibold">football (soccer)</strong> enthusiast and FC Barcelona fan who loves the teamwork and dedication the sport demands. This spirit carries over into my coding projects, where I enjoy collaborating with others to design solutions that are both <strong className="font-semibold">user-centric</strong> and <strong className="font-semibold">visually compelling</strong>.
+          Outside the classroom, I’m a die-hard <strong className="font-semibold">football (soccer)</strong> fan and <strong className="font-semibold">FC Barcelona</strong> supporter. The passion and dedication in the sport reflect my approach to coding—I thrive in collaborative environments, working towards solutions that are both <strong className="font-semibold">innovative</strong> and <strong className="font-semibold">effective</strong>.
         </p>
         <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
-          My studies in <strong className="font-semibold">front-end development</strong> and <strong className="font-semibold">product design</strong> allow me to merge creativity with technical know-how, building tools and experiences that solve real-world problems. I’m particularly drawn to opportunities that blend <strong className="font-semibold">entrepreneurial thinking</strong> with hands-on development, as it encourages me to push boundaries and deliver meaningful results.
+          My focus on <strong className="font-semibold">front-end development</strong> and <strong className="font-semibold">product design</strong> merges technical expertise with aesthetics, allowing me to create intuitive, visually compelling experiences. I’m drawn to spaces where <strong className="font-semibold">entrepreneurial thinking</strong> meets hands-on development, pushing me to innovate and deliver meaningful results.
         </p>
         <p className="mb-0 text-md font-light text-gray-600 dark:text-gray-400">
-          Moving forward, I’m eager to keep expanding my knowledge and skill set, taking on projects where I can create <strong className="font-semibold">impactful</strong> digital experiences. Whether through coding, designing, or leading new ventures, I’m always ready to learn, grow, and collaborate with others who share my passion for <strong className="font-semibold">innovation</strong>.
+          Looking ahead, I’m eager to keep improving my skills and applying them to projects that drive the world forward. Whether through <strong className="font-semibold">coding</strong>, <strong className="font-semibold">design</strong>, or <strong className="font-semibold">entrepreneurship</strong>, I’m committed to continuous learning and building solutions that leave a lasting mark.
         </p>
+
       </div>
     </section>
   );

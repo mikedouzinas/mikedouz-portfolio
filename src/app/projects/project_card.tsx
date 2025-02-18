@@ -87,7 +87,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 {project.skills.map((skill) => (
                   <span
                     key={skill}
-                    className="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full"
+                    className="px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 dark:bg-gradient-to-r dark:from-blue-900 dark:to-blue-700 dark:bg-opacity-50 dark:text-blue-300"
                   >
                     {skill}
                   </span>
