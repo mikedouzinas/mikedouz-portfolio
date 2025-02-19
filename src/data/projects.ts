@@ -32,7 +32,22 @@ export const projects: Project[] = [
   },
   {
     id: "3",
-    imageUrl: "/project3.png", // Placeholder image, see suggestions below
+    imageUrl: "/project3.png", // Consider using an app mockup or a waveform visualization as the image
+    title: "Momentum",
+    description:
+      "Momentum is a SwiftUI-powered iOS app that captures and transcribes audio in real-time while also integrating an advanced Text-to-Speech system. It leverages OpenAI's GPT-4 to intelligently process and execute tasks based on voice commands, such as adding reminders, setting calendar events, and managing to-do lists. The adaptive TTS system ensures low latency and seamless speech output, optimizing response quality through predictive modeling.",
+    githubLink: "https://github.com/mikedouzinas/momentum",
+    skills: [
+      "SwiftUI",
+      "Speech Recognition",
+      "Text-to-Speech (TTS)",
+      "Predictive Modeling",
+      "AI Task Automation",
+    ],
+  },  
+  {
+    id: "4",
+    imageUrl: "/project4.png", // Placeholder image, see suggestions below
     title: "Personal Portfolio",
     description:
       "Designed and developed a full-stack personal portfolio using Next.js, TypeScript, and Tailwind CSS, showcasing projects, experience, and skills. Integrated dark mode, smooth animations with Framer Motion, and accessibility enhancements for an optimized user experience.",
