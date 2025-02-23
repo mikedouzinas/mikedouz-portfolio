@@ -47,7 +47,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             alt={project.title}
             width={400}
             height={300}
-            className="rounded-md object-cover w-full h-auto min-w-[150px]"
+            className="rounded-md object-cover w-[50%] md:w-full h-auto min-w-[150px]"
           />
         </div>
         <div className="flex flex-col">

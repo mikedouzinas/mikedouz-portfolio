@@ -79,7 +79,7 @@ export default function HomeContent({
       id="home"
       className={`${containerClass} transition-opacity duration-300 ${fadeOut ? 'opacity-0' : 'opacity-100'} bg-gray-50 dark:bg-gray-900`}
     >
-      <div className="inline-block relative sm:w-auto w-full sm:block flex justify-center">
+      <div className="inline-block relative">
         <div
           ref={containerRef}
           onMouseEnter={handleMouseEnter}
@@ -100,7 +100,7 @@ export default function HomeContent({
         </div>
       </div>
       <div className="py-4" />
-      <div className={`${textWrapperClass} sm:w-auto w-full flex flex-col items-center sm:items-start`}>
+      <div className={textWrapperClass}>
         <h1 className={`${headingSize} font-bold text-gray-800 dark:text-gray-200`}>Mike Veson</h1>
         <p className={`${subTextSize} text-gray-600 dark:text-gray-400`}>
           Elevating <strong>Ideas into Impact.</strong>
