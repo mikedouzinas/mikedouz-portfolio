@@ -91,8 +91,8 @@ export default function HomeContent({
             <Image
               src="/profile.png"
               alt="Mike Veson"
-              width={150} // Adjust as needed
-              height={150} // Adjust as needed
+              width={150}
+              height={150}
               className={`${imageSize} rounded-full`}
             />
             <div ref={glareRef} className="absolute inset-0 rounded-full pointer-events-none" style={{ opacity: 0 }} />

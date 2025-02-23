@@ -35,7 +35,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       onClick={() => window.open(project.githubLink, "_blank")}
       role="link"
       tabIndex={0}
-      className="max-w-[42rem] mx-auto w-full relative rounded-xl transition-all duration-300 ease-in-out md:hover:shadow-lg mb-6 cursor-pointer md:hover:bg-gradient-to-br md:hover:from-gray-100 md:hover:to-gray-200 md:hover:bg-opacity-80 dark:md:hover:from-gray-800 dark:md:hover:to-gray-700 dark:md:hover:bg-opacity-80"
+      className="max-w-[42rem] mx-auto w-full relative rounded-xl md:hover:shadow-lg mb-6 cursor-pointer md:hover:bg-gradient-to-br md:hover:from-gray-100 md:hover:to-gray-200 md:hover:bg-opacity-80 dark:md:hover:from-gray-800 dark:md:hover:to-gray-700 dark:md:hover:bg-opacity-80"
     >
       <div className="absolute top-2 right-2 flex space-x-2">
         <a

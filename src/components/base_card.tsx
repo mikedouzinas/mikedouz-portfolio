@@ -13,7 +13,6 @@ interface BaseCardProps extends MotionProps {
 export default function BaseCard({
   children,
   className,
-  // Provide some default transitions
   initial = { opacity: 0, y: 10 },
   animate = { opacity: 1, y: 0 },
   exit = { opacity: 0, y: -10 },
