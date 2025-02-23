@@ -41,7 +41,7 @@ export default function BaseCard({
       transition={transition}
       className={clsx(
         "max-w-[42rem] mx-auto w-full relative rounded-xl",
-        "md:hover:shadow-lg mb-6 cursor-pointer",
+        "md:hover:shadow-lg mb-6 cursor-pointer group",
         "md:hover:bg-gradient-to-br md:hover:from-gray-100 md:hover:to-gray-200 md:hover:bg-opacity-80",
         "dark:md:hover:from-gray-800 dark:md:hover:to-gray-700 dark:md:hover:bg-opacity-80",
         className

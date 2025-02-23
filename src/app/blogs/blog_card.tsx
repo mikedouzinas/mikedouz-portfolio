@@ -30,7 +30,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="text-lg font-semibold text-gray-900 dark:text-gray-200 hover:underline"
+            className="text-lg font-semibold text-gray-900 dark:text-gray-200 group-hover:text-blue-800 dark:group-hover:text-blue-300 hover:underline"
           >
             {blog.title}
           </a>

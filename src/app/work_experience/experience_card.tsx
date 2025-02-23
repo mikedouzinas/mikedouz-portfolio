@@ -15,7 +15,9 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
           {item.period}
         </div>
         <div className="flex flex-col flex-1">
-          <h3 className="text-xl">{item.title}</h3>
+          <h3 className="text-xl text-gray-900 dark:text-gray-200 group-hover:text-blue-800 dark:group-hover:text-blue-300">
+            {item.title}
+          </h3>
           <div className="mb-2 text-sm">
             <a
               href={item.companyUrl}
