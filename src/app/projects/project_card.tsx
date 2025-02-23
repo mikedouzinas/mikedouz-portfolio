@@ -11,26 +11,6 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const [imageWidth, setImageWidth] = useState(280);
-  const textRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const checkTextLines = () => {
-      if (textRef.current) {
-        const computedStyle = window.getComputedStyle(textRef.current);
-        const lineHeight = parseFloat(computedStyle.lineHeight);
-        const textHeight = textRef.current.clientHeight;
-        const lines = textHeight / lineHeight;
-        // If text wraps more than 5 lines, shrink the image column
-        setImageWidth(lines > 7 ? 200 : 280);
-      }
-    };
-
-    checkTextLines();
-    window.addEventListener("resize", checkTextLines);
-    return () => window.removeEventListener("resize", checkTextLines);
-  }, [project.description]);
-
   return (
     <BaseCard href={project.githubLink}>
       <div className="absolute top-2 right-2 flex space-x-2">
@@ -58,7 +38,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       <div
         className="flex flex-col-reverse md:grid gap-x-4 items-start"
         style={{
-          gridTemplateColumns: `minmax(0, ${imageWidth}px) 1fr`,
+          gridTemplateColumns: "minmax(150px, 220px) minmax(265px, 1fr)",
         }}
       >
         <div className="mt-6 md:mt-0">
@@ -67,10 +47,10 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             alt={project.title}
             width={400}
             height={300}
-            className="rounded-md object-cover"
+            className="rounded-md object-cover w-full h-auto min-w-[150px]"
           />
         </div>
-        <div className="flex flex-col" ref={textRef}>
+        <div className="flex flex-col">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-2">
             {project.title}
           </h3>
@@ -78,11 +58,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             {project.description}
           </p>
           {project.skills && (
-            <div className="flex flex-wrap gap-2 mt-4">
+            <div className="flex flex-wrap gap-1 sm:gap-2 mt-4">
               {project.skills.map((skill) => (
                 <span
                   key={skill}
-                  className="px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 dark:bg-gradient-to-r dark:from-blue-900 dark:to-blue-700 dark:bg-opacity-50 dark:text-blue-300"
+                  className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 dark:bg-gradient-to-r dark:from-blue-900 dark:to-blue-700 dark:bg-opacity-50 dark:text-blue-300"
                 >
                   {skill}
                 </span>

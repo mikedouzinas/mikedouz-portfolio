@@ -35,7 +35,7 @@ export const projects: Project[] = [
     imageUrl: "/project3.png", // Consider using an app mockup or a waveform visualization as the image
     title: "Momentum",
     description:
-      "Momentum is a SwiftUI-powered iOS app that captures and transcribes audio in real-time while also integrating an advanced Text-to-Speech system. It leverages OpenAI's GPT-4 to intelligently process and execute tasks based on voice commands, such as adding reminders, setting calendar events, and managing to-do lists. The adaptive TTS system ensures low latency and seamless speech output, optimizing response quality through predictive modeling.",
+      "Momentum is a SwiftUI-powered iOS app that captures and transcribes audio in real-time, integrates advanced Text-to-Speech, and leverages OpenAI's GPT-4 to process voice commands for tasks like reminders, calendar events, and to-do lists. The adaptive TTS system ensures low latency and seamless speech output, optimizing response quality through predictive modeling.",
     githubLink: "https://github.com/mikedouzinas/momentum",
     skills: [
       "SwiftUI",
