@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { FaGithub } from "react-icons/fa";
 import { ExternalLink } from "lucide-react";
 import { Project } from "@/data/projects";
