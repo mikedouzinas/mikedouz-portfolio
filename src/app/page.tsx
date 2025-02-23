@@ -18,21 +18,28 @@ export default function Home() {
     }
   };
 
+  // Add this function to pass to SidebarHome
+  const scrollToTop = () => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
       <MouseGlow />
       <div className="flex">
         {/* Desktop Sidebar */}
         <aside onWheel={handleSidebarWheel} className="hidden md:block fixed inset-y-0 left-0 w-1/3">
-          <SidebarHome />
+          <SidebarHome scrollToTop={scrollToTop} />
         </aside>
         {/* Main Content */}
         <main ref={mainRef} className="ml-0 md:ml-[33.3333%] w-full p-8 overflow-y-auto md:h-screen">
           {/* Mobile Header: visible only on small screens */}
           <div className="md:hidden mb-4">
-            <SidebarHome />
+            <SidebarHome scrollToTop={scrollToTop} />
           </div>
-          <section id="about">
+          <section id="about" className="mt-16">
             <About />
           </section>
           <section id="experience" className="mt-16">

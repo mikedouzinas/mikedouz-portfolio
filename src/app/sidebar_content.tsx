@@ -35,7 +35,11 @@ const useActiveSection = (sectionIds: string[]): string => {
     return activeSection;
 };
 
-export default function SidebarHome() {
+interface SidebarHomeProps {
+    scrollToTop: () => void;
+}
+
+const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
     const navItems = [
         { id: 'about', label: 'About' },
         { id: 'experience', label: 'Experience' },
@@ -47,9 +51,13 @@ export default function SidebarHome() {
     // Smooth scrolling handler
     const handleNavClick = (id: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
-        const element = document.getElementById(id);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
+        if (id === 'about') {
+            scrollToTop();
+        } else {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
         }
     };
 
@@ -120,5 +128,7 @@ export default function SidebarHome() {
             </div>
         </div>
     );
-}
+};
+
+export default SidebarHome;
 
