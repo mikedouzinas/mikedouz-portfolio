@@ -80,9 +80,9 @@ export default function SidebarHome() {
                                         className={`
               group flex items-center transition-all duration-300 ease-in-out 
               text-xs uppercase tracking-wide 
-              ${isActive ? 'text-[#ff7f32]' : 'text-gray-500 hover:text-gray-300'}`}>
+              ${isActive ? 'text-[#ff7f32] dark:text-blue-500' : 'text-gray-500 hover:text-[#ff7f32] dark:hover:text-blue-500'}`}>
                                         <div className={`transition-all duration-300 ease-in-out ${isActive
-                                            ? 'bg-[#ff7f32] w-4 mr-4'
+                                            ? 'bg-[#ff7f32] dark:bg-blue-500 w-4 mr-4'
                                             : 'bg-gray-900 dark:bg-white w-2 mr-2 group-hover:w-4 group-hover:mr-4'} h-4`}
                                         ></div>
                                         <span>{item.label}</span>
@@ -99,7 +99,7 @@ export default function SidebarHome() {
                     href="https://github.com/mikedouzinas"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
+                    className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
                 >
                     <FaGithub size={24} />
                 </a>
@@ -107,13 +107,13 @@ export default function SidebarHome() {
                     href="https://www.linkedin.com/in/mikedouzinas"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
+                    className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
                 >
                     <FaLinkedin size={24} />
                 </a>
                 <a
                     href="mailto:mike@douzinas.com"
-                    className="text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
+                    className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
                 >
                     <FaEnvelope size={24} />
                 </a>
