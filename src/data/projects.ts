@@ -47,11 +47,19 @@ export const projects: Project[] = [
   },  
   {
     id: "4",
-    imageUrl: "/project4.png", // Placeholder image, see suggestions below
+    imageUrl: "/project4.png", 
     title: "Personal Portfolio",
     description:
       "Designed and developed a full-stack personal portfolio using Next.js, TypeScript, and Tailwind CSS, showcasing projects, experience, and skills. Integrated dark mode, smooth animations with Framer Motion, and accessibility enhancements for an optimized user experience.",
     githubLink: "https://github.com/mikedouzinas/mikedouz-portfolio",
     skills: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion", "UI/UX Design"],
   },
+  {
+    "id": "5",
+    "imageUrl": "/project5.png",
+    "title": "HiLiTe - Soccer Highlight Generator",
+    "description": "Developed a machine learning pipeline that transforms full-length soccer matches into engaging highlight reels with AI-generated commentary. Led the commentary generation stage using BLIP-2 vision-language models to analyze key moments and produce natural, sports-style descriptions. Implemented frame extraction, visual context processing, and integration with language models to create dynamic soccer commentary.",
+    "githubLink": "https://github.com/mikedouzinas/HiLiTe.git",
+    "skills": ["Python", "Computer Vision", "BLIP-2", "Sports Analytics", "Video Processing"]
+  }
 ];

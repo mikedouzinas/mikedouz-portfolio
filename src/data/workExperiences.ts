@@ -17,6 +17,16 @@ export interface WorkExperience {
   export const workExperiences: WorkExperience[] = [
     {
       id: "1",
+      title: "Software Engineer Intern",
+      company: "Parsons Corporation",
+      period: "MAY - AUG 2025",
+      description:
+        "Full-Stack Development for technology-focused defense, intelligence, and infrastructure engineering firm.",
+      companyUrl: "https://www.parsons.com/",
+      skills: ["Full Stack", "TypeScript", "Node.js", "Security", "Cloud Infrastructure", "DevOps"],
+    },
+    {
+      id: "2",
       title: "Software Engineer in Residence",
       company: "Liu Idea Lab for Innovation & Entrepreneurship",
       period: "FEB - NOV 2024",
@@ -26,7 +36,7 @@ export interface WorkExperience {
       skills: ["Entrepreneurship", "Innovation", "Full Stack", "Node.js", "React"],
     },
     {
-      id: "2",
+      id: "3",
       title: "Software Engineering Intern",
       company: "Veson Nautical",
       period: "JUN - SEP 2024",
@@ -36,7 +46,7 @@ export interface WorkExperience {
       skills: ["Python", "FastAPI", "Document AI", "Docker", "Client Engagement"],
     },
     {
-      id: "3",
+      id: "4",
       title: "Data Science Intern",
       company: "VesselsValue",
       period: "MAY - JUN 2024",
@@ -46,12 +56,12 @@ export interface WorkExperience {
       skills: ["Machine Learning", "NLP", "BERT", "FAISS", "Python"],
     },
     {
-      id: "4",
+      id: "5",
       title: "Software Development Intern",
       company: "Veson Nautical",
       period: "2021 - 2023",
       description:
-        "Helped build Veson Nautical’s first mobile app in Swift, providing real-time shipping data to enterprise clients. Gathered feedback in sprints, integrated changes quickly, and ensured a smooth user experience throughout development.",
+        "Helped build Veson Nautical's first mobile app in Swift, providing real-time shipping data to enterprise clients. Gathered feedback in sprints, integrated changes quickly, and ensured a smooth user experience throughout development.",
       companyUrl: "https://veson.com/",
       skills: ["Swift", "Xcode", "Mobile Dev", "Agile", "Atlassian Suite"],
     },
