@@ -12,12 +12,13 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    "id": "1",
-    "imageUrl": "/HiLiTe.png",
-    "title": "HiLiTe",
-    "description": "Developed a machine learning pipeline that transforms full-length soccer matches into engaging highlight reels with AI-generated commentary. Led the commentary generation stage using BLIP-2 vision-language models to analyze key moments and produce natural, sports-style descriptions. Implemented frame extraction, visual context processing, and integration with language models to create dynamic soccer commentary.",
-    "githubLink": "https://github.com/mikedouzinas/HiLiTe.git",
-    "skills": ["Python", "Computer Vision", "BLIP-2", "Sports Analytics", "Video Processing"]
+    id: "1",
+    imageUrl: "/HiLiTe.png",
+    title: "HiLiTe",
+    description: "Developed a machine learning pipeline that transforms full-length soccer matches into engaging highlight reels with AI-generated commentary. Led the commentary generation stage using BLIP-2 vision-language models to analyze key moments and produce natural, sports-style descriptions. Implemented frame extraction, visual context processing, and integration with language models to create dynamic soccer commentary.",
+    githubLink: "https://github.com/mikedouzinas/HiLiTe.git",
+    projectLink: "https://drive.google.com/drive/folders/1RbYaJtlQUq2LSUwuK25WHB8cJdrdIkr8?usp=sharing",
+    skills: ["Python", "Computer Vision", "BLIP-2", "Sports Analytics", "Video Processing"]
   },  
   {
     id: "2",
@@ -35,7 +36,6 @@ export const projects: Project[] = [
     description:
       "I developed a machine learning project to predict outcomes for Euro 2024 matches by web scraping comprehensive datasets and processing them with Pandas. Using a RandomForestClassifier, the model forecasts expected goals and final scores, landing in the top ~3% of UEFA predictions.",
     githubLink: "https://github.com/mikedouzinas/euros-predictor",
-    projectLink: "https://drive.google.com/drive/folders/1RbYaJtlQUq2LSUwuK25WHB8cJdrdIkr8?usp=sharing",
     skills: ["Python", "Pandas", "RandomForestClassifier", "Web Scraping"],
   },
   {
