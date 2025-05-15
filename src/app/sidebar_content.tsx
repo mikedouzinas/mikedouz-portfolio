@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import HomeContent from '../components/home_content';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
+import { SiCalendly } from 'react-icons/si';
 
 // Hook to detect the currently active section using Intersection Observer
 const useActiveSection = (sectionIds: string[]): string => {
@@ -124,6 +125,14 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                     className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
                 >
                     <FaEnvelope size={24} />
+                </a>
+                <a
+                    href="https://fantastical.app/mikeveson/mikeveson-meeting"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
+                >
+                    <SiCalendly size={24} />
                 </a>
             </div>
         </div>

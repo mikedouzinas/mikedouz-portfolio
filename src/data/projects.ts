@@ -35,6 +35,7 @@ export const projects: Project[] = [
     description:
       "I developed a machine learning project to predict outcomes for Euro 2024 matches by web scraping comprehensive datasets and processing them with Pandas. Using a RandomForestClassifier, the model forecasts expected goals and final scores, landing in the top ~3% of UEFA predictions.",
     githubLink: "https://github.com/mikedouzinas/euros-predictor",
+    projectLink: "https://drive.google.com/drive/folders/1RbYaJtlQUq2LSUwuK25WHB8cJdrdIkr8?usp=sharing",
     skills: ["Python", "Pandas", "RandomForestClassifier", "Web Scraping"],
   },
   {
