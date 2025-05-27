@@ -1,5 +1,4 @@
 "use client";
-import { motion } from 'framer-motion';
 import { usePageTransition } from '@/components/PageTransition';
 import PageTransition from '@/components/PageTransition';
 
