@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import HomeContent from '../components/home_content';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { SiCalendly } from 'react-icons/si';
+import BoredButton from '../components/BoredButton';
 
 // Hook to detect the currently active section using Intersection Observer
 const useActiveSection = (sectionIds: string[]): string => {
@@ -103,37 +104,40 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                 </nav>
             </div>
             {/* Social media icons aligned with the profile container */}
-            <div className="w-48 mx-auto flex space-x-4">
-                <a
-                    href="https://github.com/mikedouzinas"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
-                >
-                    <FaGithub size={24} />
-                </a>
-                <a
-                    href="https://www.linkedin.com/in/mikedouzinas"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
-                >
-                    <FaLinkedin size={24} />
-                </a>
-                <a
-                    href="mailto:mike@douzinas.com"
-                    className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
-                >
-                    <FaEnvelope size={24} />
-                </a>
-                <a
-                    href="https://fantastical.app/mikeveson/mikeveson-meeting"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
-                >
-                    <SiCalendly size={24} />
-                </a>
+            <div className="w-48 mx-auto">
+                <BoredButton />
+                <div className="flex space-x-4">
+                    <a
+                        href="https://github.com/mikedouzinas"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
+                    >
+                        <FaGithub size={24} />
+                    </a>
+                    <a
+                        href="https://www.linkedin.com/in/mikedouzinas"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
+                    >
+                        <FaLinkedin size={24} />
+                    </a>
+                    <a
+                        href="mailto:mike@douzinas.com"
+                        className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
+                    >
+                        <FaEnvelope size={24} />
+                    </a>
+                    <a
+                        href="https://fantastical.app/mikeveson/mikeveson-meeting"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"
+                    >
+                        <SiCalendly size={24} />
+                    </a>
+                </div>
             </div>
         </div>
     );
