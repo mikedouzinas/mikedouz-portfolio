@@ -2,6 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CSS-based page transitions */
+html {
+  view-transition-name: root;
+}
+
+/* Smooth page transitions using CSS View Transitions API */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Fallback for browsers that don't support View Transitions */
+  body {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  body.page-transition {
+    opacity: 0;
+  }
+}
+
 .header {
     @apply fixed top-0 w-full bg-white dark:bg-gray-900 shadow-md z-50;
   }

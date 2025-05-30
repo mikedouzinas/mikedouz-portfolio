@@ -1,5 +1,5 @@
 import { TileType, CellType, PlacedTile } from '../types';
-import { LETTER_DISTRIBUTION, BOARD_SIZE } from '../constants';
+import { LETTER_DISTRIBUTION } from '../constants';
 
 // Create letter bag
 export const createLetterBag = (): TileType[] => {

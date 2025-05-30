@@ -1,11 +1,11 @@
 import React, { useContext, useEffect } from 'react';
 import { GameContext } from '../../context/GameContext';
-import { usePageTransition } from '@/components/PageTransition';
+import { useRouter } from 'next/navigation';
 import { GAME_CONFIG } from '../../constants';
 
 export const EndScreen: React.FC = () => {
   const context = useContext(GameContext);
-  const { transitionTo } = usePageTransition();
+  const router = useRouter();
   
   // Move useEffect to top level and make it conditional inside
   useEffect(() => {
@@ -67,10 +67,10 @@ export const EndScreen: React.FC = () => {
             See Leaderboard
           </button>
           <button
-            onClick={() => transitionTo('/')}
-            className="w-full px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold"
+            onClick={() => router.push('/')}
+            className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
           >
-            Back to Portfolio
+            Back to Home
           </button>
         </div>
       </div>

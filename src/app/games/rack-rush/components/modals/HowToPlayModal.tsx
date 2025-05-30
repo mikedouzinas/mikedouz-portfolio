@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { GameContext } from '../../context/GameContext';
-import { usePageTransition } from '@/components/PageTransition';
+import { useRouter } from 'next/navigation';
 import { GameMode } from '../../types';
 
 export const HowToPlayModal: React.FC = () => {
   const context = useContext(GameContext);
-  const { transitionTo } = usePageTransition();
+  const router = useRouter();
   
   if (!context) return null;
   
@@ -17,7 +17,7 @@ export const HowToPlayModal: React.FC = () => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-2xl mx-4 relative">
         <button
-          onClick={() => transitionTo('/')}
+          onClick={() => router.push('/')}
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           ✕

@@ -1,12 +1,12 @@
 "use client";
 import { motion } from 'framer-motion';
-import { usePageTransition } from './PageTransition';
+import { useRouter } from 'next/navigation';
 
 export default function BoredButton() {
-  const { transitionTo } = usePageTransition();
+  const router = useRouter();
 
   const handleClick = () => {
-    transitionTo('/games');
+    router.push('/games');
   };
 
   return (
@@ -19,7 +19,7 @@ export default function BoredButton() {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
-      Psst! Try <strong>Rack Rush</strong>
+    Try <strong>Rack Rush</strong> here!
     </motion.button>
   );
 } 

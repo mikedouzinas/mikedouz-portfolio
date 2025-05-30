@@ -1,4 +1,4 @@
-import { CellType, TileType, PlacedTile } from '../types';
+import { CellType, PlacedTile } from '../types';
 import { BOARD_SIZE, PREMIUM_LAYOUT } from '../constants';
 
 // Create empty board

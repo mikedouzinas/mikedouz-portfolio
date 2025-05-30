@@ -1,21 +1,25 @@
 // Words database for O(1) word lookup
+// NOTE: This module only loads the dictionary on the client (browser) using fetch.
 let wordSet: Set<string> | null = null;
 let loadingPromise: Promise<Set<string>> | null = null;
 
 /**
  * Load all words from the TWL06 dictionary file into a Set for O(1) lookup
+ * Only works in the browser (client-side).
  */
 export const loadWordDatabase = async (): Promise<Set<string>> => {
   // Return existing promise if already loading
   if (loadingPromise) {
     return loadingPromise;
   }
-  
   // Return cached set if already loaded
   if (wordSet) {
     return wordSet;
   }
-  
+  // Only run on client
+  if (typeof window === 'undefined') {
+    throw new Error('Word database can only be loaded on the client (browser)');
+  }
   // Start loading
   loadingPromise = (async () => {
     try {
@@ -23,13 +27,10 @@ export const loadWordDatabase = async (): Promise<Set<string>> => {
       if (!response.ok) {
         throw new Error(`Failed to load word database: ${response.statusText}`);
       }
-      
       const text = await response.text();
-      const words = text.trim().split('\n').map(word => word.trim().toUpperCase());
-      
+      const words = text.trim().split('\n').map((word: string) => word.trim().toUpperCase());
       wordSet = new Set(words);
       console.log(`Loaded ${wordSet.size} words into dictionary`);
-      
       return wordSet;
     } catch (error) {
       console.error('Error loading word database:', error);
@@ -38,7 +39,6 @@ export const loadWordDatabase = async (): Promise<Set<string>> => {
       return wordSet;
     }
   })();
-  
   return loadingPromise;
 };
 
@@ -76,5 +76,7 @@ export const isDatabaseLoaded = (): boolean => {
 };
 
 // Pre-load the database when this module is imported (optional)
-// You can comment this out if you prefer to load on-demand
-loadWordDatabase().catch(console.error); 
+// Only runs on client
+if (typeof window !== 'undefined') {
+  loadWordDatabase().catch(console.error);
+} 

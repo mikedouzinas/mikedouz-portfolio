@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useContext, useCallback, DragEvent } from 'react';
+import React, { useState, useEffect, useContext, useCallback, DragEvent, useRef } from 'react';
 import { GameContext } from '../context/GameContext';
 import { TileType, CellType } from '../types';
 import { BOARD_SIZE } from '../constants';
@@ -11,6 +11,7 @@ export const Board: React.FC = () => {
   const [selectedPosition, setSelectedPosition] = useState<{ row: number; col: number } | null>(null);
   const [direction, setDirection] = useState<'right' | 'down' | 'none'>('none');
   const [isDraggingToRack, setIsDraggingToRack] = useState(false);
+  const prevPlacedTilesLength = useRef(0);
 
   // Helper function to find the last placed tile in the current sequence
   const findLastPlacedTileInSequence = useCallback((currentPos: { row: number; col: number }, dir: 'right' | 'down' | 'none') => {
@@ -177,14 +178,17 @@ export const Board: React.FC = () => {
   useEffect(() => {
     if (!context) return;
     
-    // Only reset when a word is submitted (placedTiles becomes empty after submission)
-    // or when the game phase changes
-    if (context.state.placedTiles.length === 0 && context.state.phase === 'play') {
+    const currentPlacedTilesLength = context.state.placedTiles.length;
+    
+    // Only reset when we transition from having tiles to no tiles (word was submitted)
+    if (currentPlacedTilesLength === 0 && prevPlacedTilesLength.current > 0 && context.state.phase === 'play') {
       setSelectedPosition(null);
       setDirection('none');
-      return;
     }
-  }, [context?.state.placedTiles.length, context?.state.phase]);
+    
+    // Update the ref for next render
+    prevPlacedTilesLength.current = currentPlacedTilesLength;
+  }, [context?.state.placedTiles.length, context?.state.phase, context]);
 
   if (!context) return null;
   

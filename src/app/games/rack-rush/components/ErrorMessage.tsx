@@ -3,9 +3,6 @@ import { GameContext } from '../context/GameContext';
 
 export const ErrorMessage: React.FC = () => {
   const context = useContext(GameContext);
-  if (!context) return null;
-  
-  const { state } = context;
   
   useEffect(() => {
     // Add animation styles if not already present
@@ -30,7 +27,9 @@ export const ErrorMessage: React.FC = () => {
       }
     }
   }, []);
-  
+
+  if (!context) return null;
+  const { state } = context;
   if (!state.errorMessage) return null;
   
   return (
