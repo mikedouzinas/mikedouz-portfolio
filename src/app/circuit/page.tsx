@@ -1013,22 +1013,14 @@ const Board: React.FC = () => {
   useEffect(() => {
     if (!context) return;
     
-    if (context.state.placedTiles.length === 0) {
+    // Only reset when a word is submitted (placedTiles becomes empty after submission)
+    // or when the game phase changes
+    if (context.state.placedTiles.length === 0 && context.state.phase === 'play') {
       setSelectedPosition(null);
       setDirection('none');
       return;
     }
-    
-    // Also clear selection if no tiles are available in rack
-    const availableRackTiles = context.state.rack.filter(tile => 
-      !context.state.placedTiles.some(p => p.tile.id === tile.id)
-    );
-    
-    if (availableRackTiles.length === 0) {
-      setSelectedPosition(null);
-      setDirection('none');
-    }
-  }, [context]);
+  }, [context?.state.placedTiles.length, context?.state.phase]);
 
   if (!context) return null;
   
