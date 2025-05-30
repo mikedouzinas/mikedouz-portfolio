@@ -6,7 +6,7 @@ export default function BoredButton() {
   const { transitionTo } = usePageTransition();
 
   const handleClick = () => {
-    transitionTo('/circuit');
+    transitionTo('/games');
   };
 
   return (
