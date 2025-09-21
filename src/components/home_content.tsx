@@ -103,7 +103,7 @@ export default function HomeContent({
       <div className={textWrapperClass}>
         <h1 className={`${headingSize} font-bold text-gray-800 dark:text-gray-200`}>Mike Veson</h1>
         <p className={`${subTextSize} text-gray-600 dark:text-gray-400`}>
-          Channeling <strong>Creativity into Motion.</strong>
+        Shaping <strong>Creativity into Momentum.</strong>
         </p>
       </div>
     </section>

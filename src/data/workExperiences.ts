@@ -21,9 +21,9 @@ export interface WorkExperience {
       company: "Parsons Corporation",
       period: "MAY - AUG 2025",
       description:
-        "Full-Stack Development for technology-focused defense, intelligence, and infrastructure engineering firm.",
+        "Developed and improved services in C#/.NET that integrated external APIs with SQL databases and AWS infrastructure, powering Power BI dashboards for Air Force users.",
       companyUrl: "https://www.parsons.com/",
-      skills: ["Full Stack", "TypeScript", "Node.js", "Security", "Cloud Infrastructure", "DevOps"],
+      skills: ["C#", ".NET", "SQL", "AWS", "PowerBI","APIs", "Data Integration"],
     },
     {
       id: "2",
