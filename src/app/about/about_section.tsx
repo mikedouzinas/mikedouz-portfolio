@@ -32,7 +32,7 @@ export default function AboutSection() {
           </p>
 
           <p className="mb-4 text-md font-light text-gray-600 dark:text-gray-400">
-            I'm a fast learner, I break down big problems into clear steps, and always
+            I&apos;m a fast learner, I break down big problems into clear steps, and always
             put users first. I&apos;ve worked everywhere from shipping software to
             defense, usually in software engineering, product, and client-facing
             roles. My primary technical skillset spans{" "}
