@@ -5,7 +5,6 @@ import About from './about/about_section';
 import Experience from './work_experience/work_experiences';
 import Projects from './projects/projects';
 import Blogs from './blogs/blogs_section';
-import ThemeToggle from '@/components/theme_toggle';
 import MouseGlow from '@/components/mouse_glow';
 
 export default function Home() {
@@ -51,7 +50,6 @@ export default function Home() {
           <section id="blogs" className="mt-16">
             <Blogs />
           </section>
-          <ThemeToggle />
         </main>
       </div>
     </div>

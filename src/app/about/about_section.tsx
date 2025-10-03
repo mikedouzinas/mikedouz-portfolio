@@ -56,7 +56,7 @@ export default function AboutSection() {
             improving my Greek and Spanish.
           </p>
 
-          <p className="mb-0 text-md font-light text-gray-600 dark:text-gray-400">
+          <p className="mb-6 text-md font-light text-gray-600 dark:text-gray-400">
             Long-term, I want to build products that meaningfully help people
             at scale. If you&apos;re working on challenges in{" "}
             <strong className="font-semibold">big tech</strong> 🖥️,{" "}
@@ -67,6 +67,7 @@ export default function AboutSection() {
             <strong className="font-semibold">fast output</strong> are valuable,
             let&apos;s connect.
           </p>
+
         </div>
       </div>
     </section>

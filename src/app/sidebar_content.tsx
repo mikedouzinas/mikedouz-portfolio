@@ -72,7 +72,6 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                         imageContainerSize="w-[13.5rem] h-[13.5rem]"
                         imageSize="w-[13rem] h-[13rem]"
                         headingSize="text-4xl"
-                        subTextSize="mt-2FaGithub text-lg"
                         containerClass="flex flex-col items-start justify-start py-8"
                         textWrapperClass="mt-4 text-left"
                     />
