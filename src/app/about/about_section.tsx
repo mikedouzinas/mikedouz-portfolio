@@ -1,6 +1,27 @@
 "use client";
+import { useState, useEffect } from "react";
 
 export default function AboutSection() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile devices
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const mobileKeywords = ['mobile', 'iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini'];
+      setIsMobile(mobileKeywords.some(keyword => userAgent.includes(keyword)));
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const handleHeroClick = () => {
+    if (!isMobile) {
+      window.dispatchEvent(new CustomEvent('mv-open-cmdk'));
+    }
+  };
   return (
     <section
       id="about"
@@ -56,7 +77,7 @@ export default function AboutSection() {
             improving my Greek and Spanish.
           </p>
 
-          <p className="mb-0 text-md font-light text-gray-600 dark:text-gray-400">
+          <p className="mb-6 text-md font-light text-gray-600 dark:text-gray-400">
             Long-term, I want to build products that meaningfully help people
             at scale. If you&apos;re working on challenges in{" "}
             <strong className="font-semibold">big tech</strong> 🖥️,{" "}
@@ -67,6 +88,22 @@ export default function AboutSection() {
             <strong className="font-semibold">fast output</strong> are valuable,
             let&apos;s connect.
           </p>
+
+          {/* Hero Button for Command Palette */}
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={handleHeroClick}
+              disabled={isMobile}
+              className={`group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-500 hover:from-blue-700 hover:via-purple-700 hover:to-blue-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5 ${isMobile ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <span className="text-lg">Learn more about me</span>
+              {!isMobile && (
+                <div className="flex items-center gap-1 text-sm opacity-90 group-hover:opacity-100 transition-opacity">
+                  <span className="font-mono bg-black/20 px-2 py-0.5 rounded text-xs">⌘K</span>
+                </div>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </section>

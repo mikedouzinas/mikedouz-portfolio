@@ -2,6 +2,7 @@
 import { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "next-themes";
+import MiniMike from "@/components/MiniMike";
 import "../styles/globals.css";
 
 export const metadata: Metadata = {
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark">
           {children}
+          <MiniMike />
         </ThemeProvider>
         <Analytics />
       </body>
