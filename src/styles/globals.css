@@ -43,3 +43,28 @@ html {
   .link {
     @apply text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-300 text-xl;
   }
+
+/* Reusable MV UI classes */
+.mv-card {
+  @apply rounded-2xl border border-white/10 shadow-md bg-slate-900/40 hover:bg-slate-900/60 transition-all duration-300 ease-in-out hover:shadow-lg;
+}
+
+.mv-pill {
+  @apply inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs bg-white/10 text-gray-300;
+}
+
+.mv-btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-2xl font-medium transition-all duration-300 ease-in-out;
+}
+
+.mv-btn-primary {
+  @apply mv-btn bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+}
+
+.mv-btn-neutral {
+  @apply mv-btn bg-slate-700 hover:bg-slate-600 text-gray-200 shadow-md hover:shadow-lg focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+}
+
+.mv-glow {
+  filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.15));
+}
