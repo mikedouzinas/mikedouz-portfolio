@@ -2,7 +2,7 @@
 import { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "next-themes";
-import Iris from "@/components/Iris";
+import IrisPalette from "@/components/IrisPalette";
 import "../styles/globals.css";
 
 export const metadata: Metadata = {
@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark">
           {children}
-          <Iris />
+          <IrisPalette />
         </ThemeProvider>
         <Analytics />
       </body>
