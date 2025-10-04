@@ -64,7 +64,7 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
     };
 
     return (
-        <div className="flex flex-col h-full justify-between p-8 text-center md:text-left">
+        <div className="flex flex-col h-full justify-between p-8 text-center md:text-center">
             <div>
                 {/* Profile container: fixed width and centered */}
                 <div className="w-48 mx-auto">
@@ -72,8 +72,8 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                         imageContainerSize="w-[13.5rem] h-[13.5rem]"
                         imageSize="w-[13rem] h-[13rem]"
                         headingSize="text-4xl"
-                        containerClass="flex flex-col items-start justify-start py-8"
-                        textWrapperClass="mt-4 text-left"
+                        containerClass="flex flex-col items-center justify-center py-8"
+                        textWrapperClass="mt-4 text-center"
                     />
                 </div>
                 {/* Navigation links aligned with the profile container */}
@@ -105,7 +105,7 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
             {/* Social media icons aligned with the profile container */}
             <div className="w-48 mx-auto">
                 <BoredButton />
-                <div className="flex space-x-4">
+                <div className="flex space-x-4 justify-center md:justify-start">
                     <a
                         href="https://github.com/mikedouzinas"
                         target="_blank"

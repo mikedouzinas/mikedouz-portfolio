@@ -100,18 +100,24 @@ export default function HomeContent({
       </div>
       <div className="py-4" />
       <div className={textWrapperClass}>
-        <h1 className={`${headingSize} font-bold text-gray-800 dark:text-gray-200`}>Mike Veson</h1>
-          <div className="mt-4">
+        {/* Parent container with fixed width and centered alignment */}
+        <div className="w-48 flex flex-col items-center">
+          <h1 className={`${headingSize} font-bold text-gray-800 dark:text-gray-200 w-full text-center`}>Mike Veson</h1>
+          <div className="mt-4 w-full">
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('mv-open-cmdk'))}
-              className="group relative inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 via-green-600 to-blue-600 hover:from-green-600 hover:via-blue-700 hover:to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5"
+              className="group relative inline-flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-600 via-green-600 to-blue-600 hover:from-green-600 hover:via-blue-700 hover:to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5 w-full"
             >
-              <span className="text-xs">Want to Learn More?</span>
+              <span className="text-xs">Questions? Ask Iris</span>
               <div className="flex items-center gap-1 text-xs opacity-90 group-hover:opacity-100 transition-opacity">
-                <span className="font-mono bg-black/20 px-1.5 py-0.5 rounded text-xs">⌘K</span>
+                <span className="font-mono bg-black/20 px-1.5 py-0.5 rounded text-xs flex items-center gap-1">
+                  <span className="text-xs">⌘</span>
+                  <span className="text-[10px]">K</span>
+                </span>
               </div>
             </button>
           </div>
+        </div>
       </div>
     </section>
   );

@@ -52,7 +52,7 @@ export default function AboutSection() {
             <span className="font-semibold bg-gradient-to-r from-red-600 to-blue-600 text-transparent bg-clip-text">
               Barcelona
             </span>{" "}
-            this Fall, where I&apos;ll keep exploring new cultures while
+            this Fall, exploring new cultures while
             improving my Greek and Spanish.
           </p>
 
