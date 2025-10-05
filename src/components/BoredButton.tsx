@@ -10,7 +10,7 @@ export default function BoredButton() {
 
 
   return (
-    <div className="flex flex-col space-y-3 mb-4 hidden sm:flex">
+    <div className="flex flex-col space-y-3 mb-4 hidden md:flex">
       {/* Primary CTA - The Playground */}
       <button
         onClick={handlePlaygroundClick}

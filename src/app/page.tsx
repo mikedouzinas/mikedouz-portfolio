@@ -39,15 +39,43 @@ export default function Home() {
             <SidebarHome scrollToTop={scrollToTop} />
           </div>
           <section id="about" className="mt-16">
+            {/* Mobile section header with decorative line */}
+            <div className="md:hidden mb-6">
+              <div className="flex items-center space-x-3">
+                <h2 className="text-lg font-light text-gray-400 dark:text-gray-500">About</h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent dark:from-gray-600"></div>
+              </div>
+            </div>
             <About />
           </section>
-          <section id="experience" className="mt-16">
+          <section id="experience" className="mt-16 md:mt-32">
+            {/* Mobile section header with decorative line */}
+            <div className="md:hidden mb-6">
+              <div className="flex items-center space-x-3">
+                <h2 className="text-lg font-light text-gray-400 dark:text-gray-500">Experience</h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent dark:from-gray-600"></div>
+              </div>
+            </div>
             <Experience />
           </section>
-          <section id="projects" className="mt-16">
+          <section id="projects" className="mt-16 md:mt-32">
+            {/* Mobile section header with decorative line */}
+            <div className="md:hidden mb-6">
+              <div className="flex items-center space-x-3">
+                <h2 className="text-lg font-light text-gray-400 dark:text-gray-500">Projects</h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent dark:from-gray-600"></div>
+              </div>
+            </div>
             <Projects />
           </section>
-          <section id="blogs" className="mt-16">
+          <section id="blogs" className="mt-16 md:mt-32">
+            {/* Mobile section header with decorative line */}
+            <div className="md:hidden mb-6">
+              <div className="flex items-center space-x-3">
+                <h2 className="text-lg font-light text-gray-400 dark:text-gray-500">Blogs</h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent dark:from-gray-600"></div>
+              </div>
+            </div>
             <Blogs />
           </section>
         </main>
