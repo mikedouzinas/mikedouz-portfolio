@@ -21,7 +21,7 @@ export interface WorkExperience {
       company: "Parsons Corporation",
       period: "MAY - AUG 2025",
       description:
-        "Developed and improved services in C#/.NET that integrated external APIs with SQL databases and AWS infrastructure, powering Power BI dashboards for Air Force users.",
+        "Developed and improved services in C#/.NET that integrated external APIs with SQL databases and AWS infrastructure, powering Power BI dashboards for U.S. Air Force users.",
       companyUrl: "https://www.parsons.com/",
       skills: ["C#", ".NET", "SQL", "AWS", "PowerBI","APIs", "Data Integration"],
     },

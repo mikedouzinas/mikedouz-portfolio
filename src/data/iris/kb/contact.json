@@ -1,0 +1,18 @@
+{
+  "contact_methods": [
+    {
+      "type": "email",
+      "value": "mike@douzinas.com",
+      "preferred": true,
+      "description": "Best way to reach out for opportunities and collaborations"
+    },
+    {
+      "type": "linkedin", 
+      "value": "https://linkedin.com/in/mikedouzinas",
+      "preferred": true,
+      "description": "Professional networking and career discussions"
+    }
+  ],
+  "response_time": "Usually within 24-48 hours",
+  "availability": "Open to discussing new opportunities and interesting projects"
+}

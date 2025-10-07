@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from 'next/navigation';
 
-export default function BoredButton() {
+export default function PlaygroundButton() {
   const router = useRouter();
 
   const handlePlaygroundClick = () => {

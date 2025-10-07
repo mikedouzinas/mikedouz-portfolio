@@ -16,47 +16,42 @@ export const knowledgeBase: Record<string, string> = {
 
   "secret-playbook": `There might be a way to find it 👀... Keep exploring the site and you might discover something special. Sometimes the best discoveries come from those who dig a little deeper into the details.`,
 
+  // Add more static answers here:
+  "education-background": `I have a strong foundation in computer science and software engineering, with hands-on experience building real-world applications. My learning journey has been focused on practical problem-solving and staying current with modern technologies. I believe in continuous learning and have pursued both formal education and self-directed learning to build expertise in full-stack development.`,
+
+  "remote-work": `Absolutely! I'm very comfortable with remote work and have experience collaborating effectively with distributed teams. I'm currently studying abroad in Barcelona while working on projects, which has given me great experience with remote communication and time zone management. I'm open to hybrid, fully remote, or on-site opportunities depending on the role and team needs.`,
+
+  "salary-expectations": `I'm open to discussing compensation based on the role, responsibilities, and company. I value opportunities for growth, learning, and meaningful impact. Let's have a conversation about how I can contribute to your team, and we can discuss compensation that's fair for both parties based on market rates and the value I bring.`,
+
   "default": `I can tell you about my projects, experience, and values. Try one of the suggestions above to learn more about my work, motivations, or how we might collaborate!`
 };
 
-// Base suggestions for the command palette
-export const baseSuggestions = [
-  { id: "current-work", text: "What is Mike working on right now?" },
-  { id: "rack-rush-30s", text: "Tell me about Rack Rush in 30s." },
-  { id: "frontend-experience", text: "Summarize his experience for a frontend team." },
-  { id: "motivation", text: "What motivates Mike to build?" },
-  { id: "playground-projects", text: "Show Playground projects." },
-  { id: "contact", text: "How can I contact Mike?" },
-  { id: "secret-playbook", text: "What's the secret Playbook?" }
-];
+// Note: Static suggestions moved to /data/iris/suggestions.ts
+// This file now only contains the knowledge base for fallback answers
 
-// Function to find matching answer
+// Function to find matching answer (simplified - no more suggestion matching)
 export function findAnswer(query: string): string {
   const normalizedQuery = query.toLowerCase().trim();
   
-  // Direct suggestion match
-  const suggestion = baseSuggestions.find(s => 
-    s.text.toLowerCase() === normalizedQuery
-  );
-  
-  if (suggestion) {
-    return knowledgeBase[suggestion.id];
+  // Simple keyword matching against knowledge base keys
+  for (const [key, answer] of Object.entries(knowledgeBase)) {
+    if (key !== 'default' && normalizedQuery.includes(key.replace('-', ' '))) {
+      return answer;
+    }
   }
   
-  // Fuzzy matching for partial queries
-  const fuzzyMatch = baseSuggestions.find(s => {
-    const suggestionWords = s.text.toLowerCase().split(' ');
-    const queryWords = normalizedQuery.split(' ');
-    
-    return queryWords.some(qWord => 
-      suggestionWords.some(sWord => 
-        sWord.includes(qWord) || qWord.includes(sWord)
-      )
-    );
-  });
-  
-  if (fuzzyMatch) {
-    return knowledgeBase[fuzzyMatch.id];
+  // Fuzzy matching for common patterns
+  if (normalizedQuery.includes('work') && normalizedQuery.includes('current')) {
+    return knowledgeBase['current-work'];
+  }
+  if (normalizedQuery.includes('contact') || normalizedQuery.includes('reach')) {
+    return knowledgeBase['contact'];
+  }
+  if (normalizedQuery.includes('motivat') || normalizedQuery.includes('drive')) {
+    return knowledgeBase['motivation'];
+  }
+  if (normalizedQuery.includes('rack rush') || normalizedQuery.includes('game')) {
+    return knowledgeBase['rack-rush-30s'];
   }
   
   return knowledgeBase.default;

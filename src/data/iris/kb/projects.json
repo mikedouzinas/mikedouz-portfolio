@@ -1,0 +1,28 @@
+{
+  "projects": [
+    {
+      "name": "Rack Rush",
+      "description": "Real-time Scrabble-inspired word game with multiplayer support",
+      "route": "/games/rack-rush",
+      "stack": ["React", "TypeScript", "Next.js", "Game Logic"]
+    },
+    {
+      "name": "Euro 2024 Prediction Model",
+      "description": "Machine learning model for predicting Euro 2024 match outcomes",
+      "route": "/projects#euro2024",
+      "stack": ["Python", "Machine Learning", "Data Analysis", "Sports Analytics"]
+    },
+    {
+      "name": "Elysium",
+      "description": "Modern web application with elegant user interface design",
+      "route": "/projects#elysium", 
+      "stack": ["React", "Next.js", "Tailwind CSS", "UI/UX"]
+    },
+    {
+      "name": "Barça System Rating",
+      "description": "Football analytics system for rating Barcelona's playing style",
+      "route": "/projects#barca-rating",
+      "stack": ["Data Analysis", "Football Analytics", "Visualization"]
+    }
+  ]
+}

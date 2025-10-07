@@ -1,0 +1,49 @@
+{
+  "experiences": [
+    {
+      "company": "Parsons",
+      "role": "Software Engineer",
+      "dates": "2023 - 2024",
+      "location": "Remote",
+      "stack": ["React", "TypeScript", "Node.js", "PostgreSQL"],
+      "impact": [
+        "Built modern web applications for enterprise clients",
+        "Collaborated with cross-functional teams on complex projects",
+        "Implemented scalable solutions using cloud technologies"
+      ]
+    },
+    {
+      "company": "Lilie",
+      "role": "Frontend Developer",
+      "dates": "2022 - 2023", 
+      "location": "Remote",
+      "stack": ["React", "JavaScript", "CSS", "REST APIs"],
+      "impact": [
+        "Developed responsive user interfaces for educational platform",
+        "Improved user engagement through intuitive design implementations"
+      ]
+    },
+    {
+      "company": "Veson Nautical",
+      "role": "Software Developer Intern",
+      "dates": "Summer 2022",
+      "location": "Boston, MA",
+      "stack": ["C#", ".NET", "SQL Server", "WPF"],
+      "impact": [
+        "Contributed to maritime logistics software solutions",
+        "Enhanced data processing capabilities for shipping operations"
+      ]
+    },
+    {
+      "company": "VesselsValue", 
+      "role": "Data Analyst Intern",
+      "dates": "Summer 2021",
+      "location": "London, UK",
+      "stack": ["Python", "SQL", "Data Analytics", "Maritime Data"],
+      "impact": [
+        "Analyzed maritime market data and shipping trends",
+        "Created data visualization dashboards for market insights"
+      ]
+    }
+  ]
+}

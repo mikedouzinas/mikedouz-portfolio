@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import HomeContent from '../components/home_content';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { SiCalendly } from 'react-icons/si';
-import BoredButton from '../components/BoredButton';
+import PlaygroundButton from '../components/PlaygroundButton';
 
 // Hook to detect the currently active section using Intersection Observer
 const useActiveSection = (sectionIds: string[]): string => {
@@ -104,7 +104,7 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
             </div>
             {/* Social media icons aligned with the profile container */}
             <div className="w-48 mx-auto">
-                <BoredButton />
+                <PlaygroundButton />
                 <div className="flex space-x-4 justify-center md:justify-start">
                     <a
                         href="https://github.com/mikedouzinas"

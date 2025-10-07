@@ -1,0 +1,32 @@
+{
+  "core_values": [
+    {
+      "name": "Speed to Learning",
+      "description": "Prioritize rapid iteration and continuous learning over perfect initial solutions"
+    },
+    {
+      "name": "User-First Thinking", 
+      "description": "Always consider the end user experience in every technical decision"
+    },
+    {
+      "name": "Systems Thinking",
+      "description": "Understand how components interact within larger systems and ecosystems"
+    },
+    {
+      "name": "Cultural Heritage",
+      "description": "Embrace diverse perspectives and the richness that comes from different backgrounds"
+    },
+    {
+      "name": "Quality Through Simplicity",
+      "description": "Achieve excellence by reducing complexity and focusing on essential features"
+    },
+    {
+      "name": "Collaborative Growth", 
+      "description": "Believe that the best solutions emerge from diverse teams working together"
+    },
+    {
+      "name": "Sustainable Innovation",
+      "description": "Build solutions that can evolve and scale responsibly over time"
+    }
+  ]
+}
