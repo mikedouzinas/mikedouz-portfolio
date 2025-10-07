@@ -7,8 +7,6 @@ import {
   CornerDownLeft,
   Briefcase,
   User2,
-  FileText,
-  Sparkles,
   Loader2,
   X,
   Compass,
@@ -570,8 +568,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     accumulatedAnswer += parsed.text;
                     setAnswer(accumulatedAnswer);
                   }
-                } catch (e) {
-                  // Skip invalid JSON
+                } catch {
+                  // Skip invalid JSON - intentionally ignoring parse errors
                 }
               }
             }
