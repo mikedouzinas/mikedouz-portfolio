@@ -18,6 +18,12 @@ export const metadata: Metadata = {
       },
     ],
   },
+  // Configure mobile browser theme colors for status bar
+  // Using dark colors that work well with both themes
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#0f172a" }, // slate-900 for light mode
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" }, // slate-900 for dark mode
+  ],
   openGraph: {
     title: "Mike Veson",
     description: "Personal Portfolio showcasing projects and work.",

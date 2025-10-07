@@ -1,24 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mike Veson Portfolio
+
+A modern, interactive personal portfolio built with [Next.js](https://nextjs.org), featuring an AI-powered command palette called **Iris** that helps visitors explore projects, experience, and work using natural language.
+
+## Features
+
+- 🎨 **Modern UI**: Clean, responsive design with dark mode support
+- 🤖 **Iris AI Assistant**: Arc-inspired command palette (⌘K) powered by OpenAI for intelligent Q&A
+- 🎮 **Interactive Projects**: Including Rack Rush word game
+- 📱 **Mobile Optimized**: Fully responsive with proper theme colors
+- ⚡ **Performance**: Fast load times with streaming responses and caching
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ and npm/yarn/pnpm
+- OpenAI API key (required for Iris AI features)
+- GitHub token (optional, for live commit activity)
+
+### Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
 
 ```bash
+# Required for Iris AI Assistant to work
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Optional: Enables live GitHub activity in Iris responses
+GITHUB_TOKEN=your_github_token_here
+```
+
+**Important for Production**: Make sure to add these environment variables to your hosting platform (Vercel, Netlify, etc.) for Iris to work in production.
+
+### Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
 

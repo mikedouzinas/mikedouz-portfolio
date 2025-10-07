@@ -534,15 +534,31 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         `/api/iris/answer?q=${encodeURIComponent(q)}&signals=${encodeURIComponent(JSON.stringify(signals))}`
       );
 
+      console.log('[IrisPalette] API response status:', response.status);
+      console.log('[IrisPalette] API response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+        // Try to get error details from response body
+        let errorMessage = `API request failed with status ${response.status}`;
+        try {
+          const errorData = await response.json();
+          console.error('[IrisPalette] API error response:', errorData);
+          errorMessage = errorData.answer || errorData.error || errorMessage;
+        } catch (e) {
+          console.error('[IrisPalette] Could not parse error response:', e);
+        }
+        setAnswer(errorMessage);
+        setIsProcessingQuery(false);
+        return;
       }
 
       // Check if response is streaming (SSE) or JSON
       const contentType = response.headers.get('content-type');
+      console.log('[IrisPalette] Content-Type:', contentType);
       
       if (contentType?.includes('text/event-stream')) {
         // Real streaming from OpenAI
+        console.log('[IrisPalette] Starting streaming response');
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
         let accumulatedAnswer = '';
@@ -575,9 +591,12 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             }
           }
         }
+        console.log('[IrisPalette] Streaming complete, total length:', accumulatedAnswer.length);
       } else {
         // Fallback JSON response
+        console.log('[IrisPalette] Using JSON response');
         const data = await response.json();
+        console.log('[IrisPalette] JSON data:', data);
         const answerText = data.answer || 'No answer available.';
         setAnswer(answerText);
       }

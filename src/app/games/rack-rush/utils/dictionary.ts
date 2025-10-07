@@ -60,4 +60,7 @@ export const dictionary = {
 };
 
 // Auto-initialize the dictionary when this module is imported
-initializeDictionary().catch(console.error); 
+// Only run on client to prevent server-side build errors
+if (typeof window !== 'undefined') {
+  initializeDictionary().catch(console.error);
+} 

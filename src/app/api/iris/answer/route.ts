@@ -24,6 +24,20 @@ export async function GET(request: Request) {
       );
     }
 
+    // Check for required environment variables in production
+    // This helps diagnose configuration issues early
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('[Answer API] OPENAI_API_KEY environment variable is not set');
+      return NextResponse.json({
+        answer: "I'm currently unavailable. The API configuration is incomplete. Please contact the site administrator.",
+        sources: [],
+        cached: false,
+        error: true,
+        errorType: 'configuration',
+        timing: Date.now()
+      });
+    }
+
     console.log(`[Answer API] Processing query: "${query}"`);
     
     // Parse user signals (for future RAG personalization)
@@ -87,6 +101,7 @@ export async function GET(request: Request) {
         
         try {
           // Generate intelligent answer using ChatGPT
+          console.log('[Answer API] Initializing OpenAI client');
           const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
           
           // Build enhanced context with recent activity
@@ -95,6 +110,7 @@ export async function GET(request: Request) {
             enhancedContext += `\n\nRecent Development Activity:\n${recentActivity}`;
           }
           
+          console.log('[Answer API] Creating chat completion stream with model:', config.models.chat);
           const stream = await openai.chat.completions.create({
             model: config.models.chat,
             messages: [{
@@ -140,6 +156,7 @@ Remember: You're here to help people connect with Mike's work in an authentic, h
             }
           });
           
+          console.log('[Answer API] Stream created successfully, sending to client');
           return new Response(readable, {
             headers: {
               'Content-Type': 'text/event-stream',
@@ -149,9 +166,17 @@ Remember: You're here to help people connect with Mike's work in an authentic, h
           });
         } catch (error) {
           console.error('[Answer API] ChatGPT generation failed:', error);
-          // Fallback to simple context-based answer
-          answer = `Based on the information available:\n\n${contextText}`;
-          sources = retrievalResult.chunks.map(chunk => chunk.source);
+          console.error('[Answer API] Error details:', error instanceof Error ? error.message : String(error));
+          console.error('[Answer API] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+          
+          // Return a user-friendly error message
+          return NextResponse.json({
+            answer: `I encountered an error while generating a response. This might be due to API configuration issues. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            sources: [],
+            cached: false,
+            error: true,
+            timing: Date.now()
+          });
         }
       } else {
         // Fallback to static knowledge base
