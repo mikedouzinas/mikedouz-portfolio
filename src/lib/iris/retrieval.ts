@@ -26,11 +26,19 @@ interface Project {
   stack: string[];
 }
 
-interface PlaygroundProject {
+interface IrisInfo {
   name: string;
-  description: string;
-  route: string;
-  status: string;
+  tagline: string;
+  what_it_is: string;
+  why_built: string;
+  technical_implementation: {
+    architecture: string;
+    key_features: string[];
+    technologies: string[];
+  };
+  user_experience: string;
+  demonstrates_skills: string[];
+  philosophy: string;
 }
 
 interface Value {
@@ -111,7 +119,7 @@ interface KBData {
   profile?: Profile;
   experience?: { experiences: Experience[] };
   projects?: { projects: Project[] };
-  playground?: { playground_projects: PlaygroundProject[] };
+  iris_info?: { about_iris: IrisInfo };
   values?: { core_values: Value[] };
   contact?: { contact_methods: ContactMethod[]; response_time: string; availability: string };
   site_map?: { routes: Route[] };
@@ -132,7 +140,7 @@ export interface KBChunk {
   section?: string;    // Which section within that file
   route?: string;      // Associated route if available
   metadata: {
-    type: 'profile' | 'experience' | 'project' | 'playground' | 'value' | 'contact' | 'route' | 'fun' | 'blog';
+    type: 'profile' | 'experience' | 'project' | 'iris' | 'value' | 'contact' | 'route' | 'fun' | 'blog';
     entity?: string;   // Company name, project name, etc.
     weight?: number;   // Relevance boost for this chunk
   };
@@ -260,11 +268,11 @@ async function loadAndChunkKB(): Promise<KBChunk[]> {
   
   try {
     // Load all KB files
-    const [profile, experience, projects, playground, values, contact, siteMap, fun, blogs] = await Promise.all([
+    const [profile, experience, projects, irisInfo, values, contact, siteMap, fun, blogs] = await Promise.all([
       import('@/data/iris/kb/profile.json'),
       import('@/data/iris/kb/experience.json'),
       import('@/data/iris/kb/projects.json'), 
-      import('@/data/iris/kb/playground.json'),
+      import('@/data/iris/kb/iris_info.json'),
       import('@/data/iris/kb/values.json'),
       import('@/data/iris/kb/contact.json'),
       import('@/data/iris/kb/site_map.json'),
@@ -281,18 +289,18 @@ async function loadAndChunkKB(): Promise<KBChunk[]> {
       metadata: { type: 'profile', weight: 1.2 }
     });
     
-    // Process profile - Full Name (low priority - background info only)
+    // Process profile - Full Name (very low priority - only for specific name questions)
     if (profileData.full_name) {
       chunks.push({
         id: `chunk-${chunkId++}`,
         content: `Mike's full name is ${profileData.full_name.english} (in English) and ${profileData.full_name.greek} (in Greek). ${profileData.full_name.note}.`,
         source: 'profile',
         section: 'full_name',
-        metadata: { type: 'profile', weight: 0.8 }
+        metadata: { type: 'profile', weight: 0.5 }
       });
     }
     
-    // Process profile - Family (low priority - background info only)
+    // Process profile - Family (very low priority - only for specific family questions)
     if (profileData.family) {
       const family = profileData.family;
       const siblingsText = family.siblings.map(s => `${s.name} (${s.relation})`).join(' and ');
@@ -301,7 +309,7 @@ async function loadAndChunkKB(): Promise<KBChunk[]> {
         content: `Mike's family: His parents are ${family.parents.father} and ${family.parents.mother}. His siblings are ${siblingsText}. His grandfathers are ${family.grandfathers.paternal} and ${family.grandfathers.maternal}. ${family.legacy}`,
         source: 'profile',
         section: 'family',
-        metadata: { type: 'profile', weight: 0.8 }
+        metadata: { type: 'profile', weight: 0.5 }
       });
     }
     
@@ -313,11 +321,11 @@ async function loadAndChunkKB(): Promise<KBChunk[]> {
         content: `${vh.founded_by}. ${vh.company_name_origin}. ${vh.mother_role}. ${vh.mike_involvement}. ${vh.legacy} ${profileData.entrepreneurship_history.influence}`,
         source: 'profile',
         section: 'entrepreneurship',
-        metadata: { type: 'profile', weight: 1.1 }
+        metadata: { type: 'profile', weight: 1.0 }
       });
     }
     
-    // Process experience
+    // Process experience (high priority - primary professional content)
     const experienceData = experience.default as KBData['experience'];
     experienceData?.experiences?.forEach((exp: Experience) => {
       chunks.push({
@@ -328,12 +336,12 @@ async function loadAndChunkKB(): Promise<KBChunk[]> {
         metadata: { 
           type: 'experience', 
           entity: exp.company,
-          weight: 1.1 
+          weight: 1.4 
         }
       });
     });
     
-    // Process projects
+    // Process projects (high priority - primary portfolio content)
     const projectsData = projects.default as KBData['projects'];
     projectsData?.projects?.forEach((project: Project) => {
       chunks.push({
@@ -345,29 +353,29 @@ async function loadAndChunkKB(): Promise<KBChunk[]> {
         metadata: { 
           type: 'project',
           entity: project.name,
-          weight: 1.3
+          weight: 1.5
         }
       });
     });
     
-    // Process playground
-    const playgroundData = playground.default as KBData['playground'];
-    playgroundData?.playground_projects?.forEach((project: PlaygroundProject) => {
+    // Process Iris info (high priority - showcases Mike's technical capabilities)
+    const irisData = irisInfo.default as KBData['iris_info'];
+    if (irisData?.about_iris) {
+      const iris = irisData.about_iris;
       chunks.push({
         id: `chunk-${chunkId++}`,
-        content: `${project.name}: ${project.description}. Status: ${project.status}.`,
-        source: 'playground',
-        section: project.name,
-        route: project.route,
+        content: `${iris.name}: ${iris.tagline}. ${iris.what_it_is} ${iris.why_built} Architecture: ${iris.technical_implementation.architecture}. Key features: ${iris.technical_implementation.key_features.join(', ')}. Technologies: ${iris.technical_implementation.technologies.join(', ')}. ${iris.user_experience} This demonstrates: ${iris.demonstrates_skills.join(', ')}. ${iris.philosophy}`,
+        source: 'iris_info',
+        section: 'about_iris',
         metadata: {
-          type: 'playground',
-          entity: project.name,
-          weight: 1.0
+          type: 'iris',
+          entity: 'Iris Assistant',
+          weight: 1.4
         }
       });
-    });
+    }
     
-    // Process values
+    // Process values (medium-high priority - important for culture fit)
     const valuesData = values.default as KBData['values'];
     valuesData?.core_values?.forEach((value: Value) => {
       chunks.push({
@@ -375,7 +383,7 @@ async function loadAndChunkKB(): Promise<KBChunk[]> {
         content: `${value.name}: ${value.description}`,
         source: 'values',
         section: value.name,
-        metadata: { type: 'value', weight: 1.1 }
+        metadata: { type: 'value', weight: 1.3 }
       });
     });
     
@@ -418,7 +426,7 @@ async function loadAndChunkKB(): Promise<KBChunk[]> {
       metadata: { type: 'fun', weight: 0.9 }
     });
     
-    // Process blog posts (high priority for professional storytelling)
+    // Process blog posts (medium priority - supplementary context)
     const blogsData = blogs.default as KBData['blogs'];
     blogsData?.blog_posts?.forEach((post: BlogPost) => {
       chunks.push({
@@ -430,7 +438,7 @@ async function loadAndChunkKB(): Promise<KBChunk[]> {
         metadata: { 
           type: 'blog',
           entity: post.title,
-          weight: 1.2 
+          weight: 0.9 
         }
       });
     });
