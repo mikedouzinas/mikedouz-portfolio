@@ -8,5 +8,41 @@
     "learning": ["Spanish"]
   },
   "interests": ["Product development", "System design", "User experience"],
-  "availability_status": "Open to new opportunities"
+  "availability_status": "Open to new opportunities",
+  "full_name": {
+    "english": "Michael Konstantinos Veson",
+    "greek": "Michael Konstantinos John Douzinas Veson",
+    "note": "Mike sometimes goes by Mike Douzinas to honor his maternal grandfather, Kostas Douzinas, who is an idol to him"
+  },
+  "family": {
+    "parents": {
+      "father": "John Veson",
+      "mother": "Eva Douzinas"
+    },
+    "siblings": [
+      {
+        "name": "Natalie",
+        "relation": "older sister"
+      },
+      {
+        "name": "Kai",
+        "relation": "younger brother"
+      }
+    ],
+    "grandfathers": {
+      "paternal": "Michael Veson - an inspiration to Mike, namesake in his full name",
+      "maternal": "Kostas Douzinas - an idol to Mike, namesake in his full name"
+    },
+    "legacy": "Mike is very proud of his family. Both of his grandfathers are inspirations - his name Michael Konstantinos Douzinas Veson is a mix of both their full names"
+  },
+  "entrepreneurship_history": {
+    "veson_nautical": {
+      "founded_by": "Mike's parents, John Veson and Eva Douzinas, founded Veson Nautical together 20 years ago",
+      "company_name_origin": "Veson Nautical's name is a blend of Kostas Douzinas' company 'Nautical Corporation' and Michael Veson's company 'Veson Inc'",
+      "mother_role": "Eva left the company in 2017",
+      "mike_involvement": "Mike learned to code by going to the office with his parents, learning how the shipping software space worked, and built the first mobile app for the company",
+      "legacy": "Mike has a long history of entrepreneurship and deep roots in the shipping space - you can read more about this in his blog"
+    },
+    "influence": "Growing up around Veson Nautical gave Mike early exposure to software engineering, the shipping industry, and entrepreneurship from a young age"
+  }
 }
