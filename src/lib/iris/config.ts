@@ -13,7 +13,7 @@ export const config = {
   maxAnswersPerSession: 20,         // Maximum answers per user session before soft cap
   
   // RAG and retrieval settings
-  topK: 6,                          // Number of knowledge base chunks to retrieve for answers
+  topK: 10,                         // Number of knowledge base chunks to retrieve for answers - increased for better context
   chunkSize: 400,                   // Size of KB chunks for embeddings (chars)
   
   // Caching and performance
@@ -38,14 +38,14 @@ export const config = {
   
   // OpenAI model configuration
   models: {
-    chat: 'gpt-3.5-turbo',          // Much faster model for answers
+    chat: 'gpt-4.1',                // GPT-4 Turbo for better quality answers with larger context window
     embedding: 'text-embedding-3-small' // Embedding model for RAG
   },
   
   // Answer generation settings
   chatSettings: {
-    temperature: 0.1,               // Very low temperature for faster, consistent answers
-    maxTokens: 400,                 // Shorter answers for faster responses
+    temperature: 0.3,               // Slightly higher temperature for more natural, conversational responses
+    maxTokens: 800,                 // Longer answers to provide more detailed, complete information
     stream: true                    // Enable streaming responses
   }
 } as const;
