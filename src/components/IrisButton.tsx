@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 /**
  * Interactive button component for Iris AI assistant
@@ -11,6 +11,7 @@ export default function IrisButton() {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const isFirstHover = useRef(true);
+  const isAnimating = useRef(false);
 
   /**
    * Handle mouse enter event
@@ -34,7 +35,7 @@ export default function IrisButton() {
    * Position is calculated relative to the button's bounding box
    */
   const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!buttonRef.current) return;
+    if (!buttonRef.current || isAnimating.current) return;
     
     // Get button position and calculate cursor position relative to button
     const rect = buttonRef.current.getBoundingClientRect();
@@ -56,7 +57,7 @@ export default function IrisButton() {
     // Create a radial gradient centered at cursor position with prominent green highlight
     // The green color is strong at cursor position and gradually fades, blending with blue
     if (glowRef.current) {
-      glowRef.current.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 40%, transparent 70%)`;
+      glowRef.current.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 20%, transparent 40%)`;
       glowRef.current.style.opacity = "1";
     }
   };
@@ -77,6 +78,78 @@ export default function IrisButton() {
     }
     isFirstHover.current = true;
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey && event.key === 'k' && !isAnimating.current) {
+        event.preventDefault();
+
+        if (buttonRef.current && glowRef.current) {
+          isAnimating.current = true;
+          const button = buttonRef.current;
+          const glow = glowRef.current;
+          const { width, height } = button.getBoundingClientRect();
+          const y = height / 2;
+
+          const duration = 600;
+          let startTime: number | null = null;
+          
+          button.style.transition = 'none';
+          button.style.background = '#2563eb';
+
+          glow.style.transition = 'opacity 100ms ease-out';
+          glow.style.opacity = '1';
+
+          const animationStep = (timestamp: number) => {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            const firstAnimationEnd = 0.6;
+            const secondAnimationStart = 0.4;
+            
+            const backgrounds = [];
+
+            if (progress < firstAnimationEnd) {
+                const p = progress / firstAnimationEnd;
+                const easedP = p * p;
+                const x = (width / 2) + (width / 2) * easedP;
+                backgrounds.push(`radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 22%, transparent 40%)`);
+            }
+
+            if (progress > secondAnimationStart) {
+                const p = (progress - secondAnimationStart) / (1.0 - secondAnimationStart);
+                const easedP = 1 - (1 - p) * (1 - p);
+                const x = 0 + (width / 2) * easedP;
+                backgrounds.push(`radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 22%, transparent 40%)`);
+            }
+
+            glow.style.background = backgrounds.join(', ');
+            if (glow.style.transition !== 'none') {
+                glow.style.transition = 'none';
+            }
+
+            if (progress < 1) {
+              requestAnimationFrame(animationStep);
+            } else {
+              glow.style.transition = 'opacity 300ms ease-out';
+              glow.style.opacity = '0';
+              button.style.transition = '';
+              button.style.background = '';
+              isAnimating.current = false;
+            }
+          };
+
+          requestAnimationFrame(animationStep);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   /**
    * Dispatches custom event to open the Iris command palette

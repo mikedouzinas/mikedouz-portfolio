@@ -715,7 +715,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             ? 'top-4 w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] overflow-y-auto' 
             : 'top-[20vh] w-[720px] max-w-[calc(100vw-2rem)]'
           }
-          rounded-2xl border border-white/20 bg-slate-800/95 backdrop-blur-xl shadow-3xl ring-1 ring-white/5
+          rounded-2xl border border-white/20 bg-blue-600/20 backdrop-blur-xl shadow-3xl ring-1 ring-white/5
           ${isInputFocused ? 'ring-1 ring-sky-400/30' : ''}
         `}
       >
@@ -768,26 +768,18 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               disabled={isProcessingQuery}
               className={`
                 absolute right-2 inset-y-2
-                inline-flex items-center gap-1
-                rounded-full px-3 py-1
-                text-xs font-medium
-                bg-white/10 hover:bg-white/15 text-white
+                inline-flex items-center justify-center
+                rounded-full w-9 h-9
+                bg-emerald-500 hover:bg-emerald-600 text-white
                 transition-colors
-                max-w-[40%]
                 ${isProcessingQuery ? 'opacity-50 cursor-not-allowed' : ''}
               `}
               aria-label="Submit to Iris"
             >
               {isProcessingQuery ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span className="truncate">Processing</span>
-                </>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
               ) : (
-                <>
-                  <span className="truncate">Ask Iris</span>
-                  <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-                </>
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               )}
             </button>
           )}
@@ -842,7 +834,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     transition-colors
                     ${isSelected 
                       ? 'bg-white/10' 
-                      : 'hover:bg-white/5'
+                      : 'hover:bg-green-500/10'
                     }
                     focus:outline-none focus:ring-0 focus:border-0 focus:shadow-none
                     active:outline-none active:ring-0 active:border-0 active:shadow-none
