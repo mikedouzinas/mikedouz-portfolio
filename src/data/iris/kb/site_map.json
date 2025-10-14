@@ -4,46 +4,6 @@
       "path": "/",
       "title": "Home",
       "description": "Main portfolio page with overview and navigation"
-    },
-    {
-      "path": "/projects",
-      "title": "Projects", 
-      "description": "Showcase of completed projects and technical work"
-    },
-    {
-      "path": "/games/rack-rush",
-      "title": "Rack Rush",
-      "description": "Interactive word game built with React and TypeScript"
-    },
-    {
-      "path": "/playground",
-      "title": "Playground",
-      "description": "Experimental projects and work-in-progress ideas"
-    },
-    {
-      "path": "/playground/decision-maker",
-      "title": "Decision Maker",
-      "description": "Tool for making complex decisions with weighted criteria"
-    },
-    {
-      "path": "/playground/rankings", 
-      "title": "Rankings",
-      "description": "Personal ranking system for various topics"
-    },
-    {
-      "path": "/playground/quotes",
-      "title": "Quotes",
-      "description": "Collection of inspiring and meaningful quotes"
-    },
-    {
-      "path": "/experience",
-      "title": "Work Experience",
-      "description": "Professional background and career journey"
-    },
-    {
-      "path": "/about", 
-      "title": "About",
-      "description": "Personal background, interests, and professional philosophy"
     }
   ]
 }

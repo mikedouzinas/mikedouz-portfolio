@@ -10,7 +10,7 @@ export const knowledgeBase: Record<string, string> = {
 
   "motivation": `I'm driven by the opportunity to **transform ideas into products that meaningfully help people at scale**. Growing up around shipping software taught me how technology can transform industries. I love breaking down complex problems, learning fast, and building solutions that connect customer needs to rapid, quality output.`,
 
-  "playground-projects": `**Playground** showcases my range across different domains - from interactive games like Rack Rush to data analytics tools for soccer predictions (where I reached **top 3% in Euro 2024**). Each project demonstrates different technical skills while maintaining focus on user experience and practical impact.`,
+  // "playground-projects": `**Playground** showcases my range across different domains - from interactive games like Rack Rush to data analytics tools for soccer predictions (where I reached **top 3% in Euro 2024**). Each project demonstrates different technical skills while maintaining focus on user experience and practical impact.`,
 
   "contact": `Let's connect! You can reach me through LinkedIn, GitHub, or email. I'm particularly interested in opportunities in **big tech**, **finance**, **shipping**, or any space where fast learners who bridge **customer needs** with **fast output** add value. Currently studying abroad in Barcelona 🇪🇸 while exploring new challenges.`,
 

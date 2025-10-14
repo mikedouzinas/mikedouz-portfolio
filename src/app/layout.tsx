@@ -1,5 +1,5 @@
 // app/layout.tsx
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "next-themes";
 import IrisPalette from "@/components/IrisPalette";
@@ -18,12 +18,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-  // Configure mobile browser theme colors for status bar
-  // Using dark colors that work well with both themes
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#0f172a" }, // slate-900 for light mode
-    { media: "(prefers-color-scheme: dark)", color: "#0f172a" }, // slate-900 for dark mode
-  ],
   openGraph: {
     title: "Mike Veson",
     description: "Personal Portfolio showcasing projects and work.",
@@ -45,6 +39,15 @@ export const metadata: Metadata = {
     description: "Personal Portfolio showcasing projects and work.",
     images: ["https://mikeveson.com/og-image.png"], // Same as Open Graph image
   },
+};
+
+// Viewport configuration for mobile browser theme colors
+// Moved from metadata as per Next.js 15 requirements
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#0f172a" }, // slate-900 for light mode
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" }, // slate-900 for dark mode
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -122,7 +122,6 @@ Core principles:
 - Use natural language, avoid jargon and corporate speak
 - Keep answers concise but complete (aim for 2-3 short paragraphs)
 - If you mention contact info, always provide the actual link or email
-- If relevant pages exist (like /projects, /playground, /games/rack-rush), suggest visiting them
 - Be honest when you don't have enough information
 
 Context about Mike: ${enhancedContext}

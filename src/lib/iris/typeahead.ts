@@ -225,17 +225,17 @@ async function buildPhraseBank(): Promise<SearchableItem[]> {
     });
 
     // Playground projects
-    kb.playground?.playground_projects?.forEach((project: PlaygroundProject, index: number) => {
-      items.push({
-        id: `playground-${index}`,
-        title: `What is ${project.name}?`,
-        alt: project.description,
-        entity: 'playground',
-        intent: 'playground_specific',
-        route: project.route,
-        weight: 1.1
-      });
-    });
+    // kb.playground?.playground_projects?.forEach((project: PlaygroundProject, index: number) => {
+    //   items.push({
+    //     id: `playground-${index}`,
+    //     title: `What is ${project.name}?`,
+    //     alt: project.description,
+    //     entity: 'playground',
+    //     intent: 'playground_specific',
+    //     route: project.route,
+    //     weight: 1.1
+    //   });
+    // });
 
     // Routes from site map
     kb.site_map?.routes?.forEach((route: Route, index: number) => {

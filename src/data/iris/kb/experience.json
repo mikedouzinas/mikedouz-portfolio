@@ -1,49 +1,69 @@
 {
   "experiences": [
     {
-      "company": "Parsons",
-      "role": "Software Engineer",
-      "dates": "2023 - 2024",
-      "location": "Remote",
-      "stack": ["React", "TypeScript", "Node.js", "PostgreSQL"],
-      "impact": [
-        "Built modern web applications for enterprise clients",
-        "Collaborated with cross-functional teams on complex projects",
-        "Implemented scalable solutions using cloud technologies"
-      ]
-    },
-    {
-      "company": "Lilie",
-      "role": "Frontend Developer",
-      "dates": "2022 - 2023", 
-      "location": "Remote",
-      "stack": ["React", "JavaScript", "CSS", "REST APIs"],
-      "impact": [
-        "Developed responsive user interfaces for educational platform",
-        "Improved user engagement through intuitive design implementations"
-      ]
-    },
-    {
-      "company": "Veson Nautical",
-      "role": "Software Developer Intern",
-      "dates": "Summer 2022",
-      "location": "Boston, MA",
-      "stack": ["C#", ".NET", "SQL Server", "WPF"],
-      "impact": [
-        "Contributed to maritime logistics software solutions",
-        "Enhanced data processing capabilities for shipping operations"
-      ]
-    },
-    {
-      "company": "VesselsValue", 
-      "role": "Data Analyst Intern",
-      "dates": "Summer 2021",
-      "location": "London, UK",
-      "stack": ["Python", "SQL", "Data Analytics", "Maritime Data"],
-      "impact": [
-        "Analyzed maritime market data and shipping trends",
-        "Created data visualization dashboards for market insights"
-      ]
-    }
+      "company": "Parsons Corporation",
+    "role": "Software Engineer Intern",
+    "dates": "May 2025 – Aug 2025 (Return Offer for 2026)",
+    "location": "Remote (USAF Program)",
+    "stack": ["C#", ".NET", "SQL", "AWS", "Power BI"],
+    "impact": [
+      "Built a data integration pipeline linking .NET backend services with external APIs and AWS, cutting redundant API calls by 40% and powering dashboards for 3,000+ Air Force personnel.",
+      "Redesigned Power BI interfaces with Air Force analysts to clarify KPIs and reduce data-interpretation time 25%.",
+      "Optimized SQL schema design for predictive maintenance data, improving query efficiency and reliability for mission-critical insights.",
+      "Recognized by senior leadership for mastering C#/.NET rapidly and independently delivering production-grade features in under 4 weeks."
+    ]
+  },
+  {
+    "company": "Rice University — Liu Idea Lab for Innovation & Entrepreneurship (Lilie)",
+    "role": "Software Engineer-in-Residence",
+    "dates": "Feb 2024 – Oct 2024",
+    "location": "Houston, TX",
+    "stack": ["React", "TypeScript", "Supabase", "CI/CD", "Figma"],
+    "impact": [
+      "Led design of Rice’s entrepreneurship platform, bui",
+      "Ran 40+ user interviews and implemented feature priorities from feedback, resulting in 100% growth in platform adoption.",
+      "Built Supabase CI/CD pipelines reducing deployment time 50% and improving team reliability across engineering pods.",
+      "Mentored 30+ student founders; 3 startups later accepted into Y Combinator with technical foundations architected under Mike’s guidance."
+    ]
+  },
+  {
+    "company": "Veson Nautical",
+    "role": "Software Engineering Intern",
+    "dates": "Jun 2024 – Aug 2024",
+    "location": "Boston, MA",
+    "stack": ["Python", "Google Document AI", "Streamlit", "TypeScript"],
+    "impact": [
+      "Developed a Document-AI pipeline parsing 100+ complex maritime contracts in parallel, cutting client processing from 3 days to <8 minutes (540× faster).",
+      "Built and demoed an automated laytime calculation module that helped secure $25M+ in renewals with clients including ExxonMobil and Oldendorff.",
+      "Collaborated weekly with enterprise clients to refine algorithms based on evolving maritime contract logic, ensuring compliance with 15+ document types.",
+      "Delivered ahead of deadline and presented integration plan for IMOS product line, strengthening Veson’s competitive edge."
+    ]
+  },
+  {
+    "company": "VesselsValue (acquired by Veson Nautical)",
+    "role": "Data Science Intern",
+    "dates": "May 2024 – Jun 2024",
+    "location": "London, UK (Remote)",
+    "stack": ["Python", "SentenceTransformer", "FAISS", "SQL", "Jupyter"],
+    "impact": [
+      "Built NLP pipeline using SentenceTransformer + FAISS to cluster 100K+ job titles with 97% accuracy, streamlining recruitment segmentation.",
+      "Unified 600K+ company records into one high-fidelity dataset with custom stopword and similarity search, improving match accuracy 20%.",
+      "Automated ETL ingestion and lead enrichment pipeline, shrinking onboarding from 3 hours to 30 minutes and accelerating outreach 70%.",
+      "Partnered with PMs to translate data insights into product-roadmap decisions, embedding ML feedback loops into commercial operations."
+    ]
+  },
+  {
+    "company": "Veson Nautical (Mobile Team)",
+    "role": "iOS Developer Intern",
+    "dates": "Jun 2021 – Jun 2023",
+    "location": "Boston, MA",
+    "stack": ["Swift", "Xcode", "CI/CD", "API Integration"],
+    "impact": [
+      "Co-developed Veson’s first mobile client app, enabling 1,000+ enterprise users to access voyage data on iOS.",
+      "Reduced average client time to access IMOS system by 30% through optimized API handling and mobile caching logic.",
+      "Collaborated in Agile sprints, implementing client feedback cycles and demoing builds to enterprise users.",
+      "Strengthened product reliability using Atlassian pipelines and automated test scripts for CI/CD delivery."
+    ]
+  }
   ]
 }

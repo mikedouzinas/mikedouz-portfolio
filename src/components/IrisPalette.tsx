@@ -83,10 +83,11 @@ function truncateText(text: string, maxLength: number = 60): string {
  */
 function renderTextWithLinks(text: string, router: ReturnType<typeof useRouter>) {
   // Patterns to detect
+  // Note: URL pattern matches valid URL characters and trims trailing punctuation
   const patterns = {
     email: /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi,
-    url: /(https?:\/\/[^\s]+)/gi,
-    internalRoute: /\/(projects|playground|games\/rack-rush|about|blogs|work_experience)(?:\/[^\s]*)?/gi
+    url: /(https?:\/\/[^\s]+?)(?=[.,;!?)]*(?:\s|$))/gi,
+    // internalRoute: /\/(projects|playground|games\/rack-rush|about|blogs|work_experience)(?:\/[^\s]*)?/gi
   };
   
   const parts: React.ReactNode[] = [];
@@ -94,7 +95,7 @@ function renderTextWithLinks(text: string, router: ReturnType<typeof useRouter>)
   const allMatches: Array<{index: number; length: number; type: string; value: string}> = [];
   
   // Find all matches
-  ['email', 'url', 'internalRoute'].forEach(type => {
+  ['email', 'url'].forEach(type => {
     const pattern = patterns[type as keyof typeof patterns];
     let match;
     while ((match = pattern.exec(text)) !== null) {
@@ -214,7 +215,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const panelRef = useRef<HTMLDivElement>(null);
 
   /**
-   * Detect mobile devices to disable palette
+   * Detect mobile devices for mobile-optimized UI
    * Mobile detection based on User-Agent containing Mobi|Android
    */
   useEffect(() => {
@@ -315,11 +316,11 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   /**
    * Global keyboard shortcut listener
    * Opens palette with ⌘K (Mac) or Ctrl+K (Win/Linux)
-   * Ignores on mobile devices
+   * Desktop only - mobile users use the button
    */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore on mobile
+      // Keyboard shortcuts only work on desktop
       if (isMobile) return;
       
       // ⌘K or Ctrl+K to toggle
@@ -336,17 +337,16 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   /**
    * Listen for custom 'mv-open-cmdk' event
    * Allows external components (like hero button) to open the palette
+   * Works on both desktop and mobile
    */
   useEffect(() => {
     const handleCustomOpen = () => {
-      if (!isMobile) {
-        handleOpenChange(true);
-      }
+      handleOpenChange(true);
     };
 
     window.addEventListener('mv-open-cmdk', handleCustomOpen);
     return () => window.removeEventListener('mv-open-cmdk', handleCustomOpen);
-  }, [isMobile, handleOpenChange]);
+  }, [handleOpenChange]);
 
   /**
    * Focus input when palette opens
@@ -698,24 +698,24 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     }
   };
 
-  // Don't render on mobile
-  if (isMobile) return null;
-  
   // Don't render if not open
   if (!isOpen) return null;
 
   return (
     <>
-      {/* Fixed positioned panel - anchored from top, centered horizontally */}
+      {/* Fixed positioned panel - mobile-optimized layout */}
       <div
         ref={panelRef}
         role="dialog"
         aria-label="Iris command palette"
         aria-modal="false"
         className={`
-          fixed left-1/2 top-[20vh] -translate-x-1/2 z-[1000]
-          w-[720px] max-w-[calc(100vw-2rem)]
-          rounded-2xl border border-white/20 bg-slate-800/80 backdrop-blur-xl shadow-3xl ring-1 ring-white/5
+          fixed left-1/2 -translate-x-1/2 z-[1000]
+          ${isMobile 
+            ? 'top-4 w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] overflow-y-auto' 
+            : 'top-[20vh] w-[720px] max-w-[calc(100vw-2rem)]'
+          }
+          rounded-2xl border border-white/20 bg-slate-800/95 backdrop-blur-xl shadow-3xl ring-1 ring-white/5
           ${isInputFocused ? 'ring-1 ring-sky-400/30' : ''}
         `}
       >

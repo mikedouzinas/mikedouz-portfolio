@@ -338,7 +338,7 @@ function calculateAdjustedWeight(
     'about': 'about',
     'projects': 'projects', 
     'experience': 'experience',
-    'playground': 'playground',
+    // 'playground': 'playground',
     'technical': 'projects', // Technical questions often relate to project work
     'contact': 'contact',
     'navigation': 'home',

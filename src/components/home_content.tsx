@@ -109,7 +109,8 @@ export default function HomeContent({
               className="group relative inline-flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-600 via-green-600 to-blue-600 hover:from-green-600 hover:via-blue-700 hover:to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 hover:-translate-y-0.5 w-full"
             >
               <span className="text-xs">Questions? Ask Iris</span>
-              <div className="flex items-center gap-1 text-xs opacity-90 group-hover:opacity-100 transition-opacity">
+              {/* Keyboard shortcut hint - desktop only */}
+              <div className="hidden sm:flex items-center gap-1 text-xs opacity-90 group-hover:opacity-100 transition-opacity">
                 <span className="font-mono bg-black/20 px-1.5 py-0.5 rounded text-xs flex items-center gap-1">
                   <span className="text-xs">⌘</span>
                   <span className="text-[10px]">K</span>
