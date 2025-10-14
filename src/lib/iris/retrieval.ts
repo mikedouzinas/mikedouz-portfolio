@@ -66,6 +66,36 @@ interface Profile {
   };
   interests: string[];
   availability_status: string;
+  full_name?: {
+    english: string;
+    greek: string;
+    note: string;
+  };
+  family?: {
+    parents: {
+      father: string;
+      mother: string;
+    };
+    siblings: Array<{
+      name: string;
+      relation: string;
+    }>;
+    grandfathers: {
+      paternal: string;
+      maternal: string;
+    };
+    legacy: string;
+  };
+  entrepreneurship_history?: {
+    veson_nautical: {
+      founded_by: string;
+      company_name_origin: string;
+      mother_role: string;
+      mike_involvement: string;
+      legacy: string;
+    };
+    influence: string;
+  };
 }
 
 interface KBData {
@@ -231,7 +261,7 @@ async function loadAndChunkKB(): Promise<KBChunk[]> {
       import('@/data/iris/kb/fun.json')
     ]);
     
-    // Process profile
+    // Process profile - Basic Info
     const profileData = profile.default;
     chunks.push({
       id: `chunk-${chunkId++}`,
@@ -239,6 +269,42 @@ async function loadAndChunkKB(): Promise<KBChunk[]> {
       source: 'profile',
       metadata: { type: 'profile', weight: 1.2 }
     });
+    
+    // Process profile - Full Name
+    if (profileData.full_name) {
+      chunks.push({
+        id: `chunk-${chunkId++}`,
+        content: `Mike's full name is ${profileData.full_name.english} (in English) and ${profileData.full_name.greek} (in Greek). ${profileData.full_name.note}.`,
+        source: 'profile',
+        section: 'full_name',
+        metadata: { type: 'profile', weight: 1.3 }
+      });
+    }
+    
+    // Process profile - Family
+    if (profileData.family) {
+      const family = profileData.family;
+      const siblingsText = family.siblings.map(s => `${s.name} (${s.relation})`).join(' and ');
+      chunks.push({
+        id: `chunk-${chunkId++}`,
+        content: `Mike's family: His parents are ${family.parents.father} and ${family.parents.mother}. His siblings are ${siblingsText}. His grandfathers are ${family.grandfathers.paternal} and ${family.grandfathers.maternal}. ${family.legacy}`,
+        source: 'profile',
+        section: 'family',
+        metadata: { type: 'profile', weight: 1.4 }
+      });
+    }
+    
+    // Process profile - Entrepreneurship History
+    if (profileData.entrepreneurship_history) {
+      const vh = profileData.entrepreneurship_history.veson_nautical;
+      chunks.push({
+        id: `chunk-${chunkId++}`,
+        content: `${vh.founded_by}. ${vh.company_name_origin}. ${vh.mother_role}. ${vh.mike_involvement}. ${vh.legacy} ${profileData.entrepreneurship_history.influence}`,
+        source: 'profile',
+        section: 'entrepreneurship',
+        metadata: { type: 'profile', weight: 1.3 }
+      });
+    }
     
     // Process experience
     const experienceData = experience.default as KBData['experience'];
