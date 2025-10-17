@@ -491,7 +491,7 @@ function formatContext(docs: Array<Partial<KBItem>>, includeDetails: boolean = t
  * Loads contact information and returns a helpful message directing users to reach out
  * This prevents hallucination when the knowledge base has no matching information
  */
-async function createNoContextResponse(query: string): Promise<Response> {
+async function createNoContextResponse(): Promise<Response> {
   console.log('[Answer API] No relevant context found, returning fallback response');
   
   try {
@@ -707,7 +707,7 @@ export async function POST(req: NextRequest) {
       // If no results found, return fallback response with contact info instead of generating with LLM
       // This prevents hallucination when there's no matching context
       if (results.length === 0) {
-        return await createNoContextResponse(query);
+        return await createNoContextResponse();
       }
       
       // For specific_item queries with exactly one match, we can return direct info
@@ -787,7 +787,7 @@ export async function POST(req: NextRequest) {
       // making things up when context quality is low, so we only fall back on truly empty results
       if (results.length === 0) {
         console.log('[Answer API] No results from semantic search, using fallback');
-        return await createNoContextResponse(query);
+        return await createNoContextResponse();
       }
       
       // Rerank results to prioritize technically complex experiences for technical queries
