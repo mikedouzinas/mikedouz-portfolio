@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "npm run build:embeddings && npm run build:typeahead",
     "build:embeddings": "tsx scripts/build_embeddings.ts",
     "build:typeahead": "tsx scripts/build_typeahead.ts",
     "verify:kb": "tsx scripts/verify_kb.ts",
