@@ -64,7 +64,9 @@ export async function loadClasses(): Promise<ClassT[]> {
 
 export async function loadSkills(): Promise<SkillT[]> {
   const data = await readJSON<unknown>(fp("skills.json"))
-  return SkillsArray.parse(data)
+  const parsed = SkillsArray.parse(data)
+  // Add the 'kind' property so skills can be treated as KB items for retrieval
+  return parsed.map(s => ({ ...s, kind: "skill" as const }))
 }
 
 export async function loadBlogs(): Promise<BlogT[]> {
@@ -141,7 +143,9 @@ export async function loadBio(): Promise<BioT[]> {
 
 /** ---- Combined content for retrieval (all KB items) ---- */
 export async function loadKBItems(): Promise<KBItem[]> {
-  const [projects, experience, classes, blogs, stories, values, interests, education, bio] = await Promise.all([
+  // Load all document types including skills so they're available for semantic search
+  // Skills can now be retrieved when users ask "what are Mike's skills?"
+  const [projects, experience, classes, blogs, stories, values, interests, education, bio, skills] = await Promise.all([
     loadProjects(),
     loadExperience(),
     loadClasses(),
@@ -151,6 +155,7 @@ export async function loadKBItems(): Promise<KBItem[]> {
     loadInterests(),
     loadEducation(),
     loadBio(),
+    loadSkills(),
   ])
   const items: KBItem[] = [
     ...projects,
@@ -162,6 +167,7 @@ export async function loadKBItems(): Promise<KBItem[]> {
     ...interests,
     ...education,
     ...bio,
+    ...skills,
   ]
 
   // sanity: unique ids

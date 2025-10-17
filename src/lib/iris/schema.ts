@@ -82,7 +82,8 @@ export const Evidence = z.object({
   id: Id,
 })
 
-export const Skill = z.object({
+// Skill schema without kind (for parsing JSON files)
+const SkillBase = z.object({
   id: Id,
   name: z.string(),
   type: z.enum(["language","framework","library","tool","service","technology","domain","technique","algorithm","concept","skill","paradigm","model_family","tooling"]).default("skill"),
@@ -90,6 +91,9 @@ export const Skill = z.object({
   description: z.string().optional(),
   evidence: z.array(Evidence).default([]), // single place for where it's used/learned
 })
+
+// Public type with kind discriminator to enable skills as retrievable KB items
+export const Skill = SkillBase.extend({ kind: z.literal("skill") })
 export type SkillT = z.infer<typeof Skill>
 
 /** ---------- Content entities: project / experience / class / blog ---------- */
@@ -226,7 +230,7 @@ export type BioT = z.infer<typeof Bio>
 export const ProjectsArray = z.array(ProjectBase)
 export const ExperienceArray = z.array(ExperienceBase)
 export const ClassesArray = z.array(ClassBase)
-export const SkillsArray = z.array(Skill)
+export const SkillsArray = z.array(SkillBase)  // Parse JSON without kind, then add it in load.ts
 export const BlogsArray = z.array(BlogBase)
 export const StoriesArray = z.array(StoryBase)
 export const ValuesArray = z.array(ValueBase)
@@ -244,5 +248,6 @@ export type KBItem =
   | InterestT
   | EducationT
   | BioT
+  | SkillT  // Adding SkillT so skills can be retrieved as standalone documents
 
-export const KBItemKinds = ["project","experience","class","blog","story","value","interest","education","bio"] as const
+export const KBItemKinds = ["project","experience","class","blog","story","value","interest","education","bio","skill"] as const

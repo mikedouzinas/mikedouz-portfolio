@@ -22,7 +22,7 @@ type Retrieved = { score: number; doc: Partial<KBItem> };
 type Options = { 
   topK?: number; 
   fields?: string[]; 
-  types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio'>;
+  types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'>;
   debug?: boolean;
 };
 

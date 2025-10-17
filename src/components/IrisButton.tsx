@@ -56,8 +56,9 @@ export default function IrisButton() {
     
     // Create a radial gradient centered at cursor position with prominent green highlight
     // The green color is strong at cursor position and gradually fades, blending with blue
+    // Using 15% for a more compact, focused green highlight that matches the animation size
     if (glowRef.current) {
-      glowRef.current.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 20%, transparent 40%)`;
+      glowRef.current.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, transparent 40%)`;
       glowRef.current.style.opacity = "1";
     }
   };
@@ -91,11 +92,13 @@ export default function IrisButton() {
           const { width, height } = button.getBoundingClientRect();
           const y = height / 2;
 
+          // Animation duration in milliseconds - increased for a smoother, more noticeable effect
           const duration = 600;
           let startTime: number | null = null;
           
           button.style.transition = 'none';
-          button.style.background = '#2563eb';
+          // Keep the original gradient background during animation instead of solid blue
+          // This matches the pre-animation state with the from-blue-600 via-green-600 to-blue-600 gradient
 
           glow.style.transition = 'opacity 100ms ease-out';
           glow.style.opacity = '1';
@@ -110,18 +113,20 @@ export default function IrisButton() {
             
             const backgrounds = [];
 
+            // Use 15% to match the compact, focused green highlight from the hover state
+            // This ensures consistent visual size between hover and animation gradients
             if (progress < firstAnimationEnd) {
                 const p = progress / firstAnimationEnd;
                 const easedP = p * p;
                 const x = (width / 2) + (width / 2) * easedP;
-                backgrounds.push(`radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 22%, transparent 40%)`);
+                backgrounds.push(`radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, transparent 40%)`);
             }
 
             if (progress > secondAnimationStart) {
                 const p = (progress - secondAnimationStart) / (1.0 - secondAnimationStart);
                 const easedP = 1 - (1 - p) * (1 - p);
                 const x = 0 + (width / 2) * easedP;
-                backgrounds.push(`radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 22%, transparent 40%)`);
+                backgrounds.push(`radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, transparent 40%)`);
             }
 
             glow.style.background = backgrounds.join(', ');

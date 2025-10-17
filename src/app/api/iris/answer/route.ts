@@ -29,7 +29,7 @@ type Intent =
  * Enables queries like "all Python projects" or "experiences from 2024"
  */
 interface QueryFilter {
-  type?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio'>;
+  type?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'>;
   // Field-based filters
   skills?: string[];          // For any item with skills field
   company?: string[];         // For experiences
@@ -88,6 +88,8 @@ Examples:
 - "tell me Mike's story" → personal (family background)
 - "why is Mike's name Douzinas?" → personal (family info)
 - "what does Mike like to do?" → personal (interests)
+- "what are Mike's skills?" → filter_query with type: ["skill"], show_all: true
+- "what technologies does Mike know?" → filter_query with type: ["skill"], show_all: true
 - "what technical work has Mike done?" → general (semantic search across all work)`
         },
         {
@@ -114,7 +116,7 @@ Examples:
                 properties: {
                   type: {
                     type: 'array',
-                    items: { type: 'string', enum: ['project', 'experience', 'class', 'blog', 'story', 'value', 'interest'] },
+                    items: { type: 'string', enum: ['project', 'experience', 'class', 'blog', 'story', 'value', 'interest', 'skill'] },
                     description: 'Document types to filter'
                   },
                   skills: {
@@ -310,7 +312,7 @@ const FIELD_MAP: Record<Intent, string[]> = {
  * Document type filtering for each intent
  * With structured filtering, most intents either use filters or search everything
  */
-const TYPE_FILTERS: Record<Intent, Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio'> | null> = {
+const TYPE_FILTERS: Record<Intent, Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'> | null> = {
   contact: null,                                             // Fast-path, no retrieval needed
   filter_query: null,                                        // Types determined by filters
   specific_item: null,                                       // Search all types for specific items
@@ -763,7 +765,7 @@ export async function POST(req: NextRequest) {
     } else {
       // Standard semantic retrieval for other intents
       const typeFilter = TYPE_FILTERS[intent];
-      const retrievalOptions: { topK: number; fields: string[]; types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio'> } = {
+      const retrievalOptions: { topK: number; fields: string[]; types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'> } = {
         topK: 5,
         fields
       };
