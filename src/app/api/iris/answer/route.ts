@@ -69,6 +69,10 @@ Analyze queries and extract:
 2. Any specific filters the user wants
 
 Examples:
+- "what projects has mike worked on?" → filter_query with type: ["project"], show_all: true
+- "list all projects" → filter_query with type: ["project"], show_all: true
+- "show me mike's work experience" → filter_query with type: ["experience"], show_all: true
+- "what classes has mike taken?" → filter_query with type: ["class"], show_all: true
 - "show me all Python projects" → filter_query with type: ["project"], skills: ["Python"]
 - "what classes involved ML?" → filter_query with type: ["class"], skills: ["ML"]
 - "list experiences from 2024" → filter_query with type: ["experience"], year: [2024]

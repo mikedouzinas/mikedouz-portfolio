@@ -18,7 +18,7 @@ const colors = {
 };
 
 // Test configuration
-const BASE_URL = process.env.TEST_URL || 'http://localhost:3001';
+const BASE_URL = process.env.TEST_URL || 'http://localhost:3000';
 const API_ENDPOINT = `${BASE_URL}/api/iris/answer`;
 
 interface TestCase {
