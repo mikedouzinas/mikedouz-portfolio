@@ -1,28 +1,115 @@
-{
-  "projects": [
-    {
-      "name": "Rack Rush",
-      "description": "Real-time Scrabble-inspired word game with multiplayer support",
-      "route": "/games/rack-rush",
-      "stack": ["React", "TypeScript", "Next.js", "Game Logic"]
+[
+  {
+    "id": "proj_hilite",
+    "title": "HiLiTe",
+    "summary": "Developed a machine learning pipeline that transforms full-length soccer matches into engaging highlight reels with AI-generated commentary.",
+    "specifics": [
+      "Vision pipeline: frame/clip extraction, event detection, and scoring",
+      "Commentary generation for key moments with sports-style narration",
+      "Synchronization of narration with selected clips for coherent highlights"
+    ],
+    "skills": ["python", "opencv", "pytorch", "computer_architecture", "computer_vision", "deep_learning", "transformers", "nlp"],
+    "tech_stack": ["Python", "OpenCV", "PyTorch", "Vision–Language methods"],
+    "architecture": "Video ingestion → moment scoring → vision features → (VLM-based) narration → timeline assembly/export",
+    "tags": ["AI", "Computer Vision", "Multimodal", "Sports Analytics"],
+    "links": {
+      "github": "https://github.com/mikedouzinas/HiLiTe.git",
+      "demo": "https://drive.google.com/drive/folders/1RbYaJtlQUq2LSUwuK25WHB8cJdrdIkr8?usp=sharing",
+      "image": "/HiLiTe.png"
     },
-    {
-      "name": "Euro 2024 Prediction Model",
-      "description": "Machine learning model for predicting Euro 2024 match outcomes",
-      "route": "/projects#euro2024",
-      "stack": ["Python", "Machine Learning", "Data Analysis", "Sports Analytics"]
-    },
-    {
-      "name": "Elysium",
-      "description": "Modern web application with elegant user interface design",
-      "route": "/projects#elysium", 
-      "stack": ["React", "Next.js", "Tailwind CSS", "UI/UX"]
-    },
-    {
-      "name": "Barça System Rating",
-      "description": "Football analytics system for rating Barcelona's playing style",
-      "route": "/projects#barca-rating",
-      "stack": ["Data Analysis", "Football Analytics", "Visualization"]
+    "dates": {
+      "start": "2025-01",
+      "end": "2025-05"
     }
-  ]
-}
+  },
+  {
+    "id": "proj_portfolio",
+    "title": "Personal Portfolio & Iris",
+    "summary": "Full-stack portfolio built with Next.js and TypeScript featuring Iris — a custom AI assistant that powers conversational navigation and contextual Q&A.",
+    "specifics": [
+      "Iris: Named after the Greek messenger goddess, part of a long-term vision for Mike's AI assistants (Iris for digital, Hermes for physical robot form)",
+      "Custom RAG pipeline: embeddings retrieval, semantic search, intent detection, and streaming LLM responses",
+      "⌘K command palette for instant search and Iris chat integration",
+      "Structured knowledge base with filter queries, year-based filtering, and personal context retrieval",
+      "Accessibility-first design with responsive layout and smooth Framer Motion animations"
+    ],
+    "skills": ["openai_api", "rag", "product_management", "user_research", "typescript", "react", "nextjs", "tailwind_css", "framer_motion"],
+    "tech_stack": ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion", "OpenAI API"],
+    "architecture": "Next.js 15 (App Router) → RAG backend (embeddings + cosine + intent detection) → GPT streaming → Iris UI (palette + chat)",
+    "tags": ["Web", "AI", "RAG", "Full-Stack", "Iris"],
+    "links": {
+      "github": "https://github.com/mikedouzinas/mikedouz-portfolio",
+      "image": "/Portfolio.png"
+    },
+    "dates": {
+      "start": "2025-02"
+    }
+  },
+  {
+    "id": "proj_euros",
+    "title": "Euros 2024 Predictor",
+    "summary": "Predicted Euro 2024 outcomes by scraping datasets and training classical ML models; reached ~top 3% in UEFA predictions.",
+    "specifics": [
+      "Feature engineering from fixtures, form, and team stats with Pandas/NumPy",
+      "Random Forest classification with CV and hyperparameter tuning",
+      "Produced xG-style expectations and discrete scoreline predictions; error analysis and calibration"
+    ],
+    "skills": ["python", "pandas", "numpy", "scikit_learn", "data_mining", "feature_engineering", "model_evaluation", "probability", "statistics"],
+    "tech_stack": ["Python", "Pandas", "NumPy", "scikit-learn"],
+    "architecture": "Scraper → feature store (CSV/Parquet) → model training (RF) → inference/evaluation notebooks",
+    "tags": ["ML", "Sports Analytics", "Classical ML"],
+    "links": {
+      "github": "https://github.com/mikedouzinas/euros-predictor",
+      "image": "/Euros.png"
+    },
+    "dates": {
+      "start": "2024-05",
+      "end": "2024-06"
+    }
+  },
+  {
+    "id": "proj_momentum",
+    "title": "Momentum",
+    "summary": "SwiftUI iOS app for voice-first productivity: real-time transcription, GPT intent parsing, and adaptive TTS feedback.",
+    "specifics": [
+      "Streaming ASR pipeline with <1s perceived latency",
+      "Intent parsing → actions (reminders, calendar, to-dos) via GPT",
+      "Low-latency TTS with interruption handling; privacy-aware UX"
+    ],
+    "skills": ["speech_recognition", "tts", "openai_api", "product_management", "ux_design", "swiftui", "avfoundation"],
+    "tech_stack": ["SwiftUI", "AVFoundation", "OpenAI API"],
+    "architecture": "Audio capture → ASR → intent (LLM) → action execution → TTS playback; reactive state with SwiftUI",
+    "tags": ["iOS", "Voice", "Assistant"],
+    "links": {
+      "github": "https://github.com/mikedouzinas/momentum",
+      "image": "/Momentum.png"
+    },
+    "dates": {
+      "start": "2024-04",
+      "end": "2024-05"
+    }
+  },
+  {
+    "id": "proj_knight_life",
+    "title": "BB&N's Knight Life",
+    "summary": "Native iOS app that streamlined school scheduling at BB&N; widely adopted and rated 4.9★ on the App Store.",
+    "specifics": [
+      "Centralized schedules with reliable local caching and notifications",
+      "Continuous releases using student feedback loops",
+      "End-to-end App Store deployment and support"
+    ],
+    "skills": ["swift", "firebase", "product_management", "user_research", "ux_design"],
+    "tech_stack": ["Swift", "Firebase"],
+    "architecture": "Native iOS app with Firebase backend for sync/messaging; notification scheduling and offline-first caching",
+    "tags": ["iOS", "Product"],
+    "links": {
+      "github": "https://github.com/mikedouzinas/BBN-Knight-Life",
+      "app_store": "https://apps.apple.com/us/app/bb-ns-knight-life/id1585503654",
+      "image": "/KnightLife.png"
+    },
+    "dates": {
+      "start": "2021-09",
+      "end": "2023-06"
+    }
+  }
+]

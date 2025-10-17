@@ -1,69 +1,84 @@
-{
-  "experiences": [
-    {
-      "company": "Parsons Corporation",
+[
+  {
+    "id": "exp_parsons_2025",
+    "company": "Parsons Corporation",
     "role": "Software Engineer Intern",
-    "dates": "May 2025 – Aug 2025 (Return Offer for 2026)",
-    "location": "Remote (USAF Program)",
-    "stack": ["C#", ".NET", "SQL", "AWS", "Power BI"],
-    "impact": [
-      "Built a data integration pipeline linking .NET backend services with external APIs and AWS, cutting redundant API calls by 40% and powering dashboards for 3,000+ Air Force personnel.",
-      "Redesigned Power BI interfaces with Air Force analysts to clarify KPIs and reduce data-interpretation time 25%.",
-      "Optimized SQL schema design for predictive maintenance data, improving query efficiency and reliability for mission-critical insights.",
-      "Recognized by senior leadership for mastering C#/.NET rapidly and independently delivering production-grade features in under 4 weeks."
-    ]
+    "dates": { "start": "2025-05", "end": "2025-08" },
+    "summary": "Built automated .NET/C# data-integration services feeding Power BI for 3K daily USAF users; reduced upstream API calls ~40% and improved stakeholder-facing layouts.",
+    "specifics": [
+      "Designed a C#/.NET pipeline to consume external APIs, normalize records, and sync into SQL with schema optimizations for report performance.",
+      "Implemented request de-duplication and caching, reducing third-party API calls by ~40% while maintaining freshness SLAs.",
+      "Integrated with AWS-hosted services and Power BI Embedded; hardened auth and connection lifecycle.",
+      "Refactored dashboard layout and data contract for clearer decision support across USAF housing workflows.",
+      "Recognized with a 2026 return offer for rapid ramp-up on .NET and platform ownership."
+    ],
+    "skills": ["csharp", "dotnet", "aws", "power_bi", "api_integration"],
+    "links": { "company": "https://www.parsons.com/" },
+    "tags": ["internship", "data-integration", "analytics", "gov"]
   },
   {
-    "company": "Rice University — Liu Idea Lab for Innovation & Entrepreneurship (Lilie)",
-    "role": "Software Engineer-in-Residence",
-    "dates": "Feb 2024 – Oct 2024",
-    "location": "Houston, TX",
-    "stack": ["React", "TypeScript", "Supabase", "CI/CD", "Figma"],
-    "impact": [
-      "Led design of Rice’s entrepreneurship platform, bui",
-      "Ran 40+ user interviews and implemented feature priorities from feedback, resulting in 100% growth in platform adoption.",
-      "Built Supabase CI/CD pipelines reducing deployment time 50% and improving team reliability across engineering pods.",
-      "Mentored 30+ student founders; 3 startups later accepted into Y Combinator with technical foundations architected under Mike’s guidance."
-    ]
+    "id": "exp_lilie_2024",
+    "company": "Liu Idea Lab for Innovation & Entrepreneurship (Rice)",
+    "role": "Software Engineer in Residence",
+    "dates": { "start": "2024-02", "end": "2024-11" },
+    "summary": "Led full-stack platform work (React/TypeScript/Supabase) and product discovery; doubled student usage and supported ~30 startups (3 admitted to YC).",
+    "specifics": [
+      "Ran 40+ user interviews to define platform requirements; translated findings into a typed component library and data model.",
+      "Implemented auth, data access, and content modules on Supabase with React/TypeScript; instrumented usage analytics for prioritization.",
+      "Built an onboarding flow and resources hub that increased student engagement ~100% across Lilie properties.",
+      "Partnered with faculty and founders; managed roadmap, sprint rituals, and stakeholder demos for >4,000 community members."
+    ],
+    "skills": ["typescript", "react", "supabase", "product_management", "user_research", "ux_design"],
+    "links": { "company": "https://entrepreneurship.rice.edu/" },
+    "tags": ["platform", "product", "full-stack", "edtech"]
   },
   {
+    "id": "exp_veson_2024",
     "company": "Veson Nautical",
-    "role": "Software Engineering Intern",
-    "dates": "Jun 2024 – Aug 2024",
-    "location": "Boston, MA",
-    "stack": ["Python", "Google Document AI", "Streamlit", "TypeScript"],
-    "impact": [
-      "Developed a Document-AI pipeline parsing 100+ complex maritime contracts in parallel, cutting client processing from 3 days to <8 minutes (540× faster).",
-      "Built and demoed an automated laytime calculation module that helped secure $25M+ in renewals with clients including ExxonMobil and Oldendorff.",
-      "Collaborated weekly with enterprise clients to refine algorithms based on evolving maritime contract logic, ensuring compliance with 15+ document types.",
-      "Delivered ahead of deadline and presented integration plan for IMOS product line, strengthening Veson’s competitive edge."
-    ]
+    "role": "Software Engineering Intern (IMOS – Laytime Automation)",
+    "dates": { "start": "2024-06", "end": "2024-09" },
+    "summary": "Built a high-throughput document-processing pipeline (Google Document AI + Python) to automate laytime calculations; reduced multi-day workflows to ~2 minutes.",
+    "specifics": [
+      "Parsed PDFs/EMLs/XLSX and nested attachments at scale (100+ docs per batch) using Google Document AI with parallel execution.",
+      "Extracted Statement of Facts, Charter Parties, vendor calculations, and 15+ doc classes; normalized into a contract-aware schema.",
+      "Implemented rule engines that codified client-specific laytime clauses; cross-checked vendor demurrage against computed results.",
+      "Delivered Streamlit prototypes and initiated IMOS integration; iterated daily with enterprise stakeholders under tight deadlines.",
+      "Consultative work helped close four multi-million-dollar annual deals within one month by demonstrating speed and accuracy."
+    ],
+    "skills": ["python", "google_document_ai", "streamlit", "rule_engines", "data_extraction", "api_integration", "docker", "typescript"],
+    "links": { "company": "https://veson.com/" },
+    "tags": ["automation", "nlp-vision", "enterprise", "maritime"]
   },
   {
-    "company": "VesselsValue (acquired by Veson Nautical)",
+    "id": "exp_vesselsvalue_2024",
+    "company": "VesselsValue",
     "role": "Data Science Intern",
-    "dates": "May 2024 – Jun 2024",
-    "location": "London, UK (Remote)",
-    "stack": ["Python", "SentenceTransformer", "FAISS", "SQL", "Jupyter"],
-    "impact": [
-      "Built NLP pipeline using SentenceTransformer + FAISS to cluster 100K+ job titles with 97% accuracy, streamlining recruitment segmentation.",
-      "Unified 600K+ company records into one high-fidelity dataset with custom stopword and similarity search, improving match accuracy 20%.",
-      "Automated ETL ingestion and lead enrichment pipeline, shrinking onboarding from 3 hours to 30 minutes and accelerating outreach 70%.",
-      "Partnered with PMs to translate data insights into product-roadmap decisions, embedding ML feedback loops into commercial operations."
-    ]
+    "dates": { "start": "2024-05", "end": "2024-06" },
+    "summary": "Shipped NLP clustering and entity-matching pipelines (Sentence Transformers + FAISS) achieving ~97% title-category accuracy; improved company merge precision >20%.",
+    "specifics": [
+      "Built job-title classifier using SentenceTransformer embeddings; tuned thresholds and stop-word handling for noisy maritime data.",
+      "Designed FAISS-based similarity search to merge 600k+ companies; improved matching precision by >20% versus legacy methods.",
+      "Automated an ingestion/cleaning pipeline to refresh leads and segmentation; cut outreach cycle time ~70%.",
+      "Partnered with PMs to productize insights and tighten feedback loops into roadmap decisions."
+    ],
+    "skills": ["python", "sentence_transformers", "faiss", "pandas", "numpy", "model_evaluation", "feature_engineering"],
+    "links": { "company": "https://www.vesselsvalue.com/" },
+    "tags": ["nlp", "search", "data-quality", "ml-platform"]
   },
   {
-    "company": "Veson Nautical (Mobile Team)",
-    "role": "iOS Developer Intern",
-    "dates": "Jun 2021 – Jun 2023",
-    "location": "Boston, MA",
-    "stack": ["Swift", "Xcode", "CI/CD", "API Integration"],
-    "impact": [
-      "Co-developed Veson’s first mobile client app, enabling 1,000+ enterprise users to access voyage data on iOS.",
-      "Reduced average client time to access IMOS system by 30% through optimized API handling and mobile caching logic.",
-      "Collaborated in Agile sprints, implementing client feedback cycles and demoing builds to enterprise users.",
-      "Strengthened product reliability using Atlassian pipelines and automated test scripts for CI/CD delivery."
-    ]
+    "id": "exp_veson_mobile_2021_2023",
+    "company": "Veson Nautical",
+    "role": "Software Development Intern (Mobile)",
+    "dates": { "start": "2021-06", "end": "2023-06" },
+    "summary": "One of three frontend iOS devs on Veson’s first mobile app; enabled on-the-go access to voyage/cargo data and drove broad client adoption.",
+    "specifics": [
+      "Built Swift UI features, API client, and offline-tolerant data flows; coordinated sprint integration with the platform team.",
+      "Presented builds to enterprise users; incorporated feedback for usability and reliability improvements.",
+      "Introduced >50% of surveyed clients to mobile workflows; reduced time-to-data by ~30% versus desktop access.",
+      "Established CI/CD hygiene and release rituals with Atlassian tooling."
+    ],
+    "skills": ["swift", "xcode", "api_integration", "ci_cd", "product_management"],
+    "links": { "company": "https://veson.com/" },
+    "tags": ["ios", "mobile", "enterprise"]
   }
-  ]
-}
+]

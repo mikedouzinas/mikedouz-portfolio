@@ -1,0 +1,227 @@
+[
+    {
+      "id": "class_ap_csa_2020",
+      "title": "AP Computer Science A",
+      "institution": "Buckingham Browne & Nichols (BB&N)",
+      "term": "Fall 2020 – Spring 2021",
+      "professor": "Mark Fidler",
+      "summary": "Intro CS in Java; algorithmic thinking and problem solving. Culminated in first Swift app.",
+      "specifics": [
+        "Java programming fundamentals, OOP, and problem decomposition",
+        "Intro algorithms and testing; AP subset of DSA",
+        "Capstone led to first Swift app and early product habits"
+      ],
+      "skills": ["java", "oop", "algorithms", "software_design_basics", "swift"]
+    },
+    {
+      "id": "class_atcs_2022",
+      "title": "Advanced Topics in Computer Science",
+      "institution": "BB&N",
+      "term": "Fall 2022",
+      "professor": "Dr. Amelia Mattern",
+      "summary": "Built a computer from logic gate to OS; wrote 'Angry Circle' game in assembly.",
+      "specifics": [
+        "HDL → CPU → OS stack (Nand2Tetris-style flow)",
+        "Jack/VM/Assembly and binary representations",
+        "Systems thinking from hardware to software"
+      ],
+      "skills": ["computer_architecture", "assembly", "compilers_parsing_basics", "systems_thinking"]
+    },
+    {
+      "id": "class_comp_140_2023",
+      "title": "COMP 140 – Computational Thinking",
+      "institution": "Rice University",
+      "term": "Fall 2023",
+      "professor": "Dave Johnson",
+      "summary": "Python, core algorithms, BFS/DFS; Google Maps–style pathfinding projects.",
+      "specifics": [
+        "Algorithmic problem solving with Python",
+        "Graph traversal patterns and complexity intuition"
+      ],
+      "skills": ["python", "algorithms", "graphs"]
+    },
+    {
+      "id": "class_busi_221_2023",
+      "title": "BUSI 221 – New Enterprises Discovery",
+      "institution": "Rice University",
+      "term": "Fall 2023",
+      "professor": "Hesam Panahi",
+      "summary": "Entrepreneurship discovery; built ClipNote mobile app and clarified personal direction.",
+      "specifics": [
+        "Opportunity discovery and customer development",
+        "Built ClipNote; wrote blog 'What are you going to do with your life?'"
+      ],
+      "skills": ["entrepreneurship", "product_discovery", "user_research", "writing"]
+    },
+    {
+      "id": "class_fwis_180_2023",
+      "title": "FWIS 180 – Innovation in Educational Technology",
+      "institution": "Rice University",
+      "term": "Fall 2023",
+      "professor": "Ali Garib",
+      "summary": "Explored AI’s role in education; research and comparative writing.",
+      "specifics": [
+        "Research Paper: AI’s transformative role in educating students with disabilities",
+        "Comparative portfolio on AI and creative writing"
+      ],
+      "skills": ["ai_ethics_policy", "research_writing"]
+    },
+    {
+      "id": "class_comp_182_2024",
+      "title": "COMP 182 – Algorithmic Thinking",
+      "institution": "Rice University",
+      "term": "Spring 2024",
+      "professor": "Ronald Goldman",
+      "summary": "Discrete math + algorithm design; correctness proofs and complexity.",
+      "specifics": [
+        "Recursion, divide-and-conquer, greedy methods",
+        "Graphs, correctness proofs, asymptotic analysis"
+      ],
+      "skills": ["algorithms", "discrete_math", "proofs", "graphs"]
+    },
+    {
+      "id": "class_busi_369_2024",
+      "title": "BUSI 369 – New Enterprises",
+      "institution": "Rice University",
+      "term": "Spring 2024",
+      "professor": "Hesam Panahi",
+      "summary": "Cofounded Lock-In; multimodal AI for attention/focus with real user discovery.",
+      "specifics": [
+        "Venture testing with interviews, go/no-go decisions, investor feedback",
+        "Mapped technical feasibility against user needs"
+      ],
+      "skills": ["entrepreneurship", "product_management", "user_research"]
+    },
+    {
+      "id": "class_busi_220_2024",
+      "title": "BUSI 220 – Intro to Design and Innovation",
+      "institution": "Rice University",
+      "term": "Spring 2024",
+      "professor": "Hesam Panahi",
+      "summary": "Built Momentum, a voice-first iOS app (SwiftUI, ASR, TTS, GPT-4).",
+      "specifics": [
+        "Realtime transcription (<1s) and adaptive TTS feedback",
+        "Agile sprints, TestFlight feedback, user-centered iteration"
+      ],
+      "skills": ["swiftui", "speech_recognition", "tts", "openai_api", "product_management", "ux_design"]
+    },
+    {
+      "id": "class_busi_360_2024",
+      "title": "BUSI 360 – Founder’s Journey",
+      "institution": "Rice University",
+      "term": "Spring 2024",
+      "professor": "Kyle Judah",
+      "summary": "Founder talks; lessons in adaptability, purpose, and networks.",
+      "specifics": [
+        "Patterns in founder decision-making and resilience",
+        "Aligning products with deeper values"
+      ],
+      "skills": ["entrepreneurship", "leadership"]
+    },
+    {
+      "id": "class_comp_215_2024",
+      "title": "COMP 215 – Introduction to Program Design",
+      "institution": "Rice University",
+      "term": "Fall 2024",
+      "professor": "Rebecca Schreib",
+      "summary": "Large-scale Java systems; OOP, data structures, and maintainability.",
+      "specifics": [
+        "Built 1k+ line Java programs; linked lists, hash tables, BSTs, heaps, tries",
+        "Testing, debugging, refactoring for clarity and performance"
+      ],
+      "skills": ["java", "oop", "data_structures"]
+    },
+    {
+      "id": "class_comp_222_2024",
+      "title": "COMP 222 – Introduction to Computer Organization",
+      "institution": "Rice University",
+      "term": "Fall 2024",
+      "professor": "Alan Cox",
+      "summary": "C and assembly to machine execution; memory, caching, and basic security.",
+      "specifics": [
+        "Pointers, dynamic allocation, and debugging segfaults",
+        "Pipelining, caching, and intro to ROP/security mindset"
+      ],
+      "skills": ["c_lang", "assembly", "computer_architecture", "memory_management", "systems_security_basics"]
+    },
+    {
+      "id": "class_stat_315_2024",
+      "title": "STAT 315 – Probability and Statistics for Data Science",
+      "institution": "Rice University",
+      "term": "Fall 2024",
+      "professor": "Rudy Guerra",
+      "summary": "Probability, inference, and hypothesis testing; labs in R.",
+      "specifics": [
+        "Distributions, expectation/variance, confidence intervals",
+        "One-/two-sample tests and simulation-based intuition in R"
+      ],
+      "skills": ["probability", "statistics", "hypothesis_testing", "r_lang", "data_analysis_basics"]
+    },
+    {
+      "id": "class_comp_312_2025",
+      "title": "COMP 312 – Introduction to Programming Languages",
+      "institution": "Rice University",
+      "term": "Spring 2025",
+      "professor": "Rebecca Schreib",
+      "summary": "Why languages work: grammars, parsing, ASTs, compilation, and FP.",
+      "specifics": [
+        "Built parsers with ANTLR; visitor pattern over ASTs",
+        "Compiler components and functional-programming paradigms"
+      ],
+      "skills": ["programming_languages", "parsing", "compilers", "functional_programming", "antlr", "java", "python"]
+    },
+    {
+      "id": "class_comp_321_2025",
+      "title": "COMP 321 – Introduction to Computer Systems",
+      "institution": "Rice University",
+      "term": "Spring 2025",
+      "professor": "Alan Cox",
+      "summary": "Systems programming in C; processes, threads, malloc, shells, and concurrency.",
+      "specifics": [
+        "Built Unix shell, threading libs, custom malloc, checkpointing, and KV store",
+        "Debugging race conditions and performance bottlenecks"
+      ],
+      "skills": ["c_lang", "systems_programming", "concurrency", "operating_systems", "networking_basics", "memory_management"]
+    },
+    {
+      "id": "class_comp_646_2025",
+      "title": "COMP 646 – Deep Learning for Vision and Language",
+      "institution": "Rice University",
+      "term": "Spring 2025",
+      "professor": "",
+      "summary": "Modern multimodal DL (CNNs, transformers, diffusion); built HiLiTe.",
+      "specifics": [
+        "BERT/ViT/LLaMA; VAEs, diffusion, DiTs",
+        "Object detection, captioning, and text-to-image foundations",
+        "Project: HiLiTe — highlight reels with VLM commentary"
+      ],
+      "skills": ["deep_learning", "transformers", "computer_vision", "nlp", "diffusion_models", "project_hilite_link", "python"]
+    },
+    {
+      "id": "class_cs430_2025",
+      "title": "CS430 – Data Mining",
+      "institution": "Ramon Llull University",
+      "term": "Fall 2025",
+      "professor": "Alejandro Moñux Bernal",
+      "summary": "End-to-end data mining: collection → cleaning → modeling → evaluation.",
+      "specifics": [
+        "Hands-on Pandas + scikit-learn for real problems (fraud, segmentation, prediction)",
+        "Warehouses, OLAP, and evaluation/optimization patterns"
+      ],
+      "skills": ["pandas", "scikit_learn", "data_mining", "feature_engineering", "model_evaluation", "data_warehousing", "olap", "python"]
+    },
+    {
+      "id": "class_ep430_2025",
+      "title": "EP430 – Computer Architecture",
+      "institution": "Ramon Llull University",
+      "term": "Fall 2025",
+      "professor": "Guillem Guerrero Massana",
+      "summary": "Processors, pipelining, parallel architectures, and multicore systems.",
+      "specifics": [
+        "Instruction execution and dataflow within CPU",
+        "Performance trade-offs across pipelines and multiprocessor designs"
+      ],
+      "skills": ["computer_architecture", "parallel_computing", "multicore_systems", "performance_engineering", "python"]
+    }
+  ]
+  

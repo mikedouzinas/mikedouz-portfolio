@@ -1,48 +1,78 @@
 {
-  "tagline": "Fullstack engineer building impactful products with modern web technologies",
-  "current_work": "Working on personal projects and exploring new opportunities in product engineering",
-  "location": "Boston",
-  "languages": {
-    "native": ["Greek"],
-    "fluent": ["English"],
-    "learning": ["Spanish"]
-  },
-  "interests": ["Product development", "System design", "User experience"],
-  "availability_status": "Open to new opportunities",
-  "full_name": {
-    "english": "Michael Konstantinos Veson",
-    "greek": "Michael Konstantinos John Douzinas Veson",
-    "note": "Mike sometimes goes by Mike Douzinas to honor his maternal grandfather, Kostas Douzinas, who is an idol to him"
-  },
-  "family": {
-    "parents": {
-      "father": "John Veson",
-      "mother": "Eva Douzinas"
+  "name": "Mike Konstantinos Veson",
+  "headline": "Computer Science @ Rice University | AI, Full-Stack, and Data-Driven Product Builder",
+  "bio": "Engineer focused on building thoughtful, AI-driven systems that bridge product, data, and design. Skilled at working alongside clients and cusotomers to output excellent products. Experienced in ML and modern web & mobile architectures.",
+  "education": [
+    {
+      "school": "Rice University",
+      "degree": "B.S. Computer Science",
+      "gpa": "3.88",
+      "expected_grad": "May 2027"
+    }
+  ],
+  "key_values": [
+    {
+      "value": "Integrity",
+      "why": "I believe I have a duty as a person to always give my all to do the right thing. To me, being honest and transparent with myself and others is the most important thing I can do."
     },
+    {
+      "value": "Ambition",
+      "why": "I am someone who is always looking to improve, stay humble, and grow. I always believe anything can be done as long as you have the courage to try and the determination to see it through. 'My idol is me in 5 years'"
+    },
+    {
+      "value": "Serenity",
+      "why": "I always try to live my life by the serenity prayer: 'Grant me the serenity to accept the things I cannot change, the courage to change the things I can, and the wisdom to know the difference.'"
+    },
+    {
+      "value": "Creativity",
+      "why": "The ability to see the world in a new way and to express yourself in a new way. I strive to put myself in situations where I can be creative and always learn."
+    }
+  ],
+  "interests": [
+    {
+      "interest": "Software Development",
+      "why": "I love building products that change and simplify people's lives. I am someone obssessed with details and love to build products that are both functional and aesthetically pleasing (like Iris)"
+    },
+    {
+      "interest": "Creative Writing",
+      "why": "I love writing and sharing my thoughts with the world. I write blogs in my free time, and published one for Rice"
+    },
+    {
+      "interest": "Learning Languages",
+      "why": "I love learning new languages and cultures. I have a strong relation to Greek and Spanish from my family, and I am studying abroad to improve both."
+    }
+  ],
+  "family": {
+    "parents": [
+      "Eva Douzinas",
+      "John Veson"
+    ],
     "siblings": [
+      "Natalie Veson",
+      "Konstantinos Veson"
+    ],
+    "pets": [
       {
-        "name": "Natalie",
-        "relation": "older sister"
+        "name": "Callie",
+        "note": "white golden retriever"
       },
       {
-        "name": "Kai",
-        "relation": "younger brother"
+        "name": "Cooper",
+        "note": "orange golden retriever"
       }
     ],
-    "grandfathers": {
-      "paternal": "Michael Veson - an inspiration to Mike, namesake in his full name",
-      "maternal": "Kostas Douzinas - an idol to Mike, namesake in his full name"
-    },
-    "legacy": "Mike is very proud of his family. Both of his grandfathers are inspirations - his name Michael Konstantinos Douzinas Veson is a mix of both their full names"
-  },
-  "entrepreneurship_history": {
-    "veson_nautical": {
-      "founded_by": "Mike's parents, John Veson and Eva Douzinas, founded Veson Nautical together 20 years ago",
-      "company_name_origin": "Veson Nautical's name is a blend of Kostas Douzinas' company 'Nautical Corporation' and Michael Veson's company 'Veson Inc'",
-      "mother_role": "Eva left the company in 2017",
-      "mike_involvement": "Mike learned to code by going to the office with his parents, learning how the shipping software space worked, and built the first mobile app for the company",
-      "legacy": "Mike has a long history of entrepreneurship and deep roots in the shipping space - you can read more about this in his blog"
-    },
-    "influence": "Growing up around Veson Nautical gave Mike early exposure to software engineering, the shipping industry, and entrepreneurship from a young age"
+    "grandparents": [
+      "Kostas Douzinas",
+      "Nancy Douzinas",
+      "Mary Veson",
+      "Michael Veson (deceased)"
+    ],
+    "stories": [
+      {
+        "id": "veson_nautical_roots",
+        "title": "Family roots in maritime software",
+        "text": "Mike's grandfathers—Michael Veson (Veson Inc.) and Kostas Douzinas (Nautical Corporation)—each founded shipping software companies. His parents, John Veson and Eva Douzinas, later founded Veson Nautical, inspired by those companies. Seeing them build from the ground up shaped Mike’s belief in software’s real-world impact; he helped the family business in high school while learning to code and shipping the first Veson Nautical mobile app."
+      }
+    ]
   }
 }

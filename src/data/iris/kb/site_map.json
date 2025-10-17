@@ -1,9 +1,0 @@
-{
-  "routes": [
-    {
-      "path": "/",
-      "title": "Home",
-      "description": "Main portfolio page with overview and navigation"
-    }
-  ]
-}

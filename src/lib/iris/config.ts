@@ -23,13 +23,12 @@ export const config = {
   
   // GitHub integration
   repo: { 
-    owner: 'mikeveson',             // GitHub repo owner for commit fetching
-    name: 'portfolio'               // GitHub repo name for commit fetching
+    owner: 'mikedouzinas',             // GitHub repo owner for commit fetching
+    name: 'mikedouz-portfolio'               // GitHub repo name for commit fetching
   },
   
   // Placeholder URLs (to be replaced with real endpoints)
-  availabilityUrl: 'https://example.com/availability',
-  interviewLinksUrl: 'https://example.com/interview',
+  availabilityUrl: 'https://fantastical.app/mikeveson/mikeveson-meeting',
   
   // Performance budgets
   typeaheadMaxMs: 16,               // Local typeahead must respond under 16ms
@@ -38,13 +37,13 @@ export const config = {
   
   // OpenAI model configuration
   models: {
-    chat: 'gpt-4.1',                // GPT-4 Turbo for better quality answers with larger context window
+    chat: 'gpt-4.1-mini',                // Nano is the cheapest model and will do for now
     embedding: 'text-embedding-3-small' // Embedding model for RAG
   },
   
   // Answer generation settings
   chatSettings: {
-    temperature: 0.3,               // Slightly higher temperature for more natural, conversational responses
+    temperature: 1,               // Slightly higher temperature for more natural, conversational responses
     maxTokens: 800,                 // Longer answers to provide more detailed, complete information
     stream: true                    // Enable streaming responses
   }

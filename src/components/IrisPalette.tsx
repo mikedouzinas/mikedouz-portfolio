@@ -585,13 +585,13 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     setAnswer(accumulatedAnswer);
                   }
                 } catch {
-                  // Skip invalid JSON - intentionally ignoring parse errors
+                  // Skip invalid JSON - silently ignore parse errors
                 }
               }
             }
           }
         }
-        console.log('[IrisPalette] Streaming complete, total length:', accumulatedAnswer.length);
+        console.log('[IrisPalette] Streaming complete, length:', accumulatedAnswer.length);
       } else {
         // Fallback JSON response
         console.log('[IrisPalette] Using JSON response');
