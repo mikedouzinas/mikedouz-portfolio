@@ -1,8 +1,32 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import { playgroundProjects } from '@/data/playground';
 import { FaChevronRight } from 'react-icons/fa';
+
+// TODO: Move this to a proper data source in future iteration
+// Temporary inline playground projects data for build compatibility
+const playgroundProjects = [
+  {
+    slug: 'rack-rush',
+    name: 'Rack Rush',
+    blurb: 'A Scrabble-inspired word game with time pressure and strategy.'
+  },
+  {
+    slug: 'decision-maker',
+    name: 'Decision Maker',
+    blurb: 'Can\'t decide? Let this tool help you make a choice with thoughtful reasoning.'
+  },
+  {
+    slug: 'quotes',
+    name: 'Quotes Collection',
+    blurb: 'Personal collection of quotes that resonate with me and why.'
+  },
+  {
+    slug: 'ranked-by-mv',
+    name: 'Ranked by MV',
+    blurb: 'My systematic rating system for products, experiences, and more.'
+  }
+];
 
 export default function PlaygroundPage() {
   return (

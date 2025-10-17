@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { WorkExperience } from "@/data/workExperiences";
+import { WorkExperience } from "@/data/loaders";
 import BaseCard from "@/components/base_card";
 
 interface ExperienceCardProps {

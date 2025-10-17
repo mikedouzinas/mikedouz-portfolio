@@ -2,7 +2,7 @@
 import React from "react";
 import { FaGithub } from "react-icons/fa";
 import { ExternalLink } from "lucide-react";
-import { Project } from "@/data/projects";
+import { Project } from "@/data/loaders";
 import Image from "next/image";
 import BaseCard from "@/components/base_card";
 

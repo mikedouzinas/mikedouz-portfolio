@@ -1,12 +1,30 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getProjectBySlug } from '@/data/playground';
-import { quotes } from '@/data/quotes';
 import { FaArrowLeft } from 'react-icons/fa';
 
+// TODO: Move these to proper data sources in future iteration
+// Temporary inline data for build compatibility
+const project = {
+  slug: 'quotes',
+  name: 'Quotes Collection',
+  blurb: 'Personal collection of quotes that resonate with me and why.'
+};
+
+const quotes = [
+  {
+    text: "The best time to plant a tree was 20 years ago. The second best time is now.",
+    author: "Chinese Proverb",
+    why: "A reminder that it's never too late to start something meaningful. Progress is better than perfection."
+  },
+  {
+    text: "Do not go where the path may lead, go instead where there is no path and leave a trail.",
+    author: "Ralph Waldo Emerson",
+    why: "Encourages innovation and pioneering. Sometimes the most rewarding path is the one you create yourself."
+  }
+];
+
 export default function QuotesPage() {
-  const project = getProjectBySlug('quotes');
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -48,10 +66,6 @@ export default function QuotesPage() {
   };
 
   const currentQuote = quotes[currentQuoteIndex];
-
-  if (!project) {
-    return <div>Project not found</div>;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16 px-8">

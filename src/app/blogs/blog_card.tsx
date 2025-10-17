@@ -1,7 +1,7 @@
 "use client";
 import React from "react";  
 import Image from "next/image";
-import { Blog } from "@/data/blogs";
+import { Blog } from "@/data/loaders";
 import BaseCard from "@/components/base_card";
 
 interface BlogCardProps {

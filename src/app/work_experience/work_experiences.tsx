@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import ExperienceCard from "@/app/work_experience/experience_card";
-import { workExperiences } from "@/data/workExperiences";
+import { workExperiences } from "@/data/loaders";
 
 export default function ExperienceSection() {
   return (

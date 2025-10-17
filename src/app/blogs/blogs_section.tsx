@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { blogs } from "@/data/blogs";
+import { blogs } from "@/data/loaders";
 import BlogCard from "./blog_card";
 
 export default function BlogsSection() {

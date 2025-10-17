@@ -1,8 +1,15 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { getProjectBySlug } from '@/data/playground';
 import { FaArrowLeft } from 'react-icons/fa';
+
+// TODO: Move this to a proper data source in future iteration
+// Temporary inline project metadata for build compatibility
+const project = {
+  slug: 'rack-rush',
+  name: 'Rack Rush',
+  blurb: 'A Scrabble-inspired word game with time pressure and strategy.'
+};
 
 // Simple letter stream for the typing game
 interface Letter {
@@ -14,7 +21,6 @@ interface Letter {
 }
 
 export default function RackRushPage() {
-  const project = getProjectBySlug('rack-rush');
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
   const [wpm, setWpm] = useState(0);
@@ -124,10 +130,6 @@ export default function RackRushPage() {
       }
     }
   };
-
-  if (!project) {
-    return <div>Project not found</div>;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16 px-8">

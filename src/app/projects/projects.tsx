@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import ProjectCard from "@/app/projects/project_card";
-import { projects } from "@/data/projects";
+import { projects } from "@/data/loaders";
 
 export default function ProjectsSection() {
   return (

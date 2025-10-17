@@ -1,8 +1,15 @@
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { getProjectBySlug } from '@/data/playground';
 import { FaArrowLeft } from 'react-icons/fa';
+
+// TODO: Move this to a proper data source in future iteration
+// Temporary inline project metadata for build compatibility
+const project = {
+  slug: 'decision-maker',
+  name: 'Decision Maker',
+  blurb: 'Can\'t decide? Let this tool help you make a choice with thoughtful reasoning.'
+};
 
 // Decision reasoning templates for fun explanations
 const reasoningTemplates = [
@@ -25,7 +32,6 @@ interface Decision {
 }
 
 export default function DecisionMakerPage() {
-  const project = getProjectBySlug('decision-maker');
   const [options, setOptions] = useState('');
   const [criteria, setCriteria] = useState('');
   const [currentDecision, setCurrentDecision] = useState<Decision | null>(null);
@@ -58,10 +64,6 @@ export default function DecisionMakerPage() {
     setOptions('');
     setCriteria('');
   };
-
-  if (!project) {
-    return <div>Project not found</div>;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16 px-8">
