@@ -193,6 +193,33 @@ export const Interest = InterestBase.extend({
 })
 export type InterestT = z.infer<typeof Interest>
 
+/** ---------- Education (from profile.education) ---------- */
+
+const EducationBase = z.object({
+  id: Id,
+  school: z.string().min(1),
+  degree: z.string().min(1),
+  gpa: z.string().optional(),
+  expected_grad: z.string().optional(),
+})
+export const Education = EducationBase.extend({
+  kind: z.literal("education")
+})
+export type EducationT = z.infer<typeof Education>
+
+/** ---------- Bio (from profile.bio + headline) ---------- */
+
+const BioBase = z.object({
+  id: Id,
+  name: z.string().min(1),
+  headline: z.string().min(1),
+  bio: z.string().min(1),
+})
+export const Bio = BioBase.extend({
+  kind: z.literal("bio")
+})
+export type BioT = z.infer<typeof Bio>
+
 /** ---------- Union + arrays ---------- */
 
 // For parsing raw JSON (without kind)
@@ -204,6 +231,8 @@ export const BlogsArray = z.array(BlogBase)
 export const StoriesArray = z.array(StoryBase)
 export const ValuesArray = z.array(ValueBase)
 export const InterestsArray = z.array(InterestBase)
+export const EducationArray = z.array(EducationBase)
+export const BioArray = z.array(BioBase)
 
 export type KBItem =
   | ProjectT
@@ -213,5 +242,7 @@ export type KBItem =
   | StoryT
   | ValueT
   | InterestT
+  | EducationT
+  | BioT
 
-export const KBItemKinds = ["project","experience","class","blog","story","value","interest"] as const
+export const KBItemKinds = ["project","experience","class","blog","story","value","interest","education","bio"] as const

@@ -21,7 +21,7 @@ type Intent =
   | 'contact'        // Fast-path for contact information (no LLM needed)
   | 'filter_query'   // Structured filtering (e.g., "Python projects", "2025 work", "ML classes")
   | 'specific_item'  // Query about a specific item (e.g., "tell me about HiLiTe")
-  | 'personal'       // Personal/family questions (stories, values, interests)
+  | 'personal'       // Personal/family questions (stories, values, interests, education, bio/headline)
   | 'general';       // Catch-all semantic search for everything else
 
 /**
@@ -29,7 +29,7 @@ type Intent =
  * Enables queries like "all Python projects" or "experiences from 2024"
  */
 interface QueryFilter {
-  type?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest'>;
+  type?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio'>;
   // Field-based filters
   skills?: string[];          // For any item with skills field
   company?: string[];         // For experiences
@@ -79,6 +79,8 @@ Examples:
 - "tell me about Veson internship" → specific_item with title_match: "Veson"
 - "how can I contact Mike?" → contact (fast-path, no filters)
 - "what are Mike's values?" → personal (searches stories/values/interests)
+- "where does Mike go to school?" → personal (education info)
+- "what's Mike's headline?" → personal (bio/headline)
 - "tell me Mike's story" → personal (family background)
 - "why is Mike's name Douzinas?" → personal (family info)
 - "what does Mike like to do?" → personal (interests)
@@ -304,12 +306,12 @@ const FIELD_MAP: Record<Intent, string[]> = {
  * Document type filtering for each intent
  * With structured filtering, most intents either use filters or search everything
  */
-const TYPE_FILTERS: Record<Intent, Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest'> | null> = {
-  contact: null,                              // Fast-path, no retrieval needed
-  filter_query: null,                         // Types determined by filters
-  specific_item: null,                        // Search all types for specific items
-  personal: ['story', 'value', 'interest'],   // Only personal/family info
-  general: null                               // Search all types - let semantic search decide
+const TYPE_FILTERS: Record<Intent, Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio'> | null> = {
+  contact: null,                                             // Fast-path, no retrieval needed
+  filter_query: null,                                        // Types determined by filters
+  specific_item: null,                                       // Search all types for specific items
+  personal: ['story', 'value', 'interest', 'education', 'bio'],  // Personal/family info including education and bio
+  general: null                                              // Search all types - let semantic search decide
 };
 
 /**
@@ -403,6 +405,15 @@ function formatContext(docs: Array<Partial<KBItem>>, includeDetails: boolean = t
         displayName = `Value: ${d.value}`;
       } else if ('interest' in d && d.interest) {
         displayName = `Interest: ${d.interest}`;
+      } else if ('school' in d && d.school) {
+        // Education items - show school and degree
+        displayName = `Education: ${d.school}`;
+        if ('degree' in d && d.degree) {
+          displayName += ` – ${d.degree}`;
+        }
+      } else if ('headline' in d && d.headline) {
+        // Bio items - use the headline as display name
+        displayName = `Bio`;
       } else {
         displayName = d.id || 'Unknown';
       }
@@ -416,6 +427,23 @@ function formatContext(docs: Array<Partial<KBItem>>, includeDetails: boolean = t
         parts.push(`  - ${d.text}`);
       } else if ('why' in d && d.why) {
         parts.push(`  - ${d.why}`);
+      } else if ('headline' in d && d.headline) {
+        // For bio items, show headline and bio text
+        parts.push(`  - Headline: ${d.headline}`);
+        if ('bio' in d && d.bio) {
+          parts.push(`  - Bio: ${d.bio}`);
+        }
+        if ('name' in d && d.name) {
+          parts.push(`  - Name: ${d.name}`);
+        }
+      } else if ('school' in d && d.school) {
+        // For education items without summary, show GPA and graduation date
+        if ('gpa' in d && d.gpa) {
+          parts.push(`  - GPA: ${d.gpa}`);
+        }
+        if ('expected_grad' in d && d.expected_grad) {
+          parts.push(`  - Expected Graduation: ${d.expected_grad}`);
+        }
       }
       
       // Handle detail levels:
@@ -664,7 +692,7 @@ export async function POST(req: NextRequest) {
     } else {
       // Standard semantic retrieval for other intents
       const typeFilter = TYPE_FILTERS[intent];
-      const retrievalOptions: { topK: number; fields: string[]; types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest'> } = {
+      const retrievalOptions: { topK: number; fields: string[]; types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio'> } = {
         topK: 5,
         fields
       };

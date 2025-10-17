@@ -13,6 +13,8 @@ import {
   type StoryT,
   type ValueT,
   type InterestT,
+  type EducationT,
+  type BioT,
   type KBItem
 } from "./schema"
 
@@ -109,9 +111,37 @@ export async function loadInterests(): Promise<InterestT[]> {
   }))
 }
 
+export async function loadEducation(): Promise<EducationT[]> {
+  // Extract education from profile.education
+  // Creates searchable KB items for school, degree, GPA, and graduation info
+  const profile = await loadProfile()
+  const education = profile.education || []
+  return education.map((e, idx) => ({
+    id: `education_${idx}`,
+    school: e.school,
+    degree: e.degree,
+    gpa: e.gpa,
+    expected_grad: e.expected_grad,
+    kind: "education" as const
+  }))
+}
+
+export async function loadBio(): Promise<BioT[]> {
+  // Extract bio info from profile (name, headline, bio text)
+  // This makes core profile information searchable for queries like "what's mike's headline?"
+  const profile = await loadProfile()
+  return [{
+    id: 'bio_profile',
+    name: profile.name,
+    headline: profile.headline,
+    bio: profile.bio,
+    kind: "bio" as const
+  }]
+}
+
 /** ---- Combined content for retrieval (all KB items) ---- */
 export async function loadKBItems(): Promise<KBItem[]> {
-  const [projects, experience, classes, blogs, stories, values, interests] = await Promise.all([
+  const [projects, experience, classes, blogs, stories, values, interests, education, bio] = await Promise.all([
     loadProjects(),
     loadExperience(),
     loadClasses(),
@@ -119,6 +149,8 @@ export async function loadKBItems(): Promise<KBItem[]> {
     loadStories(),
     loadValues(),
     loadInterests(),
+    loadEducation(),
+    loadBio(),
   ])
   const items: KBItem[] = [
     ...projects,
@@ -128,6 +160,8 @@ export async function loadKBItems(): Promise<KBItem[]> {
     ...stories,
     ...values,
     ...interests,
+    ...education,
+    ...bio,
   ]
 
   // sanity: unique ids
