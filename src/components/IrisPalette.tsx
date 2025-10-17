@@ -26,18 +26,18 @@ const SUGGESTIONS = [
       id: 'discover',
       icon: Compass,
       primary: 'Discover what Mike’s built',
-      secondary: 'Ask Iris to walk you through key projects',
+      secondary: 'Ask Iris to walk you through specific projects',
     },
     {
       id: 'career',
       icon: Briefcase,
-      primary: 'Learn about Mike’s experience',
+      primary: 'Learn about Mike’s work experience',
       secondary: 'Internships, roles, and industry impact',
     },
     {
       id: 'tech',
       icon: Cpu,
-      primary: 'Explore Mike’s tech stack',
+      primary: 'List Mike’s skills',
       secondary: 'Languages, frameworks, and favorite tools',
     },
     {

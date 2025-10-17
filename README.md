@@ -1,3 +1,5 @@
+ok so right now here's where im at, heres my README.
+
 # Mike Veson Portfolio
 
 A modern, full-stack personal portfolio built with Next.js 15 and TypeScript, featuring **Iris** — an intelligent AI assistant that transforms how visitors explore professional work, experience, and projects through natural language conversations.
@@ -518,10 +520,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📧 Contact
 
 **Mike Veson**
-- Website: [mikedouz.com](https://mikedouz.com)
-- LinkedIn: [linkedin.com/in/mikeveson](https://linkedin.com/in/mikeveson)
+- Website: [mikeveson.com](https://mikeveson.com)
+- LinkedIn: [linkedin.com/in/mikedouzinas](https://linkedin.com/in/mikedouzinas)
 - GitHub: [github.com/mikedouzinas](https://github.com/mikedouzinas)
-- Email: mveson@rice.edu
+- Email: mike@douzinas.com
 
 *Try asking Iris on the website! Press ⌘K and say "tell me about this project"*
 

@@ -483,6 +483,67 @@ function formatContext(docs: Array<Partial<KBItem>>, includeDetails: boolean = t
 }
 
 /**
+ * Creates a fallback response when no relevant context is found
+ * Loads contact information and returns a helpful message directing users to reach out
+ * This prevents hallucination when the knowledge base has no matching information
+ */
+async function createNoContextResponse(query: string): Promise<Response> {
+  console.log('[Answer API] No relevant context found, returning fallback response');
+  
+  try {
+    // Load contact information for the fallback message
+    const contact = await loadContact();
+    
+    const fallbackMessage = `I don't have specific information about that in my knowledge base. However, you can reach out to Mike directly for more details:\n\n` +
+      `📧 Email: ${contact.email}\n` +
+      `💼 LinkedIn: ${contact.linkedin}\n` +
+      (contact.github ? `💻 GitHub: ${contact.github}\n` : '') +
+      (contact.booking?.enabled && contact.booking?.link ? `📅 Schedule a chat: ${contact.booking.link}\n` : '') +
+      `\nFeel free to ask me about Mike's projects, work experience, education, or technical skills!`;
+    
+    // Return as streaming response for consistent client behavior
+    const encoder = new TextEncoder();
+    const readable = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: fallbackMessage })}\n\n`));
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
+      }
+    });
+    
+    return new Response(readable, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+      }
+    });
+  } catch (error) {
+    console.error('[Answer API] Failed to create fallback response:', error);
+    
+    // Minimal fallback if contact loading fails
+    const minimalFallback = `I don't have specific information about that in my knowledge base. Feel free to reach out to Mike directly through the contact section of this website for more details!`;
+    
+    const encoder = new TextEncoder();
+    const readable = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: minimalFallback })}\n\n`));
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
+      }
+    });
+    
+    return new Response(readable, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+      }
+    });
+  }
+}
+
+/**
  * POST /api/iris/answer
  * Main answer endpoint with intent-based routing, streaming, and error handling
  */
@@ -639,6 +700,12 @@ export async function POST(req: NextRequest) {
       
       console.log(`[Answer API] Filter query returned ${results.length} results (show_all: ${filters.show_all})`);
       
+      // If no results found, return fallback response with contact info instead of generating with LLM
+      // This prevents hallucination when there's no matching context
+      if (results.length === 0) {
+        return await createNoContextResponse(query);
+      }
+      
       // For specific_item queries with exactly one match, we can return direct info
       if (intent === 'specific_item' && results.length === 1) {
         const item = results[0].doc;
@@ -711,6 +778,14 @@ export async function POST(req: NextRequest) {
       
       console.log(`[Answer API] Retrieved ${results.length} documents in ${retrievalTime}ms`);
       
+      // If we have no results, use fallback response with contact info
+      // The anti-hallucination instructions in the system prompt are strong enough to prevent
+      // making things up when context quality is low, so we only fall back on truly empty results
+      if (results.length === 0) {
+        console.log('[Answer API] No results from semantic search, using fallback');
+        return await createNoContextResponse(query);
+      }
+      
       // Rerank results to prioritize technically complex experiences for technical queries
       // This ensures IMOS laytime, Parsons, VesselsValue appear first for tech questions
       results = reranktechnical(results, query);
@@ -753,7 +828,7 @@ export async function POST(req: NextRequest) {
                                /^gpt-6/.test(config.models.chat.toLowerCase());
       
       // Build system prompt with anti-hallucination instructions
-      const systemPrompt = `You are Iris, Mike’s friendly AI assistant living within his personal portfolio website. Named after the Greek messenger goddess, you bridge Mike’s structured knowledge and the visitor’s curiosity — guiding them through his work, experience, and ideas in a warm, conversational way. You’re also part of a larger vision alongside Hermes, a future physical counterpart that will bring interaction into the real world. While Mike’s full long-term plans for Iris and Hermes remain private, visitors are welcome to message him directly if they’d like to learn more.
+      const systemPrompt = `You are Iris, Mike's friendly AI assistant living within his personal portfolio website. Named after the Greek messenger goddess, you bridge Mike's structured knowledge and the visitor's curiosity — guiding them through his work, experience, and ideas in a warm, conversational way. You're also part of a larger vision alongside Hermes, a future physical counterpart that will bring interaction into the real world. While Mike's full long-term plans for Iris and Hermes remain private, visitors are welcome to message him directly if they'd like to learn more.
 
 Core principles:
 - Be genuinely helpful and approachable - like a knowledgeable friend
@@ -761,17 +836,23 @@ Core principles:
 - Keep answers concise but complete (aim for 2-3 short paragraphs)
 - If you mention contact info, URLs, or blog links, ALWAYS use the exact links provided in the context
 
-**IMPORTANT**: The context below contains accurate information about Mike. Use it to answer questions:
+**CRITICAL ANTI-HALLUCINATION RULES**:
+1. ONLY use information explicitly provided in the context below - never make up details
+2. If the context doesn't contain enough information to answer fully, be honest about it
+3. NEVER invent: projects, skills, companies, dates, URLs, people's names, or technical details
+4. When unsure or lacking context, say something like: "I don't have specific information about that in my knowledge base. Feel free to reach out to Mike directly for more details!"
+5. If you mention ANY links (contact, projects, blogs), they MUST be exactly as shown in the context
+
+**Context Guidelines**:
 - Answer questions directly using the information provided in the context
 - When the context has MULTIPLE items, synthesize them into a cohesive summary (don't just describe one item in detail)
 - You can infer reasonable connections (e.g., if context shows 2025 items, you CAN say "in 2025, Mike did X, Y, and Z")
-- DO NOT invent information that's not in the context (no fake URLs, projects, or people)
-- If the context doesn't have enough information to fully answer, acknowledge what you know and suggest reaching out for more details
+- Synthesize across ALL items in the context to give a complete picture
 
 Context about Mike:
 ${enhancedContext}
 
-Remember: Synthesize across ALL items in the context to give a complete picture. Don't focus on just one.`;
+Remember: If you're not confident in your answer based on the context, acknowledge the limitation and suggest contacting Mike directly. Being accurate is more important than being comprehensive.`;
 
       // Build base request parameters
       // Using Record for type safety while allowing dynamic properties

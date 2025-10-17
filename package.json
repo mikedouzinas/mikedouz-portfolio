@@ -10,7 +10,9 @@
     "build:embeddings": "tsx scripts/build_embeddings.ts",
     "build:typeahead": "tsx scripts/build_typeahead.ts",
     "verify:kb": "tsx scripts/verify_kb.ts",
-    "kb:rebuild": "npm run verify:kb && npm run build:embeddings && npm run build:typeahead"
+    "kb:rebuild": "npm run verify:kb && npm run build:embeddings && npm run build:typeahead",
+    "test:iris": "tsx scripts/test_iris.ts",
+    "test:iris:help": "cat TESTING.md"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
