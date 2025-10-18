@@ -139,6 +139,13 @@ interface BaseKBItem {
    }
    ```
 
+   **Matching Skills Philosophy**:
+   - **Stage 1 (Retrieval)**: Intentionally broad fuzzy matching to capture all potentially relevant items
+     - Handles singular/plural variations ("transformer" ↔ "transformers")
+     - Matches skill names to IDs ("Framer Motion" → "framer_motion")
+     - Normalizes underscores, hyphens, and word order
+     - Goal: Get relevant items into context, even if slightly over-inclusive
+     
 3. **Context Building**
    - Documents formatted with detail levels:
      - **Minimal**: Name + summary (for broad lists)
@@ -169,9 +176,10 @@ interface BaseKBItem {
 #### Embeddings Generation (`scripts/build_embeddings.ts`)
 ```bash
 # Pre-compute embeddings for all KB items
-npx tsx scripts/build_embeddings.ts
+npm run build:embeddings
 
 # Outputs to: src/data/iris/derived/embeddings.json
+# Alternative: npx tsx scripts/build_embeddings.ts
 ```
 
 #### Frontend (`src/components/IrisPalette.tsx`)
@@ -214,10 +222,9 @@ kb/
 ├── experience.json     # Work history with companies, roles
 ├── classes.json        # Academic courses with terms
 ├── skills.json         # Skill taxonomy (851 entries)
-├── profile.json        # Personal stories, values, interests
+├── profile.json        # Personal info, stories, values, interests, location, availability
 ├── blogs.json          # Blog posts and articles
-├── contact.json        # Contact information
-└── meta.json          # Metadata (authorization, etc.)
+└── contact.json        # Contact information
 ```
 
 #### Derived Data (`src/data/iris/derived/`)
@@ -261,7 +268,7 @@ derived/
 
 ---
 
-## 🚀 Features
+## Features
 
 ### Portfolio Website
 - **Modern UI**: Clean, accessible design with dark mode support
@@ -333,7 +340,7 @@ derived/
 
 4. **Build embeddings** (required for Iris)
    ```bash
-   npx tsx scripts/build_embeddings.ts
+   npm run build:embeddings
    ```
 
 5. **Run development server**
@@ -365,13 +372,16 @@ npm run type-check
 npm run lint
 
 # Build embeddings for Iris
-npx tsx scripts/build_embeddings.ts
-
-# Verify knowledge base structure
-npx tsx scripts/verify_kb.ts
+npm run build:embeddings
 
 # Build typeahead suggestions
-npx tsx scripts/build_typeahead.ts
+npm run build:typeahead
+
+# Verify knowledge base structure
+npm run verify:kb
+
+# Rebuild entire knowledge base (verify + embeddings + typeahead)
+npm run kb:rebuild
 ```
 
 ---
@@ -432,7 +442,8 @@ Edit files in `src/data/iris/kb/`:
 
 After changes, rebuild embeddings:
 ```bash
-npx tsx scripts/build_embeddings.ts
+npm run kb:rebuild
+# Or just embeddings: npm run build:embeddings
 ```
 
 #### Change AI Models

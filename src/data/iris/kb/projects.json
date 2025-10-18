@@ -33,7 +33,7 @@
       "Structured knowledge base with filter queries, year-based filtering, and personal context retrieval",
       "Accessibility-first design with responsive layout and smooth Framer Motion animations"
     ],
-    "skills": ["openai_api", "rag", "product_management", "user_research", "typescript", "react", "nextjs", "tailwind_css", "framer_motion"],
+    "skills": ["openai_api", "rag", "product_management", "user_research", "ux_design", "typescript", "react", "nextjs", "tailwind_css", "framer_motion"],
     "tech_stack": ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion", "OpenAI API"],
     "architecture": "Next.js 15 (App Router) → RAG backend (embeddings + cosine + intent detection) → GPT streaming → Iris UI (palette + chat)",
     "tags": ["Web", "AI", "RAG", "Full-Stack", "Iris"],

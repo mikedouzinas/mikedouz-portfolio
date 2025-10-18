@@ -96,11 +96,6 @@ This will:
 5. Prompt you to verify (y/n)
 6. Track pass/fail for each test
 7. Generate a summary report
-
-### Quick Smoke Tests
-For rapid verification of critical paths:
-```bash
-npm run test:iris:smoke
 ```
 
 ### Final Build Verification

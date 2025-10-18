@@ -58,7 +58,7 @@ async function detectIntent(query: string, openaiClient: OpenAI): Promise<Intent
   try {
     // Use function calling for structured output
     const response = await openaiClient.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: config.models.query_processing,
       messages: [
         {
           role: 'system',
@@ -78,6 +78,9 @@ Examples:
 - "list experiences from 2024" → filter_query with type: ["experience"], year: [2024]
 - "what have I done in 2025?" → filter_query with year: [2025], all types
 - "projects using React" → filter_query with type: ["project"], skills: ["React"]
+- "what has mike done with Python?" → filter_query with skills: ["Python"], show_all: true (searches all types)
+- "where has mike used Sentence Transformers?" → filter_query with skills: ["Sentence Transformers"], show_all: true (searches all types)
+- "has mike used framer motion?" → filter_query with skills: ["framer_motion"], show_all: true (searches all types)
 - "how was HiLiTe built?" → specific_item with title_match: "HiLiTe"
 - "when did I take APCS A?" → specific_item with title_match: "APCS A"
 - "tell me about Veson internship" → specific_item with title_match: "Veson"
@@ -179,14 +182,99 @@ Examples:
 }
 
 /**
+ * Helper function to check if two strings are similar enough to match
+ * Handles singular/plural, word order, and partial matches
+ * 
+ * Professional comment: This enables flexible matching for user queries like
+ * "sentence transformer" to match "sentence transformers" or "React" to match "ReactJS"
+ */
+function isFuzzyMatch(search: string, target: string): boolean {
+  const searchWords = search.split(/\s+/);
+  const targetWords = target.split(/\s+/);
+  
+  // Exact match
+  if (search === target) return true;
+  
+  // One contains the other
+  if (target.includes(search) || search.includes(target)) return true;
+  
+  // Check if all search words are present in target (handles word order)
+  const allWordsPresent = searchWords.every(sw => 
+    targetWords.some(tw => tw.includes(sw) || sw.includes(tw))
+  );
+  if (allWordsPresent) return true;
+  
+  // Handle plural/singular by checking if words match except for trailing 's'
+  const searchStripped = search.endsWith('s') ? search.slice(0, -1) : search;
+  const targetStripped = target.endsWith('s') ? target.slice(0, -1) : target;
+  if (searchStripped === targetStripped) return true;
+  if (target.includes(searchStripped) || search.includes(targetStripped)) return true;
+  
+  return false;
+}
+
+/**
+ * Resolves skill names/aliases to their canonical skill IDs
+ * Handles fuzzy matching for names like "framer motion" → "framer_motion"
+ * 
+ * @param skillNames - Array of skill names or aliases from user query
+ * @param allItems - All KB items (includes skills with kind: "skill")
+ * @returns Array of matching skill IDs
+ * 
+ * Professional comment: This function enables users to query by skill names
+ * (e.g., "Framer Motion") instead of requiring exact ID matches (e.g., "framer_motion").
+ * It fuzzy-matches against skill names, IDs, and aliases to maximize query success.
+ */
+function resolveSkillNamesToIds(skillNames: string[], allItems: KBItem[]): string[] {
+  // Extract all skills from KB items
+  const skills = allItems.filter(item => item.kind === 'skill') as Array<KBItem & { 
+    id: string; 
+    name: string; 
+    aliases?: string[];
+  }>;
+  
+  const resolvedIds = new Set<string>();
+  
+  for (const searchName of skillNames) {
+    const searchLower = searchName.toLowerCase().trim();
+    
+    for (const skill of skills) {
+      // Match against skill ID (with underscores or hyphens normalized to spaces)
+      const skillIdNormalized = skill.id.toLowerCase().replace(/[_-]/g, ' ');
+      
+      // Match against skill name
+      const skillNameLower = skill.name.toLowerCase();
+      
+      // Match against aliases
+      const aliasesLower = (skill.aliases || []).map(a => a.toLowerCase());
+      
+      // Check if search matches ID, name, or any alias using fuzzy matching
+      if (
+        isFuzzyMatch(searchLower, skillIdNormalized) ||
+        isFuzzyMatch(searchLower, skillNameLower) ||
+        aliasesLower.some(alias => isFuzzyMatch(searchLower, alias))
+      ) {
+        resolvedIds.add(skill.id);
+      }
+    }
+  }
+  
+  return Array.from(resolvedIds);
+}
+
+/**
  * Applies structured filters to KB items
  * Enables precise queries like "all Python projects" or "2024 experiences"
  * 
  * @param items - All KB items to filter
  * @param filters - Structured filters from intent detection
  * @returns Filtered items matching all criteria
+ * 
+ * Professional comment: We keep a reference to the original unfiltered items
+ * to enable skill name resolution even after type filtering has been applied.
  */
 function applyFilters(items: KBItem[], filters: QueryFilter): KBItem[] {
+  const allItems = items; // Keep reference to all items for skill resolution
   let filtered = items;
   
   // Filter by document type
@@ -219,18 +307,28 @@ function applyFilters(items: KBItem[], filters: QueryFilter): KBItem[] {
   }
   
   // Filter by skills (works for any item with skills field)
+  // Professional comment: Resolves skill names to IDs before matching, enabling
+  // queries like "projects using Framer Motion" to match items with "framer_motion" ID
   if (filters.skills && filters.skills.length > 0) {
+    // Resolve skill names to canonical IDs using the KB
+    // Use allItems (not filtered) to ensure skills are available for resolution
+    const resolvedSkillIds = resolveSkillNamesToIds(filters.skills, allItems);
+    
+    // If no skills resolved, try direct matching as fallback
+    const searchSkills = resolvedSkillIds.length > 0 
+      ? resolvedSkillIds.map(s => s.toLowerCase())
+      : filters.skills.map(s => s.toLowerCase());
+    
     filtered = filtered.filter(item => {
       if (!('skills' in item) || !Array.isArray(item.skills)) return false;
       
       const itemSkills = item.skills.map(s => s.toLowerCase());
-      const searchSkills = filters.skills!.map(s => s.toLowerCase());
       
       if (filters.operation === 'exact') {
         return searchSkills.every(s => itemSkills.includes(s));
       } else if (filters.operation === 'any') {
         return searchSkills.some(s => itemSkills.includes(s));
-      } else { // 'contains'
+      } else { // 'contains' (default)
         return searchSkills.some(s => itemSkills.some(is => is.includes(s)));
       }
     });

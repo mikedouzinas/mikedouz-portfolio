@@ -2,6 +2,10 @@
   "name": "Mike Konstantinos Veson",
   "headline": "Junior, Computer Science @ Rice University | AI, Full-Stack, and Data-Driven Product Builder",
   "bio": "Engineer focused on building thoughtful, AI-driven systems that bridge product, data, and design. Loves working alongside clients and cusotomers to output excellent products. Experienced in ML and modern web & mobile architectures.",
+  "work_authorization": "U.S. Citizen, Greek Citizen",
+  "location": "Barcelona (Fall 2025) / Boston / Housing in New York City / School in Houston",
+  "availability": "Summer 2026 internships",
+  "language_proficiency": ["English (native)", "Greek (intermediate)", "Spanish (intermediate)"],
   "education": [
     {
       "school": "Rice University",
@@ -39,7 +43,7 @@
     },
     {
       "interest": "Learning Languages",
-      "why": "I love learning new languages and cultures. I have a strong relation to Greek and Spanish from my family, and I am studying abroad to improve both."
+      "why": "I love learning new languages and cultures. I have a strong relation to Greece from my family, and I am studying abroad to improve my spanish and greek speaking."
     },
     {
       "interest": "FC Barcelona",

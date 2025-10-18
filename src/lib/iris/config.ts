@@ -37,6 +37,7 @@ export const config = {
   
   // OpenAI model configuration
   models: {
+    query_processing: 'gpt-4o-mini',
     chat: 'gpt-4.1-mini',                // Nano is the cheapest model and will do for now
     embedding: 'text-embedding-3-small' // Embedding model for RAG
   },

@@ -3,7 +3,6 @@ import fs from "node:fs/promises"
 import path from "node:path"
 import {
   Profile, type ProfileT,
-  Meta, type MetaT,
   Contact, type ContactT,
   ProjectsArray, type ProjectT,
   ExperienceArray, type ExperienceT,
@@ -32,11 +31,6 @@ function fp(...segs: string[]) { return path.join(KB_DIR, ...segs) }
 export async function loadProfile(): Promise<ProfileT> {
   const data = await readJSON<unknown>(fp("profile.json"))
   return Profile.parse(data)
-}
-
-export async function loadMeta(): Promise<MetaT> {
-  const data = await readJSON<unknown>(fp("meta.json"))
-  return Meta.parse(data)
 }
 
 export async function loadContact(): Promise<ContactT> {
@@ -129,14 +123,20 @@ export async function loadEducation(): Promise<EducationT[]> {
 }
 
 export async function loadBio(): Promise<BioT[]> {
-  // Extract bio info from profile (name, headline, bio text)
+  // Extract bio info from profile (name, headline, bio text, and meta fields)
   // This makes core profile information searchable for queries like "what's mike's headline?"
+  // Meta fields (work_authorization, location, availability, language_proficiency) are now included
+  // so Iris can answer questions about work eligibility, location, and language skills
   const profile = await loadProfile()
   return [{
     id: 'bio_profile',
     name: profile.name,
     headline: profile.headline,
     bio: profile.bio,
+    work_authorization: profile.work_authorization,
+    location: profile.location,
+    availability: profile.availability,
+    language_proficiency: profile.language_proficiency,
     kind: "bio" as const
   }]
 }
@@ -182,14 +182,14 @@ export async function loadKBItems(): Promise<KBItem[]> {
   return items
 }
 
-/** ---- Convenience: flat “everything” (for admin/debug) ---- */
+/** ---- Convenience: flat "everything" (for admin/debug) ---- */
 export async function loadAll() {
-  const [profile, meta, contact, skills, items] = await Promise.all([
+  // Meta information is now part of profile, so no separate meta loading needed
+  const [profile, contact, skills, items] = await Promise.all([
     loadProfile(),
-    loadMeta(),
     loadContact(),
     loadSkills(),
     loadKBItems(),
   ])
-  return { profile, meta, contact, skills, items }
+  return { profile, contact, skills, items }
 }

@@ -613,6 +613,7 @@
         { "type": "class", "id": "class_busi_220_2024" },
         { "type": "experience", "id": "exp_lilie_2024" },
         { "type": "project", "id": "proj_momentum" },
+        { "type": "project", "id": "proj_portfolio" },
         { "type": "project", "id": "proj_knight_life" }
       ]
     },
@@ -705,13 +706,14 @@
       "id": "openai_api",
       "name": "OpenAI API",
       "type": "service",
-      "aliases": ["gpt_4", "gpt_4_turbo", "openai"],
+      "aliases": ["gpt_4", "gpt_4_turbo", "openai", "chatgpt"],
       "description": "Embeddings and LLM orchestration for apps.",
       "evidence": [
         { "type": "class", "id": "class_busi_220_2024" },
         { "type": "class", "id": "class_comp_646_2025" },
         { "type": "project", "id": "proj_portfolio" },
-        { "type": "project", "id": "proj_momentum" }
+        { "type": "project", "id": "proj_momentum" },
+        { "type": "project", "id": "proj_hilite" }
       ]
     },
     {

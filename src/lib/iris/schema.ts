@@ -21,6 +21,14 @@ export const Profile = z.object({
   name: z.string().min(1),
   headline: z.string().min(1),
   bio: z.string().min(1),
+  
+  // Meta information previously in meta.json (now merged into profile)
+  // These fields provide important context about work authorization, location, availability, and languages
+  work_authorization: z.string().optional(),
+  location: z.string().optional(),
+  availability: z.string().optional(),
+  language_proficiency: z.array(z.string()).default([]),
+  
   education: z.array(
     z.object({
       school: z.string(),
@@ -55,14 +63,6 @@ export const Profile = z.object({
 })
 
 export type ProfileT = z.infer<typeof Profile>
-
-export const Meta = z.object({
-  work_authorization: z.string().optional(),
-  location: z.string().optional(),
-  availability: z.string().optional(),
-  language_proficiency: z.array(z.string()).default([]),
-})
-export type MetaT = z.infer<typeof Meta>
 
 export const Contact = z.object({
   email: z.string().min(1),
@@ -211,13 +211,19 @@ export const Education = EducationBase.extend({
 })
 export type EducationT = z.infer<typeof Education>
 
-/** ---------- Bio (from profile.bio + headline) ---------- */
+/** ---------- Bio (from profile.bio + headline + meta fields) ---------- */
 
 const BioBase = z.object({
   id: Id,
   name: z.string().min(1),
   headline: z.string().min(1),
   bio: z.string().min(1),
+  // Include meta fields so they're available for retrieval
+  // This ensures Iris can answer questions about work authorization, location, availability, and languages
+  work_authorization: z.string().optional(),
+  location: z.string().optional(),
+  availability: z.string().optional(),
+  language_proficiency: z.array(z.string()).default([]),
 })
 export const Bio = BioBase.extend({
   kind: z.literal("bio")

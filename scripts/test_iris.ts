@@ -18,8 +18,9 @@ const colors = {
 };
 
 // Test configuration
-const BASE_URL = process.env.TEST_URL || 'http://localhost:3000';
-const API_ENDPOINT = `${BASE_URL}/api/iris/answer`;
+// BASE_URL will be set dynamically based on user input or environment variable
+let BASE_URL = process.env.TEST_URL || '';
+let API_ENDPOINT = '';
 
 interface TestCase {
   query: string;
@@ -199,6 +200,15 @@ const testSuites: Record<string, TestCase[]> = {
         'Spans projects, classes, work',
         'Coherent synthesis',
         'Relevant details',
+      ],
+    },
+    {
+      query: 'what work has Mike done with chatgpt?',
+      expected: 'HiLite, Portfolio, Momentum',
+      category: 'synthesis',
+      verifyPoints: [
+        'Lists skills used in projects, non direct name',
+        'No hallucinated projects'
       ],
     },
   ],
@@ -428,7 +438,28 @@ async function main() {
   print('\n🌈 Iris Interactive Testing Suite', 'cyan');
   print('This will run through test cases and prompt you to verify each one.\n', 'dim');
 
-  const answer = await question(`Testing against: ${BASE_URL}\nContinue? (y/n): `);
+  // Prompt for localhost port if BASE_URL is not set via environment variable
+  if (!BASE_URL) {
+    print('📍 Configure Test Server', 'cyan');
+    const portInput = await question('Enter localhost port number (default: 3000): ');
+    
+    // Parse and validate port number
+    // Default to 3000 if empty or invalid input
+    const port = portInput.trim() ? parseInt(portInput.trim(), 10) : 3000;
+    
+    if (isNaN(port) || port < 1 || port > 65535) {
+      print('⚠️  Invalid port number. Using default: 3000', 'yellow');
+      BASE_URL = 'http://localhost:3000';
+    } else {
+      BASE_URL = `http://localhost:${port}`;
+    }
+  }
+  
+  // Set API endpoint after BASE_URL is determined
+  API_ENDPOINT = `${BASE_URL}/api/iris/answer`;
+  
+  print(`\n🔗 Testing against: ${BASE_URL}`, 'bright');
+  const answer = await question('Continue? (y/n): ');
   if (answer.toLowerCase() !== 'y') {
     print('Test cancelled.', 'yellow');
     rl.close();
