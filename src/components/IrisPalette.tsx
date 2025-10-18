@@ -240,8 +240,19 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    * Handle open state changes
    * Calls onOpenChange callback if provided
    * Wrapped in useCallback to prevent dependency issues in effects
+   * 
+   * Design pattern: Dispatch close event IMMEDIATELY before state changes
+   * This allows dependent components (like IrisButton) to start their animations
+   * synchronously, ensuring smooth visual transitions without lag
    */
   const handleOpenChange = useCallback((open: boolean) => {
+    // CRITICAL: Dispatch close event synchronously BEFORE any state changes
+    // This ensures IrisButton can start its reverse animation immediately
+    // Without this, the animation would wait for React's state updates to propagate
+    if (!open) {
+      window.dispatchEvent(new CustomEvent('mv-close-cmdk'));
+    }
+    
     setIsOpen(open);
     onOpenChange?.(open);
     
