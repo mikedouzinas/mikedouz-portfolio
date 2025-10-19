@@ -1,6 +1,10 @@
 "use client";
 import React, { useRef, useEffect } from 'react';
 
+// Final margin: stop the reverse animation this many px short of exact center
+// This allows us to restore the base gradient under a faint green band, masking the handoff
+const FINAL_MARGIN_PX = 8;
+
 /**
  * Interactive button component for Iris AI assistant
  * Features a cursor-following green light effect that responds to mouse movement
@@ -38,7 +42,8 @@ export default function IrisButton() {
    * Position is calculated relative to the button's bounding box
    */
   const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!buttonRef.current || isAnimating.current) return;
+    // Suppress hover writes while animating or while palette is open
+    if (!buttonRef.current || isAnimating.current || isPaletteOpen.current) return;
     
     // Get button position and calculate cursor position relative to button
     const rect = buttonRef.current.getBoundingClientRect();
@@ -58,10 +63,12 @@ export default function IrisButton() {
     buttonRef.current.style.transform = 'scale(1.05) translateY(-2px)';
     
     // Create a radial gradient centered at cursor position with prominent green highlight
-    // The green color is strong at cursor position and gradually fades, blending with blue
+    // The green color is strong at cursor position and gradually fades to transparent green
     // Using 15% for a more compact, focused green highlight that matches the animation size
+    // Fade to transparent green (not transparent black) to avoid dimming the blue base
+    // Use backgroundImage (not background shorthand) to avoid implicit background-color changes
     if (glowRef.current) {
-      glowRef.current.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, transparent 40%)`;
+      glowRef.current.style.backgroundImage = `radial-gradient(circle at ${x}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, rgba(34, 197, 94, 0) 40%, rgba(34, 197, 94, 0) 100%)`;
       glowRef.current.style.opacity = "1";
     }
   };
@@ -112,11 +119,15 @@ export default function IrisButton() {
       if (!isPaletteOpen.current || !buttonRef.current || !glowRef.current) return;
       
       isPaletteOpen.current = false;
+      isAnimating.current = true; // Prevent hover from reintroducing green during reverse
       const button = buttonRef.current;
       const glow = glowRef.current;
       const { width, height } = button.getBoundingClientRect();
       const y = height / 2;
       const centerX = width / 2;
+
+      // Keep blue-only background throughout reverse animation
+      // Do NOT restore original gradient yet - wait until glow fully fades out
 
       // Remove any existing transitions for immediate start
       glow.style.transition = 'none';
@@ -128,7 +139,8 @@ export default function IrisButton() {
 
       /**
        * Reverse animation step
-       * Contracts two gradients from edges back to center, then fades out
+       * Contracts two gradients from edges back toward center, stopping short by FINAL_MARGIN_PX
+       * This leaves a faint green band that masks the base gradient handoff
        */
       const reverseAnimationStep = (timestamp: number) => {
         if (!startTime) startTime = timestamp;
@@ -138,26 +150,63 @@ export default function IrisButton() {
         // Ease-in cubic for smooth acceleration toward center
         const easedProgress = Math.pow(progress, 3);
         
-        // Calculate distance - starts at max (edges), contracts to 0 (center)
+        // Calculate distance - starts at max (edges), contracts toward center
+        // Clamp to FINAL_MARGIN_PX to keep a faint green band for seamless handoff
         const maxDistance = centerX;
-        const currentDistance = maxDistance * (1 - easedProgress);
+        const stopDistance = Math.max(0, FINAL_MARGIN_PX);
+        const currentDistance = Math.max(
+          stopDistance,
+          maxDistance * (1 - easedProgress)
+        );
         
-        // Two gradients moving from edges back to center
-        const leftX = centerX - currentDistance; // Moves from left edge back to center
-        const rightX = centerX + currentDistance; // Moves from right edge back to center
+        // Two gradients moving from edges back toward center (but stopping short)
+        const leftX = centerX - currentDistance; // Moves from left edge toward center
+        const rightX = centerX + currentDistance; // Moves from right edge toward center
         
-        glow.style.background = `
-          radial-gradient(circle at ${leftX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, transparent 40%),
-          radial-gradient(circle at ${rightX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, transparent 40%)
+        // Use hue-matched transparent stops to avoid dimming blue areas
+        // Use backgroundImage (not background shorthand) to avoid implicit background-color changes
+        glow.style.backgroundImage = `
+          radial-gradient(circle at ${leftX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, rgba(34, 197, 94, 0) 40%, rgba(34, 197, 94, 0) 100%),
+          radial-gradient(circle at ${rightX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, rgba(34, 197, 94, 0) 40%, rgba(34, 197, 94, 0) 100%)
         `;
 
         if (progress < 1) {
           requestAnimationFrame(reverseAnimationStep);
         } else {
-          // Reverse animation complete - fade out and reset
-          // Only manipulate the glow overlay, never the button background
+          // Reverse animation complete - gradients frozen at FINAL_MARGIN_PX from center
+          // Overlay now shows a faint green band; restore base gradient under it invisibly
+          
+          // Restore original gradient from Tailwind class while overlay is still visible
+          // The green band masks this change
+          button.style.backgroundImage = '';
+          
+          // Now fade out the overlay (freeze: do not update backgroundImage anymore)
           glow.style.transition = 'opacity 150ms ease-out';
+          
+          // Force reflow to ensure browser recognizes new transition before opacity change
+          void glow.offsetWidth;
+          
+          // Fade out
           glow.style.opacity = '0';
+          
+          // Wait for opacity transition to complete before final cleanup
+          const handleGlowFadeComplete = (e: TransitionEvent) => {
+            // Only act on the opacity transition (not any other properties)
+            if (e.propertyName !== 'opacity') return;
+            
+            // Final cleanup: clear the glow background
+            glow.style.backgroundImage = 'none';
+            glow.style.transition = 'none';
+            
+            // Re-enable hover interactions
+            isAnimating.current = false;
+            isPaletteOpen.current = false;
+            
+            // Remove this one-time listener
+            glow.removeEventListener('transitionend', handleGlowFadeComplete);
+          };
+          
+          glow.addEventListener('transitionend', handleGlowFadeComplete);
         }
       };
 
@@ -188,8 +237,9 @@ export default function IrisButton() {
           const duration = 600;
           let startTime: number | null = null;
           
-          // Keep base gradient intact - do not override button background
-          // Animation happens entirely on the glow overlay to avoid dimming
+          // Set base to pure blue gradient during animation (no green via-color)
+          // This prevents green wash while the animation runs
+          button.style.backgroundImage = 'linear-gradient(90deg, #2563EB, #2563EB)';
 
           // Ensure glow layer is visible
           glow.style.transition = 'opacity 100ms ease-out';
@@ -218,9 +268,11 @@ export default function IrisButton() {
             
             // Create two radial gradients at symmetric positions
             // Using 15% for compact, focused green highlights
-            glow.style.background = `
-              radial-gradient(circle at ${leftX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, transparent 40%),
-              radial-gradient(circle at ${rightX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, transparent 40%)
+            // Use hue-matched transparent stops to avoid dimming blue areas
+            // Use backgroundImage (not background shorthand) to avoid implicit background-color changes
+            glow.style.backgroundImage = `
+              radial-gradient(circle at ${leftX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, rgba(34, 197, 94, 0) 40%, rgba(34, 197, 94, 0) 100%),
+              radial-gradient(circle at ${rightX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, rgba(34, 197, 94, 0) 40%, rgba(34, 197, 94, 0) 100%)
             `;
             glow.style.transition = 'none';
 
@@ -228,8 +280,8 @@ export default function IrisButton() {
               requestAnimationFrame(animationStep);
             } else {
               // Animation complete - keep gradients at edges while palette is open
-              // Leave glow visible with gradients at edges
-              isAnimating.current = false;
+              // Keep isAnimating true to hold the edge frame and prevent hover repaints
+              // It will be set to false only after reverse animation completes
             }
           };
 
@@ -273,10 +325,18 @@ export default function IrisButton() {
       className="group relative inline-flex items-center justify-center sm:justify-between px-3 py-2 bg-gradient-to-r from-blue-600 via-green-600 to-blue-600 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl w-full overflow-hidden"
     >
       {/* Cursor-following green glow overlay - creates dynamic gradient effect on hover */}
+      {/* Uses hue-matched transparent stops to prevent dimming of base gradient */}
+      {/* Layer stability: compositor layer pinning to prevent repaint jitter */}
       <div 
         ref={glowRef} 
         className="absolute inset-0 rounded-xl pointer-events-none" 
-        style={{ opacity: 0 }} 
+        style={{ 
+          opacity: 0,
+          backgroundColor: 'transparent',
+          willChange: 'opacity, background-image',
+          backfaceVisibility: 'hidden',
+          transform: 'translateZ(0)'
+        }} 
       />
       
       {/* Button content - positioned above the glow effect */}
