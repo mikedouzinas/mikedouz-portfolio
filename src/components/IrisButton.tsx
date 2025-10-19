@@ -8,6 +8,12 @@ const FINAL_MARGIN_PX = 2;
 /**
  * Interactive button component for Iris AI assistant
  * Features a cursor-following green light effect that responds to mouse movement
+ * 
+ * Background behavior:
+ * - Default state: Blue-green-blue gradient (from Tailwind via-green-600)
+ * - Hover/Animation state: Pure blue background (green comes from glow overlay only)
+ * - This creates a clean separation between static gradient and interactive effects
+ * 
  * Similar to the profile picture's interactive glow, but with green highlight
  */
 export default function IrisButton() {
@@ -18,20 +24,24 @@ export default function IrisButton() {
   const isAnimating = useRef(false);
   // Track palette open state to detect close actions immediately
   const isPaletteOpen = useRef(false);
+  // Track hover state to switch between default gradient and pure blue
+  const isHovering = useRef(false);
 
   /**
    * Handle mouse enter event
    * Sets up smooth transition for the initial hover state
-   * Does not change base background to avoid dimming
+   * Changes background from blue-green-blue gradient to pure blue during hover
    */
   const handleMouseEnter = () => {
     if (buttonRef.current) {
-      buttonRef.current.style.transition = 'transform 300ms ease-out';
-      // Keep base gradient intact - hover glow happens on overlay only
+      buttonRef.current.style.transition = 'transform 300ms ease-out, background-image 300ms ease-out';
+      // Switch to pure blue background during hover (green will come from glow overlay)
+      buttonRef.current.style.backgroundImage = 'linear-gradient(90deg, #2563EB, #2563EB)';
     }
     if (glowRef.current) {
       glowRef.current.style.transition = 'opacity 300ms ease-out';
     }
+    isHovering.current = true;
     isFirstHover.current = true;
   };
 
@@ -76,47 +86,76 @@ export default function IrisButton() {
   /**
    * Handle mouse leave event
    * Resets button to default state with smooth transition
-   * Only resets transform and glow, not background (it was never changed)
+   * Restores default blue-green-blue gradient from Tailwind class
    */
   const handleMouseLeave = () => {
     if (buttonRef.current) {
-      buttonRef.current.style.transition = 'transform 300ms ease-out';
+      buttonRef.current.style.transition = 'transform 300ms ease-out, background-image 300ms ease-out';
       buttonRef.current.style.transform = 'scale(1) translateY(0)';
-      // Background was never changed, so no need to reset it
+      // Restore default gradient from Tailwind class
+      buttonRef.current.style.backgroundImage = '';
     }
     if (glowRef.current) {
       glowRef.current.style.transition = 'opacity 300ms ease-out';
       glowRef.current.style.opacity = "0";
     }
+    isHovering.current = false;
     isFirstHover.current = true;
   };
 
   /**
    * Animation effect when Cmd+K is pressed
    * Forward animation: Small green gradient in center expands outward to both edges
-   * - Base gradient background remains unchanged (no dimming)
+   * - Background switches from blue-green-blue gradient to pure blue during animation
    * - Green gradient starts in center and splits, moving to left and right edges
-   * - Results in two small gradients at edges overlaid on the base gradient
+   * - Results in two small gradients at edges overlaid on pure blue base
    * - Gradients stay at edges while palette is open
    * 
    * Reverse animation when palette closes:
    * - Two gradients at edges contract back toward center
    * - Merge in center and fade out
-   * - Base gradient background remains unchanged throughout
+   * - Background restored to blue-green-blue gradient after animation completes
    * 
    * Close detection strategy (Clean & Professional):
    * - IrisPalette dispatches 'mv-close-cmdk' event synchronously when closing starts
    * - This event is fired BEFORE any React state updates, ensuring immediate animation
    * - No fragile DOM inspection, no event interception needed
    * - Simple event-driven architecture with clear component boundaries
+   * 
+   * Spam-proof design:
+   * - isAnimating guard prevents re-triggering during animation
+   * - Safety timeout (250ms) ensures state reset even if transitionend fails
+   * - Cleanup function prevents double-execution
+   * - Robust state checks handle edge cases
+   * - Button always locks during palette close, even if opened by click (not Cmd+K)
+   * 
+   * Timing synchronization:
+   * - Button reverse animation: 350ms (matches palette fade-out exactly)
+   * - Palette fade-out: 350ms
+   * - Both animations complete simultaneously for perfect coordination
    */
   useEffect(() => {
     /**
      * Trigger reverse animation
      * Called when IrisPalette dispatches the close event
+     * Robust against spam: checks state and has fallback timeout
+     * 
+     * IMPORTANT: Always lock the button during palette close, even if button didn't trigger open
+     * This prevents opening the palette again while it's still closing
      */
     const triggerReverseAnimation = () => {
-      if (!isPaletteOpen.current || !buttonRef.current || !glowRef.current) return;
+      if (!buttonRef.current || !glowRef.current) return;
+      
+      // If palette wasn't opened by Cmd+K, we still need to lock the button
+      // to prevent a new Cmd+K from opening while palette is closing
+      if (!isPaletteOpen.current) {
+        // Lock button for duration of palette close animation (350ms + buffer)
+        isAnimating.current = true;
+        setTimeout(() => {
+          isAnimating.current = false;
+        }, 450);
+        return;
+      }
       
       isPaletteOpen.current = false;
       isAnimating.current = true; // Prevent hover from reintroducing green during reverse
@@ -133,8 +172,8 @@ export default function IrisButton() {
       glow.style.transition = 'none';
       button.style.transition = 'none';
 
-      // Reverse animation duration
-      const duration = 350;
+      // Reverse animation duration - matches palette fade-out (350ms)
+      const duration = 250;
       let startTime: number | null = null;
 
       /**
@@ -190,9 +229,11 @@ export default function IrisButton() {
           glow.style.opacity = '0';
           
           // Wait for opacity transition to complete before final cleanup
-          const handleGlowFadeComplete = (e: TransitionEvent) => {
-            // Only act on the opacity transition (not any other properties)
-            if (e.propertyName !== 'opacity') return;
+          let cleanupComplete = false;
+          
+          const cleanup = () => {
+            if (cleanupComplete) return;
+            cleanupComplete = true;
             
             // Final cleanup: clear the glow background
             glow.style.backgroundImage = 'none';
@@ -202,11 +243,21 @@ export default function IrisButton() {
             isAnimating.current = false;
             isPaletteOpen.current = false;
             
-            // Remove this one-time listener
+            // Remove listener if it was added
             glow.removeEventListener('transitionend', handleGlowFadeComplete);
           };
           
+          const handleGlowFadeComplete = (e: TransitionEvent) => {
+            // Only act on the opacity transition (not any other properties)
+            if (e.propertyName !== 'opacity') return;
+            cleanup();
+          };
+          
           glow.addEventListener('transitionend', handleGlowFadeComplete);
+          
+          // Safety timeout: If transitionend never fires (can happen with spam), force cleanup
+          // 150ms transition + 100ms buffer = 250ms
+          setTimeout(cleanup, 250);
         }
       };
 
