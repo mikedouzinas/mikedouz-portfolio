@@ -3,7 +3,7 @@ import React, { useRef, useEffect } from 'react';
 
 // Final margin: stop the reverse animation this many px short of exact center
 // This allows us to restore the base gradient under a faint green band, masking the handoff
-const FINAL_MARGIN_PX = 8;
+const FINAL_MARGIN_PX = 2;
 
 /**
  * Interactive button component for Iris AI assistant
