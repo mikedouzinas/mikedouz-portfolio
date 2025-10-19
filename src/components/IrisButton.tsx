@@ -18,11 +18,12 @@ export default function IrisButton() {
   /**
    * Handle mouse enter event
    * Sets up smooth transition for the initial hover state
+   * Does not change base background to avoid dimming
    */
   const handleMouseEnter = () => {
     if (buttonRef.current) {
       buttonRef.current.style.transition = 'transform 300ms ease-out';
-      buttonRef.current.style.background = '#2563eb'; // Solid blue-600
+      // Keep base gradient intact - hover glow happens on overlay only
     }
     if (glowRef.current) {
       glowRef.current.style.transition = 'opacity 300ms ease-out';
@@ -68,12 +69,13 @@ export default function IrisButton() {
   /**
    * Handle mouse leave event
    * Resets button to default state with smooth transition
+   * Only resets transform and glow, not background (it was never changed)
    */
   const handleMouseLeave = () => {
     if (buttonRef.current) {
       buttonRef.current.style.transition = 'transform 300ms ease-out';
       buttonRef.current.style.transform = 'scale(1) translateY(0)';
-      buttonRef.current.style.background = ''; // Revert to CSS gradient
+      // Background was never changed, so no need to reset it
     }
     if (glowRef.current) {
       glowRef.current.style.transition = 'opacity 300ms ease-out';
@@ -85,15 +87,15 @@ export default function IrisButton() {
   /**
    * Animation effect when Cmd+K is pressed
    * Forward animation: Small green gradient in center expands outward to both edges
-   * - Background becomes solid blue
+   * - Base gradient background remains unchanged (no dimming)
    * - Green gradient starts in center and splits, moving to left and right edges
-   * - Results in two small gradients at edges with blue interior
+   * - Results in two small gradients at edges overlaid on the base gradient
    * - Gradients stay at edges while palette is open
    * 
    * Reverse animation when palette closes:
    * - Two gradients at edges contract back toward center
    * - Merge in center and fade out
-   * - Background returns to original gradient
+   * - Base gradient background remains unchanged throughout
    * 
    * Close detection strategy (Clean & Professional):
    * - IrisPalette dispatches 'mv-close-cmdk' event synchronously when closing starts
@@ -153,10 +155,9 @@ export default function IrisButton() {
           requestAnimationFrame(reverseAnimationStep);
         } else {
           // Reverse animation complete - fade out and reset
+          // Only manipulate the glow overlay, never the button background
           glow.style.transition = 'opacity 150ms ease-out';
           glow.style.opacity = '0';
-          button.style.transition = 'background 150ms ease-out';
-          button.style.background = ''; // Return to original gradient
         }
       };
 
@@ -187,9 +188,8 @@ export default function IrisButton() {
           const duration = 600;
           let startTime: number | null = null;
           
-          // Set background to solid blue for animation
-          button.style.transition = 'background 200ms ease-out';
-          button.style.background = '#2563eb'; // Solid blue-600
+          // Keep base gradient intact - do not override button background
+          // Animation happens entirely on the glow overlay to avoid dimming
 
           // Ensure glow layer is visible
           glow.style.transition = 'opacity 100ms ease-out';
@@ -270,7 +270,7 @@ export default function IrisButton() {
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="group relative inline-flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-600 via-green-600 to-blue-600 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl w-full overflow-hidden"
+      className="group relative inline-flex items-center justify-center sm:justify-between px-3 py-2 bg-gradient-to-r from-blue-600 via-green-600 to-blue-600 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl w-full overflow-hidden"
     >
       {/* Cursor-following green glow overlay - creates dynamic gradient effect on hover */}
       <div 
@@ -280,13 +280,19 @@ export default function IrisButton() {
       />
       
       {/* Button content - positioned above the glow effect */}
-      <span className="text-xs relative z-10">Questions? Ask Iris</span>
+      <span className="text-xs relative z-10 whitespace-nowrap">Questions? Ask Iris</span>
       
-      {/* Keyboard shortcut hint - desktop only, positioned above glow */}
-      <div className="hidden sm:flex items-center gap-1 text-xs opacity-90 group-hover:opacity-100 transition-opacity relative z-10">
-        <span className="font-mono bg-black/20 px-1.5 py-0.5 rounded text-xs flex items-center gap-1">
-          <span className="text-xs">⌘</span>
-          <span className="text-[10px]">K</span>
+      {/* Keyboard shortcut hint - two separate key tiles for ⌘ and K */}
+      {/* Hidden on mobile (sm: breakpoint and below), visible on desktop */}
+      {/* Each tile styled like a keyboard key with rounded corners, border, and shadow */}
+      <div className="hidden sm:flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity relative z-10">
+        {/* Command key tile */}
+        <span className="inline-flex items-center justify-center min-w-[20px] h-[20px] rounded-md border border-white/20 bg-white/10 shadow-inner text-[11px] font-medium leading-none">
+          ⌘
+        </span>
+        {/* K key tile */}
+        <span className="inline-flex items-center justify-center min-w-[20px] h-[20px] rounded-md border border-white/20 bg-white/10 shadow-inner text-[11px] font-medium leading-none">
+          K
         </span>
       </div>
     </button>
