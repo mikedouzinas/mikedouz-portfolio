@@ -10,7 +10,11 @@ interface BlogCardProps {
 
 export default function BlogCard({ blog }: BlogCardProps) {
   return (
-    <BaseCard href={blog.link}>
+    <BaseCard 
+      href={blog.link}
+      glowColor="251, 146, 60"  // Orange glow for blogs
+      glowIntensity={0.3}
+    >
       <div className="flex flex-col-reverse md:grid md:grid-cols-[minmax(0,280px),1fr] gap-x-4 items-start">
         <div>
           <Image

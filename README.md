@@ -268,6 +268,12 @@ derived/
 - **Responsive Layout**: Optimized for mobile, tablet, and desktop
 - **Smooth Animations**: Framer Motion for polished interactions
 - **Command Palette**: Arc-inspired ⌘K interface for quick navigation
+- **Interactive Mouse Glow System**: Universal cursor-following lighting effects
+  - **Global Glow**: Subtle blue ring that follows cursor across the site
+  - **Contained Glows**: Color-coded glows within cards (green for projects, purple for blogs, blue for experience)
+  - **Custom Glows**: Specialized effects for interactive elements (profile picture tilt, Iris button animation)
+  - **Smart Detection**: Automatically disabled on mobile/touch devices for optimal performance
+  - **Seamless Transitions**: Global glow hides when hovering over elements with custom effects
 
 ### Projects Showcase
 - **Interactive Demos**: Live project previews and links
@@ -289,6 +295,7 @@ derived/
 - **Styling**: Tailwind CSS
 - **UI Components**: shadcn/ui
 - **Animations**: Framer Motion
+- **Interactive Effects**: Custom mouse glow system with mobile detection
 - **State**: React Hooks
 
 ### Backend
@@ -393,6 +400,9 @@ mikedouz-portfolio/
 │   │   └── playground/                  # Interactive demos
 │   ├── components/
 │   │   ├── IrisPalette.tsx              # AI command palette
+│   │   ├── ContainedMouseGlow.tsx       # Contained glow component
+│   │   ├── mouse_glow.tsx               # Global mouse glow
+│   │   ├── base_card.tsx                # Card with glow support
 │   │   ├── ui/                          # shadcn components
 │   │   └── ...
 │   ├── data/
@@ -413,6 +423,7 @@ mikedouz-portfolio/
 │   ├── build_typeahead.ts               # Generate suggestions
 │   └── verify_kb.ts                     # Validate KB structure
 ├── public/                              # Static assets
+├── GLOW_SYSTEM.md                       # Mouse glow documentation
 └── README.md
 ```
 
@@ -453,6 +464,38 @@ chatSettings: {
   maxTokens: 800,      // Increase for longer responses
   temperature: 1       // 0-2, higher = more creative
 }
+```
+
+### Customizing Mouse Glow Effects
+
+The portfolio features a universal mouse glow system that can be customized per component. See [GLOW_SYSTEM.md](GLOW_SYSTEM.md) for detailed documentation.
+
+#### Quick Customization
+
+**Change Card Glow Colors:**
+```tsx
+// In project_card.tsx, experience_card.tsx, or blog_card.tsx
+<BaseCard 
+  glowColor="34, 197, 94"  // RGB values (green, purple, blue, etc.)
+  glowIntensity={0.35}      // 0-1 opacity
+>
+```
+
+**Adjust Global Glow:**
+```tsx
+// In src/components/mouse_glow.tsx
+<div className="w-20 h-20 bg-blue-300 dark:bg-blue-500 opacity-50 ..." />
+//             ^^^^^^ size   ^^^^^^^^^^^ colors   ^^^^^^^^^ intensity
+```
+
+**Add Glow to New Components:**
+```tsx
+import ContainedMouseGlow from '@/components/ContainedMouseGlow';
+
+<div className="relative overflow-hidden" data-has-contained-glow="true">
+  <ContainedMouseGlow color="147, 197, 253" intensity={0.4} />
+  {/* Your content */}
+</div>
 ```
 
 ---

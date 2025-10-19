@@ -85,9 +85,12 @@ export default function HomeContent({
           onMouseEnter={handleMouseEnter}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="rounded-full p-1 bg-gradient-to-br from-orange-500 to-gray-100 dark:from-gray-800 dark:to-gray-700 inline-flex items-center justify-center shadow-xl"
+          // Data attribute signals to MouseGlow component to hide global glow when hovering
+          // Profile picture has its own custom glare effect
+          data-has-custom-glow="true"
+          className="rounded-full p-1 bg-gradient-to-br from-orange-500 to-gray-100 dark:from-gray-800 dark:to-gray-700 inline-flex items-center justify-center shadow-xl overflow-hidden"
         >
-          <div className={`${imageContainerSize} rounded-full border-4 border-transparent relative inline-flex items-center justify-center`}>
+          <div className={`${imageContainerSize} rounded-full border-4 border-transparent relative inline-flex items-center justify-center overflow-hidden`}>
             <Image
               src="/profile.png"
               alt="Mike Veson"

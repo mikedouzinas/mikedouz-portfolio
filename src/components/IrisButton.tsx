@@ -434,6 +434,8 @@ export default function IrisButton() {
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      // Data attribute to signal components with custom glow effects (disables global mouse glow)
+      data-has-custom-glow="true"
       className="group relative inline-flex items-center justify-center sm:justify-between px-3 py-2 bg-gradient-to-r from-blue-600 via-green-600 to-blue-600 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl w-full overflow-hidden"
     >
       {/* Cursor-following green glow overlay - creates dynamic gradient effect on hover */}
@@ -459,11 +461,11 @@ export default function IrisButton() {
       {/* Each tile styled like a keyboard key with rounded corners, border, and shadow */}
       <div className="hidden sm:flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity relative z-10">
         {/* Command key tile */}
-        <span className="inline-flex items-center justify-center min-w-[20px] h-[20px] rounded-md border border-white/20 bg-white/10 shadow-inner text-[11px] font-medium leading-none">
+        <span className="inline-flex items-center justify-center min-w-[17px] h-[17px] rounded border border-white/20 bg-white/10 shadow-inner text-[10px] font-medium leading-none">
           ⌘
         </span>
         {/* K key tile */}
-        <span className="inline-flex items-center justify-center min-w-[20px] h-[20px] rounded-md border border-white/20 bg-white/10 shadow-inner text-[11px] font-medium leading-none">
+        <span className="inline-flex items-center justify-center min-w-[17px] h-[17px] rounded border border-white/20 bg-white/10 shadow-inner text-[10px] font-medium leading-none">
           K
         </span>
       </div>
