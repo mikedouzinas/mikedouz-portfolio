@@ -31,8 +31,12 @@ export default function IrisButton() {
    * Handle mouse enter event
    * Sets up smooth transition for the initial hover state
    * Changes background from blue-green-blue gradient to pure blue during hover
+   * Suppressed during animations to prevent conflicts
    */
   const handleMouseEnter = () => {
+    // Don't apply hover effects if animating or palette is open
+    if (isAnimating.current || isPaletteOpen.current) return;
+    
     if (buttonRef.current) {
       buttonRef.current.style.transition = 'transform 300ms ease-out, background-image 300ms ease-out';
       // Switch to pure blue background during hover (green will come from glow overlay)
@@ -50,10 +54,11 @@ export default function IrisButton() {
    * Creates a cursor-following green light effect using radial gradient
    * The green highlight appears at cursor position, creating a dynamic gradient
    * Position is calculated relative to the button's bounding box
+   * Suppressed during animations to prevent conflicts
    */
   const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
     // Suppress hover writes while animating or while palette is open
-    if (!buttonRef.current || isAnimating.current || isPaletteOpen.current) return;
+    if (!buttonRef.current || isAnimating.current || isPaletteOpen.current || !isHovering.current) return;
     
     // Get button position and calculate cursor position relative to button
     const rect = buttonRef.current.getBoundingClientRect();
@@ -87,8 +92,15 @@ export default function IrisButton() {
    * Handle mouse leave event
    * Resets button to default state with smooth transition
    * Restores default blue-green-blue gradient from Tailwind class
+   * Suppressed during animations to prevent conflicts
    */
   const handleMouseLeave = () => {
+    // Don't reset styles if animating or palette is open
+    if (isAnimating.current || isPaletteOpen.current) {
+      isHovering.current = false;
+      return;
+    }
+    
     if (buttonRef.current) {
       buttonRef.current.style.transition = 'transform 300ms ease-out, background-image 300ms ease-out';
       buttonRef.current.style.transform = 'scale(1) translateY(0)';
@@ -104,8 +116,100 @@ export default function IrisButton() {
   };
 
   /**
-   * Animation effect when Cmd+K is pressed
+   * Trigger forward animation
+   * Starts green gradient split from center to edges
+   * Called by both Cmd+K keyboard shortcut and button click
+   * Clears any hover state first to prevent conflicts
+   */
+  const triggerForwardAnimation = () => {
+    if (!buttonRef.current || !glowRef.current || isAnimating.current) return;
+    
+    isAnimating.current = true;
+    isPaletteOpen.current = true; // Track that palette is opening
+    isHovering.current = false; // Clear hover state to prevent conflicts
+    
+    const button = buttonRef.current;
+    const glow = glowRef.current;
+    
+    // CRITICAL: Force button back to normal size BEFORE starting animation
+    // The button has transition-all in its className, so we need !important to override it
+    
+    // Immediately disable any transitions with !important to override Tailwind's transition-all
+    button.style.setProperty('transition', 'none', 'important');
+    glow.style.setProperty('transition', 'none', 'important');
+    
+    // Force a reflow to apply transition: none
+    void button.offsetHeight;
+    
+    // Now reset the transform (should be instant with transition: none !important)
+    button.style.setProperty('transform', 'scale(1) translateY(0)', 'important');
+    
+    // Force another reflow to apply the transform reset
+    void button.offsetHeight;
+    
+    const { width, height } = button.getBoundingClientRect();
+    const y = height / 2;
+    const centerX = width / 2;
+
+    // Animation duration in milliseconds
+    const duration = 600;
+    let startTime: number | null = null;
+    
+    // Set base to pure blue gradient during animation (no green via-color)
+    // This prevents green wash while the animation runs
+    button.style.backgroundImage = 'linear-gradient(90deg, #2563EB, #2563EB)';
+
+    // Clear any hover glow background
+    glow.style.backgroundImage = 'none';
+    glow.style.opacity = '1';
+
+    /**
+     * Forward animation step
+     * Starts with a single gradient in center, expands it outward to create two gradients at edges
+     * Uses easing for smooth acceleration
+     */
+    const animationStep = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Ease-out cubic for smooth deceleration as gradients reach edges
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      
+      // Calculate distance from center to edges
+      const maxDistance = centerX;
+      const currentDistance = maxDistance * easedProgress;
+      
+      // Two gradients moving symmetrically from center to edges
+      const leftX = centerX - currentDistance; // Moves from center to left edge (0)
+      const rightX = centerX + currentDistance; // Moves from center to right edge (width)
+      
+      // Create two radial gradients at symmetric positions
+      // Using 15% for compact, focused green highlights
+      // Use hue-matched transparent stops to avoid dimming blue areas
+      // Use backgroundImage (not background shorthand) to avoid implicit background-color changes
+      glow.style.backgroundImage = `
+        radial-gradient(circle at ${leftX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, rgba(34, 197, 94, 0) 40%, rgba(34, 197, 94, 0) 100%),
+        radial-gradient(circle at ${rightX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, rgba(34, 197, 94, 0) 40%, rgba(34, 197, 94, 0) 100%)
+      `;
+      glow.style.transition = 'none';
+
+      if (progress < 1) {
+        requestAnimationFrame(animationStep);
+      } else {
+        // Animation complete - keep gradients at edges while palette is open
+        // Keep isAnimating true to hold the edge frame and prevent hover repaints
+        // It will be set to false only after reverse animation completes
+      }
+    };
+
+    requestAnimationFrame(animationStep);
+  };
+
+  /**
+   * Animation effect when button is clicked or Cmd+K is pressed
    * Forward animation: Small green gradient in center expands outward to both edges
+   * - Triggered by: button click OR Cmd+K keyboard shortcut (consistent UX)
    * - Background switches from blue-green-blue gradient to pure blue during animation
    * - Green gradient starts in center and splits, moving to left and right edges
    * - Results in two small gradients at edges overlaid on pure blue base
@@ -172,7 +276,7 @@ export default function IrisButton() {
       glow.style.transition = 'none';
       button.style.transition = 'none';
 
-      // Reverse animation duration - matches palette fade-out (350ms)
+      // Reverse animation duration - bit faster than palette fade-out (350ms)
       const duration = 250;
       let startTime: number | null = null;
 
@@ -237,11 +341,27 @@ export default function IrisButton() {
             
             // Final cleanup: clear the glow background
             glow.style.backgroundImage = 'none';
-            glow.style.transition = 'none';
+            glow.style.transition = '';
+            
+            // Remove !important flags from transform and transition
+            button.style.removeProperty('transform');
+            button.style.removeProperty('transition');
+            glow.style.removeProperty('transition');
             
             // Re-enable hover interactions
             isAnimating.current = false;
             isPaletteOpen.current = false;
+            
+            // Check if cursor is still hovering over the button after animation
+            // If so, re-apply hover state
+            if (button.matches(':hover')) {
+              isHovering.current = true;
+              button.style.transition = 'transform 300ms ease-out, background-image 300ms ease-out';
+              button.style.transform = 'scale(1.05) translateY(-2px)';
+              button.style.backgroundImage = 'linear-gradient(90deg, #2563EB, #2563EB)';
+              glow.style.transition = 'opacity 300ms ease-out';
+              glow.style.opacity = '0'; // Start at 0, will be updated by mousemove
+            }
             
             // Remove listener if it was added
             glow.removeEventListener('transitionend', handleGlowFadeComplete);
@@ -273,71 +393,7 @@ export default function IrisButton() {
       // Cmd+K to open palette and start forward animation
       if (event.metaKey && event.key === 'k' && !isAnimating.current) {
         event.preventDefault();
-
-        if (buttonRef.current && glowRef.current) {
-          isAnimating.current = true;
-          isPaletteOpen.current = true; // Track that palette is opening
-          
-          const button = buttonRef.current;
-          const glow = glowRef.current;
-          const { width, height } = button.getBoundingClientRect();
-          const y = height / 2;
-          const centerX = width / 2;
-
-          // Animation duration in milliseconds
-          const duration = 600;
-          let startTime: number | null = null;
-          
-          // Set base to pure blue gradient during animation (no green via-color)
-          // This prevents green wash while the animation runs
-          button.style.backgroundImage = 'linear-gradient(90deg, #2563EB, #2563EB)';
-
-          // Ensure glow layer is visible
-          glow.style.transition = 'opacity 100ms ease-out';
-          glow.style.opacity = '1';
-
-          /**
-           * Forward animation step
-           * Starts with a single gradient in center, expands it outward to create two gradients at edges
-           * Uses easing for smooth acceleration
-           */
-          const animationStep = (timestamp: number) => {
-            if (!startTime) startTime = timestamp;
-            const elapsed = timestamp - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            
-            // Ease-out cubic for smooth deceleration as gradients reach edges
-            const easedProgress = 1 - Math.pow(1 - progress, 3);
-            
-            // Calculate distance from center to edges
-            const maxDistance = centerX;
-            const currentDistance = maxDistance * easedProgress;
-            
-            // Two gradients moving symmetrically from center to edges
-            const leftX = centerX - currentDistance; // Moves from center to left edge (0)
-            const rightX = centerX + currentDistance; // Moves from center to right edge (width)
-            
-            // Create two radial gradients at symmetric positions
-            // Using 15% for compact, focused green highlights
-            // Use hue-matched transparent stops to avoid dimming blue areas
-            // Use backgroundImage (not background shorthand) to avoid implicit background-color changes
-            glow.style.backgroundImage = `
-              radial-gradient(circle at ${leftX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, rgba(34, 197, 94, 0) 40%, rgba(34, 197, 94, 0) 100%),
-              radial-gradient(circle at ${rightX}px ${y}px, rgba(34, 197, 94, 0.9), rgba(34, 197, 94, 0.5) 15%, rgba(34, 197, 94, 0) 40%, rgba(34, 197, 94, 0) 100%)
-            `;
-            glow.style.transition = 'none';
-
-            if (progress < 1) {
-              requestAnimationFrame(animationStep);
-            } else {
-              // Animation complete - keep gradients at edges while palette is open
-              // Keep isAnimating true to hold the edge frame and prevent hover repaints
-              // It will be set to false only after reverse animation completes
-            }
-          };
-
-          requestAnimationFrame(animationStep);
-        }
+        triggerForwardAnimation();
       }
     };
 
@@ -361,8 +417,13 @@ export default function IrisButton() {
 
   /**
    * Dispatches custom event to open the Iris command palette
+   * Also triggers the forward animation (same as Cmd+K)
+   * This creates a consistent visual experience for both keyboard and mouse interactions
    */
   const handleClick = () => {
+    // Trigger the same forward animation as Cmd+K
+    triggerForwardAnimation();
+    // Dispatch event to open palette
     window.dispatchEvent(new CustomEvent('mv-open-cmdk'));
   };
 
