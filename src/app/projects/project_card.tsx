@@ -12,7 +12,11 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project }: ProjectCardProps) {
   return (
-    <BaseCard href={project.githubLink}>
+    <BaseCard 
+      href={project.githubLink}
+      glowColor="34, 197, 94"  // Green glow for projects
+      glowIntensity={0.35}
+    >
       <div className="absolute top-2 right-2 flex space-x-2">
         <a
           href={project.githubLink}

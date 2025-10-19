@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
   ArrowRight, 
@@ -187,11 +188,22 @@ function renderTextWithLinks(text: string, router: ReturnType<typeof useRouter>)
  * - Real streaming responses from OpenAI
  * - Clickable links in responses
  * - Navigation commands
+ * - Coordinated animations using framer-motion
+ * - Animation lock prevents rapid open/close operations
  * 
  * View State Machine:
  * - Suggestions View: Shows search suggestions, no answer
  * - Answer View: Shows answer only, no suggestions
  * - Editing in Answer View switches back to Suggestions View
+ * 
+ * Animation Coordination:
+ * - Entry: Simple fade in (350ms) when opening
+ * - Exit: Simple fade out (350ms) synchronized with IrisButton's reverse animation
+ * - Button animation (500ms total) overlaps with palette fade for smooth transition
+ * - Uses framer-motion's AnimatePresence to manage mount/unmount timing
+ * - Horizontal centering uses framer-motion's x transform (-50%)
+ * - Animation lock (isAnimating state) prevents operations during transitions
+ * - Safety timeout (450ms) ensures unlock even if onAnimationComplete fails (spam-proof)
  */
 export default function IrisPalette({ open: controlledOpen, onOpenChange }: IrisPaletteProps) {
   const router = useRouter();
@@ -209,6 +221,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const [answer, setAnswer] = useState<string | null>(null);
   const [isProcessingQuery, setIsProcessingQuery] = useState(false);
   const [submittedQuery, setSubmittedQuery] = useState<string>(''); // Track the query that generated the current answer
+  const [isAnimating, setIsAnimating] = useState(false); // Prevent rapid open/close during animations
   
   // Refs for focus management
   const inputRef = useRef<HTMLInputElement>(null);
@@ -240,10 +253,42 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    * Handle open state changes
    * Calls onOpenChange callback if provided
    * Wrapped in useCallback to prevent dependency issues in effects
+   * 
+   * Design pattern: Dispatch close event IMMEDIATELY before state changes
+   * This allows dependent components (like IrisButton) to start their animations
+   * synchronously, ensuring smooth visual transitions without lag
+   * 
+   * Animation timing:
+   * 1. Event dispatches → IrisButton reverse animation starts (500ms total)
+   * 2. State updates → Palette fade-out starts via framer-motion (350ms)
+   * 3. Palette unmounts after fade completes, while button is still animating
+   * Result: Coordinated exit where palette disappears smoothly as button animates
+   * 
+   * Animation lock: Prevents rapid open/close operations during animation
    */
   const handleOpenChange = useCallback((open: boolean) => {
+    // Prevent opening/closing while animation is in progress
+    if (isAnimating) {
+      console.log('[IrisPalette] Animation in progress, ignoring state change request');
+      return;
+    }
+    
+    // CRITICAL: Dispatch close event synchronously BEFORE any state changes
+    // This ensures IrisButton can start its reverse animation immediately
+    // AnimatePresence will handle the palette's exit animation before unmounting
+    if (!open) {
+      window.dispatchEvent(new CustomEvent('mv-close-cmdk'));
+    }
+    
     setIsOpen(open);
+    setIsAnimating(true); // Lock during animation
     onOpenChange?.(open);
+    
+    // Safety timeout: If onAnimationComplete never fires (spam/race conditions), force unlock
+    // 350ms animation + 100ms buffer = 450ms
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 450);
     
     // Reset all state when closing, including view mode
     if (!open) {
@@ -255,7 +300,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setIsProcessingQuery(false);
       setSubmittedQuery('');
     }
-  }, [onOpenChange]);
+  }, [isAnimating, onOpenChange]);
 
   /**
    * Fetch autocomplete suggestions from API
@@ -698,27 +743,39 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     }
   };
 
-  // Don't render if not open
-  if (!isOpen) return null;
-
   return (
-    <>
-      {/* Fixed positioned panel - mobile-optimized layout */}
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-label="Iris command palette"
-        aria-modal="false"
-        className={`
-          fixed left-1/2 -translate-x-1/2 z-[1000]
-          ${isMobile 
-            ? 'top-4 w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] overflow-y-auto' 
-            : 'top-[20vh] w-[720px] max-w-[calc(100vw-2rem)]'
-          }
-          rounded-2xl border border-white/20 bg-blue-600/20 backdrop-blur-xl shadow-3xl ring-1 ring-white/5
-          ${isInputFocused ? 'ring-1 ring-sky-400/30' : ''}
-        `}
-      >
+    <AnimatePresence mode="wait">
+      {isOpen && (
+        <>
+          {/* Fixed positioned panel - mobile-optimized layout with framer-motion animations */}
+          {/* Simple fade in/out (350ms) to sync with button animation */}
+          {/* Centering: Uses framer-motion's x with -50% for proper horizontal alignment */}
+          <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-label="Iris command palette"
+            aria-modal="false"
+            initial={{ opacity: 0, x: "-50%" }}
+            animate={{ opacity: 1, x: "-50%" }}
+            exit={{ opacity: 0, x: "-50%" }}
+            transition={{ 
+              duration: 0.35, 
+              ease: "easeInOut" // Smooth fade
+            }}
+            onAnimationComplete={() => {
+              // Unlock animation state when animation finishes (both open and close)
+              setIsAnimating(false);
+            }}
+            className={`
+              fixed left-1/2 z-[1000]
+              ${isMobile 
+                ? 'top-4 w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] overflow-y-auto' 
+                : 'top-[20vh] w-[720px] max-w-[calc(100vw-2rem)]'
+              }
+              rounded-2xl border border-white/20 bg-blue-600/20 backdrop-blur-xl shadow-3xl ring-1 ring-white/5
+              ${isInputFocused ? 'ring-1 ring-sky-400/30' : ''}
+            `}
+          >
         {/* Input row */}
         <div className="relative flex items-center px-3">
           {/* Left search icon */}
@@ -905,15 +962,22 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             )}
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Invisible backdrop for click-outside detection (doesn't dim) */}
-      <div
+      {/* Also animated to fade in/out with the palette */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
         className="fixed inset-0 z-[999]"
         onClick={() => handleOpenChange(false)}
         aria-hidden="true"
       />
     </>
+      )}
+    </AnimatePresence>
   );
 }
 

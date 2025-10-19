@@ -37,7 +37,7 @@
     "company": "Veson Nautical",
     "role": "Software Engineering Intern (IMOS – Laytime Automation)",
     "dates": { "start": "2024-06", "end": "2024-09" },
-    "summary": "Built a high-throughput document-processing pipeline (Google Document AI + Python) to automate laytime calculations; reduced multi-day workflows to ~2 minutes.",
+    "summary": "Built a high-throughput document-processing pipeline (Google Document AI + Python) to automate laytime calculations; reduced multi-day workflows to ~8 minutes.",
     "specifics": [
       "Parsed PDFs/EMLs/XLSX and nested attachments at scale (100+ docs per batch) using Google Document AI with parallel execution.",
       "Extracted Statement of Facts, Charter Parties, vendor calculations, and 15+ doc classes; normalized into a contract-aware schema.",
