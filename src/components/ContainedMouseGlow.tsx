@@ -36,6 +36,8 @@ export default function ContainedMouseGlow({
   const [isHovering, setIsHovering] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [hasPointer, setHasPointer] = useState(true);
+  // Store global mouse position to handle scroll events
+  const mousePositionRef = useRef({ clientX: 0, clientY: 0 });
 
   useEffect(() => {
     // Detect if device has a fine pointer (mouse) vs coarse pointer (touch)
@@ -61,12 +63,39 @@ export default function ContainedMouseGlow({
     };
   }, []);
 
+  // Track global mouse position across the entire window
+  // This ensures we always know where the cursor is, even before hovering
+  useEffect(() => {
+    if (!hasPointer) return;
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      // Continuously track mouse position globally
+      mousePositionRef.current = { clientX: e.clientX, clientY: e.clientY };
+    };
+
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+    };
+  }, [hasPointer]);
+
   useEffect(() => {
     const parent = glowRef.current?.parentElement;
     if (!parent || !hasPointer) return;
 
+    // Helper function to update position based on current mouse and card locations
+    const updatePosition = () => {
+      const rect = parent.getBoundingClientRect();
+      const x = mousePositionRef.current.clientX - rect.left;
+      const y = mousePositionRef.current.clientY - rect.top;
+      setPosition({ x, y });
+    };
+
     const handleMouseEnter = () => {
       setIsHovering(true);
+      // Immediately update position when entering, using stored global mouse position
+      updatePosition();
     };
 
     const handleMouseLeave = () => {
@@ -74,23 +103,33 @@ export default function ContainedMouseGlow({
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      // Direct position update for instant cursor tracking (no RAF delay)
-      const rect = parent.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      setPosition({ x, y });
+      // Update stored position (though global handler already does this)
+      mousePositionRef.current = { clientX: e.clientX, clientY: e.clientY };
+      // Direct position update for instant cursor tracking
+      updatePosition();
+    };
+
+    // Handle scroll events - recalculate position as the card moves under the mouse
+    // This ensures the glow follows the card during scrolling without waiting for mousemove
+    const handleScroll = () => {
+      if (isHovering) {
+        updatePosition();
+      }
     };
 
     parent.addEventListener('mouseenter', handleMouseEnter);
     parent.addEventListener('mouseleave', handleMouseLeave);
     parent.addEventListener('mousemove', handleMouseMove);
+    // Listen to scroll on window to catch all scroll events (page scroll, container scroll)
+    window.addEventListener('scroll', handleScroll, true); // useCapture=true to catch all scroll phases
 
     return () => {
       parent.removeEventListener('mouseenter', handleMouseEnter);
       parent.removeEventListener('mouseleave', handleMouseLeave);
       parent.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll, true);
     };
-  }, [hasPointer]);
+  }, [hasPointer, isHovering]);
 
   // Don't render on mobile/touch devices
   if (!hasPointer) {
@@ -106,7 +145,7 @@ export default function ContainedMouseGlow({
         transition: 'opacity 300ms ease-out',
       }}
     >
-      {/* Main glow circle that follows the cursor - instant tracking with no delay */}
+      {/* Main glow circle that follows the cursor - instant tracking with no delay, even during scroll */}
       <div
         className="absolute"
         style={{
@@ -117,7 +156,7 @@ export default function ContainedMouseGlow({
           transform: 'translate(-50%, -50%)',
           background: `radial-gradient(circle, rgba(${color}, ${intensity}) 0%, rgba(${color}, ${intensity * 0.5}) 40%, rgba(${color}, 0) 70%)`,
           filter: 'blur(40px)',
-          // No transition on position - instant cursor tracking
+          // No transition on position - instant cursor tracking and scroll updates
           willChange: 'transform',
         }}
       />

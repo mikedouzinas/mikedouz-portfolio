@@ -13,13 +13,11 @@ export default function AboutSection() {
             <span className="font-semibold bg-gradient-to-r from-blue-600 to-blue-300 dark:from-blue-600 dark:to-white text-transparent bg-clip-text">
               Greek
             </span>
-            <span role="img" aria-label="Greek flag" className="ml-1 align-middle">🇬🇷</span>
             -
             <span className="font-semibold bg-gradient-to-r from-red-600 via-blue-300 to-blue-600 dark:from-red-600 dark:via-white dark:to-blue-300 text-transparent bg-clip-text">
-              American
+              American{" "}
             </span>
-            <span role="img" aria-label="United States flag" className="ml-1 align-middle">🇺🇸</span>{" "}
-            Computer Science major at{" "}
+              Computer Science major at{" "}
             <span className="font-semibold bg-gradient-to-r from-blue-500 to-gray-500 text-transparent bg-clip-text">
               Rice University
             </span>{" "}
