@@ -79,7 +79,8 @@ export default function HomeContent({
       id="home"
       className={`${containerClass} transition-opacity duration-300 ${fadeOut ? 'opacity-0' : 'opacity-100'} bg-gray-50 dark:bg-gray-900`}
     >
-      <div className="inline-block relative">
+      {/* Profile photo - hidden on mobile (md:), visible on desktop */}
+      <div className="hidden md:inline-block relative">
         <div
           ref={containerRef}
           onMouseEnter={handleMouseEnter}
@@ -102,10 +103,11 @@ export default function HomeContent({
           </div>
         </div>
       </div>
-      <div className="py-4" />
+      <div className="hidden md:block py-4" />
       <div className={textWrapperClass}>
         {/* Parent container with fixed width and centered alignment */}
-        <div className="w-48 flex flex-col items-center">
+        {/* Hidden on mobile since HeaderMobile now displays name and Iris button */}
+        <div className="hidden md:flex w-48 flex-col items-center">
           <h1 className={`${headingSize} font-bold text-gray-800 dark:text-gray-200 w-full text-center`}>Mike Veson</h1>
           <div className="mt-4 w-full">
             <IrisButton />
