@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -48,6 +48,9 @@ export default function ExpandableSection({
   // Track expanded/collapsed state
   const [expanded, setExpanded] = useState(false);
   
+  // Ref to the section container for smooth scrolling
+  const sectionRef = useRef<HTMLElement>(null);
+  
   // Only show toggle if there are more items than initialCount
   const hasMoreItems = items.length > initialCount;
   
@@ -56,13 +59,24 @@ export default function ExpandableSection({
   
   /**
    * Toggle between expanded and collapsed states
+   * When collapsing, scroll to the section position so user sees "Show all" button
    */
   const handleToggle = () => {
+    // If we're collapsing (going from expanded to collapsed)
+    if (expanded && sectionRef.current) {
+      // Small delay to let animation start, then scroll
+      setTimeout(() => {
+        sectionRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start'
+        });
+      }, 100);
+    }
     setExpanded(!expanded);
   };
 
   return (
-    <section className="space-y-4">
+    <section ref={sectionRef} className="space-y-2">
       {/* Section header - only visible on mobile (matches existing pattern) */}
       <div className="md:hidden">
         <div className="flex items-center space-x-3">
@@ -75,53 +89,69 @@ export default function ExpandableSection({
 
       {/* Items container - relative positioning for absolute overlay */}
       <div className="relative">
-        {/* Items list with tighter spacing (space-y-3 vs space-y-6) and lighter dividers */}
-        <div className="space-y-3">
+        {/* Items list with minimal spacing on mobile (space-y-0.5 = 2px) and lighter dividers */}
+        {/* When collapsed: extra padding on last item for fade overlay spacing */}
+        {/* When expanded: remove trailing padding/border from final item */}
+        {/* Note: This component is only used on mobile; desktop uses direct card rendering with md:mb-6 */}
+        <div className="space-y-0.5">
           <AnimatePresence initial={false}>
-            {visibleItems.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ 
-                  duration: 0.25,
-                  ease: 'easeInOut',
-                  delay: expanded ? index * 0.04 : 0 // Subtle stagger when expanding
-                }}
-                className="md:border-0 border-b border-gray-200/20 dark:border-gray-800/20 pb-3 md:pb-0"
-              >
-                {item}
-              </motion.div>
-            ))}
+            {visibleItems.map((item, index) => {
+              const isLast = index === visibleItems.length - 1;
+              // When collapsed: add extra padding to last item for gradient overlay
+              // When expanded: remove padding/border from last item
+              let itemClass = 'md:border-0 border-b border-gray-200/20 dark:border-gray-800/20 pb-1 md:pb-0';
+              if (isLast) {
+                if (expanded) {
+                  itemClass = 'md:border-0 border-b-0 pb-0 md:pb-0';
+                } else {
+                  // Extra padding on last item when collapsed to prevent overlay overlap
+                  itemClass = 'md:border-0 border-b border-gray-200/20 dark:border-gray-800/20 pb-6 md:pb-0';
+                }
+              }
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ 
+                    duration: 0.25,
+                    ease: 'easeInOut',
+                    delay: expanded ? index * 0.04 : 0 // Subtle stagger when expanding
+                  }}
+                  className={itemClass}
+                >
+                  {item}
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </div>
 
         {/* Fade-out gradient overlay - only when collapsed and has more items */}
+        {/* Button wrapper has pointer-events-auto to enable clicking */}
         {hasMoreItems && !expanded && (
           <div 
-            className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/80 to-transparent dark:from-gray-900 dark:via-gray-900/80 dark:to-transparent"
+            className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-50 via-gray-50/80 to-transparent dark:from-gray-900 dark:via-gray-900/80 dark:to-transparent pointer-events-none"
             aria-hidden="true"
           >
-            {/* Left-aligned "Show all" button inside overlay */}
-            <div className="absolute bottom-2 left-0 pointer-events-auto">
-              <button
-                onClick={handleToggle}
-                className="inline-flex items-center gap-1.5 px-0 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 dark:focus-visible:ring-blue-500/50 focus-visible:ring-offset-0 rounded"
-                aria-expanded={false}
-                aria-label={`Show all ${title}`}
-              >
-                <span className="font-medium">Show all</span>
-                <ChevronDown className="w-3.5 h-3.5" />
-              </button>
-            </div>
+            {/* Left-aligned "Show all" button - pointer-events-auto allows interaction */}
+            <button
+              onClick={handleToggle}
+              className="absolute bottom-0 left-0 inline-flex items-center gap-1.5 px-0 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 dark:focus-visible:ring-blue-500/50 focus-visible:ring-offset-0 rounded pointer-events-auto"
+              aria-expanded={false}
+              aria-label={`Show all ${title}`}
+            >
+              <span className="font-medium">Show all</span>
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
           </div>
         )}
       </div>
 
-      {/* Collapse control - only shown when expanded, left-aligned below items */}
+      {/* Collapse control - small gap from last item (mt-2), not inside space-y wrapper */}
       {hasMoreItems && expanded && (
-        <div className="md:hidden pt-1">
+        <div className="md:hidden mt-2">
           <button
             onClick={handleToggle}
             className="inline-flex items-center gap-1.5 px-0 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 dark:focus-visible:ring-blue-500/50 focus-visible:ring-offset-0 rounded"

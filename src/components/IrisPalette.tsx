@@ -750,6 +750,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
           {/* Fixed positioned panel - mobile-optimized layout with framer-motion animations */}
           {/* Simple fade in/out (350ms) to sync with button animation */}
           {/* Centering: Uses framer-motion's x with -50% for proper horizontal alignment */}
+          {/* Mobile: Positioned below header (top-16 = 64px) to keep header visible and accessible */}
           <motion.div
             ref={panelRef}
             role="dialog"
@@ -769,7 +770,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             className={`
               fixed left-1/2 z-[1000]
               ${isMobile 
-                ? 'top-4 w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] overflow-y-auto' 
+                ? 'top-16 w-[calc(100vw-2rem)] max-h-[calc(100vh-5rem)] overflow-y-auto' 
                 : 'top-[20vh] w-[720px] max-w-[calc(100vw-2rem)]'
               }
               rounded-2xl border border-white/20 bg-blue-600/20 backdrop-blur-xl shadow-3xl ring-1 ring-white/5

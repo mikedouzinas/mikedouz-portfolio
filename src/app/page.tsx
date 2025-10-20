@@ -64,8 +64,8 @@ export default function Home() {
         </aside>
         
         {/* Main Content */}
-        {/* Mobile: tighter spacing (pt-2, space-y-10) | Desktop: original spacing (pt-8, space-y-16) */}
-        <main ref={mainRef} className="ml-0 md:ml-[33.3333%] w-full px-4 md:px-8 pt-2 md:pt-8 pb-20 overflow-y-auto md:h-screen space-y-10 md:space-y-16">
+        {/* Mobile: minimal spacing (pt-1, space-y-6) | Desktop: generous spacing (pt-8, space-y-32) */}
+        <main ref={mainRef} className="ml-0 md:ml-[33.3333%] w-full px-4 md:px-8 pt-1 md:pt-8 pb-20 overflow-y-auto md:h-screen space-y-6 md:space-y-32">
           {/* About Section - Hidden on mobile (available via AboutSheet), visible on desktop */}
           <section id="about" className="hidden md:block md:mt-16">
             <About />
