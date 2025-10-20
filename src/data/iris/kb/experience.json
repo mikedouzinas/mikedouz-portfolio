@@ -21,12 +21,12 @@
     "company": "Liu Idea Lab for Innovation & Entrepreneurship (Rice)",
     "role": "Software Engineer in Residence",
     "dates": { "start": "2024-02", "end": "2024-11" },
-    "summary": "Led full-stack platform work (React/TypeScript/Supabase) and product discovery; doubled student usage and supported ~30 startups (3 admitted to YC).",
+    "summary": "Led early development for Rice’s entrepreneurship platform, combining full-stack development with user research to shape product direction and help design coursework to teach founders how to build with software.",
     "specifics": [
-      "Ran 40+ user interviews to define platform requirements; translated findings into a typed component library and data model.",
-      "Implemented auth, data access, and content modules on Supabase with React/TypeScript; instrumented usage analytics for prioritization.",
-      "Built an onboarding flow and resources hub that increased student engagement ~100% across Lilie properties.",
-      "Partnered with faculty and founders; managed roadmap, sprint rituals, and stakeholder demos for >4,000 community members."
+      "Conducted 40+ user interviews with student founders and faculty to identify key needs in entrepreneurship education and resource access.",
+      "Designed and prototyped full-stack platform concepts in React, TypeScript, and Supabase, creating mockups for course management, venture tracking, and mentorship tools.",
+      "Collaborated weekly with student founders to gather feedback and refine designs that could streamline startup support and community visibility.",
+      "Assisted faculty with curriculum updates that empowered non-technical students to build MVPs and leverage software tools in their ventures."
     ],
     "skills": ["typescript", "react", "supabase", "product_management", "user_research", "ux_design"],
     "links": { "company": "https://entrepreneurship.rice.edu/" },
