@@ -267,28 +267,42 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    * Animation lock: Prevents rapid open/close operations during animation
    */
   const handleOpenChange = useCallback((open: boolean) => {
+    console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('[IrisPalette] handleOpenChange called:', { 
+      requestedState: open ? 'OPEN' : 'CLOSE',
+      currentState: isOpen ? 'OPEN' : 'CLOSED',
+      isAnimating 
+    });
+    
     // Prevent opening/closing while animation is in progress
     if (isAnimating) {
-      console.log('[IrisPalette] Animation in progress, ignoring state change request');
+      console.log('[IrisPalette] ⛔ BLOCKED - Animation in progress, ignoring state change request');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
       return;
     }
+    
+    console.log('[IrisPalette] ✅ State change ALLOWED - proceeding');
     
     // CRITICAL: Dispatch close event synchronously BEFORE any state changes
     // This ensures IrisButton can start its reverse animation immediately
     // AnimatePresence will handle the palette's exit animation before unmounting
     if (!open) {
+      console.log('[IrisPalette] 📨 Dispatching mv-close-cmdk event');
       window.dispatchEvent(new CustomEvent('mv-close-cmdk'));
     }
     
     setIsOpen(open);
     setIsAnimating(true); // Lock during animation
+    console.log('[IrisPalette] 🔒 Palette LOCKED for 650ms');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
     onOpenChange?.(open);
     
     // Safety timeout: If onAnimationComplete never fires (spam/race conditions), force unlock
-    // 350ms animation + 100ms buffer = 450ms
+    // Must be longer than button's forward animation (600ms) to prevent desync
     setTimeout(() => {
+      console.log('[IrisPalette] 🔓 Palette UNLOCKED (timeout)');
       setIsAnimating(false);
-    }, 450);
+    }, 650); // 600ms forward animation + 50ms safety buffer
     
     // Reset all state when closing, including view mode
     if (!open) {
@@ -359,39 +373,38 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   }, [query, fetchSuggestions, viewMode]);
 
   /**
-   * Global keyboard shortcut listener
-   * Opens palette with ⌘K (Mac) or Ctrl+K (Win/Linux)
-   * Desktop only - mobile users use the button
+   * REMOVED: Cmd+K handling - now handled exclusively by IrisButton
+   * IrisButton dispatches 'mv-open-cmdk' event which we listen to below
+   * This prevents duplicate handlers and ensures button animation always runs with Cmd+K
    */
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Keyboard shortcuts only work on desktop
-      if (isMobile) return;
-      
-      // ⌘K or Ctrl+K to toggle
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        handleOpenChange(!isOpen);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isMobile, isOpen, handleOpenChange]);
 
   /**
    * Listen for custom 'mv-open-cmdk' event
-   * Allows external components (like hero button) to open the palette
-   * Works on both desktop and mobile
+   * Dispatched by button clicks - always opens the palette
    */
   useEffect(() => {
     const handleCustomOpen = () => {
+      console.log('[IrisPalette] 📨 Received mv-open-cmdk event (from button click)');
       handleOpenChange(true);
     };
 
     window.addEventListener('mv-open-cmdk', handleCustomOpen);
     return () => window.removeEventListener('mv-open-cmdk', handleCustomOpen);
   }, [handleOpenChange]);
+
+  /**
+   * Listen for custom 'mv-toggle-cmdk' event
+   * Dispatched by Cmd+K - toggles the palette open/closed
+   */
+  useEffect(() => {
+    const handleToggle = () => {
+      console.log('[IrisPalette] 📨 Received mv-toggle-cmdk event (from Cmd+K), current isOpen:', isOpen);
+      handleOpenChange(!isOpen);
+    };
+
+    window.addEventListener('mv-toggle-cmdk', handleToggle);
+    return () => window.removeEventListener('mv-toggle-cmdk', handleToggle);
+  }, [handleOpenChange, isOpen]);
 
   /**
    * Focus input when palette opens
@@ -764,6 +777,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             }}
             onAnimationComplete={() => {
               // Unlock animation state when animation finishes (both open and close)
+              console.log('[IrisPalette] 🔓 Palette UNLOCKED (onAnimationComplete)');
               setIsAnimating(false);
             }}
             className={`

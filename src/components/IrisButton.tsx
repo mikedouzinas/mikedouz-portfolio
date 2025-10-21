@@ -122,8 +122,16 @@ export default function IrisButton() {
    * Clears any hover state first to prevent conflicts
    */
   const triggerForwardAnimation = () => {
-    if (!buttonRef.current || !glowRef.current || isAnimating.current) return;
+    if (!buttonRef.current || !glowRef.current || isAnimating.current) {
+      console.log('[IrisButton] triggerForwardAnimation BLOCKED:', {
+        hasButton: !!buttonRef.current,
+        hasGlow: !!glowRef.current,
+        isAnimating: isAnimating.current
+      });
+      return;
+    }
     
+    console.log('[IrisButton] ✅ Starting FORWARD animation');
     isAnimating.current = true;
     isPaletteOpen.current = true; // Track that palette is opening
     isHovering.current = false; // Clear hover state to prevent conflicts
@@ -197,6 +205,7 @@ export default function IrisButton() {
       if (progress < 1) {
         requestAnimationFrame(animationStep);
       } else {
+        console.log('[IrisButton] Forward animation COMPLETE - holding at edges');
         // Animation complete - keep gradients at edges while palette is open
         // Keep isAnimating true to hold the edge frame and prevent hover repaints
         // It will be set to false only after reverse animation completes
@@ -248,19 +257,25 @@ export default function IrisButton() {
      * This prevents opening the palette again while it's still closing
      */
     const triggerReverseAnimation = () => {
-      if (!buttonRef.current || !glowRef.current) return;
+      if (!buttonRef.current || !glowRef.current) {
+        console.log('[IrisButton] triggerReverseAnimation BLOCKED - missing refs');
+        return;
+      }
       
       // If palette wasn't opened by Cmd+K, we still need to lock the button
       // to prevent a new Cmd+K from opening while palette is closing
       if (!isPaletteOpen.current) {
+        console.log('[IrisButton] Palette closed via other method - locking button for 650ms');
         // Lock button for duration of palette close animation (350ms + buffer)
         isAnimating.current = true;
         setTimeout(() => {
+          console.log('[IrisButton] 🔓 Button unlocked after external palette close');
           isAnimating.current = false;
-        }, 450);
+        }, 650); // Match palette lock duration
         return;
       }
       
+      console.log('[IrisButton] ✅ Starting REVERSE animation');
       isPaletteOpen.current = false;
       isAnimating.current = true; // Prevent hover from reintroducing green during reverse
       const button = buttonRef.current;
@@ -316,6 +331,7 @@ export default function IrisButton() {
         if (progress < 1) {
           requestAnimationFrame(reverseAnimationStep);
         } else {
+          console.log('[IrisButton] Reverse animation COMPLETE - starting fade out');
           // Reverse animation complete - gradients frozen at FINAL_MARGIN_PX from center
           // Overlay now shows a faint green band; restore base gradient under it invisibly
           
@@ -338,6 +354,8 @@ export default function IrisButton() {
           const cleanup = () => {
             if (cleanupComplete) return;
             cleanupComplete = true;
+            
+            console.log('[IrisButton] 🔓 Cleanup complete - button UNLOCKED');
             
             // Final cleanup: clear the glow background
             glow.style.backgroundImage = 'none';
@@ -376,8 +394,8 @@ export default function IrisButton() {
           glow.addEventListener('transitionend', handleGlowFadeComplete);
           
           // Safety timeout: If transitionend never fires (can happen with spam), force cleanup
-          // 150ms transition + 100ms buffer = 250ms
-          setTimeout(cleanup, 250);
+          // Must be longer than button's forward animation (600ms) to prevent desync
+          setTimeout(cleanup, 650);
         }
       };
 
@@ -390,10 +408,29 @@ export default function IrisButton() {
      * Handles Cmd+K to open palette and start forward animation
      */
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Cmd+K to open palette and start forward animation
-      if (event.metaKey && event.key === 'k' && !isAnimating.current) {
-        event.preventDefault();
-        triggerForwardAnimation();
+      // Cmd+K to toggle palette and start appropriate animation
+      if (event.metaKey && event.key === 'k') {
+        console.log('\n🔵 [IrisButton] Cmd+K PRESSED 🔵');
+        console.log('   State: isAnimating=%s, isPaletteOpen=%s', isAnimating.current, isPaletteOpen.current);
+        
+        if (!isAnimating.current) {
+          event.preventDefault();
+          
+          // Only trigger forward animation when OPENING (palette currently closed)
+          // When CLOSING (palette currently open), palette will dispatch mv-close-cmdk which triggers reverse
+          if (!isPaletteOpen.current) {
+            console.log('   → Opening palette - starting forward animation');
+            triggerForwardAnimation();
+          } else {
+            console.log('   → Closing palette - will respond to mv-close-cmdk event');
+          }
+          
+          // Dispatch TOGGLE event for Cmd+K (different from click which always opens)
+          console.log('   📨 Dispatching mv-toggle-cmdk event\n');
+          window.dispatchEvent(new CustomEvent('mv-toggle-cmdk'));
+        } else {
+          console.log('   ⛔ IGNORED - animation in progress\n');
+        }
       }
     };
 
@@ -403,6 +440,7 @@ export default function IrisButton() {
      * ensuring immediate animation start without waiting for React state updates
      */
     const handlePaletteClose = () => {
+      console.log('[IrisButton] 📨 Received mv-close-cmdk event');
       triggerReverseAnimation();
     };
 
