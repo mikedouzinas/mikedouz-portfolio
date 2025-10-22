@@ -267,40 +267,27 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    * Animation lock: Prevents rapid open/close operations during animation
    */
   const handleOpenChange = useCallback((open: boolean) => {
-    console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('[IrisPalette] handleOpenChange called:', { 
-      requestedState: open ? 'OPEN' : 'CLOSE',
-      currentState: isOpen ? 'OPEN' : 'CLOSED',
-      isAnimating 
-    });
     
     // Prevent opening/closing while animation is in progress
     if (isAnimating) {
-      console.log('[IrisPalette] ⛔ BLOCKED - Animation in progress, ignoring state change request');
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
       return;
     }
     
-    console.log('[IrisPalette] ✅ State change ALLOWED - proceeding');
     
     // CRITICAL: Dispatch close event synchronously BEFORE any state changes
     // This ensures IrisButton can start its reverse animation immediately
     // AnimatePresence will handle the palette's exit animation before unmounting
     if (!open) {
-      console.log('[IrisPalette] 📨 Dispatching mv-close-cmdk event');
       window.dispatchEvent(new CustomEvent('mv-close-cmdk'));
     }
     
     setIsOpen(open);
     setIsAnimating(true); // Lock during animation
-    console.log('[IrisPalette] 🔒 Palette LOCKED for 650ms');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
     onOpenChange?.(open);
     
     // Safety timeout: If onAnimationComplete never fires (spam/race conditions), force unlock
     // Must be longer than button's forward animation (600ms) to prevent desync
     setTimeout(() => {
-      console.log('[IrisPalette] 🔓 Palette UNLOCKED (timeout)');
       setIsAnimating(false);
     }, 650); // 600ms forward animation + 50ms safety buffer
     
@@ -384,7 +371,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    */
   useEffect(() => {
     const handleCustomOpen = () => {
-      console.log('[IrisPalette] 📨 Received mv-open-cmdk event (from button click)');
       handleOpenChange(true);
     };
 
@@ -398,7 +384,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    */
   useEffect(() => {
     const handleToggle = () => {
-      console.log('[IrisPalette] 📨 Received mv-toggle-cmdk event (from Cmd+K), current isOpen:', isOpen);
       handleOpenChange(!isOpen);
     };
 
@@ -577,7 +562,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       return;
     }
     
-    console.log('[IrisPalette] Submitting query:', q);
     
     // Immediately switch to answer view with loading state
     setIsProcessingQuery(true);
@@ -592,8 +576,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         `/api/iris/answer?q=${encodeURIComponent(q)}&signals=${encodeURIComponent(JSON.stringify(signals))}`
       );
 
-      console.log('[IrisPalette] API response status:', response.status);
-      console.log('[IrisPalette] API response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         // Try to get error details from response body
@@ -612,11 +594,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
       // Check if response is streaming (SSE) or JSON
       const contentType = response.headers.get('content-type');
-      console.log('[IrisPalette] Content-Type:', contentType);
       
       if (contentType?.includes('text/event-stream')) {
         // Real streaming from OpenAI
-        console.log('[IrisPalette] Starting streaming response');
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
         let accumulatedAnswer = '';
@@ -649,12 +629,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             }
           }
         }
-        console.log('[IrisPalette] Streaming complete, length:', accumulatedAnswer.length);
       } else {
         // Fallback JSON response
-        console.log('[IrisPalette] Using JSON response');
         const data = await response.json();
-        console.log('[IrisPalette] JSON data:', data);
         const answerText = data.answer || 'No answer available.';
         setAnswer(answerText);
       }
@@ -778,7 +755,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             }}
             onAnimationComplete={() => {
               // Unlock animation state when animation finishes (both open and close)
-              console.log('[IrisPalette] 🔓 Palette UNLOCKED (onAnimationComplete)');
               setIsAnimating(false);
             }}
             className={`
@@ -842,7 +818,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 absolute right-2 inset-y-2
                 inline-flex items-center justify-center
                 rounded-full w-9 h-9
-                bg-blue-600 hover:bg-blue-700 text-white
+                bg-blue-900/80 hover:bg-blue-900 text-white
                 transition-all duration-300 ease-out
                 hover:scale-110
                 ${isProcessingQuery ? 'opacity-50 cursor-not-allowed' : ''}
