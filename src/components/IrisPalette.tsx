@@ -314,7 +314,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setIsProcessingQuery(false);
       setSubmittedQuery('');
     }
-  }, [isAnimating, onOpenChange]);
+  }, [isAnimating, onOpenChange, isOpen]);
 
   /**
    * Fetch autocomplete suggestions from API
