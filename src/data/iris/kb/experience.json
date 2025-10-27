@@ -4,7 +4,7 @@
     "company": "Parsons Corporation",
     "role": "Software Engineer Intern",
     "dates": { "start": "2025-05", "end": "2025-08" },
-    "summary": "Built automated .NET/C# data-integration services feeding Power BI for 3K daily USAF users; reduced upstream API calls ~40% and improved stakeholder-facing layouts.",
+    "summary": "Built automated .NET/C# data-integration services feeding Power BI for daily US Air Force users; designed pipeline to reduce API calls and improved stakeholder-facing layouts.",
     "specifics": [
       "Designed a C#/.NET pipeline to consume external APIs, normalize records, and sync into SQL with schema optimizations for report performance.",
       "Implemented request de-duplication and caching, reducing third-party API calls by ~40% while maintaining freshness SLAs.",

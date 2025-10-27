@@ -763,7 +763,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 ? 'top-16 w-[calc(100vw-2rem)] max-h-[calc(100vh-5rem)] overflow-y-auto' 
                 : 'top-[20vh] w-[720px] max-w-[calc(100vw-2rem)]'
               }
-              rounded-2xl border border-white/20 bg-gradient-to-br from-blue-600/20 via-emerald-500/25 to-blue-600/20 backdrop-blur-xl shadow-3xl ring-1 ring-white/5
+              rounded-2xl border border-white/20 bg-gradient-to-br from-blue-600/25 via-emerald-400/35 to-blue-600/25 backdrop-blur-xl shadow-2xl ring-1 ring-white/10
+              shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.1),inset_0_1px_0_rgba(255,255,255,0.2)]
               ${isInputFocused ? 'ring-1 ring-sky-400/30' : ''}
             `}
           >
@@ -818,7 +819,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 absolute right-2 inset-y-2
                 inline-flex items-center justify-center
                 rounded-full w-9 h-9
-                bg-blue-900/80 hover:bg-blue-900 text-white
+                bg-blue-800/80 hover:bg-blue-800 text-white
                 transition-all duration-300 ease-out
                 hover:scale-110
                 ${isProcessingQuery ? 'opacity-50 cursor-not-allowed' : ''}
