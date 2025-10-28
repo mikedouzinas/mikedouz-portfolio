@@ -4,6 +4,7 @@ import path from "node:path";
 import OpenAI from "openai";
 import { loadKBItems } from "@/lib/iris/load";
 import { type KBItem } from "@/lib/iris/schema";
+import { config } from "@/lib/iris/config";
 
 // Lazy-load the OpenAI client to allow environment variables to be loaded first
 // This ensures .env.local is loaded before the client is instantiated
@@ -54,10 +55,18 @@ function selectFields<T extends Record<string, unknown>>(doc: T, fields?: string
 export async function retrieve(query: string, options: Options = {}): Promise<{ results: Retrieved[]; debug?: Array<{ id: string; title?: string; score: number }> }> {
   const topK = options.topK ?? 5;
 
-  const [{ data: qEmb }, vecRaw, kb] = await Promise.all([
-    getClient().embeddings.create({ model: "text-embedding-3-small", input: query }),
-    fs.readFile(EMB_PATH, "utf8"),
-    loadKBItems()
+  // Create timeout promise for retrieval operations
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error('Request timed out.')), config.retrievalTimeoutMs);
+  });
+
+  const [{ data: qEmb }, vecRaw, kb] = await Promise.race([
+    Promise.all([
+      getClient().embeddings.create({ model: "text-embedding-3-small", input: query }),
+      fs.readFile(EMB_PATH, "utf8"),
+      loadKBItems()
+    ]),
+    timeoutPromise
   ]);
 
   const q = qEmb[0].embedding;

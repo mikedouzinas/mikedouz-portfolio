@@ -17,6 +17,9 @@ import {
 } from 'lucide-react';
 import { getSignalSummary } from '@/lib/iris/signals';
 import { useRouter } from 'next/navigation';
+import { useUiDirectives, defaultOpenFor, stripUiDirectives } from './iris/useUiDirectives';
+import ContactCta from './iris/ContactCta';
+import MessageComposer from './iris/MessageComposer';
 
 /**
  * Static suggestion configuration
@@ -222,6 +225,27 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const [isProcessingQuery, setIsProcessingQuery] = useState(false);
   const [submittedQuery, setSubmittedQuery] = useState<string>(''); // Track the query that generated the current answer
   const [isAnimating, setIsAnimating] = useState(false); // Prevent rapid open/close during animations
+  const [showComposer, setShowComposer] = useState(false); // Toggle for MessageComposer
+  
+  // Track UI directives from streaming
+  const uiDirective = useUiDirectives(answer || '');
+  
+  /**
+   * Auto-open composer when directive is detected
+   * Based on reason and open behavior
+   * Reset composer state when switching to new queries
+   */
+  useEffect(() => {
+    if (!uiDirective) {
+      setShowComposer(false); // Reset composer when directive clears
+      return;
+    }
+    
+    const shouldAutoOpen = (uiDirective.open ?? defaultOpenFor(uiDirective.reason)) === 'auto';
+    if (shouldAutoOpen) {
+      setShowComposer(true);
+    }
+  }, [uiDirective]);
   
   // Refs for focus management
   const inputRef = useRef<HTMLInputElement>(null);
@@ -300,8 +324,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setAnswer(null);
       setIsProcessingQuery(false);
       setSubmittedQuery('');
+      setShowComposer(false); // Reset composer state
     }
-  }, [isAnimating, onOpenChange, isOpen]);
+  }, [isAnimating, onOpenChange]);
 
   /**
    * Fetch autocomplete suggestions from API
@@ -319,9 +344,16 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       // Get user signals for personalized suggestions
       const signals = getSignalSummary();
 
+      // Create AbortController for timeout handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout for suggestions
+
       const response = await fetch(
-        `/api/iris/suggest?q=${encodeURIComponent(searchQuery)}&signals=${encodeURIComponent(JSON.stringify(signals))}`
+        `/api/iris/suggest?q=${encodeURIComponent(searchQuery)}&signals=${encodeURIComponent(JSON.stringify(signals))}`,
+        { signal: controller.signal }
       );
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`API request failed: ${response.status}`);
@@ -331,6 +363,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setApiSuggestions(data.items || []);
     } catch (error) {
       console.error('Failed to fetch suggestions:', error);
+      // Don't show error messages for suggestions - just silently fail
       setApiSuggestions([]);
     } finally {
       setIsLoadingSuggestions(false);
@@ -564,6 +597,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     
     
     // Immediately switch to answer view with loading state
+    // CRITICAL: Reset composer state when starting a new query
+    setShowComposer(false);
     setIsProcessingQuery(true);
     setSubmittedQuery(q);
     setAnswer(''); // Start with empty answer for streaming
@@ -572,10 +607,17 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     
     try {
       const signals = getSignalSummary();
+      
+      // Create AbortController for timeout handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       const response = await fetch(
-        `/api/iris/answer?q=${encodeURIComponent(q)}&signals=${encodeURIComponent(JSON.stringify(signals))}`
+        `/api/iris/answer?q=${encodeURIComponent(q)}&signals=${encodeURIComponent(JSON.stringify(signals))}`,
+        { signal: controller.signal }
       );
-
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         // Try to get error details from response body
@@ -637,7 +679,15 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       }
     } catch (error) {
       console.error('[IrisPalette] Failed to get answer:', error);
-      setAnswer('Sorry, I couldn\'t process your question. Please try again or rephrase it.');
+      
+      // Check if it's a timeout error
+      if (error instanceof Error && error.name === 'AbortError') {
+        setAnswer('⏱️ Your request timed out due to slow internet connection. Please check your WiFi and try again.');
+      } else if (error instanceof Error && error.message.includes('fetch')) {
+        setAnswer('🌐 Network error: Unable to connect to the server. Please check your internet connection and try again.');
+      } else {
+        setAnswer('Sorry, I couldn\'t process your question. Please try again or rephrase it.');
+      }
     } finally {
       setIsProcessingQuery(false);
     }
@@ -937,23 +987,56 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
         {/* Answer display - only show in answer view */}
         {viewMode === 'answer' && (
-          <div className="p-4 max-h-64 overflow-y-auto">
-            {answer ? (
-              <div className="text-[14px] text-white/90 leading-relaxed whitespace-pre-wrap">
-                {renderTextWithLinks(answer, router)}
-                {/* Show typing cursor while streaming */}
-                {isProcessingQuery && (
-                  <span className="inline-block w-2 h-4 bg-sky-400 animate-pulse ml-1" />
-                )}
-              </div>
-            ) : (
-              /* Show loading state when no answer yet */
-              <div className="flex items-center gap-2 text-white/60">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-[14px]">Thinking...</span>
+          <>
+            <div className="p-4 max-h-64 overflow-y-auto">
+              {answer ? (
+                <div className="text-[14px] text-white/90 leading-relaxed whitespace-pre-wrap">
+                  {renderTextWithLinks(stripUiDirectives(answer), router)}
+                  {/* Show typing cursor while streaming */}
+                  {isProcessingQuery && (
+                    <span className="inline-block w-2 h-4 bg-sky-400 animate-pulse ml-1" />
+                  )}
+                </div>
+              ) : (
+                /* Show loading state when no answer yet */
+                <div className="flex items-center gap-2 text-white/60">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-[14px]">Thinking...</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Contact UI: CTA or Composer based on directive */}
+            {/* Only show if not currently processing a new query and directive exists */}
+            {!isProcessingQuery && uiDirective && !showComposer && (
+              // Show CTA button for 'more_detail' with no auto-open
+              uiDirective.reason === 'more_detail' ? (
+                <div className="px-4 pb-4">
+                  <ContactCta 
+                    draft={uiDirective.draft} 
+                    onClick={() => setShowComposer(true)} 
+                  />
+                </div>
+              ) : null
+            )}
+            
+            {/* Message Composer - shown when auto-opened or when CTA clicked */}
+            {/* Only show if not currently processing a new query */}
+            {!isProcessingQuery && showComposer && (
+              <div className="px-4 pb-4">
+                <MessageComposer
+                  origin={
+                    uiDirective?.reason === 'user_request' ? 'iris-explicit' :
+                    uiDirective?.reason === 'insufficient_context' ? 'auto-insufficient' :
+                    'iris-suggested'
+                  }
+                  initialDraft={uiDirective?.draft}
+                  locked={isProcessingQuery}
+                  userQuery={submittedQuery}
+                />
               </div>
             )}
-          </div>
+          </>
         )}
       </motion.div>
 

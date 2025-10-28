@@ -21,6 +21,10 @@ export const config = {
   suggestDebounceMs: 150,           // Debounce suggestions API calls
   answerTimeoutMs: 400,             // Timeout for LLM suggestion refinement
   
+  // API timeout settings
+  openaiTimeoutMs: 25000,          // Timeout for OpenAI API calls (25 seconds)
+  retrievalTimeoutMs: 10000,       // Timeout for retrieval operations (10 seconds)
+  
   // GitHub integration
   repo: { 
     owner: 'mikedouzinas',             // GitHub repo owner for commit fetching

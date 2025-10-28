@@ -56,13 +56,19 @@ interface IntentResult {
  */
 async function detectIntent(query: string, openaiClient: OpenAI): Promise<IntentResult> {
   try {
-    // Use function calling for structured output
-    const response = await openaiClient.chat.completions.create({
-      model: config.models.query_processing,
-      messages: [
-        {
-          role: 'system',
-          content: `You are an intent classifier for queries about Mike (a software engineer/entrepreneur).
+    // Create timeout promise for intent detection
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Intent detection timed out.')), config.openaiTimeoutMs);
+    });
+
+    // Use function calling for structured output with timeout
+    const response = await Promise.race([
+      openaiClient.chat.completions.create({
+        model: config.models.query_processing,
+        messages: [
+          {
+            role: 'system',
+            content: `You are an intent classifier for queries about Mike (a software engineer/entrepreneur). Today is ${new Date().toISOString().split('T')[0]}.
 
 Analyze queries and extract:
 1. The primary intent
@@ -94,77 +100,79 @@ Examples:
 - "what are Mike's skills?" → filter_query with type: ["skill"], show_all: true
 - "what technologies does Mike know?" → filter_query with type: ["skill"], show_all: true
 - "what technical work has Mike done?" → general (semantic search across all work)`
-        },
-        {
-          role: 'user',
-          content: query
-        }
-      ],
-      temperature: 0,
-      tools: [{
-        type: 'function',
-        function: {
-          name: 'classify_intent',
-          description: 'Classify the query intent and extract filters',
-          parameters: {
-            type: 'object',
-            properties: {
-              intent: {
-                type: 'string',
-                enum: ['contact', 'filter_query', 'specific_item', 'personal', 'general'],
-                description: 'The primary intent of the query'
-              },
-              filters: {
-                type: 'object',
-                properties: {
-                  type: {
-                    type: 'array',
-                    items: { type: 'string', enum: ['project', 'experience', 'class', 'blog', 'story', 'value', 'interest', 'skill'] },
-                    description: 'Document types to filter'
-                  },
-                  skills: {
-                    type: 'array',
-                    items: { type: 'string' },
-                    description: 'Skills to filter by (e.g., Python, ML, React, NLP)'
-                  },
-                  company: {
-                    type: 'array',
-                    items: { type: 'string' },
-                    description: 'Company names to filter'
-                  },
-                  year: {
-                    type: 'array',
-                    items: { type: 'number' },
-                    description: 'Years to filter (e.g., 2024)'
-                  },
-                  tags: {
-                    type: 'array',
-                    items: { type: 'string' },
-                    description: 'Tags to filter by'
-                  },
-                  title_match: {
-                    type: 'string',
-                    description: 'Title to match for specific item queries'
-                  },
-                  operation: {
-                    type: 'string',
-                    enum: ['contains', 'exact', 'any'],
-                    default: 'contains'
-                  },
-                  show_all: {
-                    type: 'boolean',
-                    description: 'Whether to show all results (not just top 5)'
-                  }
-                },
-                description: 'Optional filters for the query'
-              }
-            },
-            required: ['intent']
+          },
+          {
+            role: 'user',
+            content: query
           }
-        }
-      }],
-      tool_choice: { type: 'function', function: { name: 'classify_intent' } }
-    });
+        ],
+        temperature: 0,
+        tools: [{
+          type: 'function',
+          function: {
+            name: 'classify_intent',
+            description: 'Classify the query intent and extract filters',
+            parameters: {
+              type: 'object',
+              properties: {
+                intent: {
+                  type: 'string',
+                  enum: ['contact', 'filter_query', 'specific_item', 'personal', 'general'],
+                  description: 'The primary intent of the query'
+                },
+                filters: {
+                  type: 'object',
+                  properties: {
+                    type: {
+                      type: 'array',
+                      items: { type: 'string', enum: ['project', 'experience', 'class', 'blog', 'story', 'value', 'interest', 'skill'] },
+                      description: 'Document types to filter'
+                    },
+                    skills: {
+                      type: 'array',
+                      items: { type: 'string' },
+                      description: 'Skills to filter by (e.g., Python, ML, React, NLP)'
+                    },
+                    company: {
+                      type: 'array',
+                      items: { type: 'string' },
+                      description: 'Company names to filter'
+                    },
+                    year: {
+                      type: 'array',
+                      items: { type: 'number' },
+                      description: 'Years to filter (e.g., 2024)'
+                    },
+                    tags: {
+                      type: 'array',
+                      items: { type: 'string' },
+                      description: 'Tags to filter by'
+                    },
+                    title_match: {
+                      type: 'string',
+                      description: 'Title to match for specific item queries'
+                    },
+                    operation: {
+                      type: 'string',
+                      enum: ['contains', 'exact', 'any'],
+                      default: 'contains'
+                    },
+                    show_all: {
+                      type: 'boolean',
+                      description: 'Whether to show all results (not just top 5)'
+                    }
+                  },
+                  description: 'Optional filters for the query'
+                }
+              },
+              required: ['intent']
+            }
+          }
+        }],
+        tool_choice: { type: 'function', function: { name: 'classify_intent' } }
+      }),
+      timeoutPromise
+    ]);
     
     const toolCall = response.choices[0]?.message?.tool_calls?.[0];
     if (toolCall && 'function' in toolCall && toolCall.function?.arguments) {
@@ -603,7 +611,7 @@ async function createNoContextResponse(): Promise<Response> {
       `💼 LinkedIn: ${contact.linkedin}\n` +
       (contact.github ? `💻 GitHub: ${contact.github}\n` : '') +
       (contact.booking?.enabled && contact.booking?.link ? `📅 Schedule a chat: ${contact.booking.link}\n` : '') +
-      `\nFeel free to ask me about Mike's projects, work experience, education, or technical skills!`;
+      `\nFeel free to ask me about Mike's projects, work experience, education, or technical skills!\n\n<ui:contact reason="insufficient_context" draft="Can you provide more details about what you'd like to know?" />`;
     
     // Return as streaming response for consistent client behavior
     const encoder = new TextEncoder();
@@ -626,7 +634,7 @@ async function createNoContextResponse(): Promise<Response> {
     console.error('[Answer API] Failed to create fallback response:', error);
     
     // Minimal fallback if contact loading fails
-    const minimalFallback = `I don't have specific information about that in my knowledge base. Feel free to reach out to Mike directly through the contact section of this website for more details!`;
+    const minimalFallback = `I don't have specific information about that in my knowledge base. Feel free to reach out to Mike directly through the contact section of this website for more details!\n\n<ui:contact reason="insufficient_context" draft="Can you provide more details about what you'd like to know?" />`;
     
     const encoder = new TextEncoder();
     const readable = new ReadableStream({
@@ -710,13 +718,16 @@ export async function POST(req: NextRequest) {
       try {
         const contactData = await loadContact();
         
-        // Build structured contact response
+        // Build structured contact response with UI directive
         const text = [
           "Here's how to reach Mike:",
           contactData?.email ? `• Email: ${contactData.email}` : null,
           contactData?.linkedin ? `• LinkedIn: ${contactData.linkedin}` : null,
           contactData?.github ? `• GitHub: ${contactData.github}` : null,
-          contactData?.booking?.enabled && contactData?.booking?.link ? `• Book a time: ${contactData.booking.link}` : null
+          contactData?.booking?.enabled && contactData?.booking?.link ? `• Book a time: ${contactData.booking.link}` : null,
+          "",
+          "Or send him a message directly from here!",
+          '<ui:contact reason="user_request" draft="Ask Mike anything" />'
         ].filter(Boolean).join('\n');
         
         console.log('[Answer API] Returning contact info (fast-path):', text);
@@ -932,7 +943,7 @@ export async function POST(req: NextRequest) {
                                /^gpt-6/.test(config.models.chat.toLowerCase());
       
       // Build system prompt with anti-hallucination instructions
-      const systemPrompt = `You are Iris, Mike's friendly AI assistant living within his personal portfolio website. Named after the Greek messenger goddess, you bridge Mike's structured knowledge and the visitor's curiosity — guiding them through his work, experience, and ideas in a warm, conversational way. You're also part of a larger vision alongside Hermes, a future physical counterpart that will bring interaction into the real world. While Mike's full long-term plans for Iris and Hermes remain private, visitors are welcome to message him directly if they'd like to learn more.
+      const systemPrompt = `You are Iris, Mike's friendly AI assistant accessible within his personal portfolio website on mikeveson.com. Named after the Greek messenger goddess, you bridge Mike's structured knowledge and the visitor's curiosity — guiding them through his work, experience, and ideas in a warm, conversational way. You're also part of a larger vision alongside Hermes, a future physical counterpart that will bring interaction into the real world. While Mike's full long-term plans for Iris and Hermes remain private, visitors are welcome to message him directly if they'd like to learn more.
 
 Core principles:
 - Be genuinely helpful and approachable - like a knowledgeable friend
@@ -952,11 +963,34 @@ Core principles:
 - When the context has MULTIPLE items, synthesize them into a cohesive summary (don't just describe one item in detail)
 - You can infer reasonable connections (e.g., if context shows 2025 items, you CAN say "in 2025, Mike did X, Y, and Z")
 - Synthesize across ALL items in the context to give a complete picture
-
+Today's date: ${new Date().toISOString()}
 Context about Mike:
 ${enhancedContext}
 
-Remember: If you're not confident in your answer based on the context, acknowledge the limitation and suggest contacting Mike directly. Being accurate is more important than being comprehensive.`;
+Remember: If you're not confident in your answer based on the context, acknowledge the limitation and suggest contacting Mike directly. Being accurate is more important than being comprehensive.
+
+**UI Directives:**
+Be proactive about suggesting contact with Mike! Emit a UI directive whenever it would be helpful for the user to reach out. This includes:
+
+1. **Personal questions** - When users ask about Mike's preferences, opinions, or personal details
+2. **Specific project details** - When users want technical deep-dives, implementation details, or behind-the-scenes info
+3. **Collaboration inquiries** - When users express interest in working together, internships, or partnerships
+4. **Future plans** - When users ask about upcoming projects, career plans, or long-term goals
+5. **Insufficient context** - When your answer lacks detail or you're not confident about specific information
+
+Emit one self-contained UI directive exactly like this, on a single line, after your normal answer:
+<ui:contact reason="{insufficient_context|more_detail|user_request}" draft="{a short 5–15 word suggestion}" />
+
+Use reason="more_detail" when your answer is decent but you'd benefit from extra context; this should present a button first rather than opening the composer automatically.
+
+**Draft Guidelines for Messages:**
+- If user asks something personal (like "what's your favorite color?"), the draft should convert to a question for Mike: "What's your favorite color?"
+- If user asks for information you don't have, draft should ask them to provide more context: "Can you provide more details about what you'd like to know?"
+- For collaboration inquiries, draft should be: "I'd like to discuss collaboration opportunities"
+- For technical questions, draft should be: "Can you explain the technical details?"
+- Drafts should be clear, specific questions or requests that Mike can answer
+
+Do not emit more than one <ui:contact/> per reply. Keep your main answer as plain text without showing the directive tag.`;
 
       // Build base request parameters
       // Using Record for type safety while allowing dynamic properties
@@ -997,10 +1031,18 @@ Remember: If you're not confident in your answer based on the context, acknowled
         console.log(`[Answer API] Using regular model parameters: max_tokens=${config.chatSettings.maxTokens}, temperature=${config.chatSettings.temperature}`);
       }
       
-      // Create the streaming completion
+      // Create timeout promise for chat completion
+      const chatTimeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Chat completion timed out.')), config.openaiTimeoutMs);
+      });
+
+      // Create the streaming completion with timeout
       // TypeScript needs explicit typing for streaming responses
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const stream: any = await openai.chat.completions.create(requestParams as any);
+      const stream: any = await Promise.race([
+        openai.chat.completions.create(requestParams as any),
+        chatTimeoutPromise
+      ]);
       
       // Stream response back to client using Server-Sent Events format
       // CRITICAL: Start consuming immediately in the background and write to stream
@@ -1076,9 +1118,17 @@ Remember: If you're not confident in your answer based on the context, acknowled
       console.error('[Answer API] Error details:', error instanceof Error ? error.message : String(error));
       console.error('[Answer API] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
       
+      // Check if it's a timeout error
+      let errorMessage = 'I encountered an error while generating a response.';
+      if (error instanceof Error && error.message.includes('timed out')) {
+        errorMessage = '⏱️ Your request timed out due to slow internet connection. Please check your WiFi and try again.';
+      } else if (error instanceof Error && error.message.includes('Request timed out')) {
+        errorMessage = '🌐 Network timeout: The request took too long to complete. Please try again.';
+      }
+      
       // Return user-friendly error message
       return NextResponse.json({
-        answer: `I encountered an error while generating a response. This might be due to API configuration issues. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        answer: errorMessage,
         sources: [],
         cached: false,
         error: true,
@@ -1088,9 +1138,18 @@ Remember: If you're not confident in your answer based on the context, acknowled
     }
   } catch (error) {
     console.error('[Answer API] Request error:', error);
+    
+    // Check if it's a timeout error
+    let errorMessage = 'Internal server error';
+    if (error instanceof Error && error.message.includes('timed out')) {
+      errorMessage = '⏱️ Request timed out due to slow internet connection. Please check your WiFi and try again.';
+    } else if (error instanceof Error && error.message.includes('Request timed out')) {
+      errorMessage = '🌐 Network timeout: The request took too long to complete. Please try again.';
+    }
+    
     return NextResponse.json(
       { 
-        error: 'Internal server error',
+        error: errorMessage,
         details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
