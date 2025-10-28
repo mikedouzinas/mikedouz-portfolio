@@ -1039,7 +1039,11 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               <div 
                 ref={answerRef}
                 onScroll={handleScroll}
-                className="p-4 max-h-48 sm:max-h-64 overflow-y-auto"
+                className={`p-4 overflow-y-auto ${
+                  (showComposer || (uiDirective && !showComposer)) 
+                    ? 'max-h-32 sm:max-h-64' 
+                    : 'max-h-64'
+                }`}
               >
                 {answer ? (
                   <div className="text-[14px] text-white/90 leading-relaxed whitespace-pre-wrap">
