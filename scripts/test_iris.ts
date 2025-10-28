@@ -126,7 +126,7 @@ const testSuites: Record<string, TestCase[]> = {
     },
     {
       query: "what is mike's full name?",
-      expected: 'Mike Konstantinos Veson',
+      expected: 'Michael Konstantinos Veson',
       category: 'bio-detail',
       verifyPoints: [
         'Correct full name',
