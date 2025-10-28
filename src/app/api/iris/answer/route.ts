@@ -1043,9 +1043,9 @@ Do not emit more than one <ui:contact/> per reply. Keep your main answer as plai
       });
 
       // Create the streaming completion with timeout
-      // TypeScript needs explicit typing for streaming responses
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const stream: any = await Promise.race([
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         openai.chat.completions.create(requestParams as any),
         chatTimeoutPromise
       ]);
