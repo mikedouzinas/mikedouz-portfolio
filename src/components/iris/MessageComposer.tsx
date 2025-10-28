@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, User, Send, Loader2, Info } from 'lucide-react';
+import { Mail, Phone, User, Send, Loader2, Info, X } from 'lucide-react';
 import { isValidPhoneFormat, validateAndFormatPhone } from '@/lib/phone';
 import { generateNonce } from '@/lib/security';
 import ContainedMouseGlow from '../ContainedMouseGlow';
@@ -27,6 +27,11 @@ interface MessageComposerProps {
    * The user's original question that led to this composer
    */
   userQuery?: string;
+  
+  /**
+   * Callback when user cancels the composer
+   */
+  onCancel?: () => void;
 }
 
 /**
@@ -71,6 +76,7 @@ export default function MessageComposer({
   initialDraft,
   locked,
   userQuery,
+  onCancel,
 }: MessageComposerProps) {
   // Form state
   const [message, setMessage] = useState(() => getDraftForOrigin(origin, initialDraft, userQuery));
@@ -312,8 +318,9 @@ export default function MessageComposer({
   
   // Main form
   return (
-    <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-slate-800/30 via-blue-900/20 to-indigo-800/25 border border-blue-400/20 backdrop-blur-sm shadow-lg shadow-blue-900/10">
-      <div className="flex items-center gap-2 mb-3">
+    <div className="mt-4 p-3 sm:p-4 rounded-xl bg-gradient-to-br from-slate-800/30 via-blue-900/20 to-indigo-800/25 border border-blue-400/20 backdrop-blur-sm shadow-lg shadow-blue-900/10">
+      {/* Header - hide on mobile to save space */}
+      <div className="hidden sm:flex items-center gap-2 mb-3">
         <h3 className="text-sm font-medium text-white/90">
           Send Mike a message
         </h3>
@@ -325,27 +332,22 @@ export default function MessageComposer({
             {/* Mobile-friendly arrow */}
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900/95"></div>
           </div>
-          {/* Mobile touch tooltip */}
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900/95 text-white text-xs rounded-lg shadow-lg opacity-0 group-active:opacity-100 transition-opacity duration-200 pointer-events-none z-50 w-64 text-center sm:w-72 sm:hidden">
-            Iris will send this message on your behalf, including the context of your conversation so far.
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900/95"></div>
-          </div>
         </div>
       </div>
       
       {/* Message textarea */}
-      <div className="mb-3">
+      <div className="mb-2 sm:mb-3">
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           disabled={locked || isSubmitting}
           placeholder="Type your message..."
-          rows={4}
+          rows={2}
           maxLength={500}
-          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 disabled:cursor-not-allowed resize-none"
+          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 disabled:cursor-not-allowed resize-none text-sm sm:text-base"
         />
         {message.length === 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
+          <div className="flex flex-wrap gap-1 mt-1 sm:mt-2">
             {HINT_CHIPS.map((hint, i) => (
               <button
                 key={i}
@@ -361,23 +363,17 @@ export default function MessageComposer({
       </div>
       
       {/* Contact method selector */}
-      <div className="mb-3">
+      <div className="mb-2 sm:mb-3">
         {/* Horizontal scrollable container for mobile */}
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 hover:scrollbar-thumb-white/20">
-          {/* Add padding on mobile to prevent scroll lock */}
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-none">
+          {/* Hide scrollbar completely while keeping scroll functionality */}
           <style jsx>{`
             div::-webkit-scrollbar {
-              height: 4px;
+              display: none;
             }
-            div::-webkit-scrollbar-track {
-              background: transparent;
-            }
-            div::-webkit-scrollbar-thumb {
-              background-color: rgba(255, 255, 255, 0.1);
-              border-radius: 2px;
-            }
-            div::-webkit-scrollbar-thumb:hover {
-              background-color: rgba(255, 255, 255, 0.2);
+            div {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
             }
           `}</style>
           <button
@@ -435,7 +431,7 @@ export default function MessageComposer({
               }}
               disabled={locked || isSubmitting}
               placeholder="your.email@example.com"
-              className="w-full mt-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50"
+              className="w-full mt-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 text-sm sm:text-base break-all"
             />
             {validationError && (contactMethod === 'email' || validationError.includes('email')) && (
               <div className="mt-1 text-xs text-red-400">{validationError}</div>
@@ -444,7 +440,7 @@ export default function MessageComposer({
         )}
         {contactMethod === 'phone' && (
           <>
-            <div className="mt-2 flex gap-2">
+            <div className="mt-1 sm:mt-2 flex gap-2 min-w-0">
               <select
                 value={countryCode}
                 onChange={(e) => setCountryCode(e.target.value)}
@@ -464,7 +460,7 @@ export default function MessageComposer({
                 }}
                 disabled={locked || isSubmitting}
                 placeholder="1234567890"
-                className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50"
+                className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 text-sm sm:text-base break-all min-w-0"
               />
             </div>
             {validationError && (contactMethod === 'phone' || validationError.includes('phone')) && (
@@ -474,31 +470,52 @@ export default function MessageComposer({
         )}
       </div>
       
-      {/* Submit button */}
-      <button
-        onClick={handleSubmit}
-        disabled={locked || isSubmitting || !message.trim()}
-        className="relative w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 overflow-hidden"
-        style={{
-          background: 'linear-gradient(90deg, #6B4EFF 0%, #00A8FF 100%)',
-        }}
-      >
-        <ContainedMouseGlow color="147, 197, 253" intensity={0.3} size={200} />
-        {isSubmitting ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Sending...
-          </>
-        ) : (
-          <>
-            <Send className="w-4 h-4" />
-            Send to Mike
-          </>
-        )}
-      </button>
+      {/* Action buttons */}
+      <div className="flex gap-2">
+        {/* Submit button */}
+        <button
+          onClick={handleSubmit}
+          disabled={locked || isSubmitting || !message.trim()}
+          className="flex-1 relative flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 overflow-hidden text-sm sm:text-base"
+          style={{
+            background: 'linear-gradient(90deg, #6B4EFF 0%, #00A8FF 100%)',
+          }}
+        >
+          <ContainedMouseGlow color="147, 197, 253" intensity={0.3} size={200} />
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Sending...
+            </>
+          ) : (
+            <>
+              <Send className="w-4 h-4" />
+              Send to Mike
+            </>
+          )}
+        </button>
+        
+        {/* Cancel button - small square with icon */}
+        <button
+          onClick={() => {
+            // Reset form state
+            setMessage('');
+            setError(null);
+            setValidationError(null);
+            setSubmittedMessage(null);
+            // Call parent callback to hide composer
+            onCancel?.();
+          }}
+          disabled={locked || isSubmitting}
+          className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg text-white/60 hover:text-white/90 hover:bg-white/10 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 border border-white/20 hover:border-white/40"
+          title="Cancel"
+        >
+          <X className="w-4 h-4 sm:w-5 sm:h-5" />
+        </button>
+      </div>
       
-      {/* Privacy note */}
-      <p className="text-xs text-white/40 mt-2 text-center">
+      {/* Privacy note - hide on mobile to save space */}
+      <p className="hidden sm:block text-xs text-white/40 mt-2 text-center">
         Your contact info is only used to respond to your message.
       </p>
     </div>

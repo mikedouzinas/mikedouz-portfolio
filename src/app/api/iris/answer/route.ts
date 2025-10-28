@@ -708,7 +708,7 @@ export async function POST(req: NextRequest) {
     // Detect intent for optimized field filtering using LLM-based classification
     const intentResult = await detectIntent(query, openai);
     const { intent, filters } = intentResult;
-    const fields = FIELD_MAP[intent];
+    const fields = FIELD_MAP[intent] || []; // Fallback to empty array for unknown intents
     console.log(`[Answer API] Detected intent: ${intent}`, filters ? `with filters: ${JSON.stringify(filters)}` : '');
 
     // Special fast-path for contact queries - no LLM needed
@@ -873,7 +873,7 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // Standard semantic retrieval for other intents
-      const typeFilter = TYPE_FILTERS[intent];
+      const typeFilter = TYPE_FILTERS[intent] || null; // Fallback to null for unknown intents
       const retrievalOptions: { topK: number; fields: string[]; types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'> } = {
         topK: 5,
         fields
@@ -984,17 +984,21 @@ Be strategic about suggesting contact with Mike! Only emit a UI directive when i
 - **Skills/technologies** - Suggest asking about specific projects where those skills were used
 - **General questions** - Help users refine their questions to get more specific information
 
-Emit one self-contained UI directive exactly like this, on a single line, after your normal answer:
+**IMPORTANT:** Only emit a UI directive if the user is asking something that genuinely requires Mike's personal input or if you truly cannot provide a helpful answer. For informational queries about Mike's work, skills, or projects, DO NOT suggest contact - instead encourage users to ask more specific questions.
+
+If you do need to suggest contact, emit one self-contained UI directive exactly like this, on a single line, after your normal answer:
 <ui:contact reason="{insufficient_context|more_detail|user_request}" draft="{a short 5–15 word suggestion}" />
 
 Use reason="more_detail" when your answer is decent but you'd benefit from extra context; this should present a button first rather than opening the composer automatically.
 
 **Draft Guidelines for Messages:**
-- If user asks something personal (like "what's your favorite color?"), the draft should convert to a question for Mike: "What's your favorite color?"
-- If user asks for information you don't have, draft should ask them to provide more context: "Can you provide more details about what you'd like to know?"
+- Draft messages should be written as if the USER is sending them to Mike, not as if Iris is asking the user to do something
+- ALWAYS address Mike as "you" in draft messages - never use third person like "Mike" or "he"
+- If user asks something personal (like "what's mike's favorite color?"), the draft should convert to a question directly to Mike: "What's your favorite color?"
+- If user asks for information you don't have, draft should use blanks to provide a better draft: "Hey, can you tell me about..."
 - For collaboration inquiries, draft should be: "I'd like to discuss collaboration opportunities"
 - For technical questions, draft should be: "Can you explain the technical details?"
-- Drafts should be clear, specific questions or requests that Mike can answer
+- Drafts should be clear, specific questions or requests that Mike can answer, and be specific to be most helpful based on the original question.
 
 Do not emit more than one <ui:contact/> per reply. Keep your main answer as plain text without showing the directive tag.`;
 

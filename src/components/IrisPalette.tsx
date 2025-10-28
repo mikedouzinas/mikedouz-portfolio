@@ -13,7 +13,8 @@ import {
   Compass,
   Cpu,
   Mail,
-  ExternalLink
+  ExternalLink,
+  ChevronDown
 } from 'lucide-react';
 import { getSignalSummary } from '@/lib/iris/signals';
 import { useRouter } from 'next/navigation';
@@ -226,6 +227,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const [submittedQuery, setSubmittedQuery] = useState<string>(''); // Track the query that generated the current answer
   const [isAnimating, setIsAnimating] = useState(false); // Prevent rapid open/close during animations
   const [showComposer, setShowComposer] = useState(false); // Toggle for MessageComposer
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false); // Show scroll indicator
   
   // Track UI directives from streaming
   const uiDirective = useUiDirectives(answer || '');
@@ -250,6 +252,49 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   // Refs for focus management
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const answerRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Check if content overflows and user is not at bottom
+   */
+  const checkScrollState = useCallback(() => {
+    if (!answerRef.current) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = answerRef.current;
+    const hasOverflow = scrollHeight > clientHeight;
+    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px threshold
+    
+    setShowScrollToBottom(hasOverflow && !isAtBottom);
+  }, []);
+
+  /**
+   * Check scroll state when answer content changes
+   */
+  useEffect(() => {
+    if (answer && viewMode === 'answer') {
+      // Use setTimeout to ensure DOM has updated
+      setTimeout(checkScrollState, 100);
+    }
+  }, [answer, viewMode, checkScrollState]);
+
+  /**
+   * Handle scroll events to show/hide scroll-to-bottom indicator
+   */
+  const handleScroll = useCallback(() => {
+    checkScrollState();
+  }, [checkScrollState]);
+
+  /**
+   * Scroll to bottom of answer area
+   */
+  const scrollToBottom = useCallback(() => {
+    if (answerRef.current) {
+      answerRef.current.scrollTo({
+        top: answerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, []);
 
   /**
    * Detect mobile devices for mobile-optimized UI
@@ -604,6 +649,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     setAnswer(''); // Start with empty answer for streaming
     setViewMode('answer'); // Switch immediately to answer view
     setApiSuggestions([]);
+    setShowScrollToBottom(false); // Reset scroll indicator
     
     try {
       const signals = getSignalSummary();
@@ -762,6 +808,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     setApiSuggestions([]);
     setSelectedIndex(0); // Reset to top of suggestions
     setViewMode('suggestions'); // Switch back to suggestions view
+    setShowScrollToBottom(false); // Reset scroll indicator
     inputRef.current?.focus();
   };
 
@@ -988,21 +1035,38 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         {/* Answer display - only show in answer view */}
         {viewMode === 'answer' && (
           <>
-            <div className="p-4 max-h-64 overflow-y-auto">
-              {answer ? (
-                <div className="text-[14px] text-white/90 leading-relaxed whitespace-pre-wrap">
-                  {renderTextWithLinks(stripUiDirectives(answer), router)}
-                  {/* Show typing cursor while streaming */}
-                  {isProcessingQuery && (
-                    <span className="inline-block w-2 h-4 bg-sky-400 animate-pulse ml-1" />
-                  )}
-                </div>
-              ) : (
-                /* Show loading state when no answer yet */
-                <div className="flex items-center gap-2 text-white/60">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-[14px]">Thinking...</span>
-                </div>
+            <div className="relative">
+              <div 
+                ref={answerRef}
+                onScroll={handleScroll}
+                className="p-4 max-h-48 sm:max-h-64 overflow-y-auto"
+              >
+                {answer ? (
+                  <div className="text-[14px] text-white/90 leading-relaxed whitespace-pre-wrap">
+                    {renderTextWithLinks(stripUiDirectives(answer), router)}
+                    {/* Show typing cursor while streaming */}
+                    {isProcessingQuery && (
+                      <span className="inline-block w-2 h-4 bg-sky-400 animate-pulse ml-1" />
+                    )}
+                  </div>
+                ) : (
+                  /* Show loading state when no answer yet */
+                  <div className="flex items-center gap-2 text-white/60">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="text-[14px]">Thinking...</span>
+                  </div>
+                )}
+              </div>
+              
+              {/* Scroll to bottom button */}
+              {showScrollToBottom && (
+                <button
+                  onClick={scrollToBottom}
+                  className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-sm border border-white/20 hover:border-white/40 flex items-center justify-center text-white/70 hover:text-white/90 transition-all duration-200 transform hover:scale-110 z-10"
+                  title="Scroll to bottom"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
               )}
             </div>
             
@@ -1033,6 +1097,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   initialDraft={uiDirective?.draft}
                   locked={isProcessingQuery}
                   userQuery={submittedQuery}
+                  onCancel={() => setShowComposer(false)}
                 />
               </div>
             )}
