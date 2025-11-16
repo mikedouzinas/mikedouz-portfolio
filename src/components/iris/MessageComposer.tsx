@@ -39,9 +39,9 @@ interface MessageComposerProps {
  * Suggest common questions to guide users
  */
 const HINT_CHIPS = [
-  "What are your plans with Iris and Hermes?",
-  "Can I see a resume?",
-  "Are you available for internships?",
+  "What projects have you worked on?",
+  "Do you have experience with React?",
+  "Tell me about your latest work",
 ];
 
 /**
@@ -289,7 +289,7 @@ export default function MessageComposer({
   // Success state: Show confirmation
   if (submittedMessage) {
     return (
-      <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-emerald-600/25 via-teal-500/20 to-cyan-600/25 border border-emerald-400/30 backdrop-blur-sm shadow-lg shadow-emerald-900/20">
+      <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-600/25 via-teal-500/20 to-cyan-600/25 border border-emerald-400/30 backdrop-blur-sm shadow-lg shadow-emerald-900/20">
         <div className="flex items-start gap-3">
           <div className="shrink-0 rounded-lg bg-gradient-to-br from-emerald-500/30 to-teal-500/20 p-2 shadow-sm">
             <Mail className="w-4 h-4 text-emerald-300" />
@@ -310,7 +310,7 @@ export default function MessageComposer({
   // Error state - only show for submission/network errors, not validation errors
   if (error) {
     return (
-      <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-red-600/20 via-red-400/15 to-red-600/20 border border-red-500/20 backdrop-blur-sm">
+      <div className="p-4 rounded-xl bg-gradient-to-br from-red-600/20 via-red-400/15 to-red-600/20 border border-red-500/20 backdrop-blur-sm">
         <div className="text-sm text-red-400">{error}</div>
       </div>
     );
@@ -318,7 +318,7 @@ export default function MessageComposer({
   
   // Main form
   return (
-    <div className="mt-4 p-3 sm:p-4 rounded-xl bg-gradient-to-br from-slate-800/30 via-blue-900/20 to-indigo-800/25 border border-blue-400/20 backdrop-blur-sm shadow-lg shadow-blue-900/10">
+    <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-slate-800/30 via-blue-900/20 to-indigo-800/25 border border-blue-400/20 backdrop-blur-sm shadow-lg shadow-blue-900/10">
       {/* Header - hide on mobile to save space */}
       <div className="hidden sm:flex items-center gap-2 mb-3">
         <h3 className="text-sm font-medium text-white/90">
@@ -353,7 +353,7 @@ export default function MessageComposer({
                 key={i}
                 onClick={() => setMessage(hint)}
                 disabled={locked || isSubmitting}
-                className="text-xs px-2 py-0.5 rounded bg-gradient-to-r from-blue-800/30 to-blue-900/20 hover:from-blue-700/40 hover:to-blue-800/30 text-white/60 hover:text-white/80 transition-all duration-150 transform hover:scale-105 hover:shadow-sm hover:shadow-blue-500/10 disabled:opacity-50 disabled:scale-100 disabled:shadow-none"
+                className="text-xs px-2 py-0.5 rounded-xl bg-gradient-to-r from-blue-800/30 to-blue-900/20 hover:from-blue-700/40 hover:to-blue-800/30 text-white/60 hover:text-white/80 transition-all duration-150 transform hover:scale-105 hover:shadow-sm hover:shadow-blue-500/10 disabled:opacity-50 disabled:scale-100 disabled:shadow-none"
               >
                 {hint}
               </button>
@@ -365,7 +365,7 @@ export default function MessageComposer({
       {/* Contact method selector */}
       <div className="mb-2 sm:mb-3">
         {/* Horizontal scrollable container for mobile */}
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-none">
+        <div className="flex gap-2 overflow-x-auto py-2 -mx-1 px-1 scrollbar-none">
           {/* Hide scrollbar completely while keeping scroll functionality */}
           <style jsx>{`
             div::-webkit-scrollbar {
@@ -380,11 +380,11 @@ export default function MessageComposer({
             type="button"
             onClick={() => setContactMethod('email')}
             disabled={locked || isSubmitting}
-            className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 transform whitespace-nowrap ${
+            className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 transform whitespace-nowrap ${
               contactMethod === 'email'
-                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 scale-105'
-                : 'bg-gradient-to-r from-blue-800/30 to-blue-900/20 text-white/70 hover:from-blue-700/40 hover:to-blue-800/30 hover:text-white/90 hover:scale-105 hover:shadow-md hover:shadow-blue-500/20'
-            } disabled:opacity-50 disabled:scale-100 disabled:shadow-none`}
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white scale-105'
+                : 'bg-gradient-to-r from-blue-800/30 to-blue-900/20 text-white/70 hover:from-blue-700/40 hover:to-blue-800/30 hover:text-white/90 hover:scale-105'
+            } disabled:opacity-50 disabled:scale-100`}
           >
             <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Email</span>
@@ -394,11 +394,11 @@ export default function MessageComposer({
             type="button"
             onClick={() => setContactMethod('phone')}
             disabled={locked || isSubmitting}
-            className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 transform whitespace-nowrap ${
+            className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 transform whitespace-nowrap ${
               contactMethod === 'phone'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 scale-105'
-                : 'bg-gradient-to-r from-blue-800/30 to-blue-900/20 text-white/70 hover:from-blue-700/40 hover:to-blue-800/30 hover:text-white/90 hover:scale-105 hover:shadow-md hover:shadow-blue-500/20'
-            } disabled:opacity-50 disabled:scale-100 disabled:shadow-none`}
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white scale-105'
+                : 'bg-gradient-to-r from-blue-800/30 to-blue-900/20 text-white/70 hover:from-blue-700/40 hover:to-blue-800/30 hover:text-white/90 hover:scale-105'
+            } disabled:opacity-50 disabled:scale-100`}
           >
             <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Phone</span>
@@ -408,11 +408,11 @@ export default function MessageComposer({
             type="button"
             onClick={() => setContactMethod('anon')}
             disabled={locked || isSubmitting}
-            className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 transform whitespace-nowrap ${
+            className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 transform whitespace-nowrap ${
               contactMethod === 'anon'
-                ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-lg shadow-sky-500/25 scale-105'
-                : 'bg-gradient-to-r from-blue-800/30 to-blue-900/20 text-white/70 hover:from-blue-700/40 hover:to-blue-800/30 hover:text-white/90 hover:scale-105 hover:shadow-md hover:shadow-blue-500/20'
-            } disabled:opacity-50 disabled:scale-100 disabled:shadow-none`}
+                ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white scale-105'
+                : 'bg-gradient-to-r from-blue-800/30 to-blue-900/20 text-white/70 hover:from-blue-700/40 hover:to-blue-800/30 hover:text-white/90 hover:scale-105'
+            } disabled:opacity-50 disabled:scale-100`}
           >
             <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Anonymous</span>
@@ -431,7 +431,7 @@ export default function MessageComposer({
               }}
               disabled={locked || isSubmitting}
               placeholder="your.email@example.com"
-              className="w-full mt-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 text-sm sm:text-base break-all"
+              className="w-full mt-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 text-sm sm:text-base break-all"
             />
             {validationError && (contactMethod === 'email' || validationError.includes('email')) && (
               <div className="mt-1 text-xs text-red-400">{validationError}</div>
@@ -445,7 +445,7 @@ export default function MessageComposer({
                 value={countryCode}
                 onChange={(e) => setCountryCode(e.target.value)}
                 disabled={locked || isSubmitting}
-                className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-0 disabled:opacity-50"
+                className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-0 disabled:opacity-50"
               >
                 <option value="US">🇺🇸 +1</option>
                 <option value="GR">🇬🇷 +30</option>
@@ -460,7 +460,7 @@ export default function MessageComposer({
                 }}
                 disabled={locked || isSubmitting}
                 placeholder="1234567890"
-                className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 text-sm sm:text-base break-all min-w-0"
+                className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 text-sm sm:text-base break-all min-w-0"
               />
             </div>
             {validationError && (contactMethod === 'phone' || validationError.includes('phone')) && (
@@ -476,7 +476,7 @@ export default function MessageComposer({
         <button
           onClick={handleSubmit}
           disabled={locked || isSubmitting || !message.trim()}
-          className="flex-1 relative flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 overflow-hidden text-sm sm:text-base"
+          className="flex-1 relative flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-xl text-white font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 overflow-hidden text-sm sm:text-base"
           style={{
             background: 'linear-gradient(90deg, #6B4EFF 0%, #00A8FF 100%)',
           }}
@@ -507,7 +507,7 @@ export default function MessageComposer({
             onCancel?.();
           }}
           disabled={locked || isSubmitting}
-          className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg text-white/60 hover:text-white/90 hover:bg-white/10 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 border border-white/20 hover:border-white/40"
+          className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl text-white/60 hover:text-white/90 hover:bg-white/10 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 border border-white/20 hover:border-white/40"
           title="Cancel"
         >
           <X className="w-4 h-4 sm:w-5 sm:h-5" />

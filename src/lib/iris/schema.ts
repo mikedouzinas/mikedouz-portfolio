@@ -257,3 +257,62 @@ export type KBItem =
   | SkillT  // Adding SkillT so skills can be retrieved as standalone documents
 
 export const KBItemKinds = ["project","experience","class","blog","story","value","interest","education","bio","skill"] as const
+
+/** ---------- Synthesis Upgrade Types ---------- */
+
+/**
+ * Entity identified by the micro-planner
+ * Used for alias resolution and type guessing
+ */
+export interface PlannerEntity {
+  name: string;
+  typeGuess?: 'project'|'experience'|'class'|'blog'|'story'|'value'|'skill'|'education'|'bio';
+  confidence: number; // 0..1
+}
+
+/**
+ * Retrieval plan specifying which types to search and quotas per type
+ * Used to diversify retrieval for evaluative queries
+ */
+export interface RetrievalPlan {
+  types: Array<'project'|'experience'|'class'|'blog'|'story'|'value'|'skill'|'education'|'bio'>;
+  topKPerType: Partial<Record<'project'|'experience'|'class', number>>;
+  needDiversity: boolean;
+  fields: string[]; // e.g., ['title','summary','specifics','dates','skills','metrics']
+}
+
+/**
+ * Result from micro-planner including routing decision and risk assessment
+ * Helps determine whether to use general semantic search vs specific item search
+ */
+export interface PlannerResult {
+  routedIntent: 'contact'|'filter_query'|'specific_item'|'personal'|'general';
+  entities: PlannerEntity[];
+  plan: RetrievalPlan;
+  risk: {
+    entityLinkScore: number;      // 0..1
+    coverageRatio: number;        // hits/expected
+    expectedConcepts: string[];
+    matchedConcepts: string[];
+  }
+}
+
+/**
+ * Signals computed from evidence packs
+ * Used to determine whether to suggest contact via UI directive
+ */
+export interface EvidenceSignals {
+  evidenceCount: number;
+  hasMetrics: boolean;
+  entityLinkScore: number; // 0..1
+  freshnessMonths: number; // 0 = this month
+  coverageRatio: number;   // 0..1
+}
+
+/**
+ * Self-check confidence from generator
+ * Used to assess answer quality and trigger contact directive if needed
+ */
+export interface SelfCheck {
+  confidence: number; // 0..1
+}

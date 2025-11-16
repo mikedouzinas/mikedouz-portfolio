@@ -228,10 +228,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const [isAnimating, setIsAnimating] = useState(false); // Prevent rapid open/close during animations
   const [showComposer, setShowComposer] = useState(false); // Toggle for MessageComposer
   const [showScrollToBottom, setShowScrollToBottom] = useState(false); // Show scroll indicator
-  
+
   // Track UI directives from streaming
   const uiDirective = useUiDirectives(answer || '');
-  
+
   /**
    * Auto-open composer when directive is detected
    * Based on reason and open behavior
@@ -242,13 +242,13 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setShowComposer(false); // Reset composer when directive clears
       return;
     }
-    
+
     const shouldAutoOpen = (uiDirective.open ?? defaultOpenFor(uiDirective.reason)) === 'auto';
     if (shouldAutoOpen) {
       setShowComposer(true);
     }
   }, [uiDirective]);
-  
+
   // Refs for focus management
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -369,7 +369,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setAnswer(null);
       setIsProcessingQuery(false);
       setSubmittedQuery('');
-      setShowComposer(false); // Reset composer state
     }
   }, [isAnimating, onOpenChange]);
 
@@ -640,10 +639,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       return;
     }
     
-    
+
     // Immediately switch to answer view with loading state
-    // CRITICAL: Reset composer state when starting a new query
-    setShowComposer(false);
     setIsProcessingQuery(true);
     setSubmittedQuery(q);
     setAnswer(''); // Start with empty answer for streaming
@@ -653,17 +650,21 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     
     try {
       const signals = getSignalSummary();
-      
+
+      // Searching phase (no longer tracking loading phases)
+
       // Create AbortController for timeout handling
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-      
+
       const response = await fetch(
         `/api/iris/answer?q=${encodeURIComponent(q)}&signals=${encodeURIComponent(JSON.stringify(signals))}`,
         { signal: controller.signal }
       );
-      
+
       clearTimeout(timeoutId);
+
+      // Generating phase (no longer tracking loading phases)
 
       if (!response.ok) {
         // Try to get error details from response body
@@ -843,12 +844,16 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             role="dialog"
             aria-label="Iris command palette"
             aria-modal="false"
-            initial={{ opacity: 0, x: "-50%" }}
-            animate={{ opacity: 1, x: "-50%" }}
-            exit={{ opacity: 0, x: "-50%" }}
+            initial={{ opacity: 0, x: "-50%", scale: 0.95 }}
+            animate={{ opacity: 1, x: "-50%", scale: 1 }}
+            exit={{ opacity: 0, x: "-50%", scale: 0.95 }}
             transition={{ 
               duration: 0.35, 
-              ease: "easeInOut" // Smooth fade
+              ease: [0.16, 1, 0.3, 1], // Spring-like easing for liquid feel
+              scale: {
+                duration: 0.4,
+                ease: [0.16, 1, 0.3, 1]
+              }
             }}
             onAnimationComplete={() => {
               // Unlock animation state when animation finishes (both open and close)
@@ -860,15 +865,25 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 ? 'top-16 w-[calc(100vw-2rem)] max-h-[calc(100vh-5rem)] overflow-y-auto' 
                 : 'top-[20vh] w-[720px] max-w-[calc(100vw-2rem)]'
               }
-              rounded-2xl border border-white/20 bg-gradient-to-br from-blue-600/25 via-emerald-400/35 to-blue-600/25 backdrop-blur-xl shadow-2xl ring-1 ring-white/10
-              shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.1),inset_0_1px_0_rgba(255,255,255,0.2)]
-              ${isInputFocused ? 'ring-1 ring-sky-400/30' : ''}
+              rounded-2xl 
+              bg-gradient-to-br from-blue-600/[0.12] via-blue-500/[0.15] to-blue-600/[0.12]
+              backdrop-blur-3xl backdrop-saturate-[2.2]
+              border border-white/[0.18] dark:border-white/[0.12]
+              shadow-[0_8px_40px_rgba(37,99,235,0.15),0_0_0_1px_rgba(255,255,255,0.08),inset_0_0_0_1px_rgba(255,255,255,0.08)]
+              before:absolute before:inset-0 before:rounded-2xl
+              before:bg-gradient-to-b before:from-white/[0.15] before:via-blue-400/[0.05] before:to-transparent
+              before:pointer-events-none
+              after:absolute after:inset-0 after:rounded-2xl
+              after:bg-gradient-to-tr after:from-transparent after:via-white/[0.03] after:to-transparent
+              after:pointer-events-none
+              overflow-hidden
+              ${isInputFocused ? 'ring-2 ring-sky-400/20 border-sky-400/30' : ''}
             `}
           >
         {/* Input row */}
-        <div className="relative flex items-center px-3">
+        <div className="relative flex items-center pl-4 pr-[52px] min-h-[56px]">
           {/* Left search icon */}
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-black/50 dark:text-white/50 pointer-events-none" />
           
           {/* Search input - always editable with character limit */}
           <input
@@ -883,8 +898,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             maxLength={500}
             className="
               h-14 w-full bg-transparent 
-              pl-10 pr-28 
-              text-[15px] text-white placeholder-white/50 
+              pl-10 pr-16 
+              text-[15px] text-black/90 dark:text-white/90 
+              placeholder-black/40 dark:placeholder-white/40 
               outline-none border-0
             "
             aria-autocomplete="list"
@@ -897,12 +913,17 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             <button
               onClick={handleClear}
               className="
-                absolute right-2 inset-y-2
+                absolute right-2 top-1/2 -translate-y-1/2
                 inline-flex items-center justify-center
                 rounded-full w-9 h-9
                 text-xs font-medium
-                bg-white/10 hover:bg-white/15 text-white
-                transition-colors
+                bg-black/5 dark:bg-white/10 
+                hover:bg-black/10 dark:hover:bg-white/15 
+                text-black/70 dark:text-white/70
+                border border-black/10 dark:border-white/10
+                transition-all duration-200
+                backdrop-blur-sm
+                flex-shrink-0
               "
               aria-label="Clear search"
             >
@@ -913,12 +934,17 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               onClick={handleAskIrisClick}
               disabled={isProcessingQuery}
               className={`
-                absolute right-2 inset-y-2
+                absolute right-2 top-1/2 -translate-y-1/2
                 inline-flex items-center justify-center
                 rounded-full w-9 h-9
-                bg-blue-800/80 hover:bg-blue-800 text-white
-                transition-all duration-300 ease-out
-                hover:scale-110
+                bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600
+                text-white shadow-md
+                border border-white/20
+                transition-all duration-200 ease-out
+                hover:shadow-lg hover:scale-105
+                hover:from-blue-500 hover:via-emerald-400 hover:to-blue-500
+                backdrop-blur-xl
+                flex-shrink-0
                 ${isProcessingQuery ? 'opacity-50 cursor-not-allowed' : ''}
               `}
               aria-label="Submit to Iris"
@@ -933,7 +959,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         </div>
 
         {/* Divider */}
-        <div className="border-t border-white/10 mx-3" />
+        <div className="relative mx-3">
+          <div className="absolute inset-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+          <div className="border-t border-black/5 dark:border-white/10"></div>
+        </div>
 
         {/* Suggestions list - only show in suggestions view */}
         {viewMode === 'suggestions' && (
@@ -978,9 +1007,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   aria-selected={isSelected}
                   className={`
                     relative flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-default
-                    transition-colors
+                    transition-all duration-200
                     ${isSelected 
-                      ? 'bg-white/10' 
+                      ? 'bg-white/10 shadow-sm' 
                       : 'hover:bg-green-500/10'
                     }
                     focus:outline-none focus:ring-0 focus:border-0 focus:shadow-none
@@ -992,7 +1021,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   }}
                 >
                   {/* Left icon chip */}
-                  <div className="shrink-0 rounded-md bg-white/5 p-1.5 text-white/80">
+                  <div className="shrink-0 rounded-lg bg-black/5 dark:bg-white/5 p-1.5 text-black/60 dark:text-white/60">
                     {isLoading ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
                     ) : (
@@ -1004,16 +1033,16 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   <div className="flex-1 min-w-0">
                     {isLoading ? (
                       <>
-                        <div className="h-4 w-3/4 bg-white/10 rounded animate-pulse mb-1" />
-                        <div className="h-3 w-1/2 bg-white/5 rounded animate-pulse" />
+                        <div className="h-4 w-3/4 bg-black/10 dark:bg-white/10 rounded animate-pulse mb-1" />
+                        <div className="h-3 w-1/2 bg-black/5 dark:bg-white/5 rounded animate-pulse" />
                       </>
                     ) : (
                       <>
-                        <div className="text-[15px] text-white">
+                        <div className="text-[15px] text-black/90 dark:text-white/90">
                           {truncateText(suggestion.title, 60)}
                         </div>
                         {suggestion.subtitle && (
-                          <div className="text-[13px] text-white/60">
+                          <div className="text-[13px] text-black/50 dark:text-white/50">
                             {truncateText(suggestion.subtitle, 80)}
                           </div>
                         )}
@@ -1023,7 +1052,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
                   {/* Right enter glyph */}
                   {!isLoading && (
-                    <CornerDownLeft className="w-4 h-4 text-white/40 shrink-0" />
+                    <CornerDownLeft className="w-4 h-4 text-black/30 dark:text-white/30 shrink-0" />
                   )}
                 </div>
               );
@@ -1061,19 +1090,19 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   </div>
                 )}
               </div>
-              
+
               {/* Scroll to bottom button */}
               {showScrollToBottom && (
                 <button
                   onClick={scrollToBottom}
-                  className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-sm border border-white/20 hover:border-white/40 flex items-center justify-center text-white/70 hover:text-white/90 transition-all duration-200 transform hover:scale-110 z-10"
+                  className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/70 dark:bg-black/30 hover:bg-white/90 dark:hover:bg-black/50 backdrop-blur-xl border border-black/10 dark:border-white/20 flex items-center justify-center text-black/70 dark:text-white/70 transition-all duration-200 hover:scale-105 shadow-sm z-10"
                   title="Scroll to bottom"
                 >
                   <ChevronDown className="w-4 h-4" />
                 </button>
               )}
             </div>
-            
+
             {/* Contact UI: CTA or Composer based on directive */}
             {/* Only show if not currently processing a new query and directive exists */}
             {!isProcessingQuery && uiDirective && !showComposer && (

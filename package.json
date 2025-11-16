@@ -9,7 +9,7 @@
     "lint": "next lint",
     "postinstall": "npm run build:embeddings && npm run build:typeahead",
     "build:embeddings": "tsx scripts/build_embeddings.ts",
-    "build:typeahead": "tsx scripts/build_typeahead.ts",
+    "build:typeahead": "tsx scripts/build_typeahead.ts && tsx scripts/build_typeahead_v2.ts",
     "verify:kb": "tsx scripts/verify_kb.ts",
     "kb:rebuild": "npm run verify:kb && npm run build:embeddings && npm run build:typeahead",
     "test:iris": "tsx scripts/test_iris.ts",

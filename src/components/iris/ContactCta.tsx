@@ -43,7 +43,7 @@ export default function ContactCta({ draft, onClick }: ContactCtaProps) {
           )}
           <button
             onClick={onClick}
-            className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-white text-sm font-medium transition-all duration-200 transform hover:scale-[1.02] overflow-hidden"
+            className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-white text-sm font-medium transition-all duration-200 transform hover:scale-[1.02] overflow-hidden"
             style={{
               background: 'linear-gradient(90deg, #6B4EFF 0%, #00A8FF 100%)',
             }}

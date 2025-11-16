@@ -193,3 +193,59 @@ export async function loadAll() {
   ])
   return { profile, contact, skills, items }
 }
+
+/** ---------- Alias Index for Micro-Planner ---------- */
+
+/**
+ * Compact alias entry for planner use
+ * Contains only essential identifying information (no long text)
+ */
+export interface AliasEntry {
+  id: string;
+  type: string;
+  name: string;
+  aliases: string[];
+}
+
+/**
+ * Builds a compact alias index from KB items
+ * Extracts names and aliases only - used by micro-planner for fast alias resolution
+ * 
+ * Professional comment: This provides a lightweight name/alias index that the planner
+ * can use without loading full item summaries, keeping planner calls token-efficient.
+ */
+export function buildAliasIndex(items: KBItem[]): AliasEntry[] {
+  return items
+    .map(item => {
+      // Extract name based on item type
+      let name = '';
+      if ('title' in item && item.title) {
+        name = item.title;
+      } else if ('name' in item && item.name) {
+        name = item.name;
+      } else if ('company' in item && item.company) {
+        name = item.company;
+      } else if ('role' in item && item.role) {
+        name = item.role;
+      } else if ('value' in item && item.value) {
+        name = item.value;
+      } else if ('interest' in item && item.interest) {
+        name = item.interest;
+      } else if ('school' in item && item.school) {
+        name = item.school;
+      }
+
+      // Extract aliases if present (only Skills have aliases property)
+      const aliases = item.kind === 'skill' && 'aliases' in item && Array.isArray(item.aliases) 
+        ? item.aliases 
+        : [];
+
+      return {
+        id: item.id,
+        type: item.kind,
+        name,
+        aliases
+      };
+    })
+    .filter(entry => entry.name); // Only include items with names
+}
