@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { retrieve, diversifyByType, buildEvidencePacks, buildEvidenceSignals } from '@/lib/iris/retrieval';
 import { loadContact, loadKBItems, buildAliasIndex, loadSkills } from '@/lib/iris/load';
-import { type SignalSummary } from '@/lib/iris/signals';
+// SignalSummary type reserved for future RAG personalization
 import { irisCache } from '@/lib/iris/cache';
 import { type KBItem, type PlannerResult, type EvidenceSignals } from '@/lib/iris/schema';
 import { OpenAI } from 'openai';
@@ -1026,8 +1026,9 @@ export async function POST(req: NextRequest) {
     // Parse user signals for future RAG personalization
     // Note: signals are parsed but not currently used - reserved for future RAG personalization
     try {
-      const parsedSignals = typeof signalsParam === 'string' ? JSON.parse(signalsParam) : signalsParam;
-      // signals = parsedSignals; // Reserved for future use
+      // const parsedSignals = typeof signalsParam === 'string' ? JSON.parse(signalsParam) : signalsParam;
+      // Reserved for future use when RAG personalization is implemented
+      void signalsParam; // Suppress unused variable warning
     } catch (e) {
       console.warn('[Answer API] Failed to parse signals:', e);
     }
