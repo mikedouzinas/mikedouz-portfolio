@@ -814,7 +814,7 @@ function resolveSkillIdsToNames(skillIds: string[], skillMap: Map<string, string
 }
 
 /**
- * Formats retrieved documents into a clean, structured context string
+ * Formats retrieved documents into a clean, structured context string with proper markdown
  * This structured format helps the LLM extract relevant information accurately
  * Handles different KBItem types (Project, Experience, Class, Blog, Story) with varying schemas
  * 
@@ -835,9 +835,9 @@ function formatContext(docs: Array<Partial<KBItem>>, includeDetails: boolean = t
       // Extract date information based on item type
       if ('dates' in d && d.dates) {
         const endDate = d.dates.end || 'Present';
-        dateInfo = ` (${d.dates.start} – ${endDate})`;
+        dateInfo = ` *(${d.dates.start} – ${endDate})*`;
       } else if ('term' in d && d.term) {
-        dateInfo = ` (${d.term})`;
+        dateInfo = ` *(${d.term})*`;
       }
 
       // Build the display name
@@ -862,32 +862,37 @@ function formatContext(docs: Array<Partial<KBItem>>, includeDetails: boolean = t
         displayName = d.id || 'Unknown';
       }
 
-      parts.push(`• ${displayName}${dateInfo}`);
+      parts.push(`### ${displayName}${dateInfo}`);
 
       // Add summary/text/why - different types use different fields
       if ('summary' in d && d.summary) {
-        parts.push(`  - ${d.summary}`);
+        parts.push(`${d.summary}`);
+        parts.push(''); // Empty line for markdown spacing
       } else if ('text' in d && d.text) {
-        parts.push(`  - ${d.text}`);
+        parts.push(`${d.text}`);
+        parts.push(''); // Empty line for markdown spacing
       } else if ('why' in d && d.why) {
-        parts.push(`  - ${d.why}`);
+        parts.push(`${d.why}`);
+        parts.push(''); // Empty line for markdown spacing
       } else if ('headline' in d && d.headline) {
         // For bio items, show headline and bio text
-        parts.push(`  - Headline: ${d.headline}`);
+        parts.push(`**Headline:** ${d.headline}`);
         if ('bio' in d && d.bio) {
-          parts.push(`  - Bio: ${d.bio}`);
+          parts.push(`**Bio:** ${d.bio}`);
         }
         if ('name' in d && d.name) {
-          parts.push(`  - Name: ${d.name}`);
+          parts.push(`**Name:** ${d.name}`);
         }
+        parts.push(''); // Empty line for markdown spacing
       } else if ('school' in d && d.school) {
         // For education items without summary, show GPA and graduation date
         if ('gpa' in d && d.gpa) {
-          parts.push(`  - GPA: ${d.gpa}`);
+          parts.push(`**GPA:** ${d.gpa}`);
         }
         if ('expected_grad' in d && d.expected_grad) {
-          parts.push(`  - Expected Graduation: ${d.expected_grad}`);
+          parts.push(`**Expected Graduation:** ${d.expected_grad}`);
         }
+        parts.push(''); // Empty line for markdown spacing
       }
 
       // Handle detail levels:
@@ -905,29 +910,30 @@ function formatContext(docs: Array<Partial<KBItem>>, includeDetails: boolean = t
         const skillNames = skillMap 
           ? resolveSkillIdsToNames(d.skills as string[], skillMap)
           : d.skills as string[];
-        parts.push(`  - Skills: ${skillNames.join(', ')}`);
+        parts.push(`**Skills:** ${skillNames.join(', ')}`);
       }
 
       // Only include specifics, architecture, and tech_stack for full detail level
       if (detailLevel === 'full') {
         // Include up to 4 specific details (not all types have this)
-        if ('specifics' in d && Array.isArray(d.specifics)) {
-          for (const s of d.specifics.slice(0, 4)) parts.push(`  - ${s}`);
+        if ('specifics' in d && Array.isArray(d.specifics) && d.specifics.length > 0) {
+          parts.push('**Key Details:**');
+          for (const s of d.specifics.slice(0, 4)) parts.push(`- ${s}`);
         }
 
         // Add technical details for architecture-focused queries (projects)
         if ('architecture' in d && d.architecture) {
-          parts.push(`  - Architecture: ${d.architecture}`);
+          parts.push(`**Architecture:** ${d.architecture}`);
         }
 
         if ('tech_stack' in d && Array.isArray(d.tech_stack) && d.tech_stack.length > 0) {
-          parts.push(`  - Tech Stack: ${d.tech_stack.join(', ')}`);
+          parts.push(`**Tech Stack:** ${d.tech_stack.join(', ')}`);
         }
       }
 
       return parts.join('\n');
     })
-    .join('\n\n');
+    .join('\n\n---\n\n'); // Use markdown horizontal rule to separate items
 }
 
 /**
@@ -1510,6 +1516,40 @@ ${enhancedContext}`;
       const readable = new ReadableStream({
         async start(controller) {
           try {
+            // Send debug information first if in development mode
+            if (process.env.NODE_ENV === 'development' || query.toLowerCase().includes('debug')) {
+              const debugInfo = {
+                debug: {
+                  intent,
+                  filters,
+                  preRouted,
+                  planner: planner ? {
+                    routedIntent: planner.routedIntent,
+                    risk: planner.risk,
+                    entities: planner.entities
+                  } : null,
+                  resultsCount: results.length,
+                  contextItems: results.map(r => ({
+                    type: 'kind' in r.doc ? r.doc.kind : 
+                           'type' in r.doc ? r.doc.type : 'unknown',
+                    title: 'title' in r.doc ? r.doc.title : 
+                           'role' in r.doc ? r.doc.role : 
+                           'school' in r.doc ? r.doc.school : 
+                           'value' in r.doc ? r.doc.value :
+                           'interest' in r.doc ? r.doc.interest :
+                           r.doc.id || 'unknown',
+                    score: r.score
+                  })),
+                  fields,
+                  isEvaluative,
+                  detailLevel: intent === 'filter_query' && filters?.show_all ? 'minimal' : 
+                               isEvaluative ? 'compact' : 'full'
+                }
+              };
+              const debugData = `data: ${JSON.stringify(debugInfo)}\n\n`;
+              controller.enqueue(encoder.encode(debugData));
+            }
+
             // Consume the OpenAI stream and immediately pipe chunks to the controller
             // This pattern ensures chunks are sent as soon as they arrive
             for await (const chunk of stream) {

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { getSignalSummary } from '@/lib/iris/signals';
 import { useRouter } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
 import { useUiDirectives, defaultOpenFor, stripUiDirectives } from './iris/useUiDirectives';
 import ContactCta from './iris/ContactCta';
 import MessageComposer from './iris/MessageComposer';
@@ -83,98 +84,7 @@ function truncateText(text: string, maxLength: number = 60): string {
   return text.substring(0, maxLength).trim() + '...';
 }
 
-/**
- * Detect and render clickable links in text
- */
-function renderTextWithLinks(text: string, router: ReturnType<typeof useRouter>) {
-  // Patterns to detect
-  // Note: URL pattern matches valid URL characters and trims trailing punctuation
-  const patterns = {
-    email: /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi,
-    url: /(https?:\/\/[^\s]+?)(?=[.,;!?)]*(?:\s|$))/gi,
-    // internalRoute: /\/(projects|playground|games\/rack-rush|about|blogs|work_experience)(?:\/[^\s]*)?/gi
-  };
-  
-  const parts: React.ReactNode[] = [];
-  let lastIndex = 0;
-  const allMatches: Array<{index: number; length: number; type: string; value: string}> = [];
-  
-  // Find all matches
-  ['email', 'url'].forEach(type => {
-    const pattern = patterns[type as keyof typeof patterns];
-    let match;
-    while ((match = pattern.exec(text)) !== null) {
-      allMatches.push({
-        index: match.index,
-        length: match[0].length,
-        type,
-        value: match[0]
-      });
-    }
-  });
-  
-  // Sort by index
-  allMatches.sort((a, b) => a.index - b.index);
-  
-  // Build React nodes
-  allMatches.forEach((match, i) => {
-    // Add text before match
-    if (match.index > lastIndex) {
-      parts.push(text.substring(lastIndex, match.index));
-    }
-    
-    // Add clickable link
-    if (match.type === 'email') {
-      parts.push(
-        <a
-          key={`link-${i}`}
-          href={`mailto:${match.value}`}
-          className="text-sky-400 hover:text-sky-300 underline inline-flex items-center gap-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {match.value}
-          <ExternalLink className="w-3 h-3" />
-        </a>
-      );
-    } else if (match.type === 'url') {
-      parts.push(
-        <a
-          key={`link-${i}`}
-          href={match.value}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sky-400 hover:text-sky-300 underline inline-flex items-center gap-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {match.value}
-          <ExternalLink className="w-3 h-3" />
-        </a>
-      );
-    } else if (match.type === 'internalRoute') {
-      parts.push(
-        <button
-          key={`link-${i}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            router.push(match.value);
-          }}
-          className="text-sky-400 hover:text-sky-300 underline font-medium"
-        >
-          {match.value}
-        </button>
-      );
-    }
-    
-    lastIndex = match.index + match.length;
-  });
-  
-  // Add remaining text
-  if (lastIndex < text.length) {
-    parts.push(text.substring(lastIndex));
-  }
-  
-  return parts.length > 0 ? parts : text;
-}
+// Note: renderTextWithLinks function removed - using ReactMarkdown for proper markdown rendering
 
 /**
  * IrisPalette - Arc-inspired command palette component
@@ -223,6 +133,28 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const [apiSuggestions, setApiSuggestions] = useState<ApiSuggestion[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [answer, setAnswer] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<{
+    intent: string;
+    filters?: Record<string, unknown>;
+    preRouted?: string;
+    resultsCount: number;
+    contextItems?: Array<{
+      type: string;
+      title: string;
+      score?: number;
+    }>;
+    planner?: {
+      routedIntent: string;
+      risk: {
+        entityLinkScore?: number;
+        coverageRatio?: number;
+      };
+      entities?: Record<string, unknown>;
+    };
+    fields?: string[];
+    isEvaluative?: boolean;
+    detailLevel?: string;
+  } | null>(null); // Debug information from API
   const [isProcessingQuery, setIsProcessingQuery] = useState(false);
   const [submittedQuery, setSubmittedQuery] = useState<string>(''); // Track the query that generated the current answer
   const [isAnimating, setIsAnimating] = useState(false); // Prevent rapid open/close during animations
@@ -710,6 +642,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   if (parsed.text) {
                     accumulatedAnswer += parsed.text;
                     setAnswer(accumulatedAnswer);
+                  } else if (parsed.debug) {
+                    // Capture debug information
+                    setDebugInfo(parsed.debug);
                   }
                 } catch {
                   // Skip invalid JSON - silently ignore parse errors
@@ -804,6 +739,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const handleClear = () => {
     setQuery('');
     setAnswer(null);
+    setDebugInfo(null); // Clear debug info
     setSubmittedQuery('');
     setIsProcessingQuery(false);
     setApiSuggestions([]);
@@ -1075,8 +1011,75 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 }`}
               >
                 {answer ? (
-                  <div className="text-[14px] text-white/90 leading-relaxed whitespace-pre-wrap">
-                    {renderTextWithLinks(stripUiDirectives(answer), router)}
+                  <div className="text-[14px] text-white/90 leading-relaxed iris-markdown">
+                    <ReactMarkdown
+                      components={{
+                        // Custom link renderer to handle internal/external links
+                        a: ({ href, children, ...props }) => {
+                          const isExternal = href?.startsWith('http');
+                          const isEmail = href?.startsWith('mailto:');
+                          
+                          if (isEmail && href) {
+                            return (
+                              <a 
+                                href={href}
+                                className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors"
+                                {...props}
+                              >
+                                {children}
+                              </a>
+                            );
+                          }
+                          
+                          if (isExternal && href) {
+                            return (
+                              <a 
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors inline-flex items-center gap-1"
+                                {...props}
+                              >
+                                {children}
+                                <ExternalLink className="w-3 h-3 inline" />
+                              </a>
+                            );
+                          }
+                          
+                          // Internal links - use router
+                          return (
+                            <button
+                              onClick={() => href && router.push(href)}
+                              className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors"
+                            >
+                              {children}
+                            </button>
+                          );
+                        },
+                        // Style other markdown elements
+                        h3: ({ ...props }) => <h3 className="text-base font-semibold mb-2 mt-4 first:mt-0" {...props} />,
+                        p: ({ ...props }) => <p className="mb-3 last:mb-0" {...props} />,
+                        ul: ({ ...props }) => <ul className="list-disc ml-4 mb-3 space-y-1" {...props} />,
+                        ol: ({ ...props }) => <ol className="list-decimal ml-4 mb-3 space-y-1" {...props} />,
+                        li: ({ ...props }) => <li className="leading-relaxed" {...props} />,
+                        strong: ({ ...props }) => <strong className="font-semibold" {...props} />,
+                        em: ({ ...props }) => <em className="italic" {...props} />,
+                        hr: ({ ...props }) => <hr className="my-4 border-white/20" {...props} />,
+                        code: (props) => {
+                          const { children, className } = props;
+                          // Check if it's inline by looking at the className
+                          const isInline = className?.includes('language-') ? false : true;
+                          
+                          return isInline ? (
+                            <code className="px-1 py-0.5 bg-white/10 rounded text-xs">{children}</code>
+                          ) : (
+                            <code className="block p-3 bg-white/10 rounded mb-3 text-xs overflow-x-auto">{children}</code>
+                          );
+                        },
+                      }}
+                    >
+                      {stripUiDirectives(answer)}
+                    </ReactMarkdown>
                     {/* Show typing cursor while streaming */}
                     {isProcessingQuery && (
                       <span className="inline-block w-2 h-4 bg-sky-400 animate-pulse ml-1" />
@@ -1087,6 +1090,48 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   <div className="flex items-center gap-2 text-white/60">
                     <Loader2 className="w-4 h-4 animate-spin" />
                     <span className="text-[14px]">Thinking...</span>
+                  </div>
+                )}
+                
+                {/* Debug Panel - Shows when debug info is available */}
+                {debugInfo && (
+                  <div className="mt-4 p-3 bg-black/20 dark:bg-white/10 rounded-lg border border-white/20">
+                    <div className="text-xs text-white/60 font-mono space-y-2">
+                      <div><strong>Intent:</strong> {debugInfo.intent}</div>
+                      {debugInfo.filters && (
+                        <div><strong>Filters:</strong> {JSON.stringify(debugInfo.filters, null, 2)}</div>
+                      )}
+                      {debugInfo.preRouted && (
+                        <div><strong>Pre-routed:</strong> {debugInfo.preRouted}</div>
+                      )}
+                      <div><strong>Results:</strong> {debugInfo.resultsCount} items</div>
+                      {debugInfo.contextItems && debugInfo.contextItems.length > 0 && (
+                        <details className="cursor-pointer">
+                          <summary><strong>Context Items:</strong></summary>
+                          <div className="mt-1 space-y-1 pl-2">
+                            {debugInfo.contextItems.map((item, i) => (
+                              <div key={i}>
+                                {item.type}: {item.title} (score: {item.score?.toFixed(3)})
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                      )}
+                      {debugInfo.planner && (
+                        <details className="cursor-pointer">
+                          <summary><strong>Planner:</strong></summary>
+                          <div className="mt-1 pl-2 space-y-1">
+                            <div>Routed Intent: {debugInfo.planner.routedIntent}</div>
+                            <div>Entity Link Score: {debugInfo.planner.risk.entityLinkScore?.toFixed(3)}</div>
+                            <div>Coverage Ratio: {debugInfo.planner.risk.coverageRatio?.toFixed(3)}</div>
+                            {debugInfo.planner.entities && (
+                              <div>Entities: {JSON.stringify(debugInfo.planner.entities)}</div>
+                            )}
+                          </div>
+                        </details>
+                      )}
+                      <div><strong>Detail Level:</strong> {debugInfo.detailLevel}</div>
+                    </div>
                   </div>
                 )}
               </div>
