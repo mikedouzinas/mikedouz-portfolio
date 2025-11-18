@@ -176,6 +176,21 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const renderedAnswer = useMemo(() => autoLinkText(cleanedAnswer), [cleanedAnswer]);
 
   /**
+   * Handle copying email to clipboard
+   * Shows copied confirmation for 2 seconds
+   */
+  const handleEmailCopy = useCallback(async (email: string) => {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopiedEmail(email);
+      if (copiedTimer.current) clearTimeout(copiedTimer.current);
+      copiedTimer.current = setTimeout(() => setCopiedEmail(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy email:', error);
+    }
+  }, []);
+
+  /**
    * Helper function to render markdown content
    * Reused for both conversation history and current answer
    */
@@ -215,7 +230,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
               let iconElement;
               if (isLinkedIn) {
-                iconElement = <FaLinkedIn className="w-3.5 h-3.5 inline mr-1.5" />;
+                iconElement = <FaLinkedin className="w-3.5 h-3.5 inline mr-1.5" />;
               } else if (isGitHub) {
                 iconElement = <FaGithub className="w-3.5 h-3.5 inline mr-1.5" />;
               } else if (isCalendar) {
@@ -293,17 +308,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       )}
     </div>
   ), [copiedEmail, handleEmailCopy, router]);
-
-  const handleEmailCopy = useCallback(async (email: string) => {
-    try {
-      await navigator.clipboard.writeText(email);
-      setCopiedEmail(email);
-      if (copiedTimer.current) clearTimeout(copiedTimer.current);
-      copiedTimer.current = setTimeout(() => setCopiedEmail(null), 2000);
-    } catch (error) {
-      console.error('Failed to copy email:', error);
-    }
-  }, []);
 
   useEffect(() => {
     return () => {
@@ -1264,141 +1268,61 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         {viewMode === 'answer' && (
           <>
             <div className="relative">
-              <div 
+              <div
                 ref={answerRef}
                 onScroll={handleScroll}
-                className={`p-4 overflow-y-auto ${
-                  (showComposer || (uiDirective && !showComposer)) 
-                    ? 'max-h-32 sm:max-h-64' 
+                className={`p-4 overflow-y-auto space-y-4 ${
+                  (showComposer || (uiDirective && !showComposer))
+                    ? 'max-h-32 sm:max-h-64'
                     : 'max-h-64'
                 }`}
               >
-                {answer ? (
-                  <div className="text-[14px] text-white/90 leading-relaxed iris-markdown">
-                    <ReactMarkdown
-                      components={{
-                        // Custom link renderer to handle internal/external links
-                        a: ({ href, children, ...props }) => {
-                          const isExternal = href?.startsWith('http');
-                          const isEmail = href?.startsWith('mailto:');
-                          
-                          // Handle email links with envelope icon
-                          if (isEmail && href) {
-                            const email = href.replace(/^mailto:/, '');
-                            const copied = copiedEmail === email;
-                            return (
-                              <button
-                                type="button"
-                                onClick={(event) => {
-                                  event.preventDefault();
-                                  handleEmailCopy(email);
-                                }}
-                                className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors inline-flex items-center gap-1 focus:outline-none"
-                                aria-live="polite"
-                              >
-                                <FaEnvelope className="w-3.5 h-3.5 inline mr-1.5" />
-                                <span>{copied ? 'Copied!' : children}</span>
-                              </button>
-                            );
-                          }
-                          
-                          if (isExternal && href) {
-                            // Detect specific link types to use their actual icons
-                            // Professional comment: Using official brand icons for better UX and consistency
-                            const isLinkedIn = /linkedin\.com/i.test(href);
-                            const isGitHub = /github\.com/i.test(href);
-                            const isCalendar = /calendly|fantastical|schedule/i.test(href);
-                            
-                            // Render icon based on URL type
-                            // Place icon BEFORE text for all contact methods for consistent visual hierarchy
-                            let iconElement;
-                            if (isLinkedIn) {
-                              iconElement = <FaLinkedin className="w-3.5 h-3.5 inline mr-1.5" />;
-                            } else if (isGitHub) {
-                              iconElement = <FaGithub className="w-3.5 h-3.5 inline mr-1.5" />;
-                            } else if (isCalendar) {
-                              iconElement = <SiCalendly className="w-3.5 h-3.5 inline mr-1.5" />;
-                            } else {
-                              iconElement = <ExternalLink className="w-3 h-3 inline ml-1" />;
-                            }
-                            
-                            // Determine if icon should go before or after text
-                            const iconBefore = isLinkedIn || isGitHub || isCalendar;
-                            
-                            return (
-                              <a 
-                                href={href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors inline-flex items-center gap-1"
-                                {...props}
-                              >
-                                {iconBefore ? (
-                                  <>
-                                    {iconElement}
-                                    {children}
-                                  </>
-                                ) : (
-                                  <>
-                                    {children}
-                                    {iconElement}
-                                  </>
-                                )}
-                              </a>
-                            );
-                          }
-                          
-                          // Internal links - use router
-                          return (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                if (href) router.push(href);
-                              }}
-                              className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors cursor-pointer"
-                            >
-                              {children}
-                            </button>
-                          );
-                        },
-                        // Style other markdown elements
-                        h3: ({ ...props }) => <h3 className="text-base font-semibold mb-2 mt-4 first:mt-0" {...props} />,
-                        p: ({ ...props }) => <p className="mb-3 last:mb-0" {...props} />,
-                        ul: ({ ...props }) => <ul className="list-disc ml-4 mb-3 space-y-1" {...props} />,
-                        ol: ({ ...props }) => <ol className="list-decimal ml-4 mb-3 space-y-1" {...props} />,
-                        li: ({ ...props }) => <li className="leading-relaxed" {...props} />,
-                        strong: ({ ...props }) => <strong className="font-semibold" {...props} />,
-                        em: ({ ...props }) => <em className="italic" {...props} />,
-                        hr: ({ ...props }) => <hr className="my-4 border-white/20" {...props} />,
-                        code: (props) => {
-                          const { children, className } = props;
-                          // Check if it's inline by looking at the className
-                          const isInline = className?.includes('language-') ? false : true;
-                          
-                          return isInline ? (
-                            <code className="px-1 py-0.5 bg-white/10 rounded text-xs">{children}</code>
-                          ) : (
-                            <code className="block p-3 bg-white/10 rounded mb-3 text-xs overflow-x-auto">{children}</code>
-                          );
-                        },
-                      }}
-                    >
-                      {renderedAnswer}
-                    </ReactMarkdown>
-                    {/* Show typing cursor while streaming */}
-                    {isProcessingQuery && (
-                      <span className="inline-block w-2 h-4 bg-sky-400 animate-pulse ml-1" />
+                {/* Render all previous exchanges from conversation history */}
+                {conversationHistory.map((exchange, index) => (
+                  <div key={index} className="space-y-2">
+                    {/* Show query header for follow-ups (depth > 0) */}
+                    {exchange.depth > 0 && (
+                      <div className="flex items-center gap-2 text-white/50 text-sm">
+                        <ArrowRight className="w-4 h-4" />
+                        <span className="italic">{exchange.query}</span>
+                      </div>
+                    )}
+
+                    {/* Render the answer */}
+                    {renderMarkdownContent(autoLinkText(stripUiDirectives(exchange.answer)), false)}
+
+                    {/* Render quick actions for this exchange */}
+                    {exchange.quickActions.length > 0 && (
+                      <QuickActions
+                        actions={exchange.quickActions}
+                        onActionClick={handleQuickActionClick}
+                        disabled={isProcessingQuery}
+                      />
                     )}
                   </div>
-                ) : (
-                  /* Show loading state when no answer yet */
+                ))}
+
+                {/* Render current streaming answer (if any) */}
+                {answer ? (
+                  <div className="space-y-2">
+                    {/* Show query header if this is a follow-up */}
+                    {conversationHistory.length > 0 && (
+                      <div className="flex items-center gap-2 text-white/50 text-sm">
+                        <ArrowRight className="w-4 h-4" />
+                        <span className="italic">{submittedQuery}</span>
+                      </div>
+                    )}
+
+                    {/* Render current streaming answer */}
+                    {renderMarkdownContent(renderedAnswer, isProcessingQuery)}
+                  </div>
+                ) : conversationHistory.length === 0 ? (
+                  /* Show loading state when no answer yet and no history */
                   <div className="flex items-center gap-2 text-white/60">
                     <Loader2 className="w-4 h-4 animate-spin" />
                     <span className="text-[14px]">Thinking...</span>
                   </div>
-                )}
+                ) : null}
                 
                 {/* Debug Panel - Shows when debug info is available */}
                 {debugInfo && (
@@ -1454,17 +1378,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 </button>
               )}
             </div>
-
-            {/* Quick Actions - show after answer completes */}
-            {!isProcessingQuery && quickActions.length > 0 && (
-              <div className="px-4">
-                <QuickActions
-                  actions={quickActions}
-                  onActionClick={handleQuickActionClick}
-                  disabled={isProcessingQuery}
-                />
-              </div>
-            )}
 
             {/* Contact UI: CTA or Composer based on directive */}
             {/* Only show if not currently processing a new query and directive exists */}
