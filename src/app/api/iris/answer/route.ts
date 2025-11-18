@@ -1803,6 +1803,7 @@ export async function POST(req: NextRequest) {
     // Extract conversation context for follow-ups
     const previousQuery = body.previousQuery;
     const inConversation = !!previousQuery; // In conversation if there's previous context
+    const depth = typeof body.depth === 'number' ? body.depth : 0;
 
     // Extract skip classification flag and pre-set values
     const skipClassification = body.skipClassification === true;
@@ -2785,6 +2786,7 @@ ${enhancedContext}`;
                 results,
                 fullAnswer,
                 allItems: await getAllItems(),
+                depth, // Pass depth for enforcing follow-up limits
               });
 
               // Send quick actions to client
@@ -2945,6 +2947,8 @@ export async function GET(request: Request) {
     const previousQuery = searchParams.get('previousQuery') || undefined;
     const previousAnswer = searchParams.get('previousAnswer') || undefined;
     const previousIntent = searchParams.get('previousIntent') || undefined;
+    const depthParam = searchParams.get('depth');
+    const depth = depthParam ? parseInt(depthParam, 10) : undefined;
 
     // Forward skip classification flag and pre-set intent/filters
     const skipClassification = searchParams.get('skipClassification') === 'true';
@@ -2962,6 +2966,7 @@ export async function GET(request: Request) {
         previousQuery,
         previousAnswer,
         previousIntent,
+        depth,
         skipClassification,
         intent,
         filters

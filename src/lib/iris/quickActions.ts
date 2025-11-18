@@ -9,6 +9,7 @@ interface ActionContext {
   results: Array<{ score: number; doc: Partial<KBItem> }>;
   fullAnswer: string;
   allItems: KBItem[];
+  depth?: number; // Track conversation depth for limiting follow-ups
 }
 
 interface AvailableContext {
@@ -147,77 +148,85 @@ function hasContactDirective(answer: string): boolean {
 /**
  * Generate smart quick actions based on context
  * Maximum 5 actions to avoid clutter
+ * Enforces depth limit: no follow-up actions after 2 follow-ups (depth >= 2)
  */
 export function generateQuickActions(context: ActionContext): QuickAction[] {
   const actions: QuickAction[] = [];
-  const { fullAnswer, intent } = context;
+  const { fullAnswer, intent, depth = 0 } = context;
 
   // Don't show actions if there's a contact directive
   if (hasContactDirective(fullAnswer)) {
     return [];
   }
 
+  // Hard limit: no follow-up/filter actions after 2 follow-ups
+  // Still allow contact links and message_mike actions
+  const canAddFollowUps = depth < 2;
+
   const available = analyzeAvailableContext(context);
   const suggestions = extractSuggestions(fullAnswer);
 
   // Parse Iris's suggestions and convert to actions
-  for (const suggestion of suggestions.slice(0, 2)) { // Max 2 from suggestions
-    // "Want me to share key moments?"
-    if (/key moments/i.test(suggestion)) {
-      actions.push({
-        type: 'specific',
-        label: 'Key moments',
-        intent: 'personal',
-        filters: { type: ['story', 'value'] },
-      });
+  // Only add follow-up actions if under depth limit
+  if (canAddFollowUps) {
+    for (const suggestion of suggestions.slice(0, 2)) { // Max 2 from suggestions
+      // "Want me to share key moments?"
+      if (/key moments/i.test(suggestion)) {
+        actions.push({
+          type: 'specific',
+          label: 'Key moments',
+          intent: 'personal',
+          filters: { type: ['story', 'value'] },
+        });
+      }
+
+      // "Want to see projects?"
+      else if (/projects?/i.test(suggestion) && available.hasProjects) {
+        actions.push({
+          type: 'specific',
+          label: 'See projects',
+          query: 'show me projects',
+          intent: 'filter_query',
+          filters: { type: ['project'], show_all: true },
+        });
+      }
+
+      // "Read blogs/writing?"
+      else if (/(blogs?|writing)/i.test(suggestion) && available.hasBlogs) {
+        actions.push({
+          type: 'specific',
+          label: 'Read blogs',
+          query: 'show me blogs',
+          intent: 'filter_query',
+          filters: { type: ['blog'], show_all: true },
+        });
+      }
+
+      // "See work experience?"
+      else if (/experience|work/i.test(suggestion) && available.hasExperience) {
+        actions.push({
+          type: 'specific',
+          label: 'See experience',
+          query: 'show me work experience',
+          intent: 'filter_query',
+          filters: { type: ['experience'], show_all: true },
+        });
+      }
     }
 
-    // "Want to see projects?"
-    else if (/projects?/i.test(suggestion) && available.hasProjects) {
+    // Add related items if this is a deep dive
+    if (available.canGoDeeper && available.relatedProjects.length > 0) {
       actions.push({
         type: 'specific',
-        label: 'See projects',
-        query: 'show me projects',
+        label: 'Related projects',
+        query: `projects using ${available.usesSkills.slice(0, 2).join(' and ')}`,
         intent: 'filter_query',
-        filters: { type: ['project'], show_all: true },
+        filters: {
+          type: ['project'],
+          skills: available.usesSkills.slice(0, 2),
+        },
       });
     }
-
-    // "Read blogs/writing?"
-    else if (/(blogs?|writing)/i.test(suggestion) && available.hasBlogs) {
-      actions.push({
-        type: 'specific',
-        label: 'Read blogs',
-        query: 'show me blogs',
-        intent: 'filter_query',
-        filters: { type: ['blog'], show_all: true },
-      });
-    }
-
-    // "See work experience?"
-    else if (/experience|work/i.test(suggestion) && available.hasExperience) {
-      actions.push({
-        type: 'specific',
-        label: 'See experience',
-        query: 'show me work experience',
-        intent: 'filter_query',
-        filters: { type: ['experience'], show_all: true },
-      });
-    }
-  }
-
-  // Add related items if this is a deep dive
-  if (available.canGoDeeper && available.relatedProjects.length > 0) {
-    actions.push({
-      type: 'specific',
-      label: 'Related projects',
-      query: `projects using ${available.usesSkills.slice(0, 2).join(' and ')}`,
-      intent: 'filter_query',
-      filters: {
-        type: ['project'],
-        skills: available.usesSkills.slice(0, 2),
-      },
-    });
   }
 
   // Add contact links if this was about work/projects
@@ -244,8 +253,8 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
     }
   }
 
-  // Always include custom input (unless at max)
-  if (actions.length < 5) {
+  // Include custom input if under depth limit and under max actions
+  if (canAddFollowUps && actions.length < 5) {
     actions.push({
       type: 'custom_input',
       label: 'Ask a follow up...',

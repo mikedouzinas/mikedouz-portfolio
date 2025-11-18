@@ -547,6 +547,79 @@ const testSuites: Record<string, TestCase[]> = {
       ],
     },
   ],
+
+  'Conversation Threading & Quick Actions': [
+    {
+      query: 'what projects has mike worked on?',
+      expected: 'Lists projects + quick actions for follow-ups',
+      category: 'conversation-init',
+      verifyPoints: [
+        'Initial answer shows projects',
+        'Quick actions appear below answer',
+        'May include "See experience", "Read blogs", custom input, etc.',
+        'Contact links (GitHub) may appear',
+      ],
+    },
+    {
+      query: '[FOLLOW-UP 1] Tell me more about HiLiTe',
+      expected: 'Shows HiLiTe details with --> header, previous exchange visible above',
+      category: 'conversation-depth-1',
+      verifyPoints: [
+        'Follow-up query shown with --> arrow prefix',
+        'Previous question and answer still visible in conversation history',
+        'New answer appears below with its own quick actions',
+        'Quick actions include follow-up options (depth 1 < 2)',
+        'No duplicate text (answer only appears once)',
+      ],
+    },
+    {
+      query: '[FOLLOW-UP 2] What skills were used?',
+      expected: 'Shows skills with --> header, all previous exchanges visible',
+      category: 'conversation-depth-2',
+      verifyPoints: [
+        'All previous exchanges (initial + follow-up 1) visible',
+        'Current query shown with --> arrow',
+        'New answer streams below conversation history',
+        'NO follow-up/custom_input quick actions (depth limit reached)',
+        'Contact links and message_mike actions still allowed',
+      ],
+    },
+    {
+      query: '[FOLLOW-UP 3] Tell me about other ML projects',
+      expected: 'No follow-up actions, only contact options',
+      category: 'conversation-depth-3',
+      verifyPoints: [
+        'All previous exchanges visible in scrollable view',
+        'Answer displays correctly',
+        'NO follow-up or custom_input actions (depth >= 2)',
+        'Only contact_link and message_mike actions appear (if applicable)',
+        'Conversation history maintains all exchanges with their actions',
+      ],
+    },
+    {
+      query: 'what are mike\'s iOS projects?',
+      expected: 'Shows iOS projects with quick actions including drill-down options',
+      category: 'quick-actions-filter',
+      verifyPoints: [
+        'Filters to iOS projects (Momentum, Knight Life)',
+        'Quick actions suggest related follow-ups',
+        'May suggest specific project deep dives',
+        'Actions positioned directly below answer',
+        'Maximum 5 quick actions shown',
+      ],
+    },
+    {
+      query: 'new conversation - show me mike\'s experience',
+      expected: 'Fresh conversation with depth reset to 0',
+      category: 'conversation-reset',
+      verifyPoints: [
+        'Previous conversation history cleared',
+        'New answer starts fresh (no --> arrow)',
+        'Quick actions include follow-ups (depth reset)',
+        'No previous exchanges shown',
+      ],
+    },
+  ],
 };
 
 // Test results tracking

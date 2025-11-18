@@ -771,6 +771,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         params.set('previousIntent', lastTurn.intent);
       }
 
+      // Pass current depth for quick actions depth limiting
+      params.set('depth', currentDepth.toString());
+
       // Pass skip classification flag if set
       if (skipClassification && preIntent) {
         params.set('skipClassification', 'true');
@@ -870,6 +873,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             quickActions: capturedQuickActions,
             timestamp: Date.now(),
           }]);
+          // Clear answer state to prevent duplicate display
+          setAnswer(null);
         }
       } else {
         // Fallback JSON response
