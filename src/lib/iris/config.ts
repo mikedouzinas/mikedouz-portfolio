@@ -21,6 +21,10 @@ export const config = {
   suggestDebounceMs: 150,           // Debounce suggestions API calls
   answerTimeoutMs: 400,             // Timeout for LLM suggestion refinement
   
+  // API timeout settings
+  openaiTimeoutMs: 25000,          // Timeout for OpenAI API calls (25 seconds)
+  retrievalTimeoutMs: 10000,       // Timeout for retrieval operations (10 seconds)
+  
   // GitHub integration
   repo: { 
     owner: 'mikedouzinas',             // GitHub repo owner for commit fetching
@@ -47,6 +51,23 @@ export const config = {
     temperature: 1,               // Slightly higher temperature for more natural, conversational responses
     maxTokens: 800,                 // Longer answers to provide more detailed, complete information
     stream: true                    // Enable streaming responses
+  },
+
+  // Synthesis Upgrade Feature Flags
+  // These control the new evaluative/comparative query routing and evidence-rich context
+  features: {
+    evaluativeRoutingV2: true,           // Toggle new routing for evaluative queries (best/strongest/what makes)
+    microPlannerEnabled: true,           // Toggle optional micro-planner for alias resolution
+    plannerTokenBudget: { in: 150, out: 80 }, // Token budget for planner (input/output)
+    generalTopK: 5,                       // Total items to retrieve for general queries
+    perTypeQuotas: {                     // Quotas per type for diversified retrieval
+      project: 3,
+      experience: 2,
+      class: 1                           // Only used when 'class/course/academic' terms present
+    },
+    contactCooldownMsgs: 4,              // Cooldown between contact directives (messages)
+    uiDirectiveConfidenceThreshold: 0.6,  // Confidence threshold below which to suggest contact
+    typeaheadV2: true                    // Enable enhanced typeahead with question/sentence completion
   }
 } as const;
 

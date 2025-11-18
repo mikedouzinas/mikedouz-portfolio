@@ -34,7 +34,7 @@ These test the new education and bio KB items.
 | "what's mike's GPA?" | 3.88 at Rice University | ✅ Correct GPA<br>✅ School context |
 | "when does mike graduate?" | May 2027 | ✅ Correct date |
 | "tell me about mike's education" | Rice University, CS, GPA, grad date | ✅ Complete education info |
-| "what is mike's full name?" | Mike Konstantinos Veson | ✅ Correct full name |
+| "what is mike's full name?" | Michael Konstantinos Veson | ✅ Correct full name |
 
 ### 4. Edge Cases - No Context
 These should trigger fallback responses with contact info.

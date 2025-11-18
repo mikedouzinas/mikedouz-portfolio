@@ -22,6 +22,7 @@
     "role": "Software Engineer in Residence",
     "dates": { "start": "2024-02", "end": "2024-11" },
     "summary": "Led early development for Rice’s entrepreneurship platform, combining full-stack development with user research to shape product direction and help design coursework to teach founders how to build with software.",
+    "aliases": ["Lilie", "Liu Idea Lab", "Rice Lilie"],
     "specifics": [
       "Conducted 40+ user interviews with student founders and faculty to identify key needs in entrepreneurship education and resource access.",
       "Designed and prototyped full-stack platform concepts in React, TypeScript, and Supabase, creating mockups for course management, venture tracking, and mentorship tools.",
@@ -61,7 +62,7 @@
       "Automated an ingestion/cleaning pipeline to refresh leads and segmentation; cut outreach cycle time ~70%.",
       "Partnered with PMs to productize insights and tighten feedback loops into roadmap decisions."
     ],
-    "skills": ["python", "sentence_transformers", "faiss", "pandas", "numpy", "model_evaluation", "feature_engineering"],
+    "skills": ["python", "sentence_transformers", "faiss", "pandas", "numpy", "model_evaluation", "feature_engineering", "machine_learning"],
     "links": { "company": "https://www.vesselsvalue.com/" },
     "tags": ["nlp", "search", "data-quality", "ml-platform"]
   },
@@ -77,7 +78,7 @@
       "Introduced >50% of surveyed clients to mobile workflows; reduced time-to-data by ~30% versus desktop access.",
       "Established CI/CD hygiene and release rituals with Atlassian tooling."
     ],
-    "skills": ["swift", "xcode", "api_integration", "ci_cd", "product_management"],
+    "skills": ["swift", "xcode", "api_integration", "ci_cd", "product_management", "ios_development"],
     "links": { "company": "https://veson.com/" },
     "tags": ["ios", "mobile", "enterprise"]
   }

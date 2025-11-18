@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
@@ -13,10 +13,17 @@ import {
   Compass,
   Cpu,
   Mail,
-  ExternalLink
+  ExternalLink,
+  ChevronDown
 } from 'lucide-react';
+import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
+import { SiCalendly } from 'react-icons/si';
 import { getSignalSummary } from '@/lib/iris/signals';
 import { useRouter } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
+import { useUiDirectives, defaultOpenFor, stripUiDirectives } from './iris/useUiDirectives';
+import ContactCta from './iris/ContactCta';
+import MessageComposer from './iris/MessageComposer';
 
 /**
  * Static suggestion configuration
@@ -79,132 +86,20 @@ function truncateText(text: string, maxLength: number = 60): string {
   return text.substring(0, maxLength).trim() + '...';
 }
 
-/**
- * Detect and render clickable links in text
- */
-function renderTextWithLinks(text: string, router: ReturnType<typeof useRouter>) {
-  // Patterns to detect
-  // Note: URL pattern matches valid URL characters and trims trailing punctuation
-  const patterns = {
-    email: /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi,
-    url: /(https?:\/\/[^\s]+?)(?=[.,;!?)]*(?:\s|$))/gi,
-    // internalRoute: /\/(projects|playground|games\/rack-rush|about|blogs|work_experience)(?:\/[^\s]*)?/gi
-  };
-  
-  const parts: React.ReactNode[] = [];
-  let lastIndex = 0;
-  const allMatches: Array<{index: number; length: number; type: string; value: string}> = [];
-  
-  // Find all matches
-  ['email', 'url'].forEach(type => {
-    const pattern = patterns[type as keyof typeof patterns];
-    let match;
-    while ((match = pattern.exec(text)) !== null) {
-      allMatches.push({
-        index: match.index,
-        length: match[0].length,
-        type,
-        value: match[0]
-      });
-    }
-  });
-  
-  // Sort by index
-  allMatches.sort((a, b) => a.index - b.index);
-  
-  // Build React nodes
-  allMatches.forEach((match, i) => {
-    // Add text before match
-    if (match.index > lastIndex) {
-      parts.push(text.substring(lastIndex, match.index));
-    }
-    
-    // Add clickable link
-    if (match.type === 'email') {
-      parts.push(
-        <a
-          key={`link-${i}`}
-          href={`mailto:${match.value}`}
-          className="text-sky-400 hover:text-sky-300 underline inline-flex items-center gap-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {match.value}
-          <ExternalLink className="w-3 h-3" />
-        </a>
-      );
-    } else if (match.type === 'url') {
-      parts.push(
-        <a
-          key={`link-${i}`}
-          href={match.value}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sky-400 hover:text-sky-300 underline inline-flex items-center gap-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {match.value}
-          <ExternalLink className="w-3 h-3" />
-        </a>
-      );
-    } else if (match.type === 'internalRoute') {
-      parts.push(
-        <button
-          key={`link-${i}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            router.push(match.value);
-          }}
-          className="text-sky-400 hover:text-sky-300 underline font-medium"
-        >
-          {match.value}
-        </button>
-      );
-    }
-    
-    lastIndex = match.index + match.length;
-  });
-  
-  // Add remaining text
-  if (lastIndex < text.length) {
-    parts.push(text.substring(lastIndex));
-  }
-  
-  return parts.length > 0 ? parts : text;
+// Note: renderTextWithLinks function removed - using ReactMarkdown for proper markdown rendering
+
+const CONTACT_LABEL_REGEX = /(LinkedIn|GitHub|Schedule a chat|Cal|Calendar):\s*(https?:\/\/[^\s]+)/gi;
+const RAW_URL_REGEX = /(?<!\]\()(?<!href=")(https?:\/\/[^\s)<>]+)/gi;
+const EMAIL_REGEX_INLINE = /(?<!mailto:)([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi;
+
+function autoLinkText(input: string): string {
+  if (!input) return '';
+  return input
+    .replace(CONTACT_LABEL_REGEX, (_match, label, url) => `[${label}](${url})`)
+    .replace(EMAIL_REGEX_INLINE, (match) => `[${match}](mailto:${match})`)
+    .replace(RAW_URL_REGEX, (match) => `[${match}](${match})`);
 }
 
-/**
- * IrisPalette - Arc-inspired command palette component
- * 
- * Features:
- * - Opens with ⌘K (Mac) or Ctrl+K (Win/Linux)
- * - Listens for 'mv-open-cmdk' custom event
- * - No background overlay/dimming
- * - Search input with embedded "Ask Iris →" pill
- * - Two distinct views: Suggestions View and Answer View
- * - Keyboard navigation (Up/Down/Tab/Enter/Esc)
- * - Different visual states for hover vs keyboard-selected
- * - Mobile detection (disabled on mobile devices)
- * - Full accessibility support
- * - Real streaming responses from OpenAI
- * - Clickable links in responses
- * - Navigation commands
- * - Coordinated animations using framer-motion
- * - Animation lock prevents rapid open/close operations
- * 
- * View State Machine:
- * - Suggestions View: Shows search suggestions, no answer
- * - Answer View: Shows answer only, no suggestions
- * - Editing in Answer View switches back to Suggestions View
- * 
- * Animation Coordination:
- * - Entry: Simple fade in (350ms) when opening
- * - Exit: Simple fade out (350ms) synchronized with IrisButton's reverse animation
- * - Button animation (500ms total) overlaps with palette fade for smooth transition
- * - Uses framer-motion's AnimatePresence to manage mount/unmount timing
- * - Horizontal centering uses framer-motion's x transform (-50%)
- * - Animation lock (isAnimating state) prevents operations during transitions
- * - Safety timeout (450ms) ensures unlock even if onAnimationComplete fails (spam-proof)
- */
 export default function IrisPalette({ open: controlledOpen, onOpenChange }: IrisPaletteProps) {
   const router = useRouter();
   // View mode state machine: 'suggestions' = show suggestions, 'answer' = show answer only
@@ -219,13 +114,125 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const [apiSuggestions, setApiSuggestions] = useState<ApiSuggestion[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [answer, setAnswer] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<{
+    intent: string;
+    filters?: Record<string, unknown>;
+    preRouted?: string;
+    resultsCount: number;
+    contextItems?: Array<{
+      type: string;
+      title: string;
+      score?: number;
+    }>;
+    planner?: {
+      routedIntent: string;
+      risk: {
+        entityLinkScore?: number;
+        coverageRatio?: number;
+      };
+      entities?: Record<string, unknown>;
+    };
+    fields?: string[];
+    isEvaluative?: boolean;
+    detailLevel?: string;
+  } | null>(null); // Debug information from API
   const [isProcessingQuery, setIsProcessingQuery] = useState(false);
   const [submittedQuery, setSubmittedQuery] = useState<string>(''); // Track the query that generated the current answer
   const [isAnimating, setIsAnimating] = useState(false); // Prevent rapid open/close during animations
-  
+  const [showComposer, setShowComposer] = useState(false); // Toggle for MessageComposer
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false); // Show scroll indicator
+
+  // Track UI directives from streaming
+  const uiDirective = useUiDirectives(answer || '');
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+  const copiedTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const cleanedAnswer = answer ? stripUiDirectives(answer) : '';
+  const renderedAnswer = useMemo(() => autoLinkText(cleanedAnswer), [cleanedAnswer]);
+
+  const handleEmailCopy = useCallback(async (email: string) => {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopiedEmail(email);
+      if (copiedTimer.current) clearTimeout(copiedTimer.current);
+      copiedTimer.current = setTimeout(() => setCopiedEmail(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy email:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (copiedTimer.current) {
+        clearTimeout(copiedTimer.current);
+        copiedTimer.current = null;
+      }
+    };
+  }, []);
+
+  /**
+   * Auto-open composer when directive is detected
+   * Based on reason and open behavior
+   * Reset composer state when switching to new queries
+   */
+  useEffect(() => {
+    if (!uiDirective) {
+      setShowComposer(false); // Reset composer when directive clears
+      return;
+    }
+
+    const shouldAutoOpen = (uiDirective.open ?? defaultOpenFor(uiDirective.reason)) === 'auto';
+    if (shouldAutoOpen) {
+      setShowComposer(true);
+    }
+  }, [uiDirective]);
+
   // Refs for focus management
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const answerRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Check if content overflows and user is not at bottom
+   */
+  const checkScrollState = useCallback(() => {
+    if (!answerRef.current) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = answerRef.current;
+    const hasOverflow = scrollHeight > clientHeight;
+    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px threshold
+    
+    setShowScrollToBottom(hasOverflow && !isAtBottom);
+  }, []);
+
+  /**
+   * Check scroll state when answer content changes
+   */
+  useEffect(() => {
+    if (answer && viewMode === 'answer') {
+      // Use setTimeout to ensure DOM has updated
+      setTimeout(checkScrollState, 100);
+    }
+  }, [answer, viewMode, checkScrollState]);
+
+  /**
+   * Handle scroll events to show/hide scroll-to-bottom indicator
+   */
+  const handleScroll = useCallback(() => {
+    checkScrollState();
+  }, [checkScrollState]);
+
+  /**
+   * Scroll to bottom of answer area
+   */
+  const scrollToBottom = useCallback(() => {
+    if (answerRef.current) {
+      answerRef.current.scrollTo({
+        top: answerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, []);
 
   /**
    * Detect mobile devices for mobile-optimized UI
@@ -301,7 +308,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setIsProcessingQuery(false);
       setSubmittedQuery('');
     }
-  }, [isAnimating, onOpenChange, isOpen]);
+  }, [isAnimating, onOpenChange]);
 
   /**
    * Fetch autocomplete suggestions from API
@@ -319,9 +326,16 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       // Get user signals for personalized suggestions
       const signals = getSignalSummary();
 
+      // Create AbortController for timeout handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout for suggestions
+
       const response = await fetch(
-        `/api/iris/suggest?q=${encodeURIComponent(searchQuery)}&signals=${encodeURIComponent(JSON.stringify(signals))}`
+        `/api/iris/suggest?q=${encodeURIComponent(searchQuery)}&signals=${encodeURIComponent(JSON.stringify(signals))}`,
+        { signal: controller.signal }
       );
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`API request failed: ${response.status}`);
@@ -331,6 +345,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setApiSuggestions(data.items || []);
     } catch (error) {
       console.error('Failed to fetch suggestions:', error);
+      // Don't show error messages for suggestions - just silently fail
       setApiSuggestions([]);
     } finally {
       setIsLoadingSuggestions(false);
@@ -562,20 +577,32 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       return;
     }
     
-    
+
     // Immediately switch to answer view with loading state
     setIsProcessingQuery(true);
     setSubmittedQuery(q);
     setAnswer(''); // Start with empty answer for streaming
     setViewMode('answer'); // Switch immediately to answer view
     setApiSuggestions([]);
+    setShowScrollToBottom(false); // Reset scroll indicator
     
     try {
       const signals = getSignalSummary();
+
+      // Searching phase (no longer tracking loading phases)
+
+      // Create AbortController for timeout handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch(
-        `/api/iris/answer?q=${encodeURIComponent(q)}&signals=${encodeURIComponent(JSON.stringify(signals))}`
+        `/api/iris/answer?q=${encodeURIComponent(q)}&signals=${encodeURIComponent(JSON.stringify(signals))}`,
+        { signal: controller.signal }
       );
 
+      clearTimeout(timeoutId);
+
+      // Generating phase (no longer tracking loading phases)
 
       if (!response.ok) {
         // Try to get error details from response body
@@ -621,6 +648,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   if (parsed.text) {
                     accumulatedAnswer += parsed.text;
                     setAnswer(accumulatedAnswer);
+                  } else if (parsed.debug) {
+                    // Capture debug information
+                    setDebugInfo(parsed.debug);
                   }
                 } catch {
                   // Skip invalid JSON - silently ignore parse errors
@@ -637,7 +667,15 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       }
     } catch (error) {
       console.error('[IrisPalette] Failed to get answer:', error);
-      setAnswer('Sorry, I couldn\'t process your question. Please try again or rephrase it.');
+      
+      // Check if it's a timeout error
+      if (error instanceof Error && error.name === 'AbortError') {
+        setAnswer('⏱️ Your request timed out due to slow internet connection. Please check your WiFi and try again.');
+      } else if (error instanceof Error && error.message.includes('fetch')) {
+        setAnswer('🌐 Network error: Unable to connect to the server. Please check your internet connection and try again.');
+      } else {
+        setAnswer('Sorry, I couldn\'t process your question. Please try again or rephrase it.');
+      }
     } finally {
       setIsProcessingQuery(false);
     }
@@ -707,11 +745,13 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const handleClear = () => {
     setQuery('');
     setAnswer(null);
+    setDebugInfo(null); // Clear debug info
     setSubmittedQuery('');
     setIsProcessingQuery(false);
     setApiSuggestions([]);
     setSelectedIndex(0); // Reset to top of suggestions
     setViewMode('suggestions'); // Switch back to suggestions view
+    setShowScrollToBottom(false); // Reset scroll indicator
     inputRef.current?.focus();
   };
 
@@ -746,12 +786,16 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             role="dialog"
             aria-label="Iris command palette"
             aria-modal="false"
-            initial={{ opacity: 0, x: "-50%" }}
-            animate={{ opacity: 1, x: "-50%" }}
-            exit={{ opacity: 0, x: "-50%" }}
+            initial={{ opacity: 0, x: "-50%", scale: 0.95 }}
+            animate={{ opacity: 1, x: "-50%", scale: 1 }}
+            exit={{ opacity: 0, x: "-50%", scale: 0.95 }}
             transition={{ 
               duration: 0.35, 
-              ease: "easeInOut" // Smooth fade
+              ease: [0.16, 1, 0.3, 1], // Spring-like easing for liquid feel
+              scale: {
+                duration: 0.4,
+                ease: [0.16, 1, 0.3, 1]
+              }
             }}
             onAnimationComplete={() => {
               // Unlock animation state when animation finishes (both open and close)
@@ -763,15 +807,25 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 ? 'top-16 w-[calc(100vw-2rem)] max-h-[calc(100vh-5rem)] overflow-y-auto' 
                 : 'top-[20vh] w-[720px] max-w-[calc(100vw-2rem)]'
               }
-              rounded-2xl border border-white/20 bg-gradient-to-br from-blue-600/25 via-emerald-400/35 to-blue-600/25 backdrop-blur-xl shadow-2xl ring-1 ring-white/10
-              shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.1),inset_0_1px_0_rgba(255,255,255,0.2)]
-              ${isInputFocused ? 'ring-1 ring-sky-400/30' : ''}
+              rounded-2xl 
+              bg-gradient-to-br from-blue-600/[0.12] via-blue-500/[0.15] to-blue-600/[0.12]
+              backdrop-blur-3xl backdrop-saturate-[2.2]
+              border border-white/[0.18] dark:border-white/[0.12]
+              shadow-[0_8px_40px_rgba(37,99,235,0.15),0_0_0_1px_rgba(255,255,255,0.08),inset_0_0_0_1px_rgba(255,255,255,0.08)]
+              before:absolute before:inset-0 before:rounded-2xl
+              before:bg-gradient-to-b before:from-white/[0.15] before:via-blue-400/[0.05] before:to-transparent
+              before:pointer-events-none
+              after:absolute after:inset-0 after:rounded-2xl
+              after:bg-gradient-to-tr after:from-transparent after:via-white/[0.03] after:to-transparent
+              after:pointer-events-none
+              overflow-hidden
+              ${isInputFocused ? 'ring-2 ring-sky-400/20 border-sky-400/30' : ''}
             `}
           >
         {/* Input row */}
-        <div className="relative flex items-center px-3">
+        <div className="relative flex items-center pl-4 pr-[52px] min-h-[56px]">
           {/* Left search icon */}
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none" />
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-black/50 dark:text-white/50 pointer-events-none" />
           
           {/* Search input - always editable with character limit */}
           <input
@@ -786,8 +840,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             maxLength={500}
             className="
               h-14 w-full bg-transparent 
-              pl-10 pr-28 
-              text-[15px] text-white placeholder-white/50 
+              pl-10 pr-16 
+              text-[15px] text-black/90 dark:text-white/90 
+              placeholder-black/40 dark:placeholder-white/40 
               outline-none border-0
             "
             aria-autocomplete="list"
@@ -800,12 +855,17 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             <button
               onClick={handleClear}
               className="
-                absolute right-2 inset-y-2
+                absolute right-2 top-1/2 -translate-y-1/2
                 inline-flex items-center justify-center
                 rounded-full w-9 h-9
                 text-xs font-medium
-                bg-white/10 hover:bg-white/15 text-white
-                transition-colors
+                bg-black/5 dark:bg-white/10 
+                hover:bg-black/10 dark:hover:bg-white/15 
+                text-black/70 dark:text-white/70
+                border border-black/10 dark:border-white/10
+                transition-all duration-200
+                backdrop-blur-sm
+                flex-shrink-0
               "
               aria-label="Clear search"
             >
@@ -816,12 +876,17 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               onClick={handleAskIrisClick}
               disabled={isProcessingQuery}
               className={`
-                absolute right-2 inset-y-2
+                absolute right-2 top-1/2 -translate-y-1/2
                 inline-flex items-center justify-center
                 rounded-full w-9 h-9
-                bg-blue-800/80 hover:bg-blue-800 text-white
-                transition-all duration-300 ease-out
-                hover:scale-110
+                bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600
+                text-white shadow-md
+                border border-white/20
+                transition-all duration-200 ease-out
+                hover:shadow-lg hover:scale-105
+                hover:from-blue-500 hover:via-emerald-400 hover:to-blue-500
+                backdrop-blur-xl
+                flex-shrink-0
                 ${isProcessingQuery ? 'opacity-50 cursor-not-allowed' : ''}
               `}
               aria-label="Submit to Iris"
@@ -836,7 +901,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         </div>
 
         {/* Divider */}
-        <div className="border-t border-white/10 mx-3" />
+        <div className="relative mx-3">
+          <div className="absolute inset-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+          <div className="border-t border-black/5 dark:border-white/10"></div>
+        </div>
 
         {/* Suggestions list - only show in suggestions view */}
         {viewMode === 'suggestions' && (
@@ -881,9 +949,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   aria-selected={isSelected}
                   className={`
                     relative flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-default
-                    transition-colors
+                    transition-all duration-200
                     ${isSelected 
-                      ? 'bg-white/10' 
+                      ? 'bg-white/10 shadow-sm' 
                       : 'hover:bg-green-500/10'
                     }
                     focus:outline-none focus:ring-0 focus:border-0 focus:shadow-none
@@ -895,7 +963,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   }}
                 >
                   {/* Left icon chip */}
-                  <div className="shrink-0 rounded-md bg-white/5 p-1.5 text-white/80">
+                  <div className="shrink-0 rounded-lg bg-black/5 dark:bg-white/5 p-1.5 text-black/60 dark:text-white/60">
                     {isLoading ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
                     ) : (
@@ -907,16 +975,16 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   <div className="flex-1 min-w-0">
                     {isLoading ? (
                       <>
-                        <div className="h-4 w-3/4 bg-white/10 rounded animate-pulse mb-1" />
-                        <div className="h-3 w-1/2 bg-white/5 rounded animate-pulse" />
+                        <div className="h-4 w-3/4 bg-black/10 dark:bg-white/10 rounded animate-pulse mb-1" />
+                        <div className="h-3 w-1/2 bg-black/5 dark:bg-white/5 rounded animate-pulse" />
                       </>
                     ) : (
                       <>
-                        <div className="text-[15px] text-white">
+                        <div className="text-[15px] text-black/90 dark:text-white/90">
                           {truncateText(suggestion.title, 60)}
                         </div>
                         {suggestion.subtitle && (
-                          <div className="text-[13px] text-white/60">
+                          <div className="text-[13px] text-black/50 dark:text-white/50">
                             {truncateText(suggestion.subtitle, 80)}
                           </div>
                         )}
@@ -926,7 +994,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
                   {/* Right enter glyph */}
                   {!isLoading && (
-                    <CornerDownLeft className="w-4 h-4 text-white/40 shrink-0" />
+                    <CornerDownLeft className="w-4 h-4 text-black/30 dark:text-white/30 shrink-0" />
                   )}
                 </div>
               );
@@ -937,23 +1005,226 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
         {/* Answer display - only show in answer view */}
         {viewMode === 'answer' && (
-          <div className="p-4 max-h-64 overflow-y-auto">
-            {answer ? (
-              <div className="text-[14px] text-white/90 leading-relaxed whitespace-pre-wrap">
-                {renderTextWithLinks(answer, router)}
-                {/* Show typing cursor while streaming */}
-                {isProcessingQuery && (
-                  <span className="inline-block w-2 h-4 bg-sky-400 animate-pulse ml-1" />
+          <>
+            <div className="relative">
+              <div 
+                ref={answerRef}
+                onScroll={handleScroll}
+                className={`p-4 overflow-y-auto ${
+                  (showComposer || (uiDirective && !showComposer)) 
+                    ? 'max-h-32 sm:max-h-64' 
+                    : 'max-h-64'
+                }`}
+              >
+                {answer ? (
+                  <div className="text-[14px] text-white/90 leading-relaxed iris-markdown">
+                    <ReactMarkdown
+                      components={{
+                        // Custom link renderer to handle internal/external links
+                        a: ({ href, children, ...props }) => {
+                          const isExternal = href?.startsWith('http');
+                          const isEmail = href?.startsWith('mailto:');
+                          
+                          // Handle email links with envelope icon
+                          if (isEmail && href) {
+                            const email = href.replace(/^mailto:/, '');
+                            const copied = copiedEmail === email;
+                            return (
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  handleEmailCopy(email);
+                                }}
+                                className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors inline-flex items-center gap-1 focus:outline-none"
+                                aria-live="polite"
+                              >
+                                <FaEnvelope className="w-3.5 h-3.5 inline mr-1.5" />
+                                <span>{copied ? 'Copied!' : children}</span>
+                              </button>
+                            );
+                          }
+                          
+                          if (isExternal && href) {
+                            // Detect specific link types to use their actual icons
+                            // Professional comment: Using official brand icons for better UX and consistency
+                            const isLinkedIn = /linkedin\.com/i.test(href);
+                            const isGitHub = /github\.com/i.test(href);
+                            const isCalendar = /calendly|fantastical|schedule/i.test(href);
+                            
+                            // Render icon based on URL type
+                            // Place icon BEFORE text for all contact methods for consistent visual hierarchy
+                            let iconElement;
+                            if (isLinkedIn) {
+                              iconElement = <FaLinkedin className="w-3.5 h-3.5 inline mr-1.5" />;
+                            } else if (isGitHub) {
+                              iconElement = <FaGithub className="w-3.5 h-3.5 inline mr-1.5" />;
+                            } else if (isCalendar) {
+                              iconElement = <SiCalendly className="w-3.5 h-3.5 inline mr-1.5" />;
+                            } else {
+                              iconElement = <ExternalLink className="w-3 h-3 inline ml-1" />;
+                            }
+                            
+                            // Determine if icon should go before or after text
+                            const iconBefore = isLinkedIn || isGitHub || isCalendar;
+                            
+                            return (
+                              <a 
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors inline-flex items-center gap-1"
+                                {...props}
+                              >
+                                {iconBefore ? (
+                                  <>
+                                    {iconElement}
+                                    {children}
+                                  </>
+                                ) : (
+                                  <>
+                                    {children}
+                                    {iconElement}
+                                  </>
+                                )}
+                              </a>
+                            );
+                          }
+                          
+                          // Internal links - use router
+                          return (
+                            <button
+                              onClick={() => href && router.push(href)}
+                              className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors"
+                            >
+                              {children}
+                            </button>
+                          );
+                        },
+                        // Style other markdown elements
+                        h3: ({ ...props }) => <h3 className="text-base font-semibold mb-2 mt-4 first:mt-0" {...props} />,
+                        p: ({ ...props }) => <p className="mb-3 last:mb-0" {...props} />,
+                        ul: ({ ...props }) => <ul className="list-disc ml-4 mb-3 space-y-1" {...props} />,
+                        ol: ({ ...props }) => <ol className="list-decimal ml-4 mb-3 space-y-1" {...props} />,
+                        li: ({ ...props }) => <li className="leading-relaxed" {...props} />,
+                        strong: ({ ...props }) => <strong className="font-semibold" {...props} />,
+                        em: ({ ...props }) => <em className="italic" {...props} />,
+                        hr: ({ ...props }) => <hr className="my-4 border-white/20" {...props} />,
+                        code: (props) => {
+                          const { children, className } = props;
+                          // Check if it's inline by looking at the className
+                          const isInline = className?.includes('language-') ? false : true;
+                          
+                          return isInline ? (
+                            <code className="px-1 py-0.5 bg-white/10 rounded text-xs">{children}</code>
+                          ) : (
+                            <code className="block p-3 bg-white/10 rounded mb-3 text-xs overflow-x-auto">{children}</code>
+                          );
+                        },
+                      }}
+                    >
+                      {renderedAnswer}
+                    </ReactMarkdown>
+                    {/* Show typing cursor while streaming */}
+                    {isProcessingQuery && (
+                      <span className="inline-block w-2 h-4 bg-sky-400 animate-pulse ml-1" />
+                    )}
+                  </div>
+                ) : (
+                  /* Show loading state when no answer yet */
+                  <div className="flex items-center gap-2 text-white/60">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="text-[14px]">Thinking...</span>
+                  </div>
+                )}
+                
+                {/* Debug Panel - Shows when debug info is available */}
+                {debugInfo && (
+                  <div className="mt-4 p-3 bg-black/20 dark:bg-white/10 rounded-lg border border-white/20">
+                    <div className="text-xs text-white/60 font-mono space-y-2">
+                      <div><strong>Intent:</strong> {debugInfo.intent}</div>
+                      {debugInfo.filters && (
+                        <div><strong>Filters:</strong> {JSON.stringify(debugInfo.filters, null, 2)}</div>
+                      )}
+                      {debugInfo.preRouted && (
+                        <div><strong>Pre-routed:</strong> {debugInfo.preRouted}</div>
+                      )}
+                      <div><strong>Results:</strong> {debugInfo.resultsCount} items</div>
+                      {debugInfo.contextItems && debugInfo.contextItems.length > 0 && (
+                        <details className="cursor-pointer">
+                          <summary><strong>Context Items:</strong></summary>
+                          <div className="mt-1 space-y-1 pl-2">
+                            {debugInfo.contextItems.map((item, i) => (
+                              <div key={i}>
+                                {item.type}: {item.title} (score: {item.score?.toFixed(3)})
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                      )}
+                      {debugInfo.planner && (
+                        <details className="cursor-pointer">
+                          <summary><strong>Planner:</strong></summary>
+                          <div className="mt-1 pl-2 space-y-1">
+                            <div>Routed Intent: {debugInfo.planner.routedIntent}</div>
+                            <div>Entity Link Score: {debugInfo.planner.risk.entityLinkScore?.toFixed(3)}</div>
+                            <div>Coverage Ratio: {debugInfo.planner.risk.coverageRatio?.toFixed(3)}</div>
+                            {debugInfo.planner.entities && (
+                              <div>Entities: {JSON.stringify(debugInfo.planner.entities)}</div>
+                            )}
+                          </div>
+                        </details>
+                      )}
+                      <div><strong>Detail Level:</strong> {debugInfo.detailLevel}</div>
+                    </div>
+                  </div>
                 )}
               </div>
-            ) : (
-              /* Show loading state when no answer yet */
-              <div className="flex items-center gap-2 text-white/60">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-[14px]">Thinking...</span>
+
+              {/* Scroll to bottom button */}
+              {showScrollToBottom && (
+                <button
+                  onClick={scrollToBottom}
+                  className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/70 dark:bg-black/30 hover:bg-white/90 dark:hover:bg-black/50 backdrop-blur-xl border border-black/10 dark:border-white/20 flex items-center justify-center text-black/70 dark:text-white/70 transition-all duration-200 hover:scale-105 shadow-sm z-10"
+                  title="Scroll to bottom"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Contact UI: CTA or Composer based on directive */}
+            {/* Only show if not currently processing a new query and directive exists */}
+            {!isProcessingQuery && uiDirective && !showComposer && (
+              // Show CTA button for 'more_detail' with no auto-open
+              uiDirective.reason === 'more_detail' ? (
+                <div className="px-4 pb-4">
+                  <ContactCta 
+                    draft={uiDirective.draft} 
+                    onClick={() => setShowComposer(true)} 
+                  />
+                </div>
+              ) : null
+            )}
+            
+            {/* Message Composer - shown when auto-opened or when CTA clicked */}
+            {/* Only show if not currently processing a new query */}
+            {!isProcessingQuery && showComposer && (
+              <div className="px-4 pb-4">
+                <MessageComposer
+                  origin={
+                    uiDirective?.reason === 'user_request' ? 'iris-explicit' :
+                    uiDirective?.reason === 'insufficient_context' ? 'auto-insufficient' :
+                    'iris-suggested'
+                  }
+                  initialDraft={uiDirective?.draft}
+                  locked={isProcessingQuery}
+                  userQuery={submittedQuery}
+                  onCancel={() => setShowComposer(false)}
+                />
               </div>
             )}
-          </div>
+          </>
         )}
       </motion.div>
 

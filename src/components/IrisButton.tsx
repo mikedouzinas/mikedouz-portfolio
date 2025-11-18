@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 // Final margin: stop the reverse animation this many px short of exact center
 // This allows us to restore the base gradient under a faint green band, masking the handoff
@@ -26,6 +26,12 @@ export default function IrisButton() {
   const isPaletteOpen = useRef(false);
   // Track hover state to switch between default gradient and pure blue
   const isHovering = useRef(false);
+  const [isMac, setIsMac] = useState(true);
+  
+  // Detect OS on mount
+  useEffect(() => {
+    setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.userAgent));
+  }, []);
 
   /**
    * Handle mouse enter event
@@ -395,8 +401,11 @@ export default function IrisButton() {
      * Handles Cmd+K to open palette and start forward animation
      */
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Cmd+K to toggle palette and start appropriate animation
-      if (event.metaKey && event.key === 'k') {
+      // Cmd+K (Mac) or Ctrl+K (Windows/Linux) to toggle palette and start appropriate animation
+      const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
+      const modifierPressed = isMac ? event.metaKey : event.ctrlKey;
+      
+      if (modifierPressed && event.key === 'k') {
         
         if (!isAnimating.current) {
           event.preventDefault();
@@ -474,13 +483,13 @@ export default function IrisButton() {
       {/* Button content - positioned above the glow effect */}
       <span className="text-xs relative z-10 whitespace-nowrap">Questions? Ask Iris</span>
       
-      {/* Keyboard shortcut hint - two separate key tiles for ⌘ and K */}
+      {/* Keyboard shortcut hint - two separate key tiles for modifier and K */}
       {/* Hidden on mobile (sm: breakpoint and below), visible on desktop */}
       {/* Each tile styled like a keyboard key with rounded corners, border, and shadow */}
       <div className="hidden sm:flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity relative z-10">
-        {/* Command key tile */}
-        <span className="inline-flex items-center justify-center min-w-[17px] h-[17px] rounded border border-white/20 bg-white/10 shadow-inner text-[10px] font-medium leading-none">
-          ⌘
+        {/* Modifier key tile - shows ⌘ on Mac, Ctrl on Windows/Linux */}
+        <span className="inline-flex items-center justify-center min-w-[17px] h-[17px] px-1 rounded border border-white/20 bg-white/10 shadow-inner text-[10px] font-medium leading-none">
+          {isMac ? '⌘' : 'Ctrl'}
         </span>
         {/* K key tile */}
         <span className="inline-flex items-center justify-center min-w-[17px] h-[17px] rounded border border-white/20 bg-white/10 shadow-inner text-[10px] font-medium leading-none">
