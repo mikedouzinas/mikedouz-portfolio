@@ -9,6 +9,7 @@ import { OpenAI } from 'openai';
 import { config } from '@/lib/iris/config';
 import { getRecentActivityContext } from '@/lib/iris/github';
 import { generateGuardrailResponse, rewriteToValidQuery } from '@/lib/iris/intents';
+import { logQuery } from '@/lib/iris/analytics';
 
 // Ensure Node.js runtime for streaming support
 export const runtime = 'nodejs';
@@ -1741,6 +1742,8 @@ async function createNoContextResponse(query?: string, intent?: string): Promise
  * Main answer endpoint with intent-based routing, streaming, and error handling
  */
 export async function POST(req: NextRequest) {
+  const startTime = Date.now(); // Track request start for analytics
+
   try {
     // Parse request body
     const body = await req.json();
@@ -1895,6 +1898,23 @@ export async function POST(req: NextRequest) {
         console.log('───────────────────────────────────────────────────────────────');
         console.log('═══════════════════════════════════════════════════════════════\n');
 
+        // Log cached query to analytics (non-blocking)
+        const latencyMs = Date.now() - startTime;
+        logQuery({
+          query,
+          intent,
+          filters: undefined,
+          results_count: cachedData.sources?.length || 0,
+          context_items: undefined,
+          answer_length: cachedData.answer?.length || 0,
+          latency_ms: latencyMs,
+          cached: true,
+          session_id: req.headers.get('x-session-id') || undefined,
+          user_agent: req.headers.get('user-agent') || undefined
+        }).catch(error => {
+          console.warn('[Analytics] Failed to log cached query:', error);
+        });
+
         // Return cached response as stream for consistent client behavior
         const encoder = new TextEncoder();
         const readable = new ReadableStream({
@@ -2030,7 +2050,24 @@ export async function POST(req: NextRequest) {
       console.log(contactMessage);
       console.log('───────────────────────────────────────────────────────────────');
       console.log('═══════════════════════════════════════════════════════════════\n');
-      
+
+      // Log contact query to analytics (non-blocking)
+      const latencyMs = Date.now() - startTime;
+      logQuery({
+        query,
+        intent: 'contact',
+        filters: undefined,
+        results_count: 0,
+        context_items: undefined,
+        answer_length: contactMessage.length,
+        latency_ms: latencyMs,
+        cached: false,
+        session_id: req.headers.get('x-session-id') || undefined,
+        user_agent: req.headers.get('user-agent') || undefined
+      }).catch(error => {
+        console.warn('[Analytics] Failed to log contact query:', error);
+      });
+
       // Return as streaming response
       const encoder = new TextEncoder();
       const readable = new ReadableStream({
@@ -2643,6 +2680,32 @@ ${enhancedContext}`;
             // Send completion marker
             controller.enqueue(encoder.encode('data: [DONE]\n\n'));
             controller.close();
+
+            // Log query to analytics (non-blocking)
+            const latencyMs = Date.now() - startTime;
+            logQuery({
+              query,
+              intent,
+              filters: filters as Record<string, unknown> | undefined,
+              results_count: results.length,
+              context_items: results.slice(0, 10).map(r => ({
+                type: ('kind' in r.doc ? r.doc.kind : 'unknown') || 'unknown',
+                title: 'title' in r.doc && r.doc.title ? r.doc.title :
+                       'role' in r.doc && r.doc.role ? r.doc.role :
+                       'school' in r.doc && r.doc.school ? r.doc.school :
+                       'value' in r.doc && r.doc.value ? r.doc.value :
+                       'interest' in r.doc && r.doc.interest ? r.doc.interest :
+                       r.doc.id || 'unknown',
+                score: r.score
+              })),
+              answer_length: fullAnswer.length,
+              latency_ms: latencyMs,
+              cached: false,
+              session_id: req.headers.get('x-session-id') || undefined,
+              user_agent: req.headers.get('user-agent') || undefined
+            }).catch(error => {
+              console.warn('[Analytics] Failed to log query:', error);
+            });
 
             // Cache the complete answer for future requests
             try {
