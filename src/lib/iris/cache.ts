@@ -201,9 +201,10 @@ class UpstashCache implements IrisCache {
     }
 
     try {
-      const redis = await this.getRedis() as { setex: (key: string, ttl: number, value: string) => Promise<unknown> };
+      // Upstash Redis REST API uses set() with expiration option, not setex()
+      const redis = await this.getRedis() as { set: (key: string, value: string, options?: { ex?: number }) => Promise<unknown> };
       const key = normalizeQuery(query);
-      await redis.setex(`iris:answer:${key}`, ttlSec, answer);
+      await redis.set(`iris:answer:${key}`, answer, { ex: ttlSec });
     } catch (error) {
       console.warn('[UpstashCache] Set failed:', error);
       // Non-critical error, continue without caching
