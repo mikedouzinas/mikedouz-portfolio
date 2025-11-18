@@ -231,18 +231,24 @@ npm run build:embeddings
 #### Environment Variables
 ```bash
 # Required for Iris to function
-OPENAI_API_KEY=sk-...          # OpenAI API key for embeddings & chat
+OPENAI_API_KEY=sk-...                    # OpenAI API key for embeddings & chat
 
-# Required for Ask Mike inbox feature
-RESEND_API_KEY=re_...          # Email notifications via Resend
-ADMIN_API_KEY=your_secret_key  # Admin authentication for inbox
-SUPABASE_URL=https://...       # Supabase project URL
-SUPABASE_SERVICE_ROLE_KEY=...  # Service role key (bypasses RLS)
-INBOX_RECIPIENT_EMAIL=mike@... # Optional, defaults to mike@douzinas.com
+# Required for production caching (optional for local dev)
+UPSTASH_REDIS_REST_URL=https://...       # Upstash Redis URL
+UPSTASH_REDIS_REST_TOKEN=...             # Upstash Redis token
+
+# Required for analytics and inbox (optional for basic Iris functionality)
+NEXT_PUBLIC_SUPABASE_URL=https://...     # Supabase project URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...        # Supabase anon key
+SUPABASE_SERVICE_ROLE_KEY=...            # Service role key (server-side only)
 
 # Optional: Enhances responses with live activity
-GITHUB_TOKEN=ghp_...           # GitHub PAT for commit history
+GITHUB_TOKEN=ghp_...                     # GitHub PAT for commit history
 ```
+
+> **📖 Complete Setup Guide**: See [SETUP.md](./SETUP.md) for detailed instructions on obtaining API keys and configuring each service.
+>
+> **🚀 Quick Vercel Deploy**: See [VERCEL_SETUP.md](./VERCEL_SETUP.md) for production deployment checklist.
 
 #### Model Configuration (`src/lib/iris/config.ts`)
 ```typescript
@@ -380,12 +386,12 @@ derived/
 
 ### Prerequisites
 - Node.js 18+ and npm/pnpm
-- OpenAI API key (required for Iris)
-- Supabase account (required for inbox feature)
-- Resend account (required for email notifications)
-- GitHub token (optional, for live activity)
+- OpenAI account (required - for Iris AI and embeddings)
+- Upstash account (optional - for response caching, ~50-70% cost reduction)
+- Supabase account (optional - for analytics and inbox features)
+- GitHub token (optional - for live activity context in responses)
 
-### Setup
+### Quick Start
 
 1. **Clone the repository**
    ```bash
@@ -401,30 +407,42 @@ derived/
 3. **Configure environment variables**
    ```bash
    cp .env.example .env.local
-   # Edit .env.local with your API keys
+   # Edit .env.local with your API keys (see SETUP.md for details)
    ```
 
-4. **Set up Supabase** (for inbox feature)
+4. **Set up services** (see [SETUP.md](./SETUP.md) for detailed instructions)
+   - **OpenAI**: Get API key from platform.openai.com
+   - **Upstash Redis** (optional): Create free database for caching
+   - **Supabase** (optional): Set up for analytics and inbox
+
+5. **Set up Supabase tables** (if using analytics/inbox)
    ```bash
-   # Create Supabase project and run migrations
-   supabase db push
-   # Or manually run: supabase/migrations/20251027_inbox.sql
+   # In Supabase SQL Editor, run:
+   # 1. sql/iris_analytics.sql (analytics tables)
+   # 2. supabase/migrations/20251027_inbox.sql (inbox table)
+   # 3. supabase/migrations/20251027_inbox_add_context.sql (inbox context)
    ```
 
-5. **Build embeddings** (required for Iris)
+6. **Build knowledge base** (required for Iris)
    ```bash
-   npm run build:embeddings
+   npm run kb:rebuild
+   # This runs: build:embeddings + build:typeahead
    ```
 
-6. **Run development server**
+7. **Run development server**
    ```bash
    npm run dev
    ```
 
-7. **Open in browser**
+8. **Open in browser**
    ```
    http://localhost:3000
+   # Press ⌘K to open Iris
    ```
+
+> **📘 Need Help?** See comprehensive setup guides:
+> - [SETUP.md](./SETUP.md) - Detailed setup for all services
+> - [VERCEL_SETUP.md](./VERCEL_SETUP.md) - Production deployment guide
 
 ### Scripts
 
