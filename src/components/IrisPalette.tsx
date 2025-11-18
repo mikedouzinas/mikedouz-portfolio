@@ -1219,7 +1219,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                href && router.push(href);
+                                if (href) router.push(href);
                               }}
                               className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors cursor-pointer"
                             >

@@ -32,7 +32,7 @@ type Intent =
  * Structured filter for precise KB queries
  * Enables queries like "all Python projects" or "experiences from 2024"
  */
-interface QueryFilter {
+export interface QueryFilter {
   type?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'>;
   // Field-based filters
   skills?: string[];          // For any item with skills field
