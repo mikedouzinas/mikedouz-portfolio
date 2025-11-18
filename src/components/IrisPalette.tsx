@@ -92,12 +92,20 @@ const CONTACT_LABEL_REGEX = /(LinkedIn|GitHub|Schedule a chat|Cal|Calendar):\s*(
 const RAW_URL_REGEX = /(?<!\]\()(?<!href=")(https?:\/\/[^\s)<>]+)/gi;
 const EMAIL_REGEX_INLINE = /(?<!mailto:)([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi;
 
+/**
+ * Remove trailing punctuation from URLs
+ * Handles periods, commas, semicolons, etc. at end of sentences
+ */
+function cleanUrl(url: string): string {
+  return url.replace(/[.,;!?]+$/, '');
+}
+
 function autoLinkText(input: string): string {
   if (!input) return '';
   return input
-    .replace(CONTACT_LABEL_REGEX, (_match, label, url) => `[${label}](${url})`)
+    .replace(CONTACT_LABEL_REGEX, (_match, label, url) => `[${label}](${cleanUrl(url)})`)
     .replace(EMAIL_REGEX_INLINE, (match) => `[${match}](mailto:${match})`)
-    .replace(RAW_URL_REGEX, (match) => `[${match}](${match})`);
+    .replace(RAW_URL_REGEX, (match) => `[${cleanUrl(match)}](${cleanUrl(match)})`);
 }
 
 export default function IrisPalette({ open: controlledOpen, onOpenChange }: IrisPaletteProps) {
@@ -1094,8 +1102,13 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                           // Internal links - use router
                           return (
                             <button
-                              onClick={() => href && router.push(href)}
-                              className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors"
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                href && router.push(href);
+                              }}
+                              className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors cursor-pointer"
                             >
                               {children}
                             </button>
