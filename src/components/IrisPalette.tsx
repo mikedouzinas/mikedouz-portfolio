@@ -587,8 +587,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   /**
    * Submit a search query to get an answer from the API with real streaming
    * Immediately switches to answer view with loading state and streams text from OpenAI
+   * Supports conversation context for follow-up queries
    */
-  const handleSubmitQuery = async (q: string) => {
+  const handleSubmitQuery = async (q: string, skipClassification?: boolean, preFilters?: Record<string, unknown>, preIntent?: string) => {
     // Input validation - max 500 characters
     if (!q.trim() || isProcessingQuery) return;
     if (q.length > 500) {
@@ -596,7 +597,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setViewMode('answer');
       return;
     }
-    
+
 
     // Immediately switch to answer view with loading state
     setIsProcessingQuery(true);
@@ -605,7 +606,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     setViewMode('answer'); // Switch immediately to answer view
     setApiSuggestions([]);
     setShowScrollToBottom(false); // Reset scroll indicator
-    
+    setQuickActions([]); // Clear previous quick actions
+
     try {
       const signals = getSignalSummary();
 
@@ -615,8 +617,33 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
+      // Build query params
+      const params = new URLSearchParams({
+        q: q,
+        signals: JSON.stringify(signals),
+      });
+
+      // Pass conversation context if available
+      if (conversationHistory.length > 0) {
+        const lastTurn = conversationHistory[conversationHistory.length - 1];
+        params.set('previousQuery', lastTurn.query);
+        params.set('previousAnswer', lastTurn.answer);
+        params.set('previousIntent', lastTurn.intent);
+      }
+
+      // Pass skip classification flag if set
+      if (skipClassification && preIntent) {
+        params.set('skipClassification', 'true');
+        params.set('intent', preIntent);
+      }
+
+      // Pass pre-filters if provided
+      if (preFilters) {
+        params.set('filters', JSON.stringify(preFilters));
+      }
+
       const response = await fetch(
-        `/api/iris/answer?q=${encodeURIComponent(q)}&signals=${encodeURIComponent(JSON.stringify(signals))}`,
+        `/api/iris/answer?${params.toString()}`,
         { signal: controller.signal }
       );
 
@@ -647,22 +674,24 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
         let accumulatedAnswer = '';
-        
+        let finalIntent = '';
+        let capturedQuickActions: QuickAction[] = [];
+
         if (reader) {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            
+
             const chunk = decoder.decode(value);
             const lines = chunk.split('\n');
-            
+
             for (const line of lines) {
               if (line.startsWith('data: ')) {
                 const data = line.slice(6);
                 if (data === '[DONE]') {
                   break;
                 }
-                
+
                 try {
                   const parsed = JSON.parse(data);
                   if (parsed.text) {
@@ -671,6 +700,14 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   } else if (parsed.debug) {
                     // Capture debug information
                     setDebugInfo(parsed.debug);
+                    // Capture intent for conversation history
+                    if (parsed.debug.intent) {
+                      finalIntent = parsed.debug.intent;
+                    }
+                  } else if (parsed.quickActions) {
+                    // Capture quick actions from stream
+                    capturedQuickActions = parsed.quickActions;
+                    setQuickActions(capturedQuickActions);
                   }
                 } catch {
                   // Skip invalid JSON - silently ignore parse errors
@@ -678,6 +715,16 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               }
             }
           }
+        }
+
+        // After streaming completes, add this exchange to conversation history
+        if (accumulatedAnswer) {
+          setConversationHistory(prev => [...prev, {
+            query: q,
+            answer: accumulatedAnswer,
+            intent: finalIntent,
+            timestamp: Date.now(),
+          }]);
         }
       } else {
         // Fallback JSON response
@@ -775,6 +822,38 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     setConversationHistory([]); // Clear conversation history
     setQuickActions([]); // Clear quick actions
     inputRef.current?.focus();
+  };
+
+  /**
+   * Handle quick action click
+   * Different behavior based on action type
+   */
+  const handleQuickActionClick = (action: QuickAction, customQuery?: string) => {
+    // For message_mike action, open the composer
+    if (action.type === 'message_mike') {
+      setShowComposer(true);
+      return;
+    }
+
+    // For contact_link actions, they're handled by QuickActions component
+    // (opens link or copies email)
+    if (action.type === 'contact_link') {
+      // No additional handling needed - QuickActions handles this
+      return;
+    }
+
+    // For all other actions, submit a query
+    const queryToSubmit = customQuery || action.query || action.label;
+
+    // Determine if we should skip classification
+    const skipClassification = !!action.intent;
+
+    handleSubmitQuery(
+      queryToSubmit,
+      skipClassification,
+      action.filters,
+      action.intent
+    );
   };
 
   /**
@@ -1219,6 +1298,17 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 </button>
               )}
             </div>
+
+            {/* Quick Actions - show after answer completes */}
+            {!isProcessingQuery && quickActions.length > 0 && (
+              <div className="px-4">
+                <QuickActions
+                  actions={quickActions}
+                  onActionClick={handleQuickActionClick}
+                  disabled={isProcessingQuery}
+                />
+              </div>
+            )}
 
             {/* Contact UI: CTA or Composer based on directive */}
             {/* Only show if not currently processing a new query and directive exists */}

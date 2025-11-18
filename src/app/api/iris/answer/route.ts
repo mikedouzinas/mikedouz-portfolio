@@ -10,6 +10,7 @@ import { config } from '@/lib/iris/config';
 import { getRecentActivityContext } from '@/lib/iris/github';
 import { generateGuardrailResponse, rewriteToValidQuery } from '@/lib/iris/intents';
 import { logQuery } from '@/lib/iris/analytics';
+import { generateQuickActions } from '@/lib/iris/quickActions';
 
 // Ensure Node.js runtime for streaming support
 export const runtime = 'nodejs';
@@ -2747,6 +2748,34 @@ ${enhancedContext}`;
             console.log(fullAnswer);
             console.log('───────────────────────────────────────────────────────────────');
             console.log('═══════════════════════════════════════════════════════════════\n');
+
+            // Generate quick actions after answer is complete
+            try {
+              const quickActions = generateQuickActions({
+                query,
+                intent,
+                filters,
+                results,
+                fullAnswer,
+                allItems: await getAllItems(),
+              });
+
+              // Send quick actions to client
+              if (quickActions.length > 0) {
+                const quickActionsData = `data: ${JSON.stringify({ quickActions })}\n\n`;
+                controller.enqueue(encoder.encode(quickActionsData));
+
+                console.log('\n═══════════════════════════════════════════════════════════════');
+                console.log('💡 GENERATED QUICK ACTIONS');
+                console.log('═══════════════════════════════════════════════════════════════');
+                console.log(`Count: ${quickActions.length}`);
+                console.log('Actions:', JSON.stringify(quickActions, null, 2));
+                console.log('═══════════════════════════════════════════════════════════════\n');
+              }
+            } catch (error) {
+              console.warn('[Answer API] Failed to generate quick actions:', error);
+              // Non-critical error, continue without quick actions
+            }
 
             // Send completion marker
             controller.enqueue(encoder.encode('data: [DONE]\n\n'));
