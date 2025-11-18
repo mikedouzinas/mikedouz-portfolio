@@ -1,5 +1,5 @@
 -- Iris Analytics Schema for Supabase
--- Run this in your Supabase SQL Editor to set up query tracking
+-- Complete replacement script with trigger to maintain created_at_date
 
 -- Table to track all Iris queries
 CREATE TABLE IF NOT EXISTS iris_queries (
@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS iris_queries (
   rating INTEGER CHECK (rating >= 1 AND rating <= 5),
   feedback TEXT,
 
-  -- Computed column for date-based queries
-  created_at_date DATE GENERATED ALWAYS AS (created_at::date) STORED
+  -- created_at_date will be a normal column maintained by trigger
+  created_at_date DATE
 );
 
 -- Indexes for common query patterns
@@ -51,6 +51,26 @@ CREATE TABLE IF NOT EXISTS iris_quick_actions (
 
 CREATE INDEX IF NOT EXISTS idx_iris_quick_actions_query_id ON iris_quick_actions(query_id);
 CREATE INDEX IF NOT EXISTS idx_iris_quick_actions_clicked ON iris_quick_actions(clicked);
+
+-- Trigger function to keep created_at_date in sync with created_at
+CREATE OR REPLACE FUNCTION iris_set_created_at_date()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  -- On INSERT or UPDATE, set created_at_date from created_at
+  NEW.created_at_date := NEW.created_at::date;
+  RETURN NEW;
+END;
+$$;
+
+-- Install trigger (drop existing to ensure idempotence)
+DROP TRIGGER IF EXISTS iris_set_created_at_date_trig ON iris_queries;
+
+CREATE TRIGGER iris_set_created_at_date_trig
+  BEFORE INSERT OR UPDATE ON iris_queries
+  FOR EACH ROW
+  EXECUTE FUNCTION iris_set_created_at_date();
 
 -- Optional: Enable Row Level Security (RLS) for public access control
 -- ALTER TABLE iris_queries ENABLE ROW LEVEL SECURITY;
@@ -123,7 +143,7 @@ SELECT
   ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY latency_ms)::numeric, 2) as p50_latency,
   ROUND(PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY latency_ms)::numeric, 2) as p95_latency,
   ROUND(PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY latency_ms)::numeric, 2) as p99_latency,
-  COUNT(CASE WHEN cached THEN 1 END)::float / COUNT(*)::float as cache_hit_rate
+  COUNT(CASE WHEN cached THEN 1 END)::float / NULLIF(COUNT(*),0)::float as cache_hit_rate
 FROM iris_queries
 WHERE created_at > NOW() - INTERVAL '7 days'
 GROUP BY DATE_TRUNC('hour', created_at)
@@ -140,3 +160,5 @@ COMMENT ON COLUMN iris_queries.latency_ms IS 'Total query processing time in mil
 COMMENT ON COLUMN iris_queries.cached IS 'Whether answer was served from cache';
 COMMENT ON COLUMN iris_queries.session_id IS 'User session identifier for tracking conversations';
 COMMENT ON COLUMN iris_queries.rating IS 'User feedback rating (1-5 stars)';
+
+-- End of script
