@@ -178,11 +178,6 @@ function needsComparisonQuery(query: string): boolean {
   return COMPARISON_REGEX.test(query);
 }
 
-function heuristicallyAboutMike(query: string): boolean {
-  const lower = query.toLowerCase();
-  return /\bmike\b|\bmikes\b|\bmike's\b|\bmichael\b|\bveson\b|\biris\b|\byou\b|\byour\b|\byours\b|\byourself\b/.test(lower);
-}
-
 const PROMPT_INJECTION_REGEX = /(ignore|forget|bypass|override)\b[^.]*\b(instruction|rule|system prompt)/i;
 const OFF_TOPIC_PATTERNS = [
   /\bcapital of\b/i,
