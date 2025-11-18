@@ -1,7 +1,13 @@
 # Iris System Evaluation & Improvement Proposal
 
+> ⚠️ **NOTE**: This evaluation assumes enterprise-scale requirements (10k+ queries/day, multi-tenancy, etc.)
+>
+> 👉 **For a realistic personal portfolio evaluation, see [`IRIS_EVALUATION_REALISTIC.md`](./IRIS_EVALUATION_REALISTIC.md)** 👈
+>
+> The realistic version focuses on question variety, edge cases, and maintainability for a single-developer portfolio—not enterprise concerns.
+
 **Date**: 2025-11-18
-**Status**: Current implementation analysis
+**Context**: Enterprise-scale RAG system analysis
 **Total LOC**: ~4,559 lines across core system
 
 ---
