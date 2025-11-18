@@ -159,6 +159,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     timestamp: number;
   }>>([]);
   const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
+  const [currentQueryId, setCurrentQueryId] = useState<string | null>(null);
 
   // Track UI directives from streaming
   const uiDirective = useUiDirectives(answer || '');
@@ -607,6 +608,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     setApiSuggestions([]);
     setShowScrollToBottom(false); // Reset scroll indicator
     setQuickActions([]); // Clear previous quick actions
+    setCurrentQueryId(null); // Clear previous query ID
 
     try {
       const signals = getSignalSummary();
@@ -708,6 +710,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     // Capture quick actions from stream
                     capturedQuickActions = parsed.quickActions;
                     setQuickActions(capturedQuickActions);
+                  } else if (parsed.queryId) {
+                    // Capture query ID for analytics tracking
+                    setCurrentQueryId(parsed.queryId);
                   }
                 } catch {
                   // Skip invalid JSON - silently ignore parse errors
@@ -827,8 +832,23 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   /**
    * Handle quick action click
    * Different behavior based on action type
+   * Records analytics for tracking which actions are useful
    */
   const handleQuickActionClick = (action: QuickAction, customQuery?: string) => {
+    // Record analytics for this click (non-blocking)
+    if (currentQueryId) {
+      fetch('/api/iris/analytics/quick-action-click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          queryId: currentQueryId,
+          suggestion: action.label,
+        }),
+      }).catch(error => {
+        console.warn('[IrisPalette] Failed to record quick action click:', error);
+      });
+    }
+
     // For message_mike action, open the composer
     if (action.type === 'message_mike') {
       setShowComposer(true);

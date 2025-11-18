@@ -9,7 +9,7 @@ import { OpenAI } from 'openai';
 import { config } from '@/lib/iris/config';
 import { getRecentActivityContext } from '@/lib/iris/github';
 import { generateGuardrailResponse, rewriteToValidQuery } from '@/lib/iris/intents';
-import { logQuery } from '@/lib/iris/analytics';
+import { logQuery, logQuickAction } from '@/lib/iris/analytics';
 import { generateQuickActions } from '@/lib/iris/quickActions';
 
 // Ensure Node.js runtime for streaming support
@@ -2750,8 +2750,9 @@ ${enhancedContext}`;
             console.log('═══════════════════════════════════════════════════════════════\n');
 
             // Generate quick actions after answer is complete
+            let generatedQuickActions: ReturnType<typeof generateQuickActions> = [];
             try {
-              const quickActions = generateQuickActions({
+              generatedQuickActions = generateQuickActions({
                 query,
                 intent,
                 filters,
@@ -2761,15 +2762,15 @@ ${enhancedContext}`;
               });
 
               // Send quick actions to client
-              if (quickActions.length > 0) {
-                const quickActionsData = `data: ${JSON.stringify({ quickActions })}\n\n`;
+              if (generatedQuickActions.length > 0) {
+                const quickActionsData = `data: ${JSON.stringify({ quickActions: generatedQuickActions })}\n\n`;
                 controller.enqueue(encoder.encode(quickActionsData));
 
                 console.log('\n═══════════════════════════════════════════════════════════════');
                 console.log('💡 GENERATED QUICK ACTIONS');
                 console.log('═══════════════════════════════════════════════════════════════');
-                console.log(`Count: ${quickActions.length}`);
-                console.log('Actions:', JSON.stringify(quickActions, null, 2));
+                console.log(`Count: ${generatedQuickActions.length}`);
+                console.log('Actions:', JSON.stringify(generatedQuickActions, null, 2));
                 console.log('═══════════════════════════════════════════════════════════════\n');
               }
             } catch (error) {
@@ -2777,13 +2778,9 @@ ${enhancedContext}`;
               // Non-critical error, continue without quick actions
             }
 
-            // Send completion marker
-            controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-            controller.close();
-
-            // Log query to analytics (non-blocking)
+            // Log query to analytics BEFORE closing stream (capture query ID for quick actions)
             const latencyMs = Date.now() - startTime;
-            logQuery({
+            const queryId = await logQuery({
               query,
               intent,
               filters: filters as Record<string, unknown> | undefined,
@@ -2805,7 +2802,28 @@ ${enhancedContext}`;
               user_agent: req.headers.get('user-agent') || undefined
             }).catch(error => {
               console.warn('[Analytics] Failed to log query:', error);
+              return null;
             });
+
+            // Log quick actions if query was logged successfully
+            if (queryId && generatedQuickActions.length > 0) {
+              for (const action of generatedQuickActions) {
+                logQuickAction({
+                  query_id: queryId,
+                  suggestion: action.label,
+                }).catch(error => {
+                  console.warn('[Analytics] Failed to log quick action:', error);
+                });
+              }
+
+              // Send query ID to client for tracking clicks
+              const queryIdData = `data: ${JSON.stringify({ queryId })}\n\n`;
+              controller.enqueue(encoder.encode(queryIdData));
+            }
+
+            // Send completion marker
+            controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+            controller.close();
 
             // Cache the complete answer for future requests
             try {
