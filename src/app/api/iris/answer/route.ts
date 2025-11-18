@@ -1800,6 +1800,15 @@ export async function POST(req: NextRequest) {
     const rawQuery = body.query || body.q;
     const signalsParam = body.signals || '{}';
 
+    // Extract conversation context for follow-ups
+    const previousQuery = body.previousQuery;
+    const inConversation = !!previousQuery; // In conversation if there's previous context
+
+    // Extract skip classification flag and pre-set values
+    const skipClassification = body.skipClassification === true;
+    const presetIntent = body.intent;
+    const presetFilters = body.filters;
+
     // Validate query parameter
     if (!rawQuery || typeof rawQuery !== 'string' || !rawQuery.trim()) {
       return NextResponse.json(
@@ -1859,28 +1868,45 @@ export async function POST(req: NextRequest) {
 
     // Check pre-routing first (fast pattern matching)
     const preRouted = config.features?.evaluativeRoutingV2 ? preRoute(query) : null;
-    
+
     // Detect intent for optimized field filtering using LLM-based classification
-    const intentResult = await detectIntent(query, openai);
-    let { intent } = intentResult;
-    let { filters } = intentResult;
+    // Skip classification if we're using preset values from quick actions
+    let intent: Intent;
+    let filters: QueryFilter | undefined;
+    let intentResult: IntentResult | null = null;
     let aliasIndex: Array<{ id: string; type: string; name: string; aliases: string[] }> = [];
+
+    if (skipClassification && presetIntent) {
+      // Use preset values from quick actions (skip LLM classification)
+      intent = presetIntent as Intent;
+      filters = presetFilters;
+    } else {
+      // Normal intent detection
+      intentResult = await detectIntent(query, openai);
+      intent = intentResult.intent;
+      filters = intentResult.filters;
+    }
 
     if (detectPromptInjection(query)) {
       return streamTextResponse("I have to stick with Mike-focused instructions, but I'm happy to help with his projects, experience, or contact details.");
     }
 
-    // Build context entities from KB for off-topic detection
-    // This allows queries about companies, projects, skills in Mike's context
-    const allItems = await getAllItems();
-    const contextEntities = buildContextEntities(allItems);
+    // Skip off-topic detection when in active conversation
+    // Rationale: Follow-up questions like "what about dates?" won't mention entities,
+    // but they're contextually valid within an ongoing conversation thread
+    if (!inConversation) {
+      // Build context entities from KB for off-topic detection
+      // This allows queries about companies, projects, skills in Mike's context
+      const allItems = await getAllItems();
+      const contextEntities = buildContextEntities(allItems);
 
-    const offScope =
-      intentResult.about_mike === false ||
-      (intentResult.about_mike !== true && isClearlyOffTopic(query, contextEntities));
+      const offScope =
+        intentResult?.about_mike === false ||
+        (intentResult?.about_mike !== true && isClearlyOffTopic(query, contextEntities));
 
-    if (offScope) {
-      return buildGuardrailResponse(query);
+      if (offScope) {
+        return buildGuardrailResponse(query);
+      }
     }
 
     // Merge heuristic timeframe hints whenever the classifier missed them.
@@ -2915,11 +2941,31 @@ export async function GET(request: Request) {
     const query = searchParams.get('q') || searchParams.get('query') || '';
     const signals = searchParams.get('signals') || '{}';
 
+    // Forward conversation context for follow-ups
+    const previousQuery = searchParams.get('previousQuery') || undefined;
+    const previousAnswer = searchParams.get('previousAnswer') || undefined;
+    const previousIntent = searchParams.get('previousIntent') || undefined;
+
+    // Forward skip classification flag and pre-set intent/filters
+    const skipClassification = searchParams.get('skipClassification') === 'true';
+    const intent = searchParams.get('intent') || undefined;
+    const filtersParam = searchParams.get('filters');
+    const filters = filtersParam ? JSON.parse(filtersParam) : undefined;
+
     // Create a new Request object with POST method and JSON body
     const postRequest = new NextRequest(request.url, {
       method: 'POST',
       headers: request.headers,
-      body: JSON.stringify({ query, signals })
+      body: JSON.stringify({
+        query,
+        signals,
+        previousQuery,
+        previousAnswer,
+        previousIntent,
+        skipClassification,
+        intent,
+        filters
+      })
     });
 
     // Forward to POST handler
