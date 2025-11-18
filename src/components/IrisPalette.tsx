@@ -25,6 +25,7 @@ import { useUiDirectives, defaultOpenFor, stripUiDirectives } from './iris/useUi
 import ContactCta from './iris/ContactCta';
 import MessageComposer from './iris/MessageComposer';
 import QuickActions, { type QuickAction } from './iris/QuickActions';
+import type { QueryFilter } from '@/app/api/iris/answer/route';
 
 /**
  * Static suggestion configuration
@@ -156,9 +157,11 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     query: string;
     answer: string;
     intent: string;
+    filters?: QueryFilter;
+    depth: number; // Track how many follow-ups deep we are
     timestamp: number;
+    quickActions: QuickAction[]; // Track actions for each exchange
   }>>([]);
-  const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
   const [currentQueryId, setCurrentQueryId] = useState<string | null>(null);
 
   // Track UI directives from streaming
@@ -166,8 +169,130 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
   const copiedTimer = useRef<NodeJS.Timeout | null>(null);
 
+  // Track last seen directive to prevent auto-opening composer multiple times
+  const lastDirectiveRef = useRef<string | null>(null);
+
   const cleanedAnswer = answer ? stripUiDirectives(answer) : '';
   const renderedAnswer = useMemo(() => autoLinkText(cleanedAnswer), [cleanedAnswer]);
+
+  /**
+   * Helper function to render markdown content
+   * Reused for both conversation history and current answer
+   */
+  const renderMarkdownContent = useCallback((content: string, isStreaming = false) => (
+    <div className="text-[14px] text-white/90 leading-relaxed iris-markdown">
+      <ReactMarkdown
+        components={{
+          // Custom link renderer to handle internal/external links
+          a: ({ href, children, ...props }) => {
+            const isExternal = href?.startsWith('http');
+            const isEmail = href?.startsWith('mailto:');
+
+            // Handle email links with envelope icon
+            if (isEmail && href) {
+              const email = href.replace(/^mailto:/, '');
+              const copied = copiedEmail === email;
+              return (
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    handleEmailCopy(email);
+                  }}
+                  className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors inline-flex items-center gap-1 focus:outline-none"
+                  aria-live="polite"
+                >
+                  <FaEnvelope className="w-3.5 h-3.5 inline mr-1.5" />
+                  <span>{copied ? 'Copied!' : children}</span>
+                </button>
+              );
+            }
+
+            if (isExternal && href) {
+              const isLinkedIn = /linkedin\.com/i.test(href);
+              const isGitHub = /github\.com/i.test(href);
+              const isCalendar = /calendly|fantastical|schedule/i.test(href);
+
+              let iconElement;
+              if (isLinkedIn) {
+                iconElement = <FaLinkedIn className="w-3.5 h-3.5 inline mr-1.5" />;
+              } else if (isGitHub) {
+                iconElement = <FaGithub className="w-3.5 h-3.5 inline mr-1.5" />;
+              } else if (isCalendar) {
+                iconElement = <SiCalendly className="w-3.5 h-3.5 inline mr-1.5" />;
+              } else {
+                iconElement = <ExternalLink className="w-3 h-3 inline ml-1" />;
+              }
+
+              const iconBefore = isLinkedIn || isGitHub || isCalendar;
+
+              return (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors inline-flex items-center gap-1"
+                  {...props}
+                >
+                  {iconBefore ? (
+                    <>
+                      {iconElement}
+                      {children}
+                    </>
+                  ) : (
+                    <>
+                      {children}
+                      {iconElement}
+                    </>
+                  )}
+                </a>
+              );
+            }
+
+            // Internal links - use router
+            return (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (href) router.push(href);
+                }}
+                className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors cursor-pointer"
+              >
+                {children}
+              </button>
+            );
+          },
+          // Style other markdown elements
+          h3: ({ ...props }) => <h3 className="text-base font-semibold mb-2 mt-4 first:mt-0" {...props} />,
+          p: ({ ...props }) => <p className="mb-3 last:mb-0" {...props} />,
+          ul: ({ ...props }) => <ul className="list-disc ml-4 mb-3 space-y-1" {...props} />,
+          ol: ({ ...props }) => <ol className="list-decimal ml-4 mb-3 space-y-1" {...props} />,
+          li: ({ ...props }) => <li className="leading-relaxed" {...props} />,
+          strong: ({ ...props }) => <strong className="font-semibold" {...props} />,
+          em: ({ ...props }) => <em className="italic" {...props} />,
+          hr: ({ ...props }) => <hr className="my-4 border-white/20" {...props} />,
+          code: (props) => {
+            const { children, className } = props;
+            const isInline = className?.includes('language-') ? false : true;
+
+            return isInline ? (
+              <code className="px-1 py-0.5 bg-white/10 rounded text-xs">{children}</code>
+            ) : (
+              <code className="block p-3 bg-white/10 rounded mb-3 text-xs overflow-x-auto">{children}</code>
+            );
+          },
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+      {/* Show typing cursor while streaming */}
+      {isStreaming && (
+        <span className="inline-block w-2 h-4 bg-sky-400 animate-pulse ml-1" />
+      )}
+    </div>
+  ), [copiedEmail, handleEmailCopy, router]);
 
   const handleEmailCopy = useCallback(async (email: string) => {
     try {
@@ -192,17 +317,23 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   /**
    * Auto-open composer when directive is detected
    * Based on reason and open behavior
-   * Reset composer state when switching to new queries
+   * Uses ref to prevent re-opening the same directive multiple times
    */
   useEffect(() => {
     if (!uiDirective) {
       setShowComposer(false); // Reset composer when directive clears
+      lastDirectiveRef.current = null;
       return;
     }
 
+    // Create unique ID from directive to detect if it's new
+    const directiveId = `${uiDirective.reason}-${uiDirective.draft?.substring(0, 30)}`;
+
+    // Only auto-open if it's a new directive we haven't seen before
     const shouldAutoOpen = (uiDirective.open ?? defaultOpenFor(uiDirective.reason)) === 'auto';
-    if (shouldAutoOpen) {
+    if (shouldAutoOpen && directiveId !== lastDirectiveRef.current) {
       setShowComposer(true);
+      lastDirectiveRef.current = directiveId;
     }
   }, [uiDirective]);
 
@@ -326,8 +457,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setAnswer(null);
       setIsProcessingQuery(false);
       setSubmittedQuery('');
-      setConversationHistory([]); // Clear conversation history
-      setQuickActions([]); // Clear quick actions
+      setConversationHistory([]); // Clear conversation history (includes quick actions)
+      setCurrentQueryId(null); // Clear query ID
     }
   }, [isAnimating, onOpenChange]);
 
@@ -599,6 +730,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       return;
     }
 
+    // Calculate current depth from conversation history
+    const currentDepth = conversationHistory.length > 0
+      ? conversationHistory[conversationHistory.length - 1].depth + 1
+      : 0;
 
     // Immediately switch to answer view with loading state
     setIsProcessingQuery(true);
@@ -607,7 +742,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     setViewMode('answer'); // Switch immediately to answer view
     setApiSuggestions([]);
     setShowScrollToBottom(false); // Reset scroll indicator
-    setQuickActions([]); // Clear previous quick actions
     setCurrentQueryId(null); // Clear previous query ID
 
     try {
@@ -709,7 +843,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   } else if (parsed.quickActions) {
                     // Capture quick actions from stream
                     capturedQuickActions = parsed.quickActions;
-                    setQuickActions(capturedQuickActions);
                   } else if (parsed.queryId) {
                     // Capture query ID for analytics tracking
                     setCurrentQueryId(parsed.queryId);
@@ -728,6 +861,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             query: q,
             answer: accumulatedAnswer,
             intent: finalIntent,
+            filters: preFilters as QueryFilter | undefined,
+            depth: currentDepth,
+            quickActions: capturedQuickActions,
             timestamp: Date.now(),
           }]);
         }
@@ -824,8 +960,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     setSelectedIndex(0); // Reset to top of suggestions
     setViewMode('suggestions'); // Switch back to suggestions view
     setShowScrollToBottom(false); // Reset scroll indicator
-    setConversationHistory([]); // Clear conversation history
-    setQuickActions([]); // Clear quick actions
+    setConversationHistory([]); // Clear conversation history (includes quick actions)
+    setCurrentQueryId(null); // Clear query ID
     inputRef.current?.focus();
   };
 
