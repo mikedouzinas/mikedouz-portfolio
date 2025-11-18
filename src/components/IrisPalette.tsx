@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
@@ -16,6 +16,8 @@ import {
   ExternalLink,
   ChevronDown
 } from 'lucide-react';
+import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
+import { SiCalendly } from 'react-icons/si';
 import { getSignalSummary } from '@/lib/iris/signals';
 import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
@@ -86,39 +88,18 @@ function truncateText(text: string, maxLength: number = 60): string {
 
 // Note: renderTextWithLinks function removed - using ReactMarkdown for proper markdown rendering
 
-/**
- * IrisPalette - Arc-inspired command palette component
- * 
- * Features:
- * - Opens with ⌘K (Mac) or Ctrl+K (Win/Linux)
- * - Listens for 'mv-open-cmdk' custom event
- * - No background overlay/dimming
- * - Search input with embedded "Ask Iris →" pill
- * - Two distinct views: Suggestions View and Answer View
- * - Keyboard navigation (Up/Down/Tab/Enter/Esc)
- * - Different visual states for hover vs keyboard-selected
- * - Mobile detection (disabled on mobile devices)
- * - Full accessibility support
- * - Real streaming responses from OpenAI
- * - Clickable links in responses
- * - Navigation commands
- * - Coordinated animations using framer-motion
- * - Animation lock prevents rapid open/close operations
- * 
- * View State Machine:
- * - Suggestions View: Shows search suggestions, no answer
- * - Answer View: Shows answer only, no suggestions
- * - Editing in Answer View switches back to Suggestions View
- * 
- * Animation Coordination:
- * - Entry: Simple fade in (350ms) when opening
- * - Exit: Simple fade out (350ms) synchronized with IrisButton's reverse animation
- * - Button animation (500ms total) overlaps with palette fade for smooth transition
- * - Uses framer-motion's AnimatePresence to manage mount/unmount timing
- * - Horizontal centering uses framer-motion's x transform (-50%)
- * - Animation lock (isAnimating state) prevents operations during transitions
- * - Safety timeout (450ms) ensures unlock even if onAnimationComplete fails (spam-proof)
- */
+const CONTACT_LABEL_REGEX = /(LinkedIn|GitHub|Schedule a chat|Cal|Calendar):\s*(https?:\/\/[^\s]+)/gi;
+const RAW_URL_REGEX = /(?<!\]\()(?<!href=")(https?:\/\/[^\s)<>]+)/gi;
+const EMAIL_REGEX_INLINE = /(?<!mailto:)([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi;
+
+function autoLinkText(input: string): string {
+  if (!input) return '';
+  return input
+    .replace(CONTACT_LABEL_REGEX, (_match, label, url) => `[${label}](${url})`)
+    .replace(EMAIL_REGEX_INLINE, (match) => `[${match}](mailto:${match})`)
+    .replace(RAW_URL_REGEX, (match) => `[${match}](${match})`);
+}
+
 export default function IrisPalette({ open: controlledOpen, onOpenChange }: IrisPaletteProps) {
   const router = useRouter();
   // View mode state machine: 'suggestions' = show suggestions, 'answer' = show answer only
@@ -163,6 +144,31 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
   // Track UI directives from streaming
   const uiDirective = useUiDirectives(answer || '');
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+  const copiedTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const cleanedAnswer = answer ? stripUiDirectives(answer) : '';
+  const renderedAnswer = useMemo(() => autoLinkText(cleanedAnswer), [cleanedAnswer]);
+
+  const handleEmailCopy = useCallback(async (email: string) => {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopiedEmail(email);
+      if (copiedTimer.current) clearTimeout(copiedTimer.current);
+      copiedTimer.current = setTimeout(() => setCopiedEmail(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy email:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (copiedTimer.current) {
+        clearTimeout(copiedTimer.current);
+        copiedTimer.current = null;
+      }
+    };
+  }, []);
 
   /**
    * Auto-open composer when directive is detected
@@ -1019,19 +1025,49 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                           const isExternal = href?.startsWith('http');
                           const isEmail = href?.startsWith('mailto:');
                           
+                          // Handle email links with envelope icon
                           if (isEmail && href) {
+                            const email = href.replace(/^mailto:/, '');
+                            const copied = copiedEmail === email;
                             return (
-                              <a 
-                                href={href}
-                                className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors"
-                                {...props}
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  handleEmailCopy(email);
+                                }}
+                                className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors inline-flex items-center gap-1 focus:outline-none"
+                                aria-live="polite"
                               >
-                                {children}
-                              </a>
+                                <FaEnvelope className="w-3.5 h-3.5 inline mr-1.5" />
+                                <span>{copied ? 'Copied!' : children}</span>
+                              </button>
                             );
                           }
                           
                           if (isExternal && href) {
+                            // Detect specific link types to use their actual icons
+                            // Professional comment: Using official brand icons for better UX and consistency
+                            const isLinkedIn = /linkedin\.com/i.test(href);
+                            const isGitHub = /github\.com/i.test(href);
+                            const isCalendar = /calendly|fantastical|schedule/i.test(href);
+                            
+                            // Render icon based on URL type
+                            // Place icon BEFORE text for all contact methods for consistent visual hierarchy
+                            let iconElement;
+                            if (isLinkedIn) {
+                              iconElement = <FaLinkedin className="w-3.5 h-3.5 inline mr-1.5" />;
+                            } else if (isGitHub) {
+                              iconElement = <FaGithub className="w-3.5 h-3.5 inline mr-1.5" />;
+                            } else if (isCalendar) {
+                              iconElement = <SiCalendly className="w-3.5 h-3.5 inline mr-1.5" />;
+                            } else {
+                              iconElement = <ExternalLink className="w-3 h-3 inline ml-1" />;
+                            }
+                            
+                            // Determine if icon should go before or after text
+                            const iconBefore = isLinkedIn || isGitHub || isCalendar;
+                            
                             return (
                               <a 
                                 href={href}
@@ -1040,8 +1076,17 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                                 className="text-sky-400 hover:text-sky-300 underline underline-offset-2 transition-colors inline-flex items-center gap-1"
                                 {...props}
                               >
-                                {children}
-                                <ExternalLink className="w-3 h-3 inline" />
+                                {iconBefore ? (
+                                  <>
+                                    {iconElement}
+                                    {children}
+                                  </>
+                                ) : (
+                                  <>
+                                    {children}
+                                    {iconElement}
+                                  </>
+                                )}
                               </a>
                             );
                           }
@@ -1078,7 +1123,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                         },
                       }}
                     >
-                      {stripUiDirectives(answer)}
+                      {renderedAnswer}
                     </ReactMarkdown>
                     {/* Show typing cursor while streaming */}
                     {isProcessingQuery && (

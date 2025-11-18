@@ -217,7 +217,9 @@ export interface AliasEntry {
 export function buildAliasIndex(items: KBItem[]): AliasEntry[] {
   return items
     .map(item => {
-      // Extract name based on item type
+      const aliases = new Set<string>();
+
+      // Extract primary display name
       let name = '';
       if ('title' in item && item.title) {
         name = item.title;
@@ -235,17 +237,65 @@ export function buildAliasIndex(items: KBItem[]): AliasEntry[] {
         name = item.school;
       }
 
-      // Extract aliases if present (only Skills have aliases property)
-      const aliases = item.kind === 'skill' && 'aliases' in item && Array.isArray(item.aliases) 
-        ? item.aliases 
-        : [];
+      if (name) {
+        aliases.add(name);
+      }
+
+      if ('aliases' in item && Array.isArray(item.aliases)) {
+        item.aliases.forEach(alias => aliases.add(alias));
+      }
+
+      if ('company' in item && item.company) {
+        aliases.add(item.company);
+      }
+      if ('role' in item && item.role) {
+        aliases.add(item.role);
+      }
+      if ('role' in item && item.role && 'company' in item && item.company) {
+        aliases.add(`${item.role} at ${item.company}`);
+      }
+
+      const generated = generateHeuristicAliases(name);
+      generated.forEach(alias => aliases.add(alias));
 
       return {
         id: item.id,
         type: item.kind,
         name,
-        aliases
+        aliases: Array.from(aliases).filter(Boolean)
       };
     })
-    .filter(entry => entry.name); // Only include items with names
+    .filter(entry => entry.name);
+}
+
+function generateHeuristicAliases(name: string): string[] {
+  if (!name) return [];
+  const aliases: string[] = [];
+  const cleaned = name.replace(/\([^)]*\)/g, '').trim();
+  if (cleaned && cleaned !== name) {
+    aliases.push(cleaned);
+  }
+
+  const normalized = cleaned || name;
+  const slug = normalized.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (slug && slug !== normalized.toLowerCase()) {
+    aliases.push(slug);
+  }
+
+  const stopWords = new Set(['and', 'for', 'the', 'of', 'at', 'in', 'on', 'with', 'to', 'a', 'an']);
+  const words = normalized
+    .split(/[\s/&,-]+/)
+    .filter(Boolean);
+
+  const acronym = words
+    .filter(word => !stopWords.has(word.toLowerCase()))
+    .map(word => word[0])
+    .join('');
+
+  if (acronym.length >= 3) {
+    aliases.push(acronym);
+    aliases.push(acronym.toLowerCase());
+  }
+
+  return aliases;
 }

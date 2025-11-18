@@ -106,6 +106,7 @@ const BaseContent = z.object({
   skills: z.array(Id).default([]),     // references -> skills.json ids
   tags: z.array(z.string()).default([]),
   links: z.record(z.string(), z.string()).default({}), // { github, demo, url, etc. }
+  aliases: z.array(z.string()).default([]),
 })
 
 // Schemas without kind (for parsing JSON files)
@@ -126,6 +127,7 @@ const ExperienceBase = z.object({
   skills: z.array(Id).default([]),
   tags: z.array(z.string()).default([]),
   links: z.record(z.string(), z.string()).default({}),
+  aliases: z.array(z.string()).default([]),
 })
 
 const ClassBase = BaseContent.extend({
