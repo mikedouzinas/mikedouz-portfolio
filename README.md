@@ -13,7 +13,7 @@ A modern, full-stack personal portfolio built with Next.js 15 and TypeScript, fe
 
 This portfolio goes beyond traditional static sites by integrating an advanced RAG (Retrieval-Augmented Generation) system that enables intelligent, context-aware conversations about work experience, technical projects, coursework, and personal background.
 
-**Live Demo**: [mikedouz.com](https://mikedouz.com) *(Press ⌘K to chat with Iris)*
+**Live Demo**: [mikeveson.com](https://mikeveson.com) *(Press ⌘K to chat with Iris)*
 
 ---
 
