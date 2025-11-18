@@ -24,6 +24,7 @@ import ReactMarkdown from 'react-markdown';
 import { useUiDirectives, defaultOpenFor, stripUiDirectives } from './iris/useUiDirectives';
 import ContactCta from './iris/ContactCta';
 import MessageComposer from './iris/MessageComposer';
+import QuickActions, { type QuickAction } from './iris/QuickActions';
 
 /**
  * Static suggestion configuration
@@ -149,6 +150,15 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const [isAnimating, setIsAnimating] = useState(false); // Prevent rapid open/close during animations
   const [showComposer, setShowComposer] = useState(false); // Toggle for MessageComposer
   const [showScrollToBottom, setShowScrollToBottom] = useState(false); // Show scroll indicator
+
+  // Conversation state for follow-ups
+  const [conversationHistory, setConversationHistory] = useState<Array<{
+    query: string;
+    answer: string;
+    intent: string;
+    timestamp: number;
+  }>>([]);
+  const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
 
   // Track UI directives from streaming
   const uiDirective = useUiDirectives(answer || '');
@@ -315,6 +325,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setAnswer(null);
       setIsProcessingQuery(false);
       setSubmittedQuery('');
+      setConversationHistory([]); // Clear conversation history
+      setQuickActions([]); // Clear quick actions
     }
   }, [isAnimating, onOpenChange]);
 
@@ -760,6 +772,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     setSelectedIndex(0); // Reset to top of suggestions
     setViewMode('suggestions'); // Switch back to suggestions view
     setShowScrollToBottom(false); // Reset scroll indicator
+    setConversationHistory([]); // Clear conversation history
+    setQuickActions([]); // Clear quick actions
     inputRef.current?.focus();
   };
 

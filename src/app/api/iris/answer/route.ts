@@ -196,35 +196,57 @@ const OFF_TOPIC_PATTERNS = [
   /\brandom\b/i,
 ];
 
-// Entities that appear in Mike's context - queries about these ARE on-topic
-// This allows questions like "what does Veson do?" or "tell me about Iris"
-const CONTEXT_ENTITIES = [
-  // Companies/Organizations
-  'veson', 'nautical', 'parsons', 'cornell', 'nyu', 'columbia',
-  // Projects/Systems
-  'iris', 'hilite', 'hermes', 'chess', 'portfolio',
-  // Technologies (common ones in Mike's stack)
-  'react', 'typescript', 'python', 'nextjs', 'next.js', 'node',
-  'tailwind', 'postgresql', 'supabase', 'openai',
-  // Roles/Positions
-  'intern', 'developer', 'engineer', 'student',
-];
+/**
+ * Build a set of context entities from the knowledge base
+ * This is mutable and updates when KB content changes
+ * Extracts: companies, schools, project titles, skills, blog titles
+ */
+function buildContextEntities(items: KBItem[]): Set<string> {
+  const entities = new Set<string>();
+
+  for (const item of items) {
+    // Add project titles
+    if (item.kind === 'project' && 'title' in item && item.title) {
+      entities.add(item.title.toLowerCase());
+    }
+
+    // Add company names
+    if ('company' in item && item.company) {
+      entities.add(item.company.toLowerCase());
+    }
+
+    // Add school names
+    if ('school' in item && item.school) {
+      entities.add(item.school.toLowerCase());
+    }
+
+    // Add technologies/skills (top level ones)
+    if ('skills' in item && Array.isArray(item.skills)) {
+      item.skills.forEach(skill => entities.add(skill.toLowerCase()));
+    }
+
+    // Add blog/story titles
+    if ((item.kind === 'blog' || item.kind === 'story') && 'title' in item && item.title) {
+      entities.add(item.title.toLowerCase());
+    }
+  }
+
+  return entities;
+}
 
 function detectPromptInjection(query: string): boolean {
   return PROMPT_INJECTION_REGEX.test(query);
 }
 
-function isClearlyOffTopic(query: string): boolean {
+function isClearlyOffTopic(query: string, contextEntities: Set<string>): boolean {
   const lowerQuery = query.toLowerCase();
 
-  // Allow queries that mention context entities
-  // These ARE relevant even if they don't explicitly mention Mike
-  const mentionsContextEntity = CONTEXT_ENTITIES.some(entity =>
-    lowerQuery.includes(entity)
-  );
-
-  if (mentionsContextEntity) {
-    return false; // NOT off-topic
+  // Allow queries that mention any entity in the knowledge base
+  // This makes the system automatically adapt to KB content
+  for (const entity of contextEntities) {
+    if (lowerQuery.includes(entity)) {
+      return false; // NOT off-topic
+    }
   }
 
   // Otherwise, check against off-topic patterns
@@ -1847,9 +1869,14 @@ export async function POST(req: NextRequest) {
       return streamTextResponse("I have to stick with Mike-focused instructions, but I'm happy to help with his projects, experience, or contact details.");
     }
 
+    // Build context entities from KB for off-topic detection
+    // This allows queries about companies, projects, skills in Mike's context
+    const allItems = await getAllItems();
+    const contextEntities = buildContextEntities(allItems);
+
     const offScope =
       intentResult.about_mike === false ||
-      (intentResult.about_mike !== true && isClearlyOffTopic(query));
+      (intentResult.about_mike !== true && isClearlyOffTopic(query, contextEntities));
 
     if (offScope) {
       return buildGuardrailResponse(query);
