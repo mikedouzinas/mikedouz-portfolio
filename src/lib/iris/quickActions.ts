@@ -248,7 +248,7 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
   if (actions.length < 5) {
     actions.push({
       type: 'custom_input',
-      label: 'Ask something else...',
+      label: 'Ask a follow up...',
     });
   }
 

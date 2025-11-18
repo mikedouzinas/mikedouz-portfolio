@@ -213,9 +213,9 @@ export function classifyIntent(query: string): {
  */
 function getValidSuggestions(): string[] {
   return [
-    "What projects have you built?",
-    "Tell me about your work experience",
-    "How can I contact you?"
+    "I have an idea for a project",
+    "I want to collaborate!",
+    "Tell me more about your story"
   ];
 }
 
