@@ -353,10 +353,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       >
         {content}
       </ReactMarkdown>
-      {/* Show typing cursor while streaming */}
-      {isStreaming && (
-        <span className="inline-block w-2 h-4 bg-sky-400 animate-pulse ml-1" />
-      )}
     </div>
   ), [copiedEmail, handleEmailCopy, router]);
 
@@ -430,6 +426,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    * Rotate main loading message after 1.5 seconds if still loading
    * Smooth transition by only updating the message, keeping animation and color
    * Use ref to track if timer is already set to prevent infinite loops
+   * 
+   * CRITICAL: Do NOT include mainLoadingConfig in dependencies to prevent infinite loop
+   * The effect updates mainLoadingConfig, so including it would cause the effect to re-run
+   * every time it updates, creating a maximum update depth error
    */
   const messageRotationTimerRef = useRef<NodeJS.Timeout | null>(null);
   const messageRotatedRef = useRef(false);
@@ -442,6 +442,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     }
     messageRotatedRef.current = false;
 
+    // Check if we should set up rotation - use functional state check to avoid dependency
+    // We check mainLoadingConfig exists without including it in dependencies
     if (!mainLoadingConfig || !mainLoadingStartTime || answer || !isProcessingQuery) {
       return;
     }
@@ -467,10 +469,12 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
     // Set timer to change message after 1.5 seconds total (only once)
     messageRotationTimerRef.current = setTimeout(() => {
-      if (!messageRotatedRef.current && mainLoadingConfig && !answer && isProcessingQuery) {
+      // Only check rotation flag - effect cleanup will handle if conditions changed
+      // This avoids stale closure issues with answer/isProcessingQuery
+      if (!messageRotatedRef.current) {
         messageRotatedRef.current = true;
         setMainLoadingConfig(prev => {
-          if (!prev || answer || !isProcessingQuery) return prev;
+          if (!prev) return prev; // Safety check
           // Keep same animation and color, only change message for smooth transition
           return {
             ...prev,
@@ -487,7 +491,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         messageRotationTimerRef.current = null;
       }
     };
-  }, [mainLoadingStartTime, answer, isProcessingQuery, mainLoadingConfig]); // Include mainLoadingConfig to satisfy exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mainLoadingStartTime, answer, isProcessingQuery]); // Exclude mainLoadingConfig to prevent infinite loop
 
   /**
    * Handle scroll events to show/hide scroll-to-bottom indicator
