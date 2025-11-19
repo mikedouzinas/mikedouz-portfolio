@@ -2020,7 +2020,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Handle contact intent - fast path that returns contact info with UI directive
+    // Handle contact intent - fast path with contact directive for quick actions
     if (intent === 'contact') {
       // Debug: Log contact intent handling
       console.log('\n═══════════════════════════════════════════════════════════════');
@@ -2028,23 +2028,19 @@ export async function POST(req: NextRequest) {
       console.log('═══════════════════════════════════════════════════════════════');
       console.log(`Query: "${query}"`);
       console.log(`Intent: ${intent}`);
-      
+
       // Check if user wants to write/send a message
-      // Professional comment: Includes "tell" to catch natural language like "tell mike ____"
-      const wantsToMessage = /\b(write|send|message|contact|reach(?: out)?|connect|dm|get in touch|tell|collaborate|partner|work with|hire|book|schedule)\b.*\b(mike|you|him)\b/i.test(query) ||
+      const wantsToMessage = /\b(write|send|message|contact|reach(?: out)?|connect|dm|get in touch|tell)\b.*\b(mike|you|him)\b/i.test(query) ||
         /\b(mike|you|him)\b.*\b(collaborate|partner|work with|work together|hire|book|schedule|connect|dm)\b/i.test(query);
-      
-      // Generate a natural draft message using LLM when user wants to message
-      // Professional comment: This improves UX by creating complete, natural sentences
-      // instead of fragmented text extracted from the query
-      let draftMessage = '';
+
+      let contactMessage = '';
+
       if (wantsToMessage) {
+        // Generate draft message for explicit message requests
+        let draftMessage = '';
         try {
-          // Use LLM to create a natural, complete draft message from the user's query
-          // Remove common messaging phrases to get the actual content
           const cleanedQuery = query.replace(/\b(write|send|a message to|message|contact|reach out to|get in touch with|tell)\s+(mike|you|him|them)\s+(about|regarding|that)?\s*/gi, '').trim();
-          
-          // Only call LLM if there's substantial content (more than just "message mike")
+
           if (cleanedQuery && cleanedQuery.length > 5) {
             const draftResponse = await Promise.race([
               openai.chat.completions.create({
@@ -2063,69 +2059,31 @@ export async function POST(req: NextRequest) {
                 max_tokens: 100
               }),
               new Promise<never>((_, reject) => {
-                setTimeout(() => reject(new Error('Draft generation timed out.')), 5000); // 5 second timeout for draft
+                setTimeout(() => reject(new Error('Draft generation timed out.')), 5000);
               })
             ]);
 
-            const generatedDraft = draftResponse.choices[0]?.message?.content?.trim();
-            if (generatedDraft) {
-              draftMessage = generatedDraft;
-            } else {
-              // Fallback if LLM returns empty
-              draftMessage = `I wanted to reach out: ${cleanedQuery}`;
-            }
+            draftMessage = draftResponse.choices[0]?.message?.content?.trim() || `I wanted to reach out: ${cleanedQuery}`;
           } else {
-            // Default message if query is too short
             draftMessage = 'I\'d like to get in touch';
           }
         } catch (error) {
-          // Fallback to simple extraction if LLM call fails
           console.warn('[Answer API] Draft generation failed, using fallback:', error);
           const cleanQuery = query.replace(/\b(write|send|a message to|message|contact|reach out to|get in touch with)\s+(mike|you|him)\s+(about|regarding)?\s*/gi, '').trim();
           draftMessage = cleanQuery ? `I wanted to reach out: ${cleanQuery}` : 'I\'d like to get in touch';
         }
-      }
-      
-      const contact = await loadContact();
-      
-      // Format contact message with proper markdown links and line breaks
-      // Professional comment: Using markdown link format [text](url) for clickable links
-      // Icons for LinkedIn and GitHub are rendered by ReactMarkdown component using actual brand icons
-      // Use double newlines between items for proper paragraph separation in markdown rendering
-      const contactParts: string[] = ['Here\'s how you can reach Mike:\n\n'];
-      
-      // Add LinkedIn link (icon will be rendered by ReactMarkdown using FaLinkedin component)
-      contactParts.push(`[LinkedIn](${contact.linkedin})\n\n`);
-      
-      // Add GitHub link (icon will be rendered by ReactMarkdown using FaGithub component)
-      if (contact.github) {
-        contactParts.push(`[GitHub](${contact.github})\n\n`);
-      }
-      
-      // Add booking link with markdown formatting if enabled
-      // Icon will be rendered by ReactMarkdown using SiCalendly component
-      if (contact.booking?.enabled && contact.booking?.link) {
-        contactParts.push(`[Schedule a chat](${contact.booking.link})\n\n`);
-      }
-      
-      // Add email link with markdown formatting if available
-      // Icon will be rendered by ReactMarkdown using FaEnvelope component
-      if (contact.email) {
-        contactParts.push(`[Email](mailto:${contact.email})\n\n`);
-      }
-      
-      // Join parts (they already have double newlines for paragraph separation)
-      // Remove trailing newlines before adding UI directive if needed
-      let contactMessage = contactParts.join('').trimEnd();
-      if (wantsToMessage) {
-        contactMessage += `\n\n<ui:contact reason="user_request" draft="${draftMessage.replace(/"/g, '&quot;')}" />`;
-      }
-      
-      // Debug: Log contact response details
-      console.log(`Wants to Message: ${wantsToMessage}`);
-      if (wantsToMessage) {
+
+        // For message requests, add user_request directive
+        contactMessage = `<ui:contact reason="user_request" draft="${draftMessage.replace(/"/g, '&quot;')}" />`;
+        console.log(`Wants to Message: true`);
         console.log(`Draft Message: "${draftMessage}"`);
+      } else {
+        // For general contact queries, add insufficient_context directive
+        // This will trigger the contact quick actions to be shown
+        contactMessage = `<ui:contact reason="insufficient_context" draft="I'd like to get in touch" />`;
+        console.log(`Wants to Message: false`);
       }
+
       console.log(`Contact Message Length: ${contactMessage.length} characters`);
       console.log('\nContact Response:');
       console.log('───────────────────────────────────────────────────────────────');

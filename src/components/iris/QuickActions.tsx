@@ -162,7 +162,7 @@ export default function QuickActions({
             placeholder="Ask a follow up..."
             disabled={disabled}
             autoFocus
-            className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-sky-500/50 disabled:opacity-50 text-sm"
+            className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none disabled:opacity-50 text-sm"
           />
           <button
             type="button"
