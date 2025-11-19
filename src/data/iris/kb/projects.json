@@ -8,7 +8,7 @@
       "Commentary generation for key moments with sports-style narration",
       "Synchronization of narration with selected clips for coherent highlights"
     ],
-    "skills": ["python", "opencv", "pytorch", "computer_architecture", "computer_vision", "deep_learning", "transformers", "nlp"],
+    "skills": ["python", "opencv", "pytorch", "computer_architecture", "computer_vision", "deep_learning", "machine_learning", "transformers", "nlp"],
     "tech_stack": ["Python", "OpenCV", "PyTorch", "Vision–Language methods"],
     "architecture": "Video ingestion → moment scoring → vision features → (VLM-based) narration → timeline assembly/export",
     "tags": ["AI", "Computer Vision", "Multimodal", "Sports Analytics"],
@@ -26,6 +26,7 @@
     "id": "proj_portfolio",
     "title": "Personal Portfolio & Iris",
     "summary": "Full-stack portfolio built with Next.js and TypeScript featuring Iris — a custom AI assistant that powers conversational navigation and contextual Q&A.",
+    "aliases": ["Iris", "Iris assistant"],
     "specifics": [
       "Iris: Named after the Greek messenger goddess, part of a long-term vision for Mike's AI assistants (Iris for digital, Hermes for physical robot form)",
       "Custom RAG pipeline: embeddings retrieval, semantic search, intent detection, and streaming LLM responses",
@@ -54,7 +55,7 @@
       "Random Forest classification with CV and hyperparameter tuning",
       "Produced xG-style expectations and discrete scoreline predictions; error analysis and calibration"
     ],
-    "skills": ["python", "pandas", "numpy", "scikit_learn", "data_mining", "feature_engineering", "model_evaluation", "probability", "statistics"],
+    "skills": ["python", "pandas", "numpy", "scikit_learn", "data_mining", "feature_engineering", "model_evaluation", "machine_learning", "probability", "statistics"],
     "tech_stack": ["Python", "Pandas", "NumPy", "scikit-learn"],
     "architecture": "Scraper → feature store (CSV/Parquet) → model training (RF) → inference/evaluation notebooks",
     "tags": ["ML", "Sports Analytics", "Classical ML"],
@@ -76,7 +77,7 @@
       "Intent parsing → actions (reminders, calendar, to-dos) via GPT",
       "Low-latency TTS with interruption handling; privacy-aware UX"
     ],
-    "skills": ["speech_recognition", "tts", "openai_api", "product_management", "ux_design", "swiftui", "avfoundation"],
+    "skills": ["speech_recognition", "tts", "openai_api", "product_management", "ux_design", "swiftui", "avfoundation", "ios_development"],
     "tech_stack": ["SwiftUI", "AVFoundation", "OpenAI API"],
     "architecture": "Audio capture → ASR → intent (LLM) → action execution → TTS playback; reactive state with SwiftUI",
     "tags": ["iOS", "Voice", "Assistant"],
@@ -98,7 +99,7 @@
       "Continuous releases using student feedback loops",
       "End-to-end App Store deployment and support"
     ],
-    "skills": ["swift", "firebase", "product_management", "user_research", "ux_design"],
+    "skills": ["swift", "firebase", "product_management", "user_research", "ux_design", "ios_development"],
     "tech_stack": ["Swift", "Firebase"],
     "architecture": "Native iOS app with Firebase backend for sync/messaging; notification scheduling and offline-first caching",
     "tags": ["iOS", "Product"],

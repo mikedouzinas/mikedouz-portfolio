@@ -73,84 +73,6 @@ function isTimeSensitive(query: string): boolean {
 }
 
 /**
- * Default cache implementation (no-op for v1)
- * TODO: Replace with actual cache backend (Redis/Upstash/LRU)
- */
-class DefaultIrisCache implements IrisCache {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async get(_query: string): Promise<string | undefined> {
-    // TODO: Implement with persistent cache
-    // Example Redis implementation:
-    // const key = `iris:answer:${normalizeQuery(query)}`;
-    // return await redis.get(key);
-    
-    return undefined; // No-op for v1
-  }
-  
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async set(_query: string, _answer: string, _ttlSec?: number): Promise<void> {
-    // TODO: Implement with persistent cache  
-    // Example Redis implementation:
-    // const key = `iris:answer:${normalizeQuery(query)}`;
-    // const ttl = ttlSec || 3600; // Default 1 hour
-    // await redis.setex(key, ttl, answer);
-    
-    // No-op for v1
-  }
-  
-  shouldCache(query: string): boolean {
-    // Don't cache time-sensitive queries
-    if (isTimeSensitive(query)) {
-      return false;
-    }
-    
-    // Don't cache very short queries (likely too generic)
-    if (query.trim().length < 5) {
-      return false;
-    }
-    
-    // Don't cache very long queries (likely too specific)
-    if (query.length > 200) {
-      return false;
-    }
-    
-    return true;
-  }
-  
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async clear(_pattern?: string): Promise<void> {
-    // TODO: Implement cache clearing
-    // Example Redis implementation:
-    // const keys = await redis.keys(pattern || 'iris:answer:*');
-    // if (keys.length > 0) {
-    //   await redis.del(...keys);
-    // }
-    
-    // No-op for v1
-  }
-  
-  async getStats(): Promise<{
-    hits: number;
-    misses: number; 
-    size: number;
-    hitRate: number;
-  }> {
-    // TODO: Track and return real statistics
-    // Example implementation:
-    // const hits = await redis.get('iris:stats:hits') || '0';
-    // const misses = await redis.get('iris:stats:misses') || '0';
-    // const size = await redis.dbsize();
-    
-    return {
-      hits: 0,
-      misses: 0,
-      size: 0,
-      hitRate: 0
-    };
-  }
-}
-
-/**
  * In-memory cache for development and fallback
  * TODO: Replace with persistent solution for production
  */
@@ -234,8 +156,113 @@ class InMemoryCache implements IrisCache {
 }
 
 /**
+ * Upstash Redis cache for production
+ * Uses Upstash's HTTP-based Redis for serverless environments
+ */
+class UpstashCache implements IrisCache {
+  // Lazy import to avoid requiring env vars at build time
+  private redis: unknown = null;
+  private stats = { hits: 0, misses: 0 };
+
+  private async getRedis() {
+    if (!this.redis) {
+      const { Redis } = await import('@upstash/redis');
+      this.redis = new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL!,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+      });
+    }
+    return this.redis;
+  }
+
+  async get(query: string): Promise<string | undefined> {
+    try {
+      const redis = await this.getRedis() as { get: (key: string) => Promise<string | null> };
+      const key = normalizeQuery(query);
+      const value = await redis.get(`iris:answer:${key}`);
+
+      if (value) {
+        this.stats.hits++;
+        return value as string;
+      }
+
+      this.stats.misses++;
+      return undefined;
+    } catch (error) {
+      console.warn('[UpstashCache] Get failed:', error);
+      this.stats.misses++;
+      return undefined;
+    }
+  }
+
+  async set(query: string, answer: string, ttlSec: number = 3600): Promise<void> {
+    if (!this.shouldCache(query)) {
+      return;
+    }
+
+    try {
+      // Upstash Redis REST API uses set() with expiration option, not setex()
+      const redis = await this.getRedis() as { set: (key: string, value: string, options?: { ex?: number }) => Promise<unknown> };
+      const key = normalizeQuery(query);
+      await redis.set(`iris:answer:${key}`, answer, { ex: ttlSec });
+    } catch (error) {
+      console.warn('[UpstashCache] Set failed:', error);
+      // Non-critical error, continue without caching
+    }
+  }
+
+  shouldCache(query: string): boolean {
+    return !isTimeSensitive(query) && query.trim().length >= 5 && query.length <= 200;
+  }
+
+  async clear(pattern?: string): Promise<void> {
+    try {
+      const redis = await this.getRedis() as { keys: (pattern: string) => Promise<string[]>; del: (...keys: string[]) => Promise<unknown> };
+      const keyPattern = pattern || 'iris:answer:*';
+
+      // Upstash doesn't support SCAN in REST API, so we use KEYS (ok for small cache)
+      const keys = await redis.keys(keyPattern);
+      if (keys && keys.length > 0) {
+        await redis.del(...keys);
+      }
+    } catch (error) {
+      console.warn('[UpstashCache] Clear failed:', error);
+    }
+  }
+
+  async getStats(): Promise<{
+    hits: number;
+    misses: number;
+    size: number;
+    hitRate: number;
+  }> {
+    try {
+      const redis = await this.getRedis() as { keys: (pattern: string) => Promise<string[]> };
+      const keys = await redis.keys('iris:answer:*');
+      const total = this.stats.hits + this.stats.misses;
+      const hitRate = total > 0 ? this.stats.hits / total : 0;
+
+      return {
+        hits: this.stats.hits,
+        misses: this.stats.misses,
+        size: keys ? keys.length : 0,
+        hitRate
+      };
+    } catch (error) {
+      console.warn('[UpstashCache] GetStats failed:', error);
+      return {
+        hits: this.stats.hits,
+        misses: this.stats.misses,
+        size: 0,
+        hitRate: 0
+      };
+    }
+  }
+}
+
+/**
  * Singleton cache instance
- * TODO: Configure based on environment (Redis in prod, memory in dev)
+ * Automatically configured based on environment
  */
 let cacheInstance: IrisCache | null = null;
 
@@ -245,23 +272,23 @@ let cacheInstance: IrisCache | null = null;
  */
 export function getIrisCache(): IrisCache {
   if (!cacheInstance) {
-    // TODO: Initialize based on environment
-    // if (process.env.REDIS_URL) {
-    //   cacheInstance = new RedisIrisCache(process.env.REDIS_URL);
-    // } else if (process.env.UPSTASH_REDIS_REST_URL) {
-    //   cacheInstance = new UpstashIrisCache();
-    // } else {
-    //   cacheInstance = new InMemoryCache();
-    // }
-    
-    // For v1, use in-memory cache in development, no-op in production
-    if (process.env.NODE_ENV === 'development') {
+    // Production: Use Upstash if configured, otherwise fall back to in-memory
+    if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+      console.log('[IrisCache] Using Upstash Redis cache');
+      cacheInstance = new UpstashCache();
+    }
+    // Development: Use in-memory cache
+    else if (process.env.NODE_ENV === 'development') {
+      console.log('[IrisCache] Using in-memory cache (development)');
       cacheInstance = new InMemoryCache();
-    } else {
-      cacheInstance = new DefaultIrisCache();
+    }
+    // Fallback: In-memory for production without Upstash
+    else {
+      console.log('[IrisCache] Using in-memory cache (Upstash not configured)');
+      cacheInstance = new InMemoryCache();
     }
   }
-  
+
   return cacheInstance;
 }
 
@@ -319,27 +346,26 @@ export const cacheUtils = {
 };
 
 /**
- * TODO List for future cache implementation:
- * 
- * 1. Redis Integration:
- *    - Add @upstash/redis dependency
- *    - Implement RedisIrisCache class
- *    - Handle connection errors gracefully
- *    - Add Redis health checks
- * 
- * 2. Cache Invalidation:
+ * Future cache enhancements:
+ *
+ * 1. ✅ Redis Integration (DONE)
+ *    - ✅ Upstash Redis implementation
+ *    - ✅ Graceful error handling
+ *    - ✅ Automatic fallback to in-memory
+ *
+ * 2. Cache Invalidation (TODO):
  *    - Invalidate cache when KB updates
  *    - Version-based invalidation strategy
  *    - Manual invalidation endpoints
- * 
- * 3. Performance Monitoring:
+ *
+ * 3. Performance Monitoring (TODO):
  *    - Add detailed timing metrics
- *    - Track cache effectiveness
+ *    - Track cache effectiveness per query type
  *    - Monitor memory usage
  *    - Alert on cache failures
- * 
- * 4. Advanced Features:
- *    - Semantic similarity for cache hits
+ *
+ * 4. Advanced Features (TODO):
+ *    - Semantic similarity for cache hits (similar queries → same answer)
  *    - Partial answer caching
  *    - Precomputed popular answers
  *    - Cache warming strategies

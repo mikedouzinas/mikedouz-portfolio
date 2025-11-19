@@ -326,6 +326,19 @@
       ]
     },
     {
+      "id": "machine_learning",
+      "name": "Machine Learning",
+      "type": "domain",
+      "aliases": ["ml", "machine_learning"],
+      "description": "End-to-end ML systems: data prep, modeling, and evaluation.",
+      "evidence": [
+        { "type": "class", "id": "class_comp_646_2025" },
+        { "type": "project", "id": "proj_hilite" },
+        { "type": "project", "id": "proj_euros" },
+        { "type": "experience", "id": "exp_vesselsvalue_2024" }
+      ]
+    },
+    {
       "id": "transformers",
       "name": "Transformers",
       "type": "model_family",
@@ -700,6 +713,18 @@
         { "type": "class", "id": "class_ap_csa_2020" },
         { "type": "experience", "id": "exp_veson_mobile_2021_2023" },
         { "type": "project", "id": "proj_knight_life" }
+      ]
+    },
+    {
+      "id": "ios_development",
+      "name": "iOS Development",
+      "type": "domain",
+      "aliases": ["ios", "ios_dev", "iphone_app"],
+      "description": "Native Swift/SwiftUI development for production iOS apps.",
+      "evidence": [
+        { "type": "project", "id": "proj_momentum" },
+        { "type": "project", "id": "proj_knight_life" },
+        { "type": "experience", "id": "exp_veson_mobile_2021_2023" }
       ]
     },
     {

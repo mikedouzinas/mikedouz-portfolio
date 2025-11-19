@@ -31,6 +31,7 @@ This portfolio goes beyond traditional static sites by integrating an advanced R
 - **Contextual Awareness**: Year-based filtering, skill matching, and personal context retrieval
 - **Streaming Responses**: Real-time SSE (Server-Sent Events) for instant feedback
 - **Intelligent Caching**: Redis-based response caching with 1-hour TTL
+- **Smart Contact Integration**: Seamless "Ask Mike" inbox for direct communication
 
 ### Architecture Overview
 
@@ -87,6 +88,32 @@ Iris uses a simplified 5-intent classification system powered by OpenAI function
 | **`specific_item`** | Details about a specific item | "tell me about HiLiTe", "when did I take APCS A?" |
 | **`personal`** | Family/values/interests | "Mike's story", "why Douzinas?" |
 | **`general`** | Semantic search across all content | "technical work", "AI experience" |
+
+### Ask Mike Integration
+
+When Iris encounters questions it cannot fully answer or when users explicitly request contact, it seamlessly integrates with the **"Ask Mike"** inbox system:
+
+#### Trigger Scenarios
+
+1. **Explicit Requests**: "How can I contact you?", "I'd like to message Mike"
+2. **Insufficient Context**: Questions about topics not in the knowledge base
+3. **Additional Detail**: When users want more information than Iris can provide
+
+#### Smart UI Directives
+
+Iris emits structured directives during streaming responses:
+
+```xml
+<ui:contact reason="insufficient_context" draft="Ask about summer internship plans" />
+<ui:contact reason="user_request" draft="Contact Mike directly" />
+<ui:contact reason="more_detail" draft="Get more details about HiLiTe" />
+```
+
+#### Contact Methods
+
+- **Email**: Validated email addresses with instant delivery
+- **Phone**: E.164 formatted numbers with international support  
+- **Anonymous**: No contact info required for privacy
 
 ### Knowledge Base Structure
 
@@ -173,6 +200,12 @@ interface BaseKBItem {
 - **Error Handling**: Graceful fallbacks, detailed logging
 - **Caching**: Redis with TTL-based invalidation
 
+### Inbox System (`src/app/api/inbox/route.ts`)
+- **Message Processing**: Zod validation, sanitization, rate limiting
+- **Email Notifications**: Rich HTML emails via Resend API
+- **Security**: Honeypot spam detection, IP hashing, input sanitization
+- **Database**: Supabase integration with proper schema and migrations
+
 #### Embeddings Generation (`scripts/build_embeddings.ts`)
 ```bash
 # Pre-compute embeddings for all KB items
@@ -188,16 +221,34 @@ npm run build:embeddings
 - **State Management**: React hooks with useRef for streaming
 - **Accessibility**: Full keyboard navigation, ARIA labels
 
+#### Inbox Components (`src/components/iris/`)
+- **MessageComposer**: Contact form with validation and localStorage caching
+- **ContactCta**: Call-to-action button for suggested contact scenarios
+- **useUiDirectives**: Parser hook for streaming UI directives from Iris
+
 ### Configuration
 
 #### Environment Variables
 ```bash
 # Required for Iris to function
-OPENAI_API_KEY=sk-...          # OpenAI API key for embeddings & chat
+OPENAI_API_KEY=sk-...                    # OpenAI API key for embeddings & chat
+
+# Required for production caching (optional for local dev)
+UPSTASH_REDIS_REST_URL=https://...       # Upstash Redis URL
+UPSTASH_REDIS_REST_TOKEN=...             # Upstash Redis token
+
+# Required for analytics and inbox (optional for basic Iris functionality)
+NEXT_PUBLIC_SUPABASE_URL=https://...     # Supabase project URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...        # Supabase anon key
+SUPABASE_SERVICE_ROLE_KEY=...            # Service role key (server-side only)
 
 # Optional: Enhances responses with live activity
-GITHUB_TOKEN=ghp_...           # GitHub PAT for commit history
+GITHUB_TOKEN=ghp_...                     # GitHub PAT for commit history
 ```
+
+> **📖 Complete Setup Guide**: See [SETUP.md](./SETUP.md) for detailed instructions on obtaining API keys and configuring each service.
+>
+> **🚀 Quick Vercel Deploy**: See [VERCEL_SETUP.md](./VERCEL_SETUP.md) for production deployment checklist.
 
 #### Model Configuration (`src/lib/iris/config.ts`)
 ```typescript
@@ -292,6 +343,15 @@ derived/
 - **Skill Tagging**: 850+ skills categorized and indexed
 - **Technical Depth**: Architecture diagrams, tech stacks, impact metrics
 
+### Ask Mike Inbox System
+- **Smart Integration**: Seamlessly triggered by Iris when context is insufficient
+- **Multiple Contact Methods**: Email, phone, or anonymous messaging
+- **Rich Email Notifications**: HTML-formatted emails with full context via Resend
+- **Admin Dashboard**: Secure message management with status tracking
+- **Security Features**: Rate limiting, spam detection, input sanitization
+- **Privacy Protection**: IP hashing, optional anonymous messaging
+- **Real-time Processing**: Instant email delivery with comprehensive logging
+
 ---
 
 ## 🛠️ Tech Stack
@@ -310,11 +370,14 @@ derived/
 - **AI/ML**: OpenAI API (GPT-4.1, text-embedding-3-small)
 - **Caching**: Redis (via Upstash)
 - **Validation**: Zod schemas
+- **Email**: Resend API for inbox notifications
+- **Database**: Supabase with PostgreSQL
 
 ### Infrastructure
 - **Hosting**: Vercel
-- **Database**: JSON-based knowledge base with pre-computed embeddings
+- **Database**: JSON-based knowledge base with pre-computed embeddings + Supabase PostgreSQL
 - **CDN**: Vercel Edge Network
+- **Email**: Resend for inbox notifications
 - **Analytics**: (Optional) Vercel Analytics
 
 ---
@@ -323,10 +386,12 @@ derived/
 
 ### Prerequisites
 - Node.js 18+ and npm/pnpm
-- OpenAI API key (required for Iris)
-- GitHub token (optional, for live activity)
+- OpenAI account (required - for Iris AI and embeddings)
+- Upstash account (optional - for response caching, ~50-70% cost reduction)
+- Supabase account (optional - for analytics and inbox features)
+- GitHub token (optional - for live activity context in responses)
 
-### Setup
+### Quick Start
 
 1. **Clone the repository**
    ```bash
@@ -342,23 +407,42 @@ derived/
 3. **Configure environment variables**
    ```bash
    cp .env.example .env.local
-   # Edit .env.local with your API keys
+   # Edit .env.local with your API keys (see SETUP.md for details)
    ```
 
-4. **Build embeddings** (required for Iris)
+4. **Set up services** (see [SETUP.md](./SETUP.md) for detailed instructions)
+   - **OpenAI**: Get API key from platform.openai.com
+   - **Upstash Redis** (optional): Create free database for caching
+   - **Supabase** (optional): Set up for analytics and inbox
+
+5. **Set up Supabase tables** (if using analytics/inbox)
    ```bash
-   npm run build:embeddings
+   # In Supabase SQL Editor, run:
+   # 1. sql/iris_analytics.sql (analytics tables)
+   # 2. supabase/migrations/20251027_inbox.sql (inbox table)
+   # 3. supabase/migrations/20251027_inbox_add_context.sql (inbox context)
    ```
 
-5. **Run development server**
+6. **Build knowledge base** (required for Iris)
+   ```bash
+   npm run kb:rebuild
+   # This runs: build:embeddings + build:typeahead
+   ```
+
+7. **Run development server**
    ```bash
    npm run dev
    ```
 
-6. **Open in browser**
+8. **Open in browser**
    ```
    http://localhost:3000
+   # Press ⌘K to open Iris
    ```
+
+> **📘 Need Help?** See comprehensive setup guides:
+> - [SETUP.md](./SETUP.md) - Detailed setup for all services
+> - [VERCEL_SETUP.md](./VERCEL_SETUP.md) - Production deployment guide
 
 ### Scripts
 
@@ -400,16 +484,25 @@ mikedouz-portfolio/
 ├── src/
 │   ├── app/
 │   │   ├── api/
-│   │   │   └── iris/
-│   │   │       ├── answer/route.ts      # Main Iris endpoint
-│   │   │       ├── suggest/route.ts     # Typeahead suggestions
-│   │   │       └── health/route.ts      # Health check
+│   │   │   ├── iris/
+│   │   │   │   ├── answer/route.ts      # Main Iris endpoint
+│   │   │   │   ├── suggest/route.ts     # Typeahead suggestions
+│   │   │   │   └── health/route.ts      # Health check
+│   │   │   └── inbox/
+│   │   │       └── route.ts              # Ask Mike inbox API
+│   │   ├── admin/
+│   │   │   └── inbox/
+│   │   │       └── page.tsx              # Admin inbox dashboard
 │   │   ├── about/                       # About section
 │   │   ├── projects/                    # Projects showcase
 │   │   ├── games/rack-rush/             # Word game
 │   │   └── playground/                  # Interactive demos
 │   ├── components/
 │   │   ├── IrisPalette.tsx              # AI command palette
+│   │   ├── iris/
+│   │   │   ├── MessageComposer.tsx      # Contact form component
+│   │   │   ├── ContactCta.tsx           # Contact CTA button
+│   │   │   └── useUiDirectives.ts       # UI directive parser
 │   │   ├── ContainedMouseGlow.tsx       # Contained glow component
 │   │   ├── mouse_glow.tsx               # Global mouse glow
 │   │   ├── base_card.tsx                # Card with glow support
@@ -420,19 +513,30 @@ mikedouz-portfolio/
 │   │       ├── kb/                      # Knowledge base (JSON)
 │   │       └── derived/                 # Pre-computed data
 │   ├── lib/
-│   │   └── iris/
-│   │       ├── retrieval.ts             # Semantic search
-│   │       ├── embedding.ts             # Embedding generation
-│   │       ├── config.ts                # Configuration
-│   │       ├── schema.ts                # Zod schemas
-│   │       ├── load.ts                  # Data loading
-│   │       └── cache.ts                 # Redis caching
+│   │   ├── iris/
+│   │   │   ├── retrieval.ts             # Semantic search
+│   │   │   ├── embedding.ts             # Embedding generation
+│   │   │   ├── config.ts                # Configuration
+│   │   │   ├── schema.ts                # Zod schemas
+│   │   │   ├── load.ts                  # Data loading
+│   │   │   └── cache.ts                 # Redis caching
+│   │   ├── supabaseAdmin.ts             # Supabase client & queries
+│   │   ├── types.ts                     # Shared TypeScript types
+│   │   ├── env.ts                       # Environment validation
+│   │   ├── security.ts                  # Input sanitization
+│   │   ├── rateLimit.ts                 # Rate limiting
+│   │   └── phone.ts                     # Phone validation
 │   └── styles/
+├── supabase/
+│   └── migrations/
+│       ├── 20251027_inbox.sql           # Inbox table schema
+│       └── 20251027_inbox_add_context.sql # Context fields
 ├── scripts/
 │   ├── build_embeddings.ts              # Pre-compute embeddings
 │   ├── build_typeahead.ts               # Generate suggestions
 │   └── verify_kb.ts                     # Validate KB structure
 ├── public/                              # Static assets
+├── INBOX_FEATURE.md                     # Inbox feature documentation
 ├── GLOW_SYSTEM.md                       # Mouse glow documentation
 └── README.md
 ```
@@ -528,6 +632,9 @@ import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 3. **Add Environment Variables**
    - Settings → Environment Variables
    - Add `OPENAI_API_KEY`
+   - Add `RESEND_API_KEY` (for inbox)
+   - Add `ADMIN_API_KEY` (for inbox admin)
+   - Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (for inbox)
    - Add `GITHUB_TOKEN` (optional)
 
 4. **Deploy**
