@@ -21,7 +21,7 @@ import { SiCalendly } from 'react-icons/si';
 import { getSignalSummary } from '@/lib/iris/signals';
 import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
-import { useUiDirectives, defaultOpenFor, stripUiDirectives } from './iris/useUiDirectives';
+import { useUiDirectives, defaultOpenFor, stripUiDirectives, detectContactDirective } from './iris/useUiDirectives';
 import MessageComposer from './iris/MessageComposer';
 import QuickActions, { type QuickAction } from './iris/QuickActions';
 import type { QueryFilter } from '@/app/api/iris/answer/route';
@@ -922,6 +922,14 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
         // After streaming completes, add this exchange to conversation history
         if (accumulatedAnswer) {
+          // IMPORTANT: Detect and persist directive from accumulatedAnswer BEFORE clearing answer
+          // This ensures the directive is captured even if answer state is cleared
+          // The directive detection happens here to avoid race conditions with state updates
+          const detectedDirective = detectContactDirective(accumulatedAnswer);
+          if (detectedDirective) {
+            setPersistedDirective(detectedDirective);
+          }
+          
           setConversationHistory(prev => [...prev, {
             query: q,
             answer: accumulatedAnswer,
@@ -938,6 +946,12 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         // Fallback JSON response
         const data = await response.json();
         const answerText = data.answer || 'No answer available.';
+        // IMPORTANT: Detect and persist directive from JSON response as well
+        // This ensures the directive is captured for non-streaming responses
+        const detectedDirective = detectContactDirective(answerText);
+        if (detectedDirective) {
+          setPersistedDirective(detectedDirective);
+        }
         setAnswer(answerText);
       }
     } catch (error) {
@@ -1056,7 +1070,15 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     }
 
     // For message_mike action, open the composer
+    // Create a synthetic directive to allow the composer to render
+    // This simulates a user_request directive without a draft
     if (action.type === 'message_mike') {
+      setPersistedDirective({
+        type: 'contact',
+        reason: 'user_request',
+        // No draft - user will write their own message
+        open: 'auto', // Auto-open since user explicitly clicked the action
+      });
       setShowComposer(true);
       return;
     }

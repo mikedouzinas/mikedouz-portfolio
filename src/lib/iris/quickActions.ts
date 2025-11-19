@@ -122,7 +122,7 @@ function analyzeAvailableContext(context: ActionContext): AvailableContext {
 function extractSuggestions(answer: string): string[] {
   const suggestions: string[] = [];
 
-  // Look for questions Iris asks
+  // Look for questions Iris asks (with question mark)
   const questionMatches = answer.match(/(?:Want|Would you like|Interested in|Curious about)[^?]+\?/gi);
   if (questionMatches) {
     suggestions.push(...questionMatches.map(q => q.trim()));
@@ -132,6 +132,13 @@ function extractSuggestions(answer: string): string[] {
   const canShowMatches = answer.match(/I can (?:show|share|tell you about|walk you through)[^.!]+/gi);
   if (canShowMatches) {
     suggestions.push(...canShowMatches.map(s => s.trim()));
+  }
+
+  // Look for "just let me know" or "want more details" patterns (without question mark)
+  // These are common ways Iris suggests follow-ups
+  const letMeKnowMatches = answer.match(/(?:just let me know|want more details|if you want|if you'd like|feel free to ask)[^.!]+/gi);
+  if (letMeKnowMatches) {
+    suggestions.push(...letMeKnowMatches.map(s => s.trim()));
   }
 
   return suggestions;
@@ -179,7 +186,8 @@ function generateContactActions(): QuickAction[] {
 /**
  * Generate smart quick actions based on context
  * Maximum 5 actions to avoid clutter
- * Enforces depth limit: no follow-up actions after 2 follow-ups (depth >= 2)
+ * Enforces depth limit: no specific follow-up actions after 2 follow-ups (depth >= 2)
+ * Generic "Ask a follow up..." action is available up to depth 4 to allow continued conversation
  */
 export function generateQuickActions(context: ActionContext): QuickAction[] {
   const actions: QuickAction[] = [];
@@ -192,7 +200,9 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
 
   // Hard limit: no follow-up/filter actions after 2 follow-ups
   // Still allow contact links and message_mike actions
-  const canAddFollowUps = depth < 2;
+  // However, always allow the generic "Ask a follow up..." action as it's less intrusive
+  const canAddFollowUps = depth < 4;
+  const canAddGenericFollowUp = depth < 6; // Allow generic follow-up up to depth 4
 
   const available = analyzeAvailableContext(context);
   const suggestions = extractSuggestions(fullAnswer);
@@ -285,7 +295,9 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
   }
 
   // Include custom input if under depth limit and under max actions
-  if (canAddFollowUps && actions.length < 5) {
+  // Always show generic follow-up action if we're not too deep and have space
+  // This allows users to continue the conversation even after specific quick actions are disabled
+  if (canAddGenericFollowUp && actions.length < 5) {
     actions.push({
       type: 'custom_input',
       label: 'Ask a follow up...',
