@@ -165,11 +165,22 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
   // Track UI directives from streaming
   const uiDirective = useUiDirectives(answer || '');
+  const [persistedDirective, setPersistedDirective] = useState<typeof uiDirective>(null);
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
   const copiedTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Track last seen directive to prevent auto-opening composer multiple times
   const lastDirectiveRef = useRef<string | null>(null);
+
+  /**
+   * Persist directive even after answer moves to conversation history
+   * This allows the composer to open after streaming completes
+   */
+  useEffect(() => {
+    if (uiDirective) {
+      setPersistedDirective(uiDirective);
+    }
+  }, [uiDirective]);
 
   /**
    * Simplify answer text when there's a contact directive
@@ -344,27 +355,32 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   }, []);
 
   /**
-   * Auto-open composer when directive is detected
+   * Auto-open composer when directive is detected and streaming completes
    * Based on reason and open behavior
    * Uses ref to prevent re-opening the same directive multiple times
+   * Only opens after streaming completes (!isProcessingQuery)
    */
   useEffect(() => {
-    if (!uiDirective) {
-      setShowComposer(false); // Reset composer when directive clears
-      lastDirectiveRef.current = null;
+    if (!persistedDirective) {
+      // Don't close composer here - let manual closing handle it
+      return;
+    }
+
+    // Wait for streaming to complete before opening composer
+    if (isProcessingQuery) {
       return;
     }
 
     // Create unique ID from directive to detect if it's new
-    const directiveId = `${uiDirective.reason}-${uiDirective.draft?.substring(0, 30)}`;
+    const directiveId = `${persistedDirective.reason}-${persistedDirective.draft?.substring(0, 30)}`;
 
     // Only auto-open if it's a new directive we haven't seen before
-    const shouldAutoOpen = (uiDirective.open ?? defaultOpenFor(uiDirective.reason)) === 'auto';
+    const shouldAutoOpen = (persistedDirective.open ?? defaultOpenFor(persistedDirective.reason)) === 'auto';
     if (shouldAutoOpen && directiveId !== lastDirectiveRef.current) {
       setShowComposer(true);
       lastDirectiveRef.current = directiveId;
     }
-  }, [uiDirective]);
+  }, [persistedDirective, isProcessingQuery]);
 
   // Refs for focus management
   const inputRef = useRef<HTMLInputElement>(null);
@@ -488,6 +504,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setSubmittedQuery('');
       setConversationHistory([]); // Clear conversation history (includes quick actions)
       setCurrentQueryId(null); // Clear query ID
+      setShowComposer(false); // Close composer
+      setPersistedDirective(null); // Clear persisted directive
+      lastDirectiveRef.current = null; // Reset directive tracking
     }
   }, [isAnimating, onOpenChange]);
 
@@ -768,6 +787,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     // Reset conversation history if this is a fresh query (not from quick action)
     if (!continueConversation) {
       setConversationHistory([]);
+      setShowComposer(false); // Close composer for fresh queries
+      setPersistedDirective(null); // Clear persisted directive
+      lastDirectiveRef.current = null; // Reset directive tracking
     }
 
     // Calculate current depth from conversation history
@@ -1007,6 +1029,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     setShowScrollToBottom(false); // Reset scroll indicator
     setConversationHistory([]); // Clear conversation history (includes quick actions)
     setCurrentQueryId(null); // Clear query ID
+    setShowComposer(false); // Close composer
+    setPersistedDirective(null); // Clear persisted directive
+    lastDirectiveRef.current = null; // Reset directive tracking
     inputRef.current?.focus();
   };
 
@@ -1313,23 +1338,11 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               <div
                 ref={answerRef}
                 onScroll={handleScroll}
-                className={`p-4 overflow-y-auto space-y-4 ${
-                  (showComposer || (uiDirective && !showComposer))
-                    ? 'max-h-32 sm:max-h-64'
-                    : 'max-h-64'
-                }`}
+                className="p-4 overflow-y-auto space-y-4 max-h-96"
               >
                 {/* Render all previous exchanges from conversation history */}
                 {conversationHistory.map((exchange, index) => (
                   <div key={index} className="space-y-2">
-                    {/* Show query header for follow-ups (depth > 0) */}
-                    {exchange.depth > 0 && (
-                      <div className="flex items-center gap-2 text-white/50 text-sm">
-                        <ArrowRight className="w-4 h-4" />
-                        <span className="italic">{exchange.query}</span>
-                      </div>
-                    )}
-
                     {/* Render the answer */}
                     {renderMarkdownContent(autoLinkText(simplifyContactAnswer(exchange.answer)), false)}
 
@@ -1347,14 +1360,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 {/* Render current streaming answer (if any) */}
                 {answer ? (
                   <div className="space-y-2">
-                    {/* Show query header if this is a follow-up */}
-                    {conversationHistory.length > 0 && (
-                      <div className="flex items-center gap-2 text-white/50 text-sm">
-                        <ArrowRight className="w-4 h-4" />
-                        <span className="italic">{submittedQuery}</span>
-                      </div>
-                    )}
-
                     {/* Render current streaming answer */}
                     {renderMarkdownContent(renderedAnswer, isProcessingQuery)}
                   </div>
@@ -1365,7 +1370,25 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     <span className="text-[14px]">Thinking...</span>
                   </div>
                 ) : null}
-                
+
+                {/* Message Composer - shown inline after current answer */}
+                {/* Only show if not currently processing a new query and directive exists */}
+                {!isProcessingQuery && showComposer && persistedDirective && (
+                  <div className="mt-4">
+                    <MessageComposer
+                      origin={
+                        persistedDirective.reason === 'user_request' ? 'iris-explicit' :
+                        persistedDirective.reason === 'insufficient_context' ? 'auto-insufficient' :
+                        'iris-suggested'
+                      }
+                      initialDraft={persistedDirective.draft}
+                      locked={isProcessingQuery}
+                      userQuery={submittedQuery}
+                      onCancel={() => setShowComposer(false)}
+                    />
+                  </div>
+                )}
+
                 {/* Debug Panel - Shows when debug info is available */}
                 {debugInfo && (
                   <div className="mt-4 p-3 bg-black/20 dark:bg-white/10 rounded-lg border border-white/20">
@@ -1420,24 +1443,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 </button>
               )}
             </div>
-
-            {/* Message Composer - shown when auto-opened or when user clicks Message Mike */}
-            {/* Only show if not currently processing a new query */}
-            {!isProcessingQuery && showComposer && (
-              <div className="px-4 pb-4">
-                <MessageComposer
-                  origin={
-                    uiDirective?.reason === 'user_request' ? 'iris-explicit' :
-                    uiDirective?.reason === 'insufficient_context' ? 'auto-insufficient' :
-                    'iris-suggested'
-                  }
-                  initialDraft={uiDirective?.draft}
-                  locked={isProcessingQuery}
-                  userQuery={submittedQuery}
-                  onCancel={() => setShowComposer(false)}
-                />
-              </div>
-            )}
           </>
         )}
       </motion.div>
