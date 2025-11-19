@@ -38,13 +38,13 @@ const SUGGESTIONS = [
     {
       id: 'tech-skills',
       icon: Code,
-      primary: 'What are Mike's strongest technical skills?',
+      primary: "What are Mike's strongest technical skills?",
       secondary: 'Languages, frameworks, and areas of expertise',
     },
     {
       id: 'best-work',
       icon: Rocket,
-      primary: 'Show me Mike's best work',
+      primary: "Show me Mike's best work",
       secondary: 'Featured projects with impact and technical depth',
     },
     {
@@ -62,7 +62,7 @@ const SUGGESTIONS = [
     {
       id: 'experience',
       icon: Briefcase,
-      primary: 'Tell me about Mike's experience',
+      primary: "Tell me about Mike's experience",
       secondary: 'Internships, roles, and career progression',
     },
   ] as const;
