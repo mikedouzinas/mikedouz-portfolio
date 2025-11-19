@@ -1373,6 +1373,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                       <QuickActions
                         actions={exchange.quickActions}
                         onActionClick={handleQuickActionClick}
+                        onCancel={() => {
+                          // Hide MessageComposer when canceling quick action
+                          setShowComposer(false);
+                        }}
                         disabled={isProcessingQuery}
                       />
                     )}

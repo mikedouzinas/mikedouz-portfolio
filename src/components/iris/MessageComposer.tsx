@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, User, Send, Loader2, Info, X } from 'lucide-react';
+import { Mail, Phone, User, Send, Loader2, Info } from 'lucide-react';
 import { isValidPhoneFormat, validateAndFormatPhone } from '@/lib/phone';
 import { generateNonce } from '@/lib/security';
 import ContainedMouseGlow from '../ContainedMouseGlow';
@@ -493,24 +493,6 @@ export default function MessageComposer({
               Send to Mike
             </>
           )}
-        </button>
-        
-        {/* Cancel button - small square with icon */}
-        <button
-          onClick={() => {
-            // Reset form state
-            setMessage('');
-            setError(null);
-            setValidationError(null);
-            setSubmittedMessage(null);
-            // Call parent callback to hide composer
-            onCancel?.();
-          }}
-          disabled={locked || isSubmitting}
-          className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl text-white/60 hover:text-white/90 hover:bg-white/10 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 border border-white/20 hover:border-white/40"
-          title="Cancel"
-        >
-          <X className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
       </div>
       
