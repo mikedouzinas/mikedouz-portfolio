@@ -335,8 +335,30 @@ derived/
 
 ### Projects Showcase
 - **Interactive Demos**: Live project previews and links
-- **Rack Rush**: Built-in word game with Scrabble-style mechanics
+- **Rack Rush**: Built-in word game with Scrabble-style mechanics, time pressure, and exchange mechanics
 - **GitHub Integration**: Live commit activity (production only)
+
+### Playground Tools
+The portfolio includes an interactive playground with custom-built tools:
+
+- **Decision Maker**: Helps overcome choice paralysis by randomly selecting from user options and providing thoughtful reasoning
+  - Enter multiple options (one per line)
+  - Optional criteria for consideration
+  - Simulated "thinking" time for better UX
+  - Smart reasoning templates to help validate the choice
+
+- **Quotes Collection**: Personal curated quotes with context
+  - Auto-rotating display (6-second intervals with pause/resume)
+  - Each quote includes personal reasoning for why it resonates
+  - Manual navigation and direct selection
+  - Progress indicators and smooth transitions
+
+- **Ranked by MV**: Systematic rating system inspired by Beli
+  - 5 weighted categories: Quality, Innovation, Practical Value, Design, Personal Appeal
+  - 0-10 scoring with 0.5 increments
+  - Calculated weighted averages for overall scores
+  - LocalStorage persistence for saved ratings
+  - Color-coded score visualization (green/yellow/orange/red)
 
 ### Work Experience
 - **Timeline View**: Chronological display of roles and companies

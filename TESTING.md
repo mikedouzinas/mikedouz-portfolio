@@ -2,6 +2,23 @@
 
 This document outlines the testing procedure for Iris to ensure all functionality works correctly before deployment.
 
+## Quick Start
+
+Run the comprehensive interactive test suite:
+```bash
+npm run test:iris
+```
+
+This script includes **11 comprehensive test suites** with 80+ test cases covering:
+- Base functionality and filter queries
+- Employer/recruiter questions and contact drafting
+- Specific item queries and personal/bio information
+- Edge cases, anti-hallucination, and complex synthesis
+- Advice & guidance scenarios
+- Conversation threading and quick actions
+
+The test suites below represent **key categories** to manually verify. For the full test suite, run the script above.
+
 ## Testing Categories
 
 ### 1. Base Cases - Core Functionality
