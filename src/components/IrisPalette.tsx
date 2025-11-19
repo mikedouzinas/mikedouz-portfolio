@@ -245,7 +245,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    * Helper function to render markdown content
    * Reused for both conversation history and current answer
    */
-  const renderMarkdownContent = useCallback((content: string, isStreaming = false) => (
+  const renderMarkdownContent = useCallback((content: string) => (
     <div className="text-[14px] text-white/90 leading-relaxed iris-markdown">
       <ReactMarkdown
         components={{
@@ -1461,7 +1461,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 {conversationHistory.map((exchange, index) => (
                   <div key={index} className="space-y-2">
                     {/* Render the answer */}
-                    {renderMarkdownContent(autoLinkText(simplifyContactAnswer(exchange.answer)), false)}
+                    {renderMarkdownContent(autoLinkText(simplifyContactAnswer(exchange.answer)))}
 
                     {/* Render quick actions for this exchange */}
                     {exchange.quickActions.length > 0 && (
@@ -1484,7 +1484,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 {answer ? (
                   <div className="space-y-2">
                     {/* Render current streaming answer */}
-                    {renderMarkdownContent(renderedAnswer, isProcessingQuery)}
+                    {renderMarkdownContent(renderedAnswer)}
                   </div>
                 ) : conversationHistory.length === 0 && isProcessingQuery && mainLoadingConfig ? (
                   /* Show loading state when no answer yet and no history - use random loading messages */

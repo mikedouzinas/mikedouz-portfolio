@@ -239,7 +239,7 @@ export function generateGuardrailResponse(query: string): string {
 
   return "I can help answer questions about Mike's projects, experience, values, contact information, or current work. " +
          "Here are some things you could ask instead:\n\n" +
-         classification.suggestions?.map(s => `• ${s}`).join('\n') || '';
+         (classification.suggestions?.map(s => `- ${s}`).join('\n') || '');
 }
 
 /**

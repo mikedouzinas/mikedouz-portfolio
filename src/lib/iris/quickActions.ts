@@ -177,7 +177,7 @@ function generateContactActions(): QuickAction[] {
     {
       type: 'contact_link',
       label: 'Email',
-      link: 'mike@mikedouzinas.com',
+      link: 'mike@douzinas.com',
       linkType: 'email',
     },
   ];
@@ -198,11 +198,11 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
     return generateContactActions();
   }
 
-  // Hard limit: no follow-up/filter actions after 2 follow-ups
+  // Hard limit: no follow-up/filter actions after depth 4
   // Still allow contact links and message_mike actions
-  // However, always allow the generic "Ask a follow up..." action as it's less intrusive
+  // However, always allow the generic "Ask a follow up..." action up to depth 4
   const canAddFollowUps = depth < 4;
-  const canAddGenericFollowUp = depth < 6; // Allow generic follow-up up to depth 4
+  const canAddGenericFollowUp = depth < 6; // Always allow generic follow-up up to depth 4
 
   const available = analyzeAvailableContext(context);
   const suggestions = extractSuggestions(fullAnswer);
@@ -270,6 +270,21 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
     }
   }
 
+  // Always add generic follow-up action when depth < 4
+  // This should always be available to allow continued conversation
+  // Add it here (outside the canAddFollowUps block) to ensure it's always included
+  // even if no other follow-up actions were added
+  if (canAddGenericFollowUp) {
+    // Check if it's already added (shouldn't be, but safety check)
+    const hasFollowUp = actions.some(a => a.type === 'custom_input');
+    if (!hasFollowUp) {
+      actions.push({
+        type: 'custom_input',
+        label: 'Ask a follow up...',
+      });
+    }
+  }
+
   // Add contact links if this was about work/projects
   if (intent === 'filter_query' || intent === 'specific_item') {
     const shownProjects = available.shownTypes.has('project');
@@ -294,16 +309,6 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
     }
   }
 
-  // Include custom input if under depth limit and under max actions
-  // Always show generic follow-up action if we're not too deep and have space
-  // This allows users to continue the conversation even after specific quick actions are disabled
-  if (canAddGenericFollowUp && actions.length < 5) {
-    actions.push({
-      type: 'custom_input',
-      label: 'Ask a follow up...',
-    });
-  }
-
   // Add "Message Mike" if it makes sense
   // - If we've gone deep and exhausted related content
   // - If this was a personal query
@@ -320,6 +325,38 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
     });
   }
 
-  // Limit to 5 actions max
+  // Limit to 5 actions max, but always preserve the generic follow-up if depth < 4
+  // This ensures users can always continue the conversation
+  if (actions.length > 5 && canAddGenericFollowUp) {
+    const followUpAction = actions.find(a => a.type === 'custom_input');
+    if (followUpAction) {
+      // Remove follow-up temporarily, trim to 4, then add it back
+      const otherActions = actions.filter(a => a.type !== 'custom_input').slice(0, 4);
+      return [...otherActions, followUpAction];
+    }
+  }
+  
+  // CRITICAL: Always ensure at least one quick action is returned
+  // This guarantees users can always continue the conversation or take action
+  // Professional comment: Even at high depth levels, we should provide at least one way
+  // for users to continue engaging (follow-up or message)
+  if (actions.length === 0) {
+    // Fallback: Add generic follow-up if we haven't hit the absolute limit
+    // Or add "Message Mike" as a last resort
+    if (depth < 4) {
+      // Allow follow-up even at higher depths as absolute fallback
+      actions.push({
+        type: 'custom_input',
+        label: 'Ask a follow up...',
+      });
+    } else {
+      // Absolute last resort: message option
+      actions.push({
+        type: 'message_mike',
+        label: 'Message Mike',
+      });
+    }
+  }
+  
   return actions.slice(0, 5);
 }

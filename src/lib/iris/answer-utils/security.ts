@@ -41,7 +41,10 @@ export function detectPromptInjection(query: string): boolean {
 /**
  * Build a set of context entities from the knowledge base
  * This is mutable and updates when KB content changes
- * Extracts: companies, schools, project titles, skills, blog titles
+ * Extracts: companies, schools, project titles, skills, blog titles, and aliases
+ *
+ * Professional comment: Includes aliases so queries like "what is iris?" are recognized
+ * as valid even when "Iris" is an alias rather than the full project title.
  *
  * @param items - All KB items
  * @returns Set of entity names in lowercase
@@ -73,6 +76,12 @@ export function buildContextEntities(items: KBItem[]): Set<string> {
     // Add blog/story titles
     if ((item.kind === 'blog' || item.kind === 'story') && 'title' in item && item.title) {
       entities.add(item.title.toLowerCase());
+    }
+
+    // Add aliases for all item types (projects, experiences, classes, etc.)
+    // This allows queries like "what is iris?" to be recognized when "Iris" is an alias
+    if ('aliases' in item && Array.isArray(item.aliases)) {
+      item.aliases.forEach(alias => entities.add(alias.toLowerCase()));
     }
   }
 

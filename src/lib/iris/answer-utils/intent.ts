@@ -70,6 +70,10 @@ Follow these rules in order to determine intent:
 ## 1. CONTACT Intent
 Use when query explicitly asks for contact information, ways to reach Mike, or communication methods.
 Patterns: "contact", "email", "reach out", "get in touch", "linkedin", "how to contact", "message", "connect", "write a message", "send a message", "message mike", "write to mike", "send to mike"
+**CRITICAL: Also use CONTACT for availability queries about FUTURE opportunities:**
+- "is mike available for X", "is mike available", "is mike open to", "is mike looking for", "is mike seeking"
+- "available for internships/jobs/work" → CONTACT (about future availability)
+- "what internships has mike done" → FILTER_QUERY (about past work)
 
 ## 2. SPECIFIC_ITEM Intent
 Use when query asks about a SINGLE, SPECIFIC item by name/title.
@@ -140,7 +144,7 @@ Typically for exploratory questions like "what technical work", "what has Mike d
 
 # Decision Process
 
-1. Does the query explicitly ask for contact info? → CONTACT
+1. Does the query explicitly ask for contact info OR ask about future availability (e.g., "is mike available for X")? → CONTACT
 2. Does the query mention a specific item name/title? → SPECIFIC_ITEM (with title_match)
 3. Does the query ask for a list or multiple items? → FILTER_QUERY (extract type, skills, year, company filters)
 4. Does the query ask about personal/background information? → PERSONAL

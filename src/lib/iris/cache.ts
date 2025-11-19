@@ -218,15 +218,24 @@ class UpstashCache implements IrisCache {
   async clear(pattern?: string): Promise<void> {
     try {
       const redis = await this.getRedis() as { keys: (pattern: string) => Promise<string[]>; del: (...keys: string[]) => Promise<unknown> };
-      const keyPattern = pattern || 'iris:answer:*';
+      // Professional comment: Cache keys are stored as "iris:answer:{normalizedQuery}"
+      // If pattern is provided, it should match the normalized query part (without prefix)
+      // If no pattern, clear all iris:answer:* keys
+      const keyPattern = pattern 
+        ? `iris:answer:*${normalizeQuery(pattern)}*` 
+        : 'iris:answer:*';
 
       // Upstash doesn't support SCAN in REST API, so we use KEYS (ok for small cache)
       const keys = await redis.keys(keyPattern);
       if (keys && keys.length > 0) {
         await redis.del(...keys);
+        console.log(`[UpstashCache] Cleared ${keys.length} cache entries`);
+      } else {
+        console.log(`[UpstashCache] No cache entries found matching pattern: ${keyPattern}`);
       }
     } catch (error) {
       console.warn('[UpstashCache] Clear failed:', error);
+      throw error; // Re-throw so caller knows it failed
     }
   }
 

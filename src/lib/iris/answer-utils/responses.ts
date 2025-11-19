@@ -53,6 +53,7 @@ export function streamTextResponse(message: string): Response {
 
 /**
  * Builds a contact message draft from the user's query
+ * Converts references to Mike into direct address using "you" and "your"
  *
  * @param query - The user's query
  * @returns Drafted contact message
@@ -64,16 +65,20 @@ export function buildContactDraft(query: string): string {
     .replace(/\b(show|describe|explain)\s+me\b/gi, '')
     .trim();
 
+  // CRITICAL: Convert Mike references to direct address
+  // Must happen before other cleaning to preserve context
   const cleaned = stripped
+    .replace(/\bmike's\b/gi, 'your')  // "mike's" or "Mike's" → "your"
+    .replace(/\bmikes\b/gi, 'your')   // "mikes" (without apostrophe) → "your" 
+    .replace(/\bmike\b/gi, 'you')     // "mike" or "Mike" → "you"
     .replace(/^(about|regarding|on)\s+/i, '')
-    .replace(/\bmike's\b/gi, 'your')
-    .replace(/\bmike\b/gi, 'you')
     .trim();
 
   if (!cleaned) {
     return 'I would love to chat about opportunities to collaborate.';
   }
 
+  // Ensure sentence starts lowercase for natural flow
   const sentence = cleaned.charAt(0).toLowerCase() === cleaned.charAt(0)
     ? cleaned
     : cleaned.charAt(0).toLowerCase() + cleaned.slice(1);

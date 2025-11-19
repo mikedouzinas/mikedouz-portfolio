@@ -25,6 +25,7 @@ type Options = {
   fields?: string[]; 
   types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'>;
   debug?: boolean;
+  preFilteredItemIds?: Set<string>; // Optional set of item IDs to restrict retrieval to (for pre-filtered queries)
 };
 
 function cosine(a: number[], b: number[]) {
@@ -77,6 +78,13 @@ export async function retrieve(query: string, options: Options = {}): Promise<{ 
   let filteredKb = kb;
   if (options.types && options.types.length > 0) {
     filteredKb = kb.filter(item => options.types!.includes(item.kind));
+  }
+
+  // Professional comment: Apply pre-filtered item IDs if provided (e.g., for year filters in general intent).
+  // This ensures queries like "how has mike's work evolved from 2021 to 2025?" only search within
+  // items matching those years, not just boost them in ranking after retrieval.
+  if (options.preFilteredItemIds && options.preFilteredItemIds.size > 0) {
+    filteredKb = filteredKb.filter(item => options.preFilteredItemIds!.has(item.id));
   }
   
   // Get IDs of filtered items for scoring

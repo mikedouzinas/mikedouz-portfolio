@@ -121,8 +121,22 @@ export function deriveFilterDefaults(
   }
 
   // Specific item detection via aliases
+  // Professional comment: Only set title_match for specific items when:
+  // 1. Query is asking for a specific item (not a list/overview query)
+  // 2. The match hasn't already been added as a company filter
+  // 3. The query pattern suggests a specific item lookup (not "all X" or "list X")
   if (!next.title_match) {
-    const specificMatch = aliasMatches.find(match => match.type === 'project' || match.type === 'experience');
+    const isListQuery = /\b(list|show|give me|display|enumerate|all|every|everything|what.*has|what.*did)\b/.test(normalized);
+    const specificMatch = aliasMatches.find(match => {
+      // Only match projects or experiences that aren't already in company filters
+      if (match.type !== 'project' && match.type !== 'experience') return false;
+      // Don't set title_match if this name is already in company filters
+      if (next.company && next.company.includes(match.name)) return false;
+      // For list queries, prefer company filters over title_match
+      if (isListQuery && match.type === 'experience') return false;
+      return true;
+    });
+    
     if (specificMatch) {
       next.title_match = specificMatch.name;
       mutated = true;

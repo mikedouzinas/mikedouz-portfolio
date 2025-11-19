@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { retrieve, diversifyByType, buildEvidencePacks, buildEvidenceSignals } from '@/lib/iris/retrieval';
-import { loadContact, loadKBItems, buildAliasIndex, AliasEntry } from '@/lib/iris/load';
+import { loadContact, loadKBItems, buildAliasIndex, AliasEntry, loadBio } from '@/lib/iris/load';
 // SignalSummary type reserved for future RAG personalization
 import { irisCache } from '@/lib/iris/cache';
 import { type KBItem, type PlannerResult, type EvidenceSignals } from '@/lib/iris/schema';
@@ -33,7 +33,7 @@ import { deriveTemporalHints, applyTemporalBoost, sortItemsForFilter } from '@/l
 import { formatContext, formatContextByKind, buildContextIndex } from '@/lib/iris/answer-utils/formatting';
 
 // Import response utilities
-import { streamTextResponse, buildNoMatchResponse, buildClarificationPrompt, buildGuardrailResponse, createNoContextResponse } from '@/lib/iris/answer-utils/responses';
+import { streamTextResponse, buildNoMatchResponse, buildClarificationPrompt, buildGuardrailResponse, createNoContextResponse, buildContactDraft } from '@/lib/iris/answer-utils/responses';
 
 // Import security utilities
 import { detectPromptInjection, buildContextEntities, isClearlyOffTopic } from '@/lib/iris/answer-utils/security';
@@ -256,8 +256,17 @@ export async function POST(req: NextRequest) {
     const fields = FIELD_MAP[intent] || []; // Fallback to empty array for unknown intents
 
     // Check cache for previously answered queries (1 hour TTL)
+    // Professional comment: Cache key includes query and intent to ensure different intents
+    // for the same query get different cache entries (e.g., "contact" vs "filter_query")
     const cacheKey = `answer:${query}:${intent}`;
     const cached = await irisCache.get(cacheKey);
+    
+    // Debug: Log cache lookup result
+    if (cached) {
+      console.log(`[Cache] ✅ HIT for key: ${cacheKey}`);
+    } else {
+      console.log(`[Cache] ❌ MISS for key: ${cacheKey} - will compute fresh response`);
+    }
 
     if (cached) {
       // Debug: Log cached response
@@ -269,50 +278,113 @@ export async function POST(req: NextRequest) {
       console.log(`Cache Key: ${cacheKey}`);
 
       try {
-        const cachedData = JSON.parse(cached);
-
-        // Debug: Log cached answer
-        console.log(`Cached Answer Length: ${cachedData.answer?.length || 0} characters`);
-        console.log('\nCached Answer:');
-        console.log('───────────────────────────────────────────────────────────────');
-        console.log(cachedData.answer || 'No answer in cache');
-        console.log('───────────────────────────────────────────────────────────────');
-        console.log('═══════════════════════════════════════════════════════════════\n');
-
-        // Log cached query to analytics (non-blocking)
-        const latencyMs = Date.now() - startTime;
-        logQuery({
-          query,
-          intent,
-          filters: undefined,
-          results_count: cachedData.sources?.length || 0,
-          context_items: undefined,
-          answer_length: cachedData.answer?.length || 0,
-          latency_ms: latencyMs,
-          cached: true,
-          session_id: req.headers.get('x-session-id') || undefined,
-          user_agent: req.headers.get('user-agent') || undefined
-        }).catch(error => {
-          console.warn('[Analytics] Failed to log cached query:', error);
-        });
-
-        // Return cached response as stream for consistent client behavior
-        const encoder = new TextEncoder();
-        const readable = new ReadableStream({
-          start(controller) {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: cachedData.answer, cached: true })}\n\n`));
-            controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-            controller.close();
+        // Handle case where cached value might be an object stringified incorrectly
+        // or already be a parsed object (defensive programming)
+        let cachedData: { answer?: string; sources?: string[]; timing?: number } | undefined;
+        if (typeof cached === 'string') {
+          try {
+            cachedData = JSON.parse(cached);
+          } catch (parseError) {
+            // If parsing fails, check if it's the "[object Object]" string
+            if (cached === '[object Object]') {
+              console.warn('[Answer API] Cached value is invalid object string, clearing cache entry');
+              await irisCache.clear(cacheKey);
+              // Set cachedData to undefined to fall through to generate new response
+              cachedData = undefined;
+            } else {
+              throw parseError;
+            }
           }
-        });
+        } else if (typeof cached === 'object' && cached !== null) {
+          // Already an object (shouldn't happen, but handle gracefully)
+          cachedData = cached as { answer?: string; sources?: string[]; timing?: number };
+        } else {
+          throw new Error(`Unexpected cached value type: ${typeof cached}`);
+        }
 
-        return new Response(readable, {
-          headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive'
+        // If cachedData is undefined (cache was cleared), fall through to generate new response
+        if (cachedData && cachedData.answer) {
+          // Debug: Log cached answer
+          console.log(`Cached Answer Length: ${cachedData.answer?.length || 0} characters`);
+          console.log('\nCached Answer:');
+          console.log('───────────────────────────────────────────────────────────────');
+          console.log(cachedData.answer || 'No answer in cache');
+          console.log('───────────────────────────────────────────────────────────────');
+          console.log('═══════════════════════════════════════════════════════════════\n');
+
+          // Log cached query to analytics (non-blocking)
+          const latencyMs = Date.now() - startTime;
+          logQuery({
+            query,
+            intent,
+            filters: undefined,
+            results_count: cachedData.sources?.length || 0,
+            context_items: undefined,
+            answer_length: cachedData.answer?.length || 0,
+            latency_ms: latencyMs,
+            cached: true,
+            session_id: req.headers.get('x-session-id') || undefined,
+            user_agent: req.headers.get('user-agent') || undefined
+          }).catch(error => {
+            console.warn('[Analytics] Failed to log cached query:', error);
+          });
+
+          // Generate quick actions for cached answers (same as non-cached)
+          // Professional comment: Cached answers should have the same UX as fresh answers,
+          // including quick actions for follow-ups and engagement
+          let generatedQuickActions: ReturnType<typeof generateQuickActions> = [];
+          try {
+            // Load all items for context (needed for quick action generation)
+            const allItems = await getAllItems();
+            
+            // Generate quick actions based on cached answer content
+            generatedQuickActions = generateQuickActions({
+              query,
+              intent,
+              filters,
+              results: [], // No results available from cache, but quick actions can still be generated
+              fullAnswer: cachedData.answer,
+              allItems,
+              depth, // Pass depth for enforcing follow-up limits
+            });
+
+            console.log('\n═══════════════════════════════════════════════════════════════');
+            console.log('💡 GENERATED QUICK ACTIONS (CACHED)');
+            console.log('═══════════════════════════════════════════════════════════════');
+            console.log(`Count: ${generatedQuickActions.length}`);
+            console.log('Actions:', JSON.stringify(generatedQuickActions, null, 2));
+            console.log('═══════════════════════════════════════════════════════════════\n');
+          } catch (error) {
+            console.warn('[Answer API] Failed to generate quick actions for cached answer:', error);
+            // Non-critical error, continue without quick actions
           }
-        });
+
+          // Return cached response as stream for consistent client behavior
+          const encoder = new TextEncoder();
+          const readable = new ReadableStream({
+            start(controller) {
+              // Stream the cached answer
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: cachedData.answer, cached: true })}\n\n`));
+              
+              // Send quick actions if any were generated
+              if (generatedQuickActions.length > 0) {
+                const quickActionsData = `data: ${JSON.stringify({ quickActions: generatedQuickActions })}\n\n`;
+                controller.enqueue(encoder.encode(quickActionsData));
+              }
+              
+              controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+              controller.close();
+            }
+          });
+
+          return new Response(readable, {
+            headers: {
+              'Content-Type': 'text/event-stream',
+              'Cache-Control': 'no-cache',
+              'Connection': 'keep-alive'
+            }
+          });
+        }
       } catch (e) {
         console.warn('[Answer API] Failed to parse cached data:', e);
         // Continue to generate fresh answer
@@ -327,6 +399,21 @@ export async function POST(req: NextRequest) {
       console.log('═══════════════════════════════════════════════════════════════');
       console.log(`Query: "${query}"`);
       console.log(`Intent: ${intent}`);
+
+      // Check if this is an availability query - if so, retrieve bio info for availability details
+      const isAvailabilityQuery = /\b(available|availability|open to|looking for|seeking|hiring|hire)\b.*\b(for|internships?|jobs?|work|opportunities?|positions?|roles?)\b/i.test(query) ||
+                                  /\b(is|are)\b.*\b(available|open|looking|seeking)\b/i.test(query);
+
+      let availabilityInfo: string | undefined;
+      if (isAvailabilityQuery) {
+        // Load bio to get availability information (only load bio, not all items)
+        const bioItems = await loadBio();
+        const bioItem = bioItems[0];
+        if (bioItem && bioItem.availability) {
+          availabilityInfo = bioItem.availability;
+          console.log(`Availability Info Found: "${availabilityInfo}"`);
+        }
+      }
 
       // Check if user wants to write/send a message with specific content
       // Only matches when user has something specific to say to Mike
@@ -361,11 +448,11 @@ export async function POST(req: NextRequest) {
                 messages: [
                   {
                     role: 'system',
-                    content: 'You are a helpful assistant that creates natural, complete draft messages from user queries. Transform the user\'s raw query into a polite, complete sentence from the user\'s perspective (using "you" to refer to Mike). Keep it concise (1-2 sentences max). Make it sound natural and conversational, not formal or robotic.'
+                    content: 'You are writing an actual message that a user will send to Mike. The user has expressed interest in a topic, and you need to write a natural, direct message as if the user is already speaking to Mike.\n\nCRITICAL RULES:\n- Output ONLY the actual message content - NOT meta-commentary about drafting or writing messages\n- NEVER say things like "I think it would be great to draft..." or "I wanted to write a message about..."\n- Write as if the user is directly speaking to Mike right now (use "you" to refer to Mike)\n- Always change "mike/Mike" to "you" and "mike\'s/Mike\'s" to "your"\n- Make it sound natural, conversational, and professional\n- Keep it concise (1-2 sentences max)\n- The message should express the user\'s actual intent clearly\n\nExamples:\n- Query: "hiring him for a summer internship" → Output: "I\'m interested in discussing a summer internship opportunity with you."\n- Query: "what are mikes favorite work" → Output: "I\'d love to hear about your favorite work."\n- Query: "collaboration on a project" → Output: "I\'d like to explore a potential collaboration on a project."'
                   },
                   {
                     role: 'user',
-                    content: `Create a draft message from this query: "${cleanedQuery}"`
+                    content: `The user wants to message Mike about: "${cleanedQuery}"\n\nWrite the actual message content the user would send (not commentary about writing a message). Address Mike directly using "you".`
                   }
                 ],
                 temperature: 0.7,
@@ -377,6 +464,11 @@ export async function POST(req: NextRequest) {
             ]);
 
             draftMessage = draftResponse.choices[0]?.message?.content?.trim() || `I wanted to reach out: ${cleanedQuery}`;
+            // Ensure Mike references are converted to "you" even if model didn't do it
+            draftMessage = draftMessage
+              .replace(/\bmike's\b/gi, 'your')
+              .replace(/\bmikes\b/gi, 'your')
+              .replace(/\bmike\b/gi, 'you');
           } else {
             draftMessage = 'I\'d like to get in touch';
           }
@@ -386,13 +478,29 @@ export async function POST(req: NextRequest) {
             .replace(/\b(write|send|a message to|message|tell)\s+(to\s+)?(mike|you|him|them)\s+(about|regarding|that|on|concerning)?\s*/gi, '')
             .replace(/\b(i want to|i'd like to|can you|could you|please)\s+/gi, '')
             .trim();
-          draftMessage = cleanQuery ? `I wanted to reach out: ${cleanQuery}` : 'I\'d like to get in touch';
+          // Convert Mike references to direct address in fallback too
+          const convertedQuery = cleanQuery
+            .replace(/\bmike's\b/gi, 'your')
+            .replace(/\bmikes\b/gi, 'your')
+            .replace(/\bmike\b/gi, 'you');
+          draftMessage = convertedQuery ? `I'd love to talk about ${convertedQuery}` : 'I\'d like to get in touch';
         }
 
         // For message requests, add user_request directive
         contactMessage = `<ui:contact reason="user_request" draft="${draftMessage.replace(/"/g, '&quot;')}" />`;
         console.log(`Wants to Message: true`);
         console.log(`Draft Message: "${draftMessage}"`);
+      } else if (isAvailabilityQuery && availabilityInfo) {
+        // For availability queries with info, provide the availability details with contact option
+        const availabilityDraft = buildContactDraft(query);
+        contactMessage = `${availabilityInfo} If you'd like to discuss opportunities, feel free to reach out.\n\n<ui:contact reason="user_request" draft="${escapeAttribute(availabilityDraft)}" />`;
+        console.log(`Availability Query: true`);
+        console.log(`Availability Info: "${availabilityInfo}"`);
+      } else if (isAvailabilityQuery) {
+        // For availability queries without info, provide generic response
+        const availabilityDraft = buildContactDraft(query);
+        contactMessage = `I don't have details on Mike's current availability for internships yet. If you're interested in finding out, feel free to message him directly.\n\n<ui:contact reason="user_request" draft="${escapeAttribute(availabilityDraft)}" />`;
+        console.log(`Availability Query: true (no info found)`);
       } else {
         // For general contact queries, show 4 quick action buttons WITHOUT composer
         contactMessage = "Here's how you can reach Mike:";
@@ -452,7 +560,7 @@ export async function POST(req: NextRequest) {
               {
                 type: 'contact_link',
                 label: 'Email',
-                link: 'mike@mikedouzinas.com',
+                link: 'mike@douzinas.com',
                 linkType: 'email',
               },
             ];
@@ -677,7 +785,26 @@ export async function POST(req: NextRequest) {
         retrievalTypes = typeFilter;
       }
 
-      const retrievalOptions: { topK: number; fields: string[]; types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'> } = {
+      // Professional comment: For general intent queries with year filters, we need to apply
+      // year filters BEFORE retrieval, not just boost results after. This ensures queries like
+      // "how has mike's work evolved from 2021 to 2025?" only retrieve items from those years,
+      // not just boost them in ranking.
+      // 
+      // Note: We only pre-filter by YEAR for general intent, not other filters (type/skills/company),
+      // because those would typically indicate filter_query intent instead. Year filtering is the
+      // primary use case where general intent queries need pre-filtering.
+      let preFilteredItems: KBItem[] | null = null;
+      if (intent === 'general' && filters && filters.year && filters.year.length > 0) {
+        // Load all items and apply year filters before retrieval for general intent with year filters
+        const allItems = await getAllItems();
+        // Create a minimal filter object with only year filter to avoid over-filtering
+        const yearOnlyFilter: QueryFilter = { year: filters.year };
+        preFilteredItems = applyFilters(allItems, yearOnlyFilter);
+        
+        console.log(`[General Intent] Pre-filtered ${allItems.length} items to ${preFilteredItems.length} items using year filter:`, filters.year);
+      }
+
+      const retrievalOptions: { topK: number; fields: string[]; types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'>; preFilteredItemIds?: Set<string> } = {
         topK: config.features?.generalTopK ?? 5,
         fields: isEvaluative ? ['title', 'summary', 'specifics', 'dates', 'skills'] : fields
       };
@@ -685,6 +812,11 @@ export async function POST(req: NextRequest) {
       // Add type filtering if specified
       if (retrievalTypes && retrievalTypes.length > 0) {
         retrievalOptions.types = retrievalTypes;
+      }
+
+      // If we pre-filtered items, pass their IDs to retrieval to restrict semantic search
+      if (preFilteredItems) {
+        retrievalOptions.preFilteredItemIds = new Set(preFilteredItems.map(item => item.id));
       }
 
       const retrievalResults = await retrieve(query, retrievalOptions);
@@ -911,13 +1043,17 @@ Only suggest contacting Mike when one of these is true:
 **IMPORTANT: When user wants to write/send a message:**
 - DO NOT write the message text in your response
 - Instead, immediately add: <ui:contact reason="user_request" draft="[user's message topic/request]" />
-- The draft should be a short summary of what the user wants to message about (from the USER's perspective, using "you")
+- The draft should be a short summary of what the user wants to message about (from the USER's perspective, addressing Mike directly)
+- CRITICAL: Always change "mike/Mike" to "you" and "mike's/Mike's" to "your" in the draft
 - Example: If user says "write a message to mike about insanitary water systems", use draft="I want to discuss insanitary water systems and how you can help fix them"
+- Example: If user says "what are mikes favorite work", use draft="I'd love to talk about your favorite work"
 
 When suggesting contact, you can:
 - Naturally mention contact methods from the context (LinkedIn, GitHub, email, booking link)
 - Add a <ui:contact ... /> directive with an appropriate draft message when deeper conversation is needed
 - Draft messages should be from the USER to Mike (use "you", never third person)
+- CRITICAL: Always convert "mike/Mike" to "you" and "mike's/Mike's" to "your" in draft messages
+- Example: If user asks "what are mikes favorite work", use draft="I'd love to talk about your favorite work"
 
 Otherwise, guide exploration: propose 1–3 precise follow-ups Iris can answer from context (e.g., "Ask about Iris details" or "Want the HiLiTe sports analytics project stack?").
 

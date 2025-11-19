@@ -48,6 +48,7 @@ export default function QuickActions({
   const [submittedFollowUp, setSubmittedFollowUp] = useState<string | null>(null); // Track submitted follow-up query (persists after submission)
   const [loadingConfig, setLoadingConfig] = useState<LoadingConfig | null>(null); // Current loading configuration
   const [loadingStartTime, setLoadingStartTime] = useState<number | null>(null); // Track when loading started for message rotation
+  const [showEmailCopiedToast, setShowEmailCopiedToast] = useState(false); // Track email copy success toast
 
   /**
    * Generate a new random loading configuration when processing starts
@@ -57,6 +58,34 @@ export default function QuickActions({
   const loadingConfigInitializedRef = useRef(false);
   const lastProcessedFollowUpRef = useRef<string | null>(null);
   const lastSelectedActionRef = useRef<QuickAction | null>(null);
+  
+  // Add toast animation styles to document head
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const styleId = 'email-toast-animations';
+      if (!document.getElementById(styleId)) {
+        const styleSheet = document.createElement('style');
+        styleSheet.id = styleId;
+        styleSheet.textContent = `
+          @keyframes fadeInSlideUp {
+            from {
+              opacity: 0;
+              transform: translate(-50%, 10px);
+            }
+            to {
+              opacity: 1;
+              transform: translate(-50%, 0);
+            }
+          }
+          
+          .email-toast-enter {
+            animation: fadeInSlideUp 0.3s ease-out forwards;
+          }
+        `;
+        document.head.appendChild(styleSheet);
+      }
+    }
+  }, []);
   
   useEffect(() => {
     // Create a unique key for comparing actions (more reliable than object reference)
@@ -146,6 +175,10 @@ export default function QuickActions({
    * Rotate loading message after 1.5 seconds if still loading
    * Smooth transition by only updating the message, keeping animation and color
    * Use ref to track if timer is already set to prevent infinite loops
+   * 
+   * CRITICAL: Do NOT include loadingConfig in dependencies to prevent infinite loop
+   * The effect updates loadingConfig, so including it would cause the effect to re-run
+   * every time it updates, creating a maximum update depth error
    */
   const messageRotationTimerRef = useRef<NodeJS.Timeout | null>(null);
   const messageRotatedRef = useRef(false);
@@ -158,6 +191,8 @@ export default function QuickActions({
     }
     messageRotatedRef.current = false;
 
+    // Check if we should set up rotation - use functional state check to avoid dependency
+    // We check loadingConfig exists without including it in dependencies
     if (!loadingConfig || !loadingStartTime || hasAnswer || !isProcessing) {
       return;
     }
@@ -183,10 +218,12 @@ export default function QuickActions({
 
     // Set timer to change message after 1.5 seconds total (only once)
     messageRotationTimerRef.current = setTimeout(() => {
-      if (!messageRotatedRef.current && loadingConfig && !hasAnswer && isProcessing) {
+      // Only check rotation flag - effect cleanup will handle if conditions changed
+      // This avoids stale closure issues with hasAnswer/isProcessing
+      if (!messageRotatedRef.current) {
         messageRotatedRef.current = true;
         setLoadingConfig(prev => {
-          if (!prev || hasAnswer || !isProcessing) return prev;
+          if (!prev) return prev; // Safety check
           // Keep same animation and color, only change message for smooth transition
           return {
             ...prev,
@@ -203,7 +240,8 @@ export default function QuickActions({
         messageRotationTimerRef.current = null;
       }
     };
-  }, [loadingStartTime, hasAnswer, isProcessing, loadingConfig]); // Include loadingConfig to satisfy exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingStartTime, hasAnswer, isProcessing]); // Exclude loadingConfig to prevent infinite loop
 
   /**
    * Determine if we should show the loading message
@@ -258,8 +296,17 @@ export default function QuickActions({
     // All buttons remain visible and clickable
     if (action.type === 'contact_link' && action.link) {
       if (action.linkType === 'email') {
-        navigator.clipboard.writeText(action.link.replace('mailto:', ''));
-        // Could show a toast here
+        // Copy email to clipboard and show success toast
+        navigator.clipboard.writeText(action.link.replace('mailto:', '')).then(() => {
+          setShowEmailCopiedToast(true);
+          // Auto-dismiss toast after 2.5 seconds
+          setTimeout(() => {
+            setShowEmailCopiedToast(false);
+          }, 2500);
+        }).catch((err) => {
+          console.warn('[QuickActions] Failed to copy email to clipboard:', err);
+          // Could show error toast here if needed
+        });
       } else {
         window.open(action.link, '_blank', 'noopener,noreferrer');
       }
@@ -607,6 +654,16 @@ export default function QuickActions({
           </div>
         );
       })()}
+
+      {/* Email copied success toast - shows when email is copied to clipboard */}
+      {showEmailCopiedToast && (
+        <div className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-50 email-toast-enter">
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-br from-emerald-600/90 via-teal-500/90 to-cyan-600/90 border border-emerald-400/50 backdrop-blur-sm shadow-lg shadow-emerald-900/30 text-white">
+            <Mail className="w-4 h-4 text-emerald-100" />
+            <span className="text-sm font-medium">Email copied to clipboard!</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
