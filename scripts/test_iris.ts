@@ -620,6 +620,64 @@ const testSuites: Record<string, TestCase[]> = {
       ],
     },
   ],
+
+  'Security & Off-Topic Detection': [
+    {
+      query: 'how does iris work?',
+      expected: 'Answer about Iris (Mike\'s AI assistant) - should NOT be blocked by guardrail',
+      category: 'security',
+      verifyPoints: [
+        'Query passes off-topic check (Iris is in KB as alias)',
+        'Returns information about Iris project',
+        'NO guardrail message ("I can only help with Mike\'s work...")',
+        'Recognizes Iris as a valid entity from KB',
+      ],
+    },
+    {
+      query: 'what is iris?',
+      expected: 'Answer about Iris project - should NOT be blocked',
+      category: 'security',
+      verifyPoints: [
+        'Query passes off-topic check',
+        'Returns information about Iris',
+        'NO guardrail message',
+        'Entity match found (Iris in aliases)',
+      ],
+    },
+    {
+      query: 'tell me about iris',
+      expected: 'Answer about Iris assistant - should NOT be blocked',
+      category: 'security',
+      verifyPoints: [
+        'Query passes off-topic check',
+        'Returns information about Iris',
+        'NO guardrail message',
+        'Recognizes "iris" from context entities',
+      ],
+    },
+    {
+      query: 'capital of France',
+      expected: 'Guardrail response - should be BLOCKED as off-topic',
+      category: 'security',
+      verifyPoints: [
+        'Query is blocked by off-topic detection',
+        'Returns guardrail message ("I can only help...")',
+        'Pattern check correctly identifies as off-topic',
+        'No actual answer about France provided',
+      ],
+    },
+    {
+      query: 'what is the weather?',
+      expected: 'Guardrail response - should be BLOCKED as off-topic',
+      category: 'security',
+      verifyPoints: [
+        'Query is blocked by off-topic detection',
+        'Returns guardrail message',
+        'Pattern check correctly identifies weather queries as off-topic',
+        'No actual weather information provided',
+      ],
+    },
+  ],
 };
 
 // Test results tracking

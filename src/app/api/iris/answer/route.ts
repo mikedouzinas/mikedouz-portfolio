@@ -191,6 +191,12 @@ export async function POST(req: NextRequest) {
     // The pattern check includes entity whitelist, so it's safe to run always
     const isOffTopicByPattern = isClearlyOffTopic(query, contextEntities);
 
+    // Professional comment: If pattern check finds entities (not off-topic by pattern),
+    // we should trust that over LLM classification. Queries like "how does iris work?"
+    // mention entities from the KB (Iris is an alias), so they're valid even if LLM
+    // mistakenly classifies them as off-topic.
+    const hasEntityMatch = !isOffTopicByPattern; // If pattern check says it's on-topic, entity was found
+
     if (inConversation) {
       // In conversation: Only check obvious off-topic patterns
       // Skip LLM about_mike check to allow contextual follow-ups like "what about dates?" or "tell me more"
@@ -200,10 +206,12 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // First query: Use both pattern-based AND LLM classification
-      const isOffTopicByLLM = intentResult?.about_mike === false;
+      // BUT: If entity match found in pattern check, trust that over LLM
+      const isOffTopicByLLM = intentResult?.about_mike === false && !hasEntityMatch;
 
-      // Block if either pattern OR LLM says it's off-topic
-      // Pattern check takes precedence because it's more reliable for clearly off-topic queries
+      // Block if pattern says off-topic OR (LLM says off-topic AND no entity match)
+      // Rationale: Entity matches are definitive - if user mentions Iris/companies/projects,
+      // it's definitely about Mike's work even if LLM misclassifies
       if (isOffTopicByPattern || isOffTopicByLLM) {
         return buildGuardrailResponse(query);
       }
