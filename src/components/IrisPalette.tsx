@@ -25,6 +25,7 @@ import { useUiDirectives, defaultOpenFor, stripUiDirectives, detectContactDirect
 import MessageComposer from './iris/MessageComposer';
 import QuickActions, { type QuickAction } from './iris/QuickActions';
 import type { QueryFilter } from '@/app/api/iris/answer/route';
+import { getRandomLoadingConfig, getAnimationConfig, getRandomLoadingMessage } from '@/lib/iris/loadingMessages';
 
 /**
  * Static suggestion configuration
@@ -150,6 +151,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const [isAnimating, setIsAnimating] = useState(false); // Prevent rapid open/close during animations
   const [showComposer, setShowComposer] = useState(false); // Toggle for MessageComposer
   const [showScrollToBottom, setShowScrollToBottom] = useState(false); // Show scroll indicator
+  const [mainLoadingConfig, setMainLoadingConfig] = useState<ReturnType<typeof getRandomLoadingConfig> | null>(null); // Loading config for main loader
+  const [mainLoadingStartTime, setMainLoadingStartTime] = useState<number | null>(null); // Track when main loading started for message rotation
 
   // Conversation state for follow-ups
   const [conversationHistory, setConversationHistory] = useState<Array<{
@@ -184,7 +187,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
   /**
    * Simplify answer text when there's a contact directive
-   * For insufficient_context / more_detail, replace with simple message
+   * For insufficient_context / more_detail, keep the text before the directive and append contact message
    * For user_request, strip directive but keep original text
    */
   const simplifyContactAnswer = (text: string): string => {
@@ -204,8 +207,20 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       return stripUiDirectives(text);
     }
 
-    // For insufficient_context / more_detail, replace with simple message
-    return "Here are the best ways to reach Mike:";
+    // For insufficient_context / more_detail, extract text before the directive
+    // The directive is typically at the end, so we want to keep everything before it
+    const directiveMatch = text.match(/<ui:contact[\s\S]*?\/>/);
+    if (directiveMatch) {
+      const textBeforeDirective = text.substring(0, directiveMatch.index).trim();
+      // If there's text before the directive, keep it and append contact message
+      if (textBeforeDirective) {
+        return textBeforeDirective + "\n\nHere are the best ways to reach Mike:";
+      }
+    }
+
+    // Fallback: if we can't parse the directive, just strip it and show contact message
+    const stripped = stripUiDirectives(text).trim();
+    return stripped || "Here are the best ways to reach Mike:";
   };
 
   const cleanedAnswer = answer ? simplifyContactAnswer(answer) : '';
@@ -386,6 +401,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
+  const loadingClearedRef = useRef(false); // Track if loading config has been cleared
 
   /**
    * Check if content overflows and user is not at bottom
@@ -409,6 +425,69 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setTimeout(checkScrollState, 100);
     }
   }, [answer, viewMode, checkScrollState]);
+
+  /**
+   * Rotate main loading message after 1.5 seconds if still loading
+   * Smooth transition by only updating the message, keeping animation and color
+   * Use ref to track if timer is already set to prevent infinite loops
+   */
+  const messageRotationTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const messageRotatedRef = useRef(false);
+  
+  useEffect(() => {
+    // Clear any existing timer
+    if (messageRotationTimerRef.current) {
+      clearTimeout(messageRotationTimerRef.current);
+      messageRotationTimerRef.current = null;
+    }
+    messageRotatedRef.current = false;
+
+    if (!mainLoadingConfig || !mainLoadingStartTime || answer || !isProcessingQuery) {
+      return;
+    }
+
+    const elapsed = Date.now() - mainLoadingStartTime;
+    const timeUntilChange = 1500 - elapsed;
+
+    if (timeUntilChange <= 0) {
+      // Already past 1.5 seconds, change immediately (only once)
+      if (!messageRotatedRef.current) {
+        messageRotatedRef.current = true;
+        setMainLoadingConfig(prev => {
+          if (!prev) return null;
+          // Keep same animation and color, only change message for smooth transition
+          return {
+            ...prev,
+            message: getRandomLoadingMessage(),
+          };
+        });
+      }
+      return;
+    }
+
+    // Set timer to change message after 1.5 seconds total (only once)
+    messageRotationTimerRef.current = setTimeout(() => {
+      if (!messageRotatedRef.current && mainLoadingConfig && !answer && isProcessingQuery) {
+        messageRotatedRef.current = true;
+        setMainLoadingConfig(prev => {
+          if (!prev || answer || !isProcessingQuery) return prev;
+          // Keep same animation and color, only change message for smooth transition
+          return {
+            ...prev,
+            message: getRandomLoadingMessage(),
+          };
+        });
+      }
+      messageRotationTimerRef.current = null;
+    }, timeUntilChange);
+
+    return () => {
+      if (messageRotationTimerRef.current) {
+        clearTimeout(messageRotationTimerRef.current);
+        messageRotationTimerRef.current = null;
+      }
+    };
+  }, [mainLoadingStartTime, answer, isProcessingQuery, mainLoadingConfig]); // Include mainLoadingConfig to satisfy exhaustive-deps
 
   /**
    * Handle scroll events to show/hide scroll-to-bottom indicator
@@ -805,6 +884,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     setApiSuggestions([]);
     setShowScrollToBottom(false); // Reset scroll indicator
     setCurrentQueryId(null); // Clear previous query ID
+    setMainLoadingConfig(getRandomLoadingConfig()); // Generate new random loading config
+    setMainLoadingStartTime(Date.now()); // Track when loading started for message rotation
+    loadingClearedRef.current = false; // Reset loading cleared flag
 
     try {
       const signals = getSignalSummary();
@@ -898,6 +980,12 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   if (parsed.text) {
                     accumulatedAnswer += parsed.text;
                     setAnswer(accumulatedAnswer);
+                    // Clear loading config when answer starts streaming (only once)
+                    if (accumulatedAnswer.length > 0 && !loadingClearedRef.current) {
+                      setMainLoadingConfig(null);
+                      setMainLoadingStartTime(null);
+                      loadingClearedRef.current = true;
+                    }
                   } else if (parsed.debug) {
                     // Capture debug information
                     setDebugInfo(parsed.debug);
@@ -967,6 +1055,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       }
     } finally {
       setIsProcessingQuery(false);
+      setMainLoadingConfig(null); // Clear loading config when processing stops
+      setMainLoadingStartTime(null); // Clear loading start time
     }
     
     // Keep focus in input (Arc behavior)
@@ -1378,6 +1468,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                           setShowComposer(false);
                         }}
                         disabled={isProcessingQuery}
+                        isProcessing={isProcessingQuery}
+                        hasAnswer={!!answer && answer.length > 0}
                       />
                     )}
                   </div>
@@ -1389,12 +1481,94 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     {/* Render current streaming answer */}
                     {renderMarkdownContent(renderedAnswer, isProcessingQuery)}
                   </div>
-                ) : conversationHistory.length === 0 ? (
-                  /* Show loading state when no answer yet and no history */
-                  <div className="flex items-center gap-2 text-white/60">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="text-[14px]">Thinking...</span>
-                  </div>
+                ) : conversationHistory.length === 0 && isProcessingQuery && mainLoadingConfig ? (
+                  /* Show loading state when no answer yet and no history - use random loading messages */
+                  (() => {
+                    // Use persisted loading config
+                    const loadingConfig = mainLoadingConfig;
+                    const animConfig = getAnimationConfig(loadingConfig.animation);
+                    
+                    // Render appropriate animation based on component type
+                    let indicator;
+                    if (animConfig.component === 'spinner-thin') {
+                      // Very thin spinner
+                      indicator = (
+                        <div className="w-3.5 h-3.5 rounded-full border border-white/90 border-r-transparent animate-spin" style={{ borderWidth: '1.5px' }} />
+                      );
+                    } else if (animConfig.component === 'bars-vertical') {
+                      // Vertical bars
+                      indicator = (
+                        <div className="flex gap-0.5 items-center h-3">
+                          {[0, 1, 2].map((i) => (
+                            <div
+                              key={i}
+                              className="w-0.5 bg-white/90 rounded-full animate-pulse"
+                              style={{
+                                animationDelay: `${i * 0.15}s`,
+                                animationDuration: '0.7s',
+                                height: `${(i === 0 ? 8 : i === 1 ? 12 : 10)}px`,
+                              }}
+                            />
+                          ))}
+                        </div>
+                      );
+                    } else if (animConfig.component === 'wave-minimal') {
+                      // Minimal wave - smaller and tighter
+                      indicator = (
+                        <div className="flex gap-0.5 items-center h-2.5">
+                          {[0, 1, 2, 3, 4].map((i) => (
+                            <div
+                              key={i}
+                              className="w-0.5 bg-white/90 rounded-full animate-pulse"
+                              style={{
+                                animationDelay: `${i * 0.1}s`,
+                                animationDuration: '0.5s',
+                                height: `${(i % 2 === 0 ? 6 : 10)}px`,
+                              }}
+                            />
+                          ))}
+                        </div>
+                      );
+                    } else if (animConfig.component === 'grid-minimal') {
+                      // Smaller, tighter grid
+                      indicator = (
+                        <div className="grid grid-cols-3 gap-0.5 w-3 h-3">
+                          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                            <div
+                              key={i}
+                              className="w-0.5 h-0.5 rounded-full bg-white/90 animate-pulse"
+                              style={{
+                                animationDelay: `${(i % 3 + Math.floor(i / 3)) * 0.08}s`,
+                                animationDuration: '0.6s',
+                              }}
+                            />
+                          ))}
+                        </div>
+                      );
+                    } else if (animConfig.component === 'spinner-minimal') {
+                      // Minimal spinner - thinner border
+                      indicator = (
+                        <div className="w-3 h-3 rounded-full border border-white/90 border-t-transparent animate-spin" />
+                      );
+                    } else if (animConfig.component === 'fade') {
+                      // Fading in/out circle
+                      indicator = (
+                        <div className="w-3 h-3 rounded-full bg-white/90 animate-pulse" style={{ animationDuration: '1s' }} />
+                      );
+                    } else {
+                      // Fallback to spinner-minimal
+                      indicator = (
+                        <div className="w-3 h-3 rounded-full border border-white/90 border-t-transparent animate-spin" />
+                      );
+                    }
+                    
+                    return (
+                      <div className="flex items-center gap-2 text-white/70">
+                        {indicator}
+                        <span className="text-[14px] text-white/70">{loadingConfig.message}</span>
+                      </div>
+                    );
+                  })()
                 ) : null}
 
                 {/* Message Composer - shown inline after current answer */}

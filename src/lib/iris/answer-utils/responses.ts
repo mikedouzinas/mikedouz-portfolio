@@ -174,15 +174,11 @@ export async function createNoContextResponse(query?: string, intent?: string): 
   console.log('Reason: No matching results found in knowledge base');
 
   try {
-    const contact = await loadContact();
+    await loadContact(); // Load contact for context, but don't use it directly in fallback message
     const fallbackMessage =
-      `Mike hasn't shared anything about that yet, so the fastest path is to reach him directly:\n\n` +
-      `💼 LinkedIn: ${contact.linkedin}\n` +
-      (contact.github ? `💻 GitHub: ${contact.github}\n` : '') +
-      (contact.booking?.enabled && contact.booking?.link ? `📅 Schedule a chat: ${contact.booking.link}\n` : '') +
-      (contact.email ? `✉️ Email: ${contact.email}\n` : '') +
-      `\nI prepped a quick note you can send him below.\n\n<ui:contact reason="insufficient_context" draft="I'd love to learn more about this if you have a moment." />`;
-
+      `Mike hasn't shared anything about that yet. Here are some ways to explore what he has shared:\n\n` +
+      `**Quick Actions:** Use the buttons below to see his projects, experiences, and more.\n\n` +
+      `**Search Bar:** You can also type a new question in the search bar above to explore different topics.\n\n`
     // Debug: Log fallback message
     console.log(`Fallback Message Length: ${fallbackMessage.length} characters`);
     console.log('\nFallback Response:');

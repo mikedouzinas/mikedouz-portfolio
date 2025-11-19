@@ -76,7 +76,6 @@ export default function MessageComposer({
   initialDraft,
   locked,
   userQuery,
-  onCancel,
 }: MessageComposerProps) {
   // Form state
   const [message, setMessage] = useState(() => getDraftForOrigin(origin, initialDraft, userQuery));

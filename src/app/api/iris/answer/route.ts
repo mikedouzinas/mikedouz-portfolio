@@ -188,11 +188,17 @@ export async function POST(req: NextRequest) {
       const allItems = await getAllItems();
       const contextEntities = buildContextEntities(allItems);
 
-      const offScope =
-        intentResult?.about_mike === false ||
-        (intentResult?.about_mike !== true && isClearlyOffTopic(query, contextEntities));
+      // CRITICAL: Pattern-based detection is more reliable than LLM classification
+      // Always check patterns first - they catch clearly off-topic queries like "capital of X"
+      // The pattern check includes entity whitelist, so it's safe to run first
+      const isOffTopicByPattern = isClearlyOffTopic(query, contextEntities);
+      
+      // Also check LLM classification as a secondary signal
+      const isOffTopicByLLM = intentResult?.about_mike === false;
 
-      if (offScope) {
+      // Block if either pattern OR LLM says it's off-topic
+      // Pattern check takes precedence because it's more reliable for clearly off-topic queries
+      if (isOffTopicByPattern || isOffTopicByLLM) {
         return buildGuardrailResponse(query);
       }
     }
@@ -855,6 +861,7 @@ export async function POST(req: NextRequest) {
 - When dates exist, state them; otherwise avoid implying timeframes.
 - If user asks for comparisons or summaries, give a tight, structured overview first, then a short suggestion for where to dig deeper.
 - When you answer list/filter queries, synthesize and format the list clearly so users don't need to read raw data.
+- **IMPORTANT: Category Merging** - If there are more than 6 individual items in a response, merge related categories together. For example, instead of listing 10 individual skills separately, group them by theme or by technology stack. This makes the response more digestible and prevents overwhelming the user with too many individual items.
 
 # Capabilities & Next Steps
 - You know which filters were applied (e.g., type, skills, years). Use that to explain why results are focused ("Here's his 2024 experience…").

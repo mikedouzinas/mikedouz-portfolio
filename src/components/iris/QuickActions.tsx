@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ArrowRight, MessageSquare, ExternalLink, Mail, Send, X } from 'lucide-react';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
+import { getRandomLoadingConfig, getAnimationConfig, getRandomLoadingMessage, type LoadingConfig } from '@/lib/iris/loadingMessages';
 
 export interface QuickAction {
   type: 'affirmative' | 'custom_input' | 'specific' | 'contact_link' | 'message_mike';
@@ -19,6 +20,8 @@ interface QuickActionsProps {
   onActionClick: (action: QuickAction, customQuery?: string) => void;
   onCancel?: () => void;    // Callback to cancel action and show all actions again
   disabled?: boolean;
+  isProcessing?: boolean;   // Whether a query is currently being processed
+  hasAnswer?: boolean;      // Whether we've started receiving answer text (streaming)
 }
 
 /**
@@ -36,11 +39,210 @@ export default function QuickActions({
   onActionClick,
   onCancel,
   disabled = false,
+  isProcessing = false,
+  hasAnswer = false,
 }: QuickActionsProps) {
   const [selectedAction, setSelectedAction] = useState<QuickAction | null>(null);
   const [customQuery, setCustomQuery] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
-  const [submittedFollowUp, setSubmittedFollowUp] = useState<string | null>(null); // Track submitted follow-up query
+  const [submittedFollowUp, setSubmittedFollowUp] = useState<string | null>(null); // Track submitted follow-up query (persists after submission)
+  const [loadingConfig, setLoadingConfig] = useState<LoadingConfig | null>(null); // Current loading configuration
+  const [loadingStartTime, setLoadingStartTime] = useState<number | null>(null); // Track when loading started for message rotation
+
+  /**
+   * Generate a new random loading configuration when processing starts
+   * Track which specific queries have been processed to prevent re-initialization
+   * Use refs to track state and prevent infinite loops
+   */
+  const loadingConfigInitializedRef = useRef(false);
+  const lastProcessedFollowUpRef = useRef<string | null>(null);
+  const lastSelectedActionRef = useRef<QuickAction | null>(null);
+  
+  useEffect(() => {
+    // Create a unique key for comparing actions (more reliable than object reference)
+    const currentActionKey = selectedAction 
+      ? `${selectedAction.type}-${selectedAction.label}-${selectedAction.query || ''}` 
+      : null;
+    const lastActionKey = lastSelectedActionRef.current
+      ? `${lastSelectedActionRef.current.type}-${lastSelectedActionRef.current.label}-${lastSelectedActionRef.current.query || ''}`
+      : null;
+    
+    // CRITICAL: Check for NEW actions FIRST, before any clearing logic
+    // This ensures new actions get their loader even if hasAnswer is still true from previous query
+    const isNewAction = selectedAction && currentActionKey !== lastActionKey;
+    
+    if (isNewAction) {
+      // Reset initialized flag when a NEW action is selected (different from last)
+      loadingConfigInitializedRef.current = false;
+      lastSelectedActionRef.current = selectedAction;
+      
+      // If this is a query-triggering action (not custom_input), clear old follow-up state
+      // since we're starting a new query that supersedes the previous follow-up
+      if (selectedAction.type !== 'contact_link' && 
+          selectedAction.type !== 'message_mike' && 
+          selectedAction.type !== 'custom_input') {
+        lastProcessedFollowUpRef.current = null; // Reset so we can process new follow-ups later
+      }
+      
+      // Initialize loader immediately for new query-triggering actions
+      // This MUST happen even if hasAnswer is true (from previous query)
+      if (selectedAction.type !== 'contact_link' && 
+          selectedAction.type !== 'message_mike' &&
+          selectedAction.type !== 'custom_input') {
+        loadingConfigInitializedRef.current = true;
+        setLoadingConfig(getRandomLoadingConfig());
+        setLoadingStartTime(Date.now());
+        return; // Early return - don't run clearing logic for new actions
+      }
+    } else if (!selectedAction && lastSelectedActionRef.current) {
+      // Action was cleared
+      lastSelectedActionRef.current = null;
+    }
+    
+    // Initialize loading config if we have a selected action that triggers a query
+    // (this ensures loader shows immediately when action is clicked, even before isProcessing is true)
+    // BUT: Don't initialize for custom_input until it's actually submitted (submittedFollowUp is set)
+    const shouldInitialize = selectedAction && 
+      selectedAction.type !== 'contact_link' && 
+      selectedAction.type !== 'message_mike' &&
+      selectedAction.type !== 'custom_input' && // Don't show loader for custom_input until submitted
+      !loadingConfigInitializedRef.current;
+    
+    if (shouldInitialize) {
+      loadingConfigInitializedRef.current = true;
+      setLoadingConfig(getRandomLoadingConfig());
+      setLoadingStartTime(Date.now());
+    } 
+    // Initialize for follow-up ONLY if it's a NEW follow-up (not already processed)
+    else if (submittedFollowUp && 
+             submittedFollowUp !== lastProcessedFollowUpRef.current && 
+             !loadingConfigInitializedRef.current) {
+      loadingConfigInitializedRef.current = true;
+      lastProcessedFollowUpRef.current = submittedFollowUp;
+      setLoadingConfig(getRandomLoadingConfig());
+      setLoadingStartTime(Date.now());
+    } 
+    // Fallback: Initialize when processing starts (if not already set)
+    else if (isProcessing && !hasAnswer && !loadingConfigInitializedRef.current) {
+      loadingConfigInitializedRef.current = true;
+      setLoadingConfig(getRandomLoadingConfig());
+      setLoadingStartTime(Date.now());
+    } 
+    // Clear loader when answer arrives, but DON'T reset initialized flag
+    // (resetting the flag was causing re-initialization when submittedFollowUp persists)
+    // BUT: Only clear if we don't have a new action selected (new actions handled above)
+    else if (hasAnswer && loadingConfig && !isNewAction) {
+      setLoadingConfig(null);
+      setLoadingStartTime(null);
+    }
+    // Clear loader when processing stops and no active query state
+    else if (!isProcessing && !selectedAction && !submittedFollowUp && loadingConfig) {
+      setLoadingConfig(null);
+      setLoadingStartTime(null);
+    }
+  }, [isProcessing, hasAnswer, selectedAction, submittedFollowUp, loadingConfig]); // Added loadingConfig back to clear it properly
+
+  /**
+   * Rotate loading message after 1.5 seconds if still loading
+   * Smooth transition by only updating the message, keeping animation and color
+   * Use ref to track if timer is already set to prevent infinite loops
+   */
+  const messageRotationTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const messageRotatedRef = useRef(false);
+  
+  useEffect(() => {
+    // Clear any existing timer
+    if (messageRotationTimerRef.current) {
+      clearTimeout(messageRotationTimerRef.current);
+      messageRotationTimerRef.current = null;
+    }
+    messageRotatedRef.current = false;
+
+    if (!loadingConfig || !loadingStartTime || hasAnswer || !isProcessing) {
+      return;
+    }
+
+    const elapsed = Date.now() - loadingStartTime;
+    const timeUntilChange = 1500 - elapsed;
+
+    if (timeUntilChange <= 0) {
+      // Already past 1.5 seconds, change immediately (only once)
+      if (!messageRotatedRef.current) {
+        messageRotatedRef.current = true;
+        setLoadingConfig(prev => {
+          if (!prev) return null;
+          // Keep same animation and color, only change message for smooth transition
+          return {
+            ...prev,
+            message: getRandomLoadingMessage(),
+          };
+        });
+      }
+      return;
+    }
+
+    // Set timer to change message after 1.5 seconds total (only once)
+    messageRotationTimerRef.current = setTimeout(() => {
+      if (!messageRotatedRef.current && loadingConfig && !hasAnswer && isProcessing) {
+        messageRotatedRef.current = true;
+        setLoadingConfig(prev => {
+          if (!prev || hasAnswer || !isProcessing) return prev;
+          // Keep same animation and color, only change message for smooth transition
+          return {
+            ...prev,
+            message: getRandomLoadingMessage(),
+          };
+        });
+      }
+      messageRotationTimerRef.current = null;
+    }, timeUntilChange);
+
+    return () => {
+      if (messageRotationTimerRef.current) {
+        clearTimeout(messageRotationTimerRef.current);
+        messageRotationTimerRef.current = null;
+      }
+    };
+  }, [loadingStartTime, hasAnswer, isProcessing, loadingConfig]); // Include loadingConfig to satisfy exhaustive-deps
+
+  /**
+   * Determine if we should show the loading message
+   * Show when we have a query-triggering action selected or submitted, and no answer yet
+   * Can show even before isProcessing is true (when action is first clicked)
+   * BUT: Don't show for custom_input until it's actually submitted (submittedFollowUp is set)
+   * 
+   * CRITICAL: If a new action is selected, show loader even if hasAnswer is true from previous query
+   * This ensures the loader appears immediately when clicking a new quick action
+   */
+  const shouldShowLoading = useMemo(() => {
+    // Priority 1: Show if we have a selected action that triggers a query (even if not processing yet)
+    // This takes priority over everything else - new actions should show loader immediately
+    // even if hasAnswer is still true from the previous query
+    // BUT: Don't show for custom_input until it's submitted
+    if (selectedAction) {
+      const isQueryTriggeringAction = selectedAction.type !== 'contact_link' && 
+                                      selectedAction.type !== 'message_mike' &&
+                                      selectedAction.type !== 'custom_input';
+      if (isQueryTriggeringAction) {
+        // Show loader for new query-triggering actions, even if hasAnswer is true (from previous query)
+        return true;
+      }
+    }
+    
+    // Priority 2: Show if we submitted a follow-up (this is the main case for custom_input)
+    // Only check this if there's no active selectedAction
+    if (submittedFollowUp !== null) {
+      return true;
+    }
+    
+    // Priority 3: Show if processing and no answer yet (fallback for other cases)
+    if (isProcessing && !hasAnswer) {
+      return true;
+    }
+    
+    // Don't show if we have an answer and no active query state
+    return false;
+  }, [isProcessing, hasAnswer, selectedAction, submittedFollowUp]);
 
   const handleActionClick = (action: QuickAction) => {
     if (disabled) return;
@@ -65,7 +267,8 @@ export default function QuickActions({
       return;
     }
 
-    // For message_mike and other actions, show only that action
+    // For message_mike and other actions (including specific/affirmative that trigger queries)
+    // Set selected action so we can show loading state
     setSelectedAction(action);
     onActionClick(action);
   };
@@ -87,17 +290,18 @@ export default function QuickActions({
 
     const queryText = customQuery.trim();
     
-    // Store the submitted query for display
+    // Store the submitted query for display (this persists after submission)
     setSubmittedFollowUp(queryText);
     
-    // Hide the input and clear selected action so all actions show again
+    // Hide the input and clear selected action
+    // Keep submittedFollowUp so it shows the actual question asked
     setShowCustomInput(false);
     setCustomQuery('');
-    setSelectedAction(null); // Clear selection so all actions are visible again
+    setSelectedAction(null); // Clear selection - submittedFollowUp will show the question
 
     const customAction: QuickAction = {
       type: 'custom_input',
-      label: queryText,
+      label: queryText, // Use the actual query text as the label
       query: queryText,
     };
 
@@ -188,7 +392,7 @@ export default function QuickActions({
   }
 
   // If other actions (specific/affirmative) are selected, show only that action
-  // These don't need an X button since they don't open the composer
+  // These are disabled (not pressable) after submission
   if (selectedAction && selectedAction.type !== 'custom_input' && selectedAction.type !== 'message_mike' && selectedAction.type !== 'contact_link') {
     const gradientDirection = 'bg-gradient-to-r';
     
@@ -198,7 +402,7 @@ export default function QuickActions({
           <button
             type="button"
             disabled
-            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap ${gradientDirection} ${getActionColor(selectedAction)} text-white opacity-70`}
+            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap ${gradientDirection} ${getActionColor(selectedAction)} text-white opacity-70 cursor-not-allowed`}
           >
             {getActionIcon(selectedAction)}
             <span>{selectedAction.label}</span>
@@ -210,7 +414,7 @@ export default function QuickActions({
 
   return (
     <div className="mb-3">
-      {/* Show submitted follow-up query as a visual indicator */}
+      {/* Show submitted follow-up query as a visual indicator - shows the actual question asked */}
       {submittedFollowUp && !showCustomInput ? (
         <div className="mb-2">
           <div className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600 text-white opacity-70">
@@ -259,6 +463,7 @@ export default function QuickActions({
               placeholder="Ask a follow up..."
               disabled={disabled}
               autoFocus
+              maxLength={500}
               className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none disabled:opacity-50 text-sm"
             />
             <button
@@ -316,6 +521,92 @@ export default function QuickActions({
           })}
         </div>
       ) : null}
+
+      {/* Loading message - shown when processing a query from quick actions */}
+      {shouldShowLoading && loadingConfig && (() => {
+        const animConfig = getAnimationConfig(loadingConfig.animation);
+        
+        // Render appropriate animation based on component type
+        let indicator;
+        if (animConfig.component === 'spinner-thin') {
+          // Very thin spinner
+          indicator = (
+            <div className="w-3.5 h-3.5 rounded-full border border-white/90 border-r-transparent animate-spin" style={{ borderWidth: '1.5px' }} />
+          );
+        } else if (animConfig.component === 'bars-vertical') {
+          // Vertical bars
+          indicator = (
+            <div className="flex gap-0.5 items-center h-3">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="w-0.5 bg-white/90 rounded-full animate-pulse"
+                  style={{
+                    animationDelay: `${i * 0.15}s`,
+                    animationDuration: '0.7s',
+                    height: `${(i === 0 ? 8 : i === 1 ? 12 : 10)}px`,
+                  }}
+                />
+              ))}
+            </div>
+          );
+        } else if (animConfig.component === 'wave-minimal') {
+          // Minimal wave - smaller and tighter
+          indicator = (
+            <div className="flex gap-0.5 items-center h-2.5">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="w-0.5 bg-white/90 rounded-full animate-pulse"
+                  style={{
+                    animationDelay: `${i * 0.1}s`,
+                    animationDuration: '0.5s',
+                    height: `${(i % 2 === 0 ? 6 : 10)}px`,
+                  }}
+                />
+              ))}
+            </div>
+          );
+        } else if (animConfig.component === 'grid-minimal') {
+          // Smaller, tighter grid
+          indicator = (
+            <div className="grid grid-cols-3 gap-0.5 w-3 h-3">
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div
+                  key={i}
+                  className="w-0.5 h-0.5 rounded-full bg-white/90 animate-pulse"
+                  style={{
+                    animationDelay: `${(i % 3 + Math.floor(i / 3)) * 0.08}s`,
+                    animationDuration: '0.6s',
+                  }}
+                />
+              ))}
+            </div>
+          );
+        } else if (animConfig.component === 'spinner-minimal') {
+          // Minimal spinner - thinner border
+          indicator = (
+            <div className="w-3 h-3 rounded-full border border-white/90 border-t-transparent animate-spin" />
+          );
+        } else if (animConfig.component === 'fade') {
+          // Fading in/out circle
+          indicator = (
+            <div className="w-3 h-3 rounded-full bg-white/90 animate-pulse" style={{ animationDuration: '1s' }} />
+          );
+        } else {
+          // Fallback to spinner-minimal
+          indicator = (
+            <div className="w-3 h-3 rounded-full border border-white/90 border-t-transparent animate-spin" />
+          );
+        }
+        
+        return (
+          <div className="mt-2 flex items-center gap-2 text-sm text-white/70">
+            {indicator}
+            <span className="text-white/70">{loadingConfig.message}</span>
+          </div>
+        );
+      })()}
     </div>
   );
 }
