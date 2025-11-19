@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
 
     // Extract conversation context for follow-ups
     const previousQuery = body.previousQuery;
+    const previousAnswer = body.previousAnswer;
     const inConversation = !!previousQuery; // In conversation if there's previous context
     const depth = typeof body.depth === 'number' ? body.depth : 0;
 
@@ -179,21 +180,26 @@ export async function POST(req: NextRequest) {
       return streamTextResponse("I have to stick with Mike-focused instructions, but I'm happy to help with his projects, experience, or contact details.");
     }
 
-    // Skip off-topic detection when in active conversation
-    // Rationale: Follow-up questions like "what about dates?" won't mention entities,
-    // but they're contextually valid within an ongoing conversation thread
-    if (!inConversation) {
-      // Build context entities from KB for off-topic detection
-      // This allows queries about companies, projects, skills in Mike's context
-      const allItems = await getAllItems();
-      const contextEntities = buildContextEntities(allItems);
+    // Off-topic detection with conversation-aware logic
+    // Build context entities from KB for off-topic detection
+    // This allows queries about companies, projects, skills in Mike's context
+    const allItems = await getAllItems();
+    const contextEntities = buildContextEntities(allItems);
 
-      // CRITICAL: Pattern-based detection is more reliable than LLM classification
-      // Always check patterns first - they catch clearly off-topic queries like "capital of X"
-      // The pattern check includes entity whitelist, so it's safe to run first
-      const isOffTopicByPattern = isClearlyOffTopic(query, contextEntities);
-      
-      // Also check LLM classification as a secondary signal
+    // CRITICAL: Pattern-based detection is more reliable than LLM classification
+    // Always check patterns - they catch clearly off-topic queries like "capital of X"
+    // The pattern check includes entity whitelist, so it's safe to run always
+    const isOffTopicByPattern = isClearlyOffTopic(query, contextEntities);
+
+    if (inConversation) {
+      // In conversation: Only check obvious off-topic patterns
+      // Skip LLM about_mike check to allow contextual follow-ups like "what about dates?" or "tell me more"
+      // Rationale: Follow-up questions won't mention entities but are contextually valid
+      if (isOffTopicByPattern) {
+        return buildGuardrailResponse(query);
+      }
+    } else {
+      // First query: Use both pattern-based AND LLM classification
       const isOffTopicByLLM = intentResult?.about_mike === false;
 
       // Block if either pattern OR LLM says it's off-topic
@@ -927,19 +933,34 @@ ${enhancedContext}`;
 
       // Build base request parameters
       // Using Record for type safety while allowing dynamic properties
+
+      // Build messages array with conversation context
+      const messages: Array<{ role: string; content: string }> = [
+        {
+          role: 'system',
+          content: systemPrompt
+        }
+      ];
+
+      // Add previous conversation turn if it exists (for follow-up context)
+      // This allows Iris to understand references like "tell me more" or "yes"
+      if (previousQuery && previousAnswer) {
+        messages.push(
+          { role: 'user', content: previousQuery },
+          { role: 'assistant', content: previousAnswer }
+        );
+      }
+
+      // Add current query
+      messages.push({
+        role: 'user',
+        content: query
+      });
+
       const requestParams: Record<string, unknown> = {
         model: config.models.chat,
         stream: true,
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          },
-          {
-            role: 'user',
-            content: query
-          }
-        ]
+        messages
       };
 
       // Log the complete prompt for debugging
