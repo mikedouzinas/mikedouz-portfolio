@@ -29,7 +29,16 @@ This portfolio goes beyond traditional static sites by integrating an advanced R
 - **Semantic Search**: Embeddings-based retrieval using cosine similarity
 - **Structured Filtering**: Precise queries like "Python projects from 2025" or "ML classes"
 - **Contextual Awareness**: Year-based filtering, skill matching, and personal context retrieval
-- **Streaming Responses**: Real-time SSE (Server-Sent Events) for instant feedback
+- **Streaming Responses**: Real-time SSE (Server-Sent Events) with progressive text rendering
+- **Markdown Rendering**: Full markdown support via ReactMarkdown with auto-linking for URLs and emails
+- **Quick Actions**: Context-aware follow-up suggestions after each answer
+  - 5 action types: affirmative, specific, custom input, contact links, message Mike
+  - Horizontal scrollable bubbles on mobile
+  - Depth limiting (max 2 follow-ups) to prevent infinite loops
+- **Conversation Threading**: Maintains conversation history with context-aware follow-ups
+- **Dynamic Loading States**: 40+ unique personality-filled messages with 6 different animations
+  - Messages rotate after 1.5 seconds for engaging long loads
+  - Random combinations of messages, animations, and colors
 - **Intelligent Caching**: Redis-based response caching with 1-hour TTL
 - **Smart Contact Integration**: Seamless "Ask Mike" inbox for direct communication
 
@@ -189,7 +198,12 @@ interface BaseKBItem {
 
 5. **Response Streaming**
    - Server-Sent Events (SSE) for real-time UX
+   - Progressive text rendering with ReactMarkdown
    - Chunk-by-chunk delivery as generated
+   - Dynamic loading states with 40+ personality-filled messages
+   - 6 animation types: spinner-thin, bars-vertical, wave-minimal, grid-minimal, spinner-minimal, fade
+   - Message rotation after 1.5 seconds for long loads
+   - Debug info and quick actions streamed alongside answer text
    - Cached for 1 hour (Redis)
 
 ### Technical Implementation
@@ -219,9 +233,17 @@ npm run build:embeddings
 - **UI Framework**: React with shadcn/ui components
 - **Keyboard Shortcut**: ⌘K (Mac) / Ctrl+K (Windows/Linux)
 - **State Management**: React hooks with useRef for streaming
-- **Accessibility**: Full keyboard navigation, ARIA labels
+- **Markdown Rendering**: ReactMarkdown with auto-linking for URLs, emails, and contact info
+- **Conversation State**: Maintains history with depth tracking for contextual follow-ups
+- **Accessibility**: Full keyboard navigation (arrows, tab, enter), ARIA labels
 
-#### Inbox Components (`src/components/iris/`)
+#### Iris Components (`src/components/iris/`)
+- **QuickActions**: Context-aware follow-up suggestions with 5 action types
+  - Affirmative/specific actions: Pre-filled queries that skip re-classification
+  - Custom input: Inline text field for freeform follow-ups
+  - Contact links: GitHub, LinkedIn, email with toast notifications
+  - Message Mike: Opens MessageComposer with smart drafts
+  - Loading states: 40+ unique messages with 6 animations, rotating after 1.5s
 - **MessageComposer**: Contact form with validation and localStorage caching
 - **ContactCta**: Call-to-action button for suggested contact scenarios
 - **useUiDirectives**: Parser hook for streaming UI directives from Iris
@@ -317,6 +339,17 @@ derived/
 - "Tell me about AI projects"
 - "What's his data science background?"
 
+### Interactive Quick Actions
+
+After each response, Iris provides contextual quick action buttons to continue the conversation:
+
+- **Follow-Up Questions**: "Tell me more", "Show project details", "How was this built?"
+- **Custom Input**: Inline text field for freeform questions (max 2 follow-ups)
+- **Contact Actions**: Direct links to GitHub, LinkedIn, or email Mike
+- **Message Mike**: Opens contact form with smart-drafted message based on conversation
+
+**Depth Limiting**: Conversations support up to 2 follow-up levels to maintain focus and prevent infinite threading. Quick actions adapt based on conversation depth—deep conversations show only contact options while fresh queries offer exploration actions.
+
 ---
 
 ## Features
@@ -335,30 +368,8 @@ derived/
 
 ### Projects Showcase
 - **Interactive Demos**: Live project previews and links
-- **Rack Rush**: Built-in word game with Scrabble-style mechanics, time pressure, and exchange mechanics
+- **Rack Rush**: Built-in word game with Scrabble-style mechanics
 - **GitHub Integration**: Live commit activity (production only)
-
-### Playground Tools
-The portfolio includes an interactive playground with custom-built tools:
-
-- **Decision Maker**: Helps overcome choice paralysis by randomly selecting from user options and providing thoughtful reasoning
-  - Enter multiple options (one per line)
-  - Optional criteria for consideration
-  - Simulated "thinking" time for better UX
-  - Smart reasoning templates to help validate the choice
-
-- **Quotes Collection**: Personal curated quotes with context
-  - Auto-rotating display (6-second intervals with pause/resume)
-  - Each quote includes personal reasoning for why it resonates
-  - Manual navigation and direct selection
-  - Progress indicators and smooth transitions
-
-- **Ranked by MV**: Systematic rating system inspired by Beli
-  - 5 weighted categories: Quality, Innovation, Practical Value, Design, Personal Appeal
-  - 0-10 scoring with 0.5 increments
-  - Calculated weighted averages for overall scores
-  - LocalStorage persistence for saved ratings
-  - Color-coded score visualization (green/yellow/orange/red)
 
 ### Work Experience
 - **Timeline View**: Chronological display of roles and companies
