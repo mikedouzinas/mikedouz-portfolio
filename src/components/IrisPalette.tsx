@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Search, 
-  ArrowRight, 
+import {
+  Search,
+  ArrowRight,
   CornerDownLeft,
   Briefcase,
   User2,
@@ -14,7 +14,10 @@ import {
   Cpu,
   Mail,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  Code,
+  Rocket,
+  Lightbulb
 } from 'lucide-react';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { SiCalendly } from 'react-icons/si';
@@ -33,34 +36,34 @@ import { getRandomLoadingConfig, getAnimationConfig, getRandomLoadingMessage } f
  */
 const SUGGESTIONS = [
     {
-      id: 'discover',
-      icon: Compass,
-      primary: 'Discover what Mike’s built',
-      secondary: 'Ask Iris to walk you through specific projects',
+      id: 'tech-skills',
+      icon: Code,
+      primary: 'What are Mike's strongest technical skills?',
+      secondary: 'Languages, frameworks, and areas of expertise',
     },
     {
-      id: 'career',
-      icon: Briefcase,
-      primary: 'Learn about Mike’s work experience',
-      secondary: 'Internships, roles, and industry impact',
+      id: 'best-work',
+      icon: Rocket,
+      primary: 'Show me Mike's best work',
+      secondary: 'Featured projects with impact and technical depth',
     },
     {
-      id: 'tech',
-      icon: Cpu,
-      primary: 'List Mike’s skills',
-      secondary: 'Languages, frameworks, and favorite tools',
-    },
-    {
-      id: 'story',
-      icon: User2,
-      primary: 'Hear Mike’s story',
-      secondary: 'Background, values, and what drives his work',
-    },
-    {
-      id: 'connect',
+      id: 'contact',
       icon: Mail,
-      primary: 'Get in touch with Mike',
-      secondary: 'Email, LinkedIn, or collaboration requests',
+      primary: 'How can I contact Mike?',
+      secondary: 'Ask Iris to draft a message to send directly',
+    },
+    {
+      id: 'problem-solving',
+      icon: Lightbulb,
+      primary: 'How does Mike approach problem-solving?',
+      secondary: 'Engineering philosophy and real examples',
+    },
+    {
+      id: 'experience',
+      icon: Briefcase,
+      primary: 'Tell me about Mike's experience',
+      secondary: 'Internships, roles, and career progression',
     },
   ] as const;
 
