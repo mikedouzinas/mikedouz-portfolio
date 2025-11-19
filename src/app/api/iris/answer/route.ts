@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { retrieve, diversifyByType, buildEvidencePacks, buildEvidenceSignals } from '@/lib/iris/retrieval';
-import { loadContact, loadKBItems, buildAliasIndex } from '@/lib/iris/load';
+import { loadContact, loadKBItems, buildAliasIndex, AliasEntry } from '@/lib/iris/load';
 // SignalSummary type reserved for future RAG personalization
 import { irisCache } from '@/lib/iris/cache';
 import { type KBItem, type PlannerResult, type EvidenceSignals } from '@/lib/iris/schema';

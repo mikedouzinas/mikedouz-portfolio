@@ -22,7 +22,6 @@ import { getSignalSummary } from '@/lib/iris/signals';
 import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import { useUiDirectives, defaultOpenFor, stripUiDirectives } from './iris/useUiDirectives';
-import ContactCta from './iris/ContactCta';
 import MessageComposer from './iris/MessageComposer';
 import QuickActions, { type QuickAction } from './iris/QuickActions';
 import type { QueryFilter } from '@/app/api/iris/answer/route';
