@@ -17,6 +17,20 @@ export function stripUiDirectives(text: string): string {
 }
 
 /**
+ * Decode HTML entities in text
+ * Converts &quot;, &apos;, &amp;, &lt;, &gt; back to their characters
+ */
+function decodeHTMLEntities(text: string): string {
+  return text
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+}
+
+/**
  * Parse attributes from a UI directive tag
  * Handles attributes in any order
  */
@@ -24,11 +38,11 @@ function parseAttributes(attrString: string): Record<string, string> {
   const attrs: Record<string, string> = {};
   const attrRegex = /(\w+)="([^"]*)"/g;
   let match;
-  
+
   while ((match = attrRegex.exec(attrString)) !== null) {
     attrs[match[1]] = match[2];
   }
-  
+
   return attrs;
 }
 
@@ -53,11 +67,11 @@ export function detectContactDirective(text: string): ContactDirective | null {
   if (!attrs.reason || !['insufficient_context', 'more_detail', 'user_request'].includes(attrs.reason)) {
     return null;
   }
-  
+
   return {
     type: 'contact',
     reason: attrs.reason as ContactReason,
-    draft: attrs.draft,
+    draft: attrs.draft ? decodeHTMLEntities(attrs.draft) : undefined,
     open: attrs.open as ContactOpenBehavior | undefined,
   };
 }

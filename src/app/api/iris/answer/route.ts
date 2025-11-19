@@ -9,6 +9,7 @@ import { config } from '@/lib/iris/config';
 import { getRecentActivityContext } from '@/lib/iris/github';
 import { logQuery, logQuickAction } from '@/lib/iris/analytics';
 import { generateQuickActions } from '@/lib/iris/quickActions';
+import type { QuickAction } from '@/components/iris/QuickActions';
 
 // Import types from answer-utils modules
 import type { Intent, QueryFilter, IntentResult } from '@/lib/iris/answer-utils/types';
@@ -315,9 +316,19 @@ export async function POST(req: NextRequest) {
       console.log(`Query: "${query}"`);
       console.log(`Intent: ${intent}`);
 
-      // Check if user wants to write/send a message
-      const wantsToMessage = /\b(write|send|message|contact|reach(?: out)?|connect|dm|get in touch|tell)\b.*\b(mike|you|him)\b/i.test(query) ||
-        /\b(mike|you|him)\b.*\b(collaborate|partner|work with|work together|hire|book|schedule|connect|dm)\b/i.test(query);
+      // Check if user wants to write/send a message with specific content
+      // Only matches when user has something specific to say to Mike
+      // Examples that SHOULD match: "send Mike a message about hiring", "tell Mike I'm interested"
+      // Examples that should NOT match: "contact Mike", "get in touch with Mike", "reach out to Mike"
+      const wantsToMessage =
+        // "send/write/message Mike about X" or "send/write to Mike about X"
+        /\b(write|send|message)\b.*\b(mike|you|him)\b.*\b(about|regarding|that|to discuss|on|concerning)\b/i.test(query) ||
+        // "tell Mike [something]" - but only if there's meaningful content after Mike (>15 chars indicates content)
+        (/\btell\b.*\b(mike|you|him)\b/i.test(query) && query.replace(/.*\b(mike|you|him)\b/i, '').trim().length > 15) ||
+        // "I want to discuss/talk about X with Mike" - has topic
+        /\b(discuss|talk about|ask about|inquire about)\b.*\bwith\b.*\b(mike|you|him)\b/i.test(query) ||
+        // "message/write to Mike: [content]" or "message Mike - [content]"
+        /\b(message|write|send)\b.*\b(mike|you|him)\b\s*[:\-]/i.test(query);
 
       let contactMessage = '';
 
@@ -325,12 +336,16 @@ export async function POST(req: NextRequest) {
         // Generate draft message for explicit message requests
         let draftMessage = '';
         try {
-          const cleanedQuery = query.replace(/\b(write|send|a message to|message|contact|reach out to|get in touch with|tell)\s+(mike|you|him|them)\s+(about|regarding|that)?\s*/gi, '').trim();
+          // Clean the query by removing action verbs and Mike references
+          const cleanedQuery = query
+            .replace(/\b(write|send|a message to|message|tell)\s+(to\s+)?(mike|you|him|them)\s+(about|regarding|that|on|concerning)?\s*/gi, '')
+            .replace(/\b(i want to|i'd like to|can you|could you|please)\s+/gi, '')
+            .trim();
 
           if (cleanedQuery && cleanedQuery.length > 5) {
             const draftResponse = await Promise.race([
               openai.chat.completions.create({
-                model: config.models.query_processing,
+                model: config.models.draft_generation,
                 messages: [
                   {
                     role: 'system',
@@ -355,7 +370,10 @@ export async function POST(req: NextRequest) {
           }
         } catch (error) {
           console.warn('[Answer API] Draft generation failed, using fallback:', error);
-          const cleanQuery = query.replace(/\b(write|send|a message to|message|contact|reach out to|get in touch with)\s+(mike|you|him)\s+(about|regarding)?\s*/gi, '').trim();
+          const cleanQuery = query
+            .replace(/\b(write|send|a message to|message|tell)\s+(to\s+)?(mike|you|him|them)\s+(about|regarding|that|on|concerning)?\s*/gi, '')
+            .replace(/\b(i want to|i'd like to|can you|could you|please)\s+/gi, '')
+            .trim();
           draftMessage = cleanQuery ? `I wanted to reach out: ${cleanQuery}` : 'I\'d like to get in touch';
         }
 
@@ -364,10 +382,10 @@ export async function POST(req: NextRequest) {
         console.log(`Wants to Message: true`);
         console.log(`Draft Message: "${draftMessage}"`);
       } else {
-        // For general contact queries, add insufficient_context directive
-        // This will trigger the contact quick actions to be shown
-        contactMessage = `<ui:contact reason="insufficient_context" draft="I'd like to get in touch" />`;
+        // For general contact queries, show 4 quick action buttons WITHOUT composer
+        contactMessage = "Here's how you can reach Mike:";
         console.log(`Wants to Message: false`);
+        console.log(`Showing contact quick actions instead of composer`);
       }
 
       console.log(`Contact Message Length: ${contactMessage.length} characters`);
@@ -399,6 +417,37 @@ export async function POST(req: NextRequest) {
       const readable = new ReadableStream({
         start(controller) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: contactMessage })}\n\n`));
+
+          // For general contact queries (wantsToMessage === false), add quick actions
+          if (!wantsToMessage) {
+            const contactQuickActions: QuickAction[] = [
+              {
+                type: 'contact_link',
+                label: 'LinkedIn',
+                link: 'https://linkedin.com/in/mikedouzinas',
+                linkType: 'linkedin',
+              },
+              {
+                type: 'contact_link',
+                label: 'GitHub',
+                link: 'https://github.com/mikedouzinas',
+                linkType: 'github',
+              },
+              {
+                type: 'message_mike',
+                label: 'Message Mike',
+              },
+              {
+                type: 'contact_link',
+                label: 'Email',
+                link: 'mike@mikedouzinas.com',
+                linkType: 'email',
+              },
+            ];
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ quickActions: contactQuickActions })}\n\n`));
+            console.log(`Quick Actions: ${contactQuickActions.length} contact options`);
+          }
+
           controller.enqueue(encoder.encode('data: [DONE]\n\n'));
           controller.close();
         }
