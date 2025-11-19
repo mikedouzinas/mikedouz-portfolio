@@ -1320,19 +1320,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     : 'max-h-64'
                 }`}
               >
-                {/* Clear conversation button - show when in conversation mode */}
-                {conversationHistory.length > 0 && (
-                  <div className="flex justify-end mb-2">
-                    <button
-                      onClick={handleClear}
-                      className="p-1 rounded-md hover:bg-white/10 transition-colors text-white/50 hover:text-white/80"
-                      title="Clear conversation and start fresh"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
-
                 {/* Render all previous exchanges from conversation history */}
                 {conversationHistory.map((exchange, index) => (
                   <div key={index} className="space-y-2">
@@ -1435,21 +1422,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               )}
             </div>
 
-            {/* Contact UI: CTA or Composer based on directive */}
-            {/* Only show if not currently processing a new query and directive exists */}
-            {!isProcessingQuery && uiDirective && !showComposer && (
-              // Show CTA button for 'more_detail' with no auto-open
-              uiDirective.reason === 'more_detail' ? (
-                <div className="px-4 pb-4">
-                  <ContactCta 
-                    draft={uiDirective.draft} 
-                    onClick={() => setShowComposer(true)} 
-                  />
-                </div>
-              ) : null
-            )}
-            
-            {/* Message Composer - shown when auto-opened or when CTA clicked */}
+            {/* Message Composer - shown when auto-opened or when user clicks Message Mike */}
             {/* Only show if not currently processing a new query */}
             {!isProcessingQuery && showComposer && (
               <div className="px-4 pb-4">
