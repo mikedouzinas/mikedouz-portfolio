@@ -172,7 +172,33 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   // Track last seen directive to prevent auto-opening composer multiple times
   const lastDirectiveRef = useRef<string | null>(null);
 
-  const cleanedAnswer = answer ? stripUiDirectives(answer) : '';
+  /**
+   * Simplify answer text when there's a contact directive
+   * For insufficient_context / more_detail, replace with simple message
+   * For user_request, strip directive but keep original text
+   */
+  const simplifyContactAnswer = (text: string): string => {
+    if (!text) return '';
+
+    // Check if there's a contact directive
+    const hasContact = /<ui:contact\b/.test(text);
+    if (!hasContact) {
+      return text;
+    }
+
+    // Check if it's a user_request (explicit message request)
+    const isUserRequest = /reason="user_request"/.test(text);
+
+    if (isUserRequest) {
+      // For user requests, just strip the directive but keep the text
+      return stripUiDirectives(text);
+    }
+
+    // For insufficient_context / more_detail, replace with simple message
+    return "Here are the best ways to reach Mike:";
+  };
+
+  const cleanedAnswer = answer ? simplifyContactAnswer(answer) : '';
   const renderedAnswer = useMemo(() => autoLinkText(cleanedAnswer), [cleanedAnswer]);
 
   /**
@@ -725,13 +751,24 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    * Immediately switches to answer view with loading state and streams text from OpenAI
    * Supports conversation context for follow-up queries
    */
-  const handleSubmitQuery = async (q: string, skipClassification?: boolean, preFilters?: Record<string, unknown>, preIntent?: string) => {
+  const handleSubmitQuery = async (
+    q: string,
+    skipClassification?: boolean,
+    preFilters?: Record<string, unknown>,
+    preIntent?: string,
+    continueConversation = false // New param: true for quick actions, false for fresh queries
+  ) => {
     // Input validation - max 500 characters
     if (!q.trim() || isProcessingQuery) return;
     if (q.length > 500) {
       setAnswer('Your question is too long. Please keep it under 500 characters.');
       setViewMode('answer');
       return;
+    }
+
+    // Reset conversation history if this is a fresh query (not from quick action)
+    if (!continueConversation) {
+      setConversationHistory([]);
     }
 
     // Calculate current depth from conversation history
@@ -1017,7 +1054,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       queryToSubmit,
       skipClassification,
       action.filters,
-      action.intent
+      action.intent,
+      true // Continue conversation for quick action clicks
     );
   };
 
@@ -1282,6 +1320,19 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     : 'max-h-64'
                 }`}
               >
+                {/* Clear conversation button - show when in conversation mode */}
+                {conversationHistory.length > 0 && (
+                  <div className="flex justify-end mb-2">
+                    <button
+                      onClick={handleClear}
+                      className="p-1 rounded-md hover:bg-white/10 transition-colors text-white/50 hover:text-white/80"
+                      title="Clear conversation and start fresh"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
                 {/* Render all previous exchanges from conversation history */}
                 {conversationHistory.map((exchange, index) => (
                   <div key={index} className="space-y-2">
@@ -1294,7 +1345,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     )}
 
                     {/* Render the answer */}
-                    {renderMarkdownContent(autoLinkText(stripUiDirectives(exchange.answer)), false)}
+                    {renderMarkdownContent(autoLinkText(simplifyContactAnswer(exchange.answer)), false)}
 
                     {/* Render quick actions for this exchange */}
                     {exchange.quickActions.length > 0 && (

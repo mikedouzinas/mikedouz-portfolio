@@ -97,7 +97,8 @@ export function useUiDirectives(streamText: string): ContactDirective | null {
 /**
  * Determine default open behavior based on reason
  * Used when no explicit 'open' attribute is provided
+ * Only auto-opens for explicit user requests to send a message
  */
 export function defaultOpenFor(reason: string): 'auto' | 'cta' {
-  return reason === 'insufficient_context' || reason === 'user_request' ? 'auto' : 'cta';
+  return reason === 'user_request' ? 'auto' : 'cta';
 }

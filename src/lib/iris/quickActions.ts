@@ -139,10 +139,41 @@ function extractSuggestions(answer: string): string[] {
 
 /**
  * Check if answer has a contact directive
- * If so, don't show quick actions (MessageComposer handles it)
+ * If so, generate contact quick actions
  */
 function hasContactDirective(answer: string): boolean {
   return /<ui:contact\b/.test(answer);
+}
+
+/**
+ * Generate contact quick actions when contact directive is present
+ * Returns 4 standard contact actions: LinkedIn, GitHub, Message Mike, Email
+ */
+function generateContactActions(): QuickAction[] {
+  return [
+    {
+      type: 'contact_link',
+      label: 'LinkedIn',
+      link: 'https://linkedin.com/in/mikedouzinas',
+      linkType: 'linkedin',
+    },
+    {
+      type: 'contact_link',
+      label: 'GitHub',
+      link: 'https://github.com/mikedouzinas',
+      linkType: 'github',
+    },
+    {
+      type: 'message_mike',
+      label: 'Message Mike',
+    },
+    {
+      type: 'contact_link',
+      label: 'Email',
+      link: 'mike@mikedouzinas.com',
+      linkType: 'email',
+    },
+  ];
 }
 
 /**
@@ -154,9 +185,9 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
   const actions: QuickAction[] = [];
   const { fullAnswer, intent, depth = 0 } = context;
 
-  // Don't show actions if there's a contact directive
+  // If there's a contact directive, show contact quick actions
   if (hasContactDirective(fullAnswer)) {
-    return [];
+    return generateContactActions();
   }
 
   // Hard limit: no follow-up/filter actions after 2 follow-ups
