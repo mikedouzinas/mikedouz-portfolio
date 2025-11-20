@@ -30,8 +30,11 @@
     "specifics": [
       "Iris: Named after the Greek messenger goddess, part of a long-term vision for Mike's AI assistants (Iris for digital, Hermes for physical robot form)",
       "Custom RAG pipeline: embeddings retrieval, semantic search, intent detection, and streaming LLM responses",
+      "Intelligent quick actions with ranking-based prioritization: suggests related items, skills, and navigation paths using importance scores (complexity × impact × recency)",
+      "Config-driven action system with path tracking: avoids suggesting already-visited nodes and adapts suggestions based on conversation depth",
       "⌘K command palette for instant search and Iris chat integration",
       "Structured knowledge base with filter queries, year-based filtering, and personal context retrieval",
+      "Cross-type navigation: seamlessly connect projects ↔ skills ↔ experiences ↔ classes with smart suggestions",
       "Accessibility-first design with responsive layout and smooth Framer Motion animations"
     ],
     "skills": ["openai_api", "rag", "product_management", "user_research", "ux_design", "typescript", "react", "nextjs", "tailwind_css", "framer_motion"],

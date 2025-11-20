@@ -254,7 +254,7 @@ export function computeRankings(allItems: KBItem[]): Rankings {
       importance = computeClassImportance(item as ClassT);
       classes.push({ id: item.id, kind: item.kind, importance });
     } else if (item.kind === 'blog') {
-      importance = computeBlogImportance(item as any);
+      importance = computeBlogImportance(item as { published_date: string; related_experiences?: string[]; related_projects?: string[] });
       blogs.push({ id: item.id, kind: item.kind, importance });
     }
   }
