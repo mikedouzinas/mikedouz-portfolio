@@ -11,7 +11,7 @@
         "Intro algorithms and testing; AP subset of DSA",
         "Capstone led to first Swift app and early product habits"
       ],
-      "skills": ["java", "oop", "algorithms", "swift"]
+      "skills": ["java", "algorithms", "swift", "data_structures"]
     },
     {
       "id": "class_atcs_2022",
@@ -25,7 +25,7 @@
         "Jack/VM/Assembly and binary representations",
         "Systems thinking from hardware to software"
       ],
-      "skills": ["computer_architecture", "assembly", "parsing"],
+      "skills": ["computer_architecture", "assembly", "parsing", "systems_programming"],
       "mini_projects": [
         {
           "name": "Angry Circle Game",
@@ -45,7 +45,7 @@
         "Algorithmic problem solving with Python",
         "Graph traversal patterns and complexity intuition"
       ],
-      "skills": ["python", "algorithms", "graphs"]
+      "skills": ["python", "algorithms", "data_structures"]
     },
     {
       "id": "class_busi_221_2023",
@@ -58,12 +58,12 @@
         "Opportunity discovery and customer development",
         "Built ClipNote; wrote blog 'What are you going to do with your life?'"
       ],
-      "skills": ["entrepreneurship", "product_discovery", "user_research", "writing"],
+      "skills": ["leadership","swift", "product_management", "writing"],
       "mini_projects": [
         {
           "name": "ClipNote",
           "description": "Mobile app for entrepreneurship discovery project",
-          "skills": ["product_discovery", "user_research"]
+          "skills": ["product_management", "swift"]
         }
       ]
     },
@@ -78,7 +78,7 @@
         "Research Paper: AI’s transformative role in educating students with disabilities",
         "Comparative portfolio on AI and creative writing"
       ],
-      "skills": ["ai_ethics_policy", "research_writing"]
+      "skills": ["ai_ethics_policy", "writing"]
     },
     {
       "id": "class_comp_182_2024",
@@ -91,7 +91,7 @@
         "Recursion, divide-and-conquer, greedy methods",
         "Graphs, correctness proofs, asymptotic analysis"
       ],
-      "skills": ["algorithms", "discrete_math", "proofs", "graphs"]
+      "skills": ["algorithms", "discrete_math", "data_structures"]
     },
     {
       "id": "class_busi_369_2024",
@@ -104,7 +104,7 @@
         "Venture testing with interviews, go/no-go decisions, investor feedback",
         "Mapped technical feasibility against user needs"
       ],
-      "skills": ["entrepreneurship", "product_management", "user_research"]
+      "skills": ["leadership", "product_management"]
     },
     {
       "id": "class_busi_220_2024",
@@ -117,7 +117,7 @@
         "Realtime transcription (<1s) and adaptive TTS feedback",
         "Agile sprints, TestFlight feedback, user-centered iteration"
       ],
-      "skills": ["swiftui", "speech_recognition", "tts", "openai_api", "product_management", "ux_design"],
+      "skills": ["swift", "nlp", "openai_api", "product_management"],
       "related_projects": ["proj_momentum"]
     },
     {
@@ -131,7 +131,7 @@
         "Patterns in founder decision-making and resilience",
         "Aligning products with deeper values"
       ],
-      "skills": ["entrepreneurship", "leadership"]
+      "skills": ["leadership"]
     },
     {
       "id": "class_comp_215_2024",
@@ -144,7 +144,7 @@
         "Built 1k+ line Java programs; linked lists, hash tables, BSTs, heaps, tries",
         "Testing, debugging, refactoring for clarity and performance"
       ],
-      "skills": ["java", "oop", "data_structures"]
+      "skills": ["java", "data_structures"]
     },
     {
       "id": "class_comp_222_2024",
@@ -157,7 +157,7 @@
         "Pointers, dynamic allocation, and debugging segfaults",
         "Pipelining, caching, and intro to ROP/security mindset"
       ],
-      "skills": ["c_lang", "assembly", "computer_architecture", "memory_management", "systems_security_basics"]
+      "skills": ["c_lang", "assembly", "computer_architecture", "memory_management", "systems_programming"]
     },
     {
       "id": "class_stat_315_2024",
@@ -170,7 +170,7 @@
         "Distributions, expectation/variance, confidence intervals",
         "One-/two-sample tests and simulation-based intuition in R"
       ],
-      "skills": ["probability", "statistics", "hypothesis_testing", "r_lang", "data_analysis_basics"]
+      "skills": ["statistics", "r_lang"]
     },
     {
       "id": "class_comp_312_2025",
@@ -183,7 +183,7 @@
         "Built parsers with ANTLR; visitor pattern over ASTs",
         "Compiler components and functional-programming paradigms"
       ],
-      "skills": ["programming_languages", "parsing", "compilers", "functional_programming", "antlr", "java", "python"]
+      "skills": ["parsing", "java", "python"]
     },
     {
       "id": "class_comp_321_2025",
@@ -196,7 +196,7 @@
         "Built Unix shell, threading libs, custom malloc, checkpointing, and KV store",
         "Debugging race conditions and performance bottlenecks"
       ],
-      "skills": ["c_lang", "systems_programming", "concurrency", "operating_systems", "networking_basics", "memory_management"]
+      "skills": ["c_lang", "systems_programming", "memory_management"]
     },
     {
       "id": "class_comp_646_2025",
@@ -210,7 +210,7 @@
         "Object detection, captioning, and text-to-image foundations",
         "Project: HiLiTe — highlight reels with VLM commentary"
       ],
-      "skills": ["deep_learning", "transformers", "computer_vision", "nlp", "diffusion_models", "python"],
+      "skills": ["deep_learning", "sentence_transformers", "computer_vision", "nlp", "diffusion_models", "model_evaluation", "python"],
       "related_projects": ["proj_hilite"]
     },
     {
@@ -224,7 +224,7 @@
         "Hands-on Pandas + scikit-learn for real problems (fraud, segmentation, prediction)",
         "Warehouses, OLAP, and evaluation/optimization patterns"
       ],
-      "skills": ["pandas", "scikit_learn", "data_mining", "feature_engineering", "model_evaluation", "data_warehousing", "olap", "python"]
+      "skills": ["pandas", "scikit_learn", "data_mining", "python", "model_evaluation"]
     },
     {
       "id": "class_ep430_2025",
@@ -237,7 +237,7 @@
         "Instruction execution and dataflow within CPU",
         "Performance trade-offs across pipelines and multiprocessor designs"
       ],
-      "skills": ["computer_architecture", "parallel_computing", "multicore_systems", "performance_engineering", "python"]
+      "skills": ["computer_architecture", "python"]
     }
   ]
   

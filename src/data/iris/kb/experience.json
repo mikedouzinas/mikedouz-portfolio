@@ -56,9 +56,7 @@
       "typescript",
       "react",
       "supabase",
-      "product_management",
-      "user_research",
-      "ux_design"
+      "product_management"
     ],
     "links": {
       "company": "https://entrepreneurship.rice.edu/"
@@ -89,11 +87,14 @@
       "python",
       "google_document_ai",
       "streamlit",
-      "rule_engines",
-      "data_extraction",
       "api_integration",
       "docker",
-      "typescript"
+      "typescript",
+      "leadership",
+      "openai_api",
+      "nlp",
+      "product_management",
+      "computer_vision"
     ],
     "links": {
       "company": "https://veson.com/"
@@ -127,8 +128,8 @@
       "pandas",
       "numpy",
       "model_evaluation",
-      "feature_engineering",
-      "machine_learning"
+      "machine_learning",
+      "nlp"
     ],
     "links": {
       "company": "https://www.vesselsvalue.com/"
@@ -157,11 +158,9 @@
     ],
     "skills": [
       "swift",
-      "xcode",
       "api_integration",
       "ci_cd",
-      "product_management",
-      "ios_development"
+      "product_management"
     ],
     "links": {
       "company": "https://veson.com/"

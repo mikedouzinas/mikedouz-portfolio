@@ -97,17 +97,30 @@ export function computeProjectImportance(project: ProjectT): number {
   const hasDemo = 'demo' in (project.links || {}) ? 1 : 0;
   const hasGithub = 'github' in (project.links || {}) ? 1 : 0;
 
-  // Check BOTH summary and specifics for USER IMPACT metrics
+  // Check BOTH summary and specifics for USER IMPACT metrics and production deployment
   // Exclude competition placements like "top X%" - focus on adoption/usage metrics
   const allText = [project.summary, ...(project.specifics || [])].join(' ');
-  const hasMetrics = /\d+\+?\s*(users|downloads|clients|installs)|star.*rating|rating.*star|\d+\.\d+\s*★|widely\s+adopted|adopted\s+by/i.test(allText);
+  const hasMetrics = /\d+\+?\s*(users|downloads|clients|installs)|star.*rating|rating.*star|\d+\.\d+\s*★|widely\s+adopted|adopted\s+by|production\s+deployment|live\s+deployment|serving\s+live/i.test(allText);
 
   // Bonus for live deployment (has image/screenshot indicating it's live)
   const isLive = 'image' in (project.links || {}) ? 1 : 0;
 
+  // Check if project IS the live production system (self-hosted/deployed)
+  // Indicators: 
+  // 1. Full-Stack/Web tag + production architecture (Next.js, App Router, backend services)
+  // 2. Published mobile app (App Store/Play Store link)
+  const tagsText = (project.tags || []).join(' ');
+  const archText = project.architecture || '';
+  const hasAppStoreLink = 'app_store' in (project.links || {}) || 'play_store' in (project.links || {});
+  
+  const isProductionSystem = 
+    hasAppStoreLink || // Published mobile apps are production systems
+    ((tagsText.includes('Full-Stack') || tagsText.includes('Web')) && 
+     /Next\.js|App Router|backend|API Routes|production|deployed|live|serving/i.test(archText));
+
   // Bonus for cutting-edge AI/ML work (RAG, transformers, diffusion, etc.)
   const hasCuttingEdgeAI = (project.skills as string[]).some(s =>
-    ['rag', 'transformers', 'diffusion_models', 'pytorch', 'opencv'].includes(s)
+    ['rag', 'sentence_transformers', 'diffusion_models', 'pytorch', 'opencv'].includes(s)
   );
 
   // Weighted scoring (prioritize complexity and impact over recency)
@@ -115,16 +128,17 @@ export function computeProjectImportance(project: ProjectT): number {
   const diversityScore = Math.min(skillCount * 3, 25);    // Cap at 25 (8+ skills)
   const recencyScore = recency * 1.0;                     // Reduced from 1.5 to 1.0 (less important)
   const demoScore = hasDemo * 12;                         // Demo/shipped work (HiLiTe)
+  const productionScore = isProductionSystem ? 12 : 0;    // Self-hosted production system (Iris)
   const liveScore = isLive * 12;                          // Live projects equal value (Iris)
   const githubScore = hasGithub * 5;                      // Code availability
   const impactScore = hasMetrics ? 25 : 0;                // User adoption/impact (Knight Life)
   const aiBonus = hasCuttingEdgeAI ? 10 : 0;              // Cutting-edge AI bonus (HiLiTe, Iris)
 
-  const rawScore = complexityScore + diversityScore + recencyScore + demoScore + liveScore + githubScore + impactScore + aiBonus;
+  const rawScore = complexityScore + diversityScore + recencyScore + demoScore + productionScore + liveScore + githubScore + impactScore + aiBonus;
 
   // Normalize to 0-100
-  // Max possible: 60 + 25 + 10 + 12 + 12 + 5 + 25 + 10 = 159
-  return Math.min(Math.round((rawScore / 159) * 100), 100);
+  // Max possible: 60 + 25 + 10 + 12 + 12 + 12 + 5 + 25 + 10 = 171
+  return Math.min(Math.round((rawScore / 171) * 100), 100);
 }
 
 /**
