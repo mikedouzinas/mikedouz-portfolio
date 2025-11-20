@@ -8,7 +8,8 @@ import { OpenAI } from 'openai';
 import { config } from '@/lib/iris/config';
 import { getRecentActivityContext } from '@/lib/iris/github';
 import { logQuery, logQuickAction } from '@/lib/iris/analytics';
-import { generateQuickActions } from '@/lib/iris/quickActions';
+import { generateQuickActions } from '@/lib/iris/quickActions_v2';
+import { loadRankings } from '@/lib/iris/loadRankings';
 import type { QuickAction } from '@/components/iris/QuickActions';
 
 // Import types from answer-utils modules
@@ -344,7 +345,8 @@ export async function POST(req: NextRequest) {
           try {
             // Load all items for context (needed for quick action generation)
             const allItems = await getAllItems();
-            
+            const rankings = loadRankings();
+
             // Generate quick actions based on cached answer content
             generatedQuickActions = generateQuickActions({
               query,
@@ -353,6 +355,7 @@ export async function POST(req: NextRequest) {
               results: [], // No results available from cache, but quick actions can still be generated
               fullAnswer: cachedData.answer,
               allItems,
+              rankings, // Pass rankings for action sorting
               depth, // Pass depth for enforcing follow-up limits
             });
 
@@ -1244,13 +1247,17 @@ ${enhancedContext}`;
             // Generate quick actions after answer is complete
             let generatedQuickActions: ReturnType<typeof generateQuickActions> = [];
             try {
+              const allItems = await getAllItems();
+              const rankings = loadRankings();
+
               generatedQuickActions = generateQuickActions({
                 query,
                 intent,
                 filters,
                 results,
                 fullAnswer,
-                allItems: await getAllItems(),
+                allItems,
+                rankings, // Pass rankings for action sorting
                 depth, // Pass depth for enforcing follow-up limits
               });
 
