@@ -25,7 +25,14 @@
         "Jack/VM/Assembly and binary representations",
         "Systems thinking from hardware to software"
       ],
-      "skills": ["computer_architecture", "assembly", "compilers_parsing_basics", "systems_thinking"]
+      "skills": ["computer_architecture", "assembly", "compilers_parsing_basics", "systems_thinking"],
+      "mini_projects": [
+        {
+          "name": "Angry Circle Game",
+          "description": "Assembly-based game built from first principles after constructing a full computer from logic gates to OS",
+          "skills": ["assembly", "computer_architecture", "systems_thinking"]
+        }
+      ]
     },
     {
       "id": "class_comp_140_2023",
@@ -51,7 +58,14 @@
         "Opportunity discovery and customer development",
         "Built ClipNote; wrote blog 'What are you going to do with your life?'"
       ],
-      "skills": ["entrepreneurship", "product_discovery", "user_research", "writing"]
+      "skills": ["entrepreneurship", "product_discovery", "user_research", "writing"],
+      "mini_projects": [
+        {
+          "name": "ClipNote",
+          "description": "Mobile app for entrepreneurship discovery project",
+          "skills": ["product_discovery", "user_research"]
+        }
+      ]
     },
     {
       "id": "class_fwis_180_2023",
@@ -195,7 +209,8 @@
         "Object detection, captioning, and text-to-image foundations",
         "Project: HiLiTe — highlight reels with VLM commentary"
       ],
-      "skills": ["deep_learning", "transformers", "computer_vision", "nlp", "diffusion_models", "project_hilite_link", "python"]
+      "skills": ["deep_learning", "transformers", "computer_vision", "nlp", "diffusion_models", "project_hilite_link", "python"],
+      "related_projects": ["proj_hilite"]
     },
     {
       "id": "class_cs430_2025",

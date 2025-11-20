@@ -134,6 +134,12 @@ const ClassBase = BaseContent.extend({
   institution: z.string(),
   term: z.string(),         // e.g., "Fall 2024"
   professor: z.string().optional(),
+  mini_projects: z.array(z.object({
+    name: z.string(),
+    description: z.string(),
+    skills: z.array(z.string()).default([])
+  })).default([]),           // Small projects built within the class
+  related_projects: z.array(Id).default([])  // Link to major projects (e.g., HiLiTe from COMP 646)
 })
 
 const BlogBase = z.object({
@@ -144,6 +150,9 @@ const BlogBase = z.object({
   context: z.string().optional(),
   summary: z.string(),
   class: z.string().optional(),
+  related_class: Id.optional(),              // Link to class if written for coursework
+  related_experiences: z.array(Id).default([]),  // Link to experiences discussed in blog
+  related_projects: z.array(Id).default([]),     // Link to projects discussed in blog
   tags: z.array(z.string()).default([]),
 })
 
