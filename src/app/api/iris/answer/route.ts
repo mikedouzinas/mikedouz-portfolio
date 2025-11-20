@@ -40,7 +40,7 @@ import { streamTextResponse, buildNoMatchResponse, buildClarificationPrompt, bui
 import { detectPromptInjection, buildContextEntities, isClearlyOffTopic } from '@/lib/iris/answer-utils/security';
 
 // Import ranking utilities
-import { reranktechnical } from '@/lib/iris/answer-utils/ranking';
+import { reranktechnical, boostWithImportance } from '@/lib/iris/answer-utils/ranking';
 
 // Import planning utilities
 import { preRoute, planAutoContact, needsComparisonQuery, expandResultsForComparativeQuery } from '@/lib/iris/answer-utils/planning';
@@ -832,6 +832,10 @@ export async function POST(req: NextRequest) {
 
       const retrievalResults = await retrieve(query, retrievalOptions);
       results = retrievalResults.results;
+
+      // Boost results with importance rankings
+      const rankings = loadRankings();
+      results = boostWithImportance(results, rankings, query, isEvaluative);
 
       // Debug: Log RAG response (retrieval results) to terminal
       console.log('\n═══════════════════════════════════════════════════════════════');
