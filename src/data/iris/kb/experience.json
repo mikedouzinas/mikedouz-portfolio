@@ -3,58 +3,116 @@
     "id": "exp_parsons_2025",
     "company": "Parsons Corporation",
     "role": "Software Engineer Intern",
-    "dates": { "start": "2025-05", "end": "2025-08" },
-    "summary": "Built automated .NET/C# data-integration services feeding Power BI for daily US Air Force users; designed pipeline to reduce API calls and improved stakeholder-facing layouts.",
+    "dates": {
+      "start": "2025-05",
+      "end": "2025-08"
+    },
+    "summary": "Built automated .NET/C# data-integration services feeding Power BI for Air Force infrastructure management; learned C# and .NET on the job and delivered production features within weeks.",
     "specifics": [
-      "Designed a C#/.NET pipeline to consume external APIs, normalize records, and sync into SQL with schema optimizations for report performance.",
-      "Implemented request de-duplication and caching, reducing third-party API calls by ~40% while maintaining freshness SLAs.",
-      "Integrated with AWS-hosted services and Power BI Embedded; hardened auth and connection lifecycle.",
-      "Refactored dashboard layout and data contract for clearer decision support across USAF housing workflows.",
-      "Recognized with a 2026 return offer for rapid ramp-up on .NET and platform ownership."
+      "Designed a C#/.NET pipeline to consume external APIs, normalize facility inspection records, and sync into SQL databases with schema optimizations for Power BI report performance.",
+      "Implemented automated request batching and caching logic to reduce redundant third-party API calls while maintaining data freshness requirements.",
+      "Integrated with AWS-hosted services and Power BI Embedded for real-time Air Force infrastructure monitoring dashboards.",
+      "Refactored dashboard layouts in collaboration with Air Force analysts to improve report clarity for facility condition tracking and predictive maintenance.",
+      "Recognized with a 2026 return offer for rapid technical adaptability and production-quality delivery despite minimal prior C# and .NET experience."
     ],
-    "skills": ["csharp", "dotnet", "aws", "power_bi", "api_integration"],
-    "links": { "company": "https://www.parsons.com/" },
-    "tags": ["internship", "data-integration", "analytics", "gov"]
+    "skills": [
+      "csharp",
+      "dotnet",
+      "aws",
+      "power_bi",
+      "api_integration"
+    ],
+    "links": {
+      "company": "https://www.parsons.com/"
+    },
+    "tags": [
+      "internship",
+      "data-integration",
+      "analytics",
+      "gov"
+    ]
   },
   {
     "id": "exp_lilie_2024",
     "company": "Liu Idea Lab for Innovation & Entrepreneurship (Rice)",
     "role": "Software Engineer in Residence",
-    "dates": { "start": "2024-02", "end": "2024-11" },
-    "summary": "Led early development for Rice’s entrepreneurship platform, combining full-stack development with user research to shape product direction and help design coursework to teach founders how to build with software.",
-    "aliases": ["Lilie", "Liu Idea Lab", "Rice Lilie"],
-    "specifics": [
-      "Conducted 40+ user interviews with student founders and faculty to identify key needs in entrepreneurship education and resource access.",
-      "Designed and prototyped full-stack platform concepts in React, TypeScript, and Supabase, creating mockups for course management, venture tracking, and mentorship tools.",
-      "Collaborated weekly with student founders to gather feedback and refine designs that could streamline startup support and community visibility.",
-      "Assisted faculty with curriculum updates that empowered non-technical students to build MVPs and leverage software tools in their ventures."
+    "dates": {
+      "start": "2024-02",
+      "end": "2024-11"
+    },
+    "summary": "Conducted extensive user research and product strategy for Rice's entrepreneurship platform, combining UX design with technical prototyping to inform curriculum improvements and founder support programs.",
+    "aliases": [
+      "Lilie",
+      "Liu Idea Lab",
+      "Rice Lilie"
     ],
-    "skills": ["typescript", "react", "supabase", "product_management", "user_research", "ux_design"],
-    "links": { "company": "https://entrepreneurship.rice.edu/" },
-    "tags": ["platform", "product", "full-stack", "edtech"]
+    "specifics": [
+      "Conducted 40+ user interviews with student founders and faculty to identify key needs in entrepreneurship education, resource access, and technical support gaps.",
+      "Designed and prototyped full-stack platform concepts in React, TypeScript, and Supabase, creating mockups and wireframes for course management, venture tracking, and mentorship tools.",
+      "Met weekly with 30+ student startup teams to understand technical and operational challenges, providing insights to faculty on curriculum enhancements.",
+      "Collaborated with professors to design software-focused entrepreneurship coursework, taking multiple entrepreneurship classes to better understand student founder perspectives and inform program improvements."
+    ],
+    "skills": [
+      "typescript",
+      "react",
+      "supabase",
+      "product_management",
+      "user_research",
+      "ux_design"
+    ],
+    "links": {
+      "company": "https://entrepreneurship.rice.edu/"
+    },
+    "tags": [
+      "platform",
+      "product",
+      "full-stack",
+      "edtech"
+    ]
   },
   {
     "id": "exp_veson_2024",
     "company": "Veson Nautical",
     "role": "Software Engineering Intern (IMOS – Laytime Automation)",
-    "dates": { "start": "2024-06", "end": "2024-09" },
-    "summary": "Built a high-throughput document-processing pipeline (Google Document AI + Python) to automate laytime calculations; reduced multi-day workflows to ~8 minutes.",
+    "dates": {
+      "start": "2024-06",
+      "end": "2024-09"
+    },
+    "summary": "Built production-ready laytime calculation PoC in 1-week sprint under critical client deadline, reducing client's manual 3-day workflows to 8 minutes and directly enabling major strategic partnership.",
     "specifics": [
-      "Parsed PDFs/EMLs/XLSX and nested attachments at scale (100+ docs per batch) using Google Document AI with parallel execution.",
-      "Extracted Statement of Facts, Charter Parties, vendor calculations, and 15+ doc classes; normalized into a contract-aware schema.",
-      "Implemented rule engines that codified client-specific laytime clauses; cross-checked vendor demurrage against computed results.",
-      "Delivered Streamlit prototypes and initiated IMOS integration; iterated daily with enterprise stakeholders under tight deadlines.",
-      "Consultative work helped close four multi-million-dollar annual deals within one month by demonstrating speed and accuracy."
+      "Parsed PDFs/EMLs/XLSX and nested attachments at scale (100+ docs per batch) using Google Document AI with parallel execution, automating extraction of Statement of Facts, Charter Parties, and 15+ maritime document types.",
+      "Implemented rule engines that codified complex client-specific laytime clauses from contract documents, cross-checking vendor demurrage calculations against computed results for accuracy verification.",
+      "Served as primary technical consultant between client representatives, product teams, and engineering, conducting daily requirement sessions to ensure PoC met all contractual specifications under tight 1-week deadline.",
+      "Delivered interactive Streamlit demonstrations and initiated IMOS platform integration, completing production handoff to engineering team ahead of client expectations, with strategic agreement signed one month post-internship."
     ],
-    "skills": ["python", "google_document_ai", "streamlit", "rule_engines", "data_extraction", "api_integration", "docker", "typescript"],
-    "links": { "company": "https://veson.com/" },
-    "tags": ["automation", "nlp-vision", "enterprise", "maritime"]
+    "skills": [
+      "python",
+      "google_document_ai",
+      "streamlit",
+      "rule_engines",
+      "data_extraction",
+      "api_integration",
+      "docker",
+      "typescript"
+    ],
+    "links": {
+      "company": "https://veson.com/"
+    },
+    "tags": [
+      "automation",
+      "nlp-vision",
+      "enterprise",
+      "maritime"
+    ]
   },
   {
     "id": "exp_vesselsvalue_2024",
     "company": "VesselsValue",
     "role": "Data Science Intern",
-    "dates": { "start": "2024-05", "end": "2024-06" },
+    "dates": {
+      "start": "2024-05",
+      "end": "2024-06"
+    },
     "summary": "Shipped NLP clustering and entity-matching pipelines (Sentence Transformers + FAISS) achieving ~97% title-category accuracy; improved company merge precision >20%.",
     "specifics": [
       "Built job-title classifier using SentenceTransformer embeddings; tuned thresholds and stop-word handling for noisy maritime data.",
@@ -62,15 +120,34 @@
       "Automated an ingestion/cleaning pipeline to refresh leads and segmentation; cut outreach cycle time ~70%.",
       "Partnered with PMs to productize insights and tighten feedback loops into roadmap decisions."
     ],
-    "skills": ["python", "sentence_transformers", "faiss", "pandas", "numpy", "model_evaluation", "feature_engineering", "machine_learning"],
-    "links": { "company": "https://www.vesselsvalue.com/" },
-    "tags": ["nlp", "search", "data-quality", "ml-platform"]
+    "skills": [
+      "python",
+      "sentence_transformers",
+      "faiss",
+      "pandas",
+      "numpy",
+      "model_evaluation",
+      "feature_engineering",
+      "machine_learning"
+    ],
+    "links": {
+      "company": "https://www.vesselsvalue.com/"
+    },
+    "tags": [
+      "nlp",
+      "search",
+      "data-quality",
+      "ml-platform"
+    ]
   },
   {
     "id": "exp_veson_mobile_2021_2023",
     "company": "Veson Nautical",
     "role": "Software Development Intern (Mobile)",
-    "dates": { "start": "2021-06", "end": "2023-06" },
+    "dates": {
+      "start": "2021-06",
+      "end": "2023-06"
+    },
     "summary": "One of three frontend iOS devs on Veson’s first mobile app; enabled on-the-go access to voyage/cargo data and drove broad client adoption.",
     "specifics": [
       "Built Swift UI features, API client, and offline-tolerant data flows; coordinated sprint integration with the platform team.",
@@ -78,8 +155,21 @@
       "Introduced >50% of surveyed clients to mobile workflows; reduced time-to-data by ~30% versus desktop access.",
       "Established CI/CD hygiene and release rituals with Atlassian tooling."
     ],
-    "skills": ["swift", "xcode", "api_integration", "ci_cd", "product_management", "ios_development"],
-    "links": { "company": "https://veson.com/" },
-    "tags": ["ios", "mobile", "enterprise"]
+    "skills": [
+      "swift",
+      "xcode",
+      "api_integration",
+      "ci_cd",
+      "product_management",
+      "ios_development"
+    ],
+    "links": {
+      "company": "https://veson.com/"
+    },
+    "tags": [
+      "ios",
+      "mobile",
+      "enterprise"
+    ]
   }
 ]
