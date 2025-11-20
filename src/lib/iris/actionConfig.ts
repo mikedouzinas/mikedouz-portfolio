@@ -1,0 +1,544 @@
+/**
+ * Action configuration system for quick actions
+ * Defines what actions each KB item type should have
+ */
+
+import type { KBItem, ProjectT, ExperienceT, ClassT, BlogT, SkillT } from './schema';
+import type { QuickAction } from '@/components/iris/QuickActions';
+import type { Rankings } from './rankings';
+
+// Action types we can generate
+export type ActionType =
+  | 'link'              // External link (GitHub, demo, article, company site)
+  | 'dropdown'          // Searchable dropdown (skills, evidence)
+  | 'query'             // Pre-filled Iris query
+  | 'message_mike'      // Open MessageComposer
+  | 'custom_input';     // Generic follow-up input
+
+// Action template for generating actions
+export interface ActionTemplate {
+  type: ActionType;
+  label: string | ((item: KBItem) => string);
+  priority: number;  // Higher = more important (1-10 scale)
+
+  // Conditions for showing this action
+  condition?: (item: KBItem) => boolean;
+
+  // Data extraction functions
+  getData?: (item: KBItem, rankings: Rankings) => ActionData;
+}
+
+export interface ActionData {
+  link?: string;
+  linkType?: 'github' | 'linkedin' | 'email' | 'external' | 'demo' | 'company';
+  query?: string;
+  intent?: string;
+  filters?: Record<string, unknown>;
+  options?: Array<{ id: string; label: string; importance?: number }>;
+}
+
+/**
+ * Action configuration for each KB item type
+ * Defines what actions are available for each type
+ */
+export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
+  // ========================================
+  // PROJECT ACTIONS
+  // ========================================
+  project: [
+    {
+      type: 'link',
+      label: 'GitHub',
+      priority: 9,
+      condition: (item) => 'links' in item && 'github' in (item.links || {}),
+      getData: (item) => ({
+        link: (item as ProjectT).links?.github,
+        linkType: 'github'
+      })
+    },
+    {
+      type: 'link',
+      label: 'Live Demo',
+      priority: 9,
+      condition: (item) => 'links' in item && 'demo' in (item.links || {}),
+      getData: (item) => ({
+        link: (item as ProjectT).links?.demo,
+        linkType: 'demo'
+      })
+    },
+    {
+      type: 'dropdown',
+      label: 'Learn about skill',
+      priority: 8,
+      condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
+      getData: (item, rankings) => {
+        const project = item as ProjectT;
+        const skillOptions = project.skills
+          .map(skillId => {
+            const ranking = rankings.skills.find(s => s.id === skillId);
+            return {
+              id: skillId,
+              label: skillId,  // Will be resolved to display name in UI
+              importance: ranking?.importance || 50
+            };
+          })
+          .sort((a, b) => b.importance - a.importance);
+
+        return {
+          options: skillOptions
+        };
+      }
+    },
+    {
+      type: 'query',
+      label: 'Related projects',
+      priority: 7,
+      condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
+      getData: (item) => {
+        const project = item as ProjectT;
+        const topSkills = project.skills.slice(0, 2);
+        return {
+          query: `projects using ${topSkills.join(' and ')}`,
+          intent: 'filter_query',
+          filters: { type: ['project'], skills: topSkills }
+        };
+      }
+    }
+  ],
+
+  // ========================================
+  // EXPERIENCE ACTIONS
+  // ========================================
+  experience: [
+    {
+      type: 'link',
+      label: 'Company Website',
+      priority: 8,
+      condition: (item) => 'links' in item && 'company' in (item.links || {}),
+      getData: (item) => ({
+        link: (item as ExperienceT).links?.company,
+        linkType: 'company'
+      })
+    },
+    {
+      type: 'link',
+      label: 'LinkedIn',
+      priority: 7,
+      getData: () => ({
+        link: 'https://linkedin.com/in/mikedouzinas',
+        linkType: 'linkedin'
+      })
+    },
+    {
+      type: 'dropdown',
+      label: 'Learn about skill',
+      priority: 8,
+      condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
+      getData: (item, rankings) => {
+        const exp = item as ExperienceT;
+        const skillOptions = exp.skills
+          .map(skillId => {
+            const ranking = rankings.skills.find(s => s.id === skillId);
+            return {
+              id: skillId,
+              label: skillId,
+              importance: ranking?.importance || 50
+            };
+          })
+          .sort((a, b) => b.importance - a.importance);
+
+        return {
+          options: skillOptions
+        };
+      }
+    },
+    {
+      type: 'query',
+      label: (item) => `Other work at ${(item as ExperienceT).company}`,
+      priority: 7,
+      condition: (item) => 'company' in item,
+      getData: (item) => {
+        const exp = item as ExperienceT;
+        return {
+          query: `work at ${exp.company}`,
+          intent: 'filter_query',
+          filters: { type: ['experience'], company: [exp.company] }
+        };
+      }
+    },
+    {
+      type: 'query',
+      label: 'Similar technical work',
+      priority: 6,
+      condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
+      getData: (item) => {
+        const exp = item as ExperienceT;
+        const topSkills = exp.skills.slice(0, 2);
+        return {
+          query: `work using ${topSkills.join(' and ')}`,
+          intent: 'filter_query',
+          filters: { type: ['experience', 'project'], skills: topSkills }
+        };
+      }
+    }
+  ],
+
+  // ========================================
+  // CLASS ACTIONS
+  // ========================================
+  class: [
+    {
+      type: 'dropdown',
+      label: 'Learn about skill',
+      priority: 8,
+      condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
+      getData: (item, rankings) => {
+        const cls = item as ClassT;
+        const skillOptions = cls.skills
+          .map(skillId => {
+            const ranking = rankings.skills.find(s => s.id === skillId);
+            return {
+              id: skillId,
+              label: skillId,
+              importance: ranking?.importance || 50
+            };
+          })
+          .sort((a, b) => b.importance - a.importance);
+
+        return {
+          options: skillOptions
+        };
+      }
+    },
+    {
+      type: 'query',
+      label: 'Work using these skills',
+      priority: 7,
+      condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
+      getData: (item) => {
+        const cls = item as ClassT;
+        const topSkills = cls.skills.slice(0, 3);
+        return {
+          query: `work using ${topSkills.join(', ')}`,
+          intent: 'filter_query',
+          filters: { type: ['project', 'experience'], skills: topSkills }
+        };
+      }
+    },
+    {
+      type: 'query',
+      label: 'Related classes',
+      priority: 6,
+      condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
+      getData: (item) => {
+        const cls = item as ClassT;
+        const topSkills = cls.skills.slice(0, 2);
+        return {
+          query: `classes covering ${topSkills.join(' and ')}`,
+          intent: 'filter_query',
+          filters: { type: ['class'], skills: topSkills }
+        };
+      }
+    }
+  ],
+
+  // ========================================
+  // BLOG ACTIONS
+  // ========================================
+  blog: [
+    {
+      type: 'link',
+      label: 'Read Article',
+      priority: 10,
+      condition: (item) => 'url' in item,
+      getData: (item) => ({
+        link: (item as BlogT).url,
+        linkType: 'external'
+      })
+    },
+    {
+      type: 'query',
+      label: 'Related work',
+      priority: 7,
+      condition: (item) => {
+        const blog = item as BlogT;
+        return (blog.related_experiences?.length || 0) > 0 ||
+               (blog.related_projects?.length || 0) > 0;
+      },
+      getData: (item) => {
+        const blog = item as BlogT;
+        const related = [
+          ...(blog.related_experiences || []),
+          ...(blog.related_projects || [])
+        ];
+        return {
+          query: `tell me about ${related[0]}`,
+          intent: 'specific_item',
+          filters: { title_match: related[0] }
+        };
+      }
+    },
+    {
+      type: 'message_mike',
+      label: 'Message Mike',
+      priority: 6,
+      getData: () => ({})
+    }
+  ],
+
+  // ========================================
+  // SKILL ACTIONS
+  // ========================================
+  skill: [
+    {
+      type: 'dropdown',
+      label: 'See evidence',
+      priority: 9,
+      condition: (item) => 'evidence' in item && (item as SkillT).evidence.length > 0,
+      getData: (item, rankings) => {
+        const skill = item as SkillT;
+        const evidenceOptions = skill.evidence.map(e => {
+          const ranking = rankings.all.find(r => r.id === e.id);
+          return {
+            id: e.id,
+            label: `${e.type}: ${e.id}`,
+            importance: ranking?.importance || 50
+          };
+        }).sort((a, b) => b.importance - a.importance);
+
+        return {
+          options: evidenceOptions
+        };
+      }
+    },
+    {
+      type: 'query',
+      label: 'Top skills often used with this',
+      priority: 7,
+      getData: (item, rankings) => {
+        // Find top 3 skills by co-occurrence
+        const topSkills = rankings.skills.slice(0, 3).map(s => s.id);
+        return {
+          query: `what other skills does Mike use?`,
+          intent: 'filter_query',
+          filters: { type: ['skill'] }
+        };
+      }
+    }
+  ],
+
+  // ========================================
+  // PERSONAL ITEM ACTIONS (story, value, interest)
+  // ========================================
+  story: [
+    {
+      type: 'query',
+      label: 'Related stories',
+      priority: 7,
+      getData: () => ({
+        query: 'tell me more about Mike\'s background',
+        intent: 'personal'
+      })
+    },
+    {
+      type: 'message_mike',
+      label: 'Message Mike',
+      priority: 6,
+      getData: () => ({})
+    }
+  ],
+
+  value: [
+    {
+      type: 'query',
+      label: 'Related stories',
+      priority: 7,
+      getData: () => ({
+        query: 'tell me more about Mike\'s values',
+        intent: 'personal'
+      })
+    },
+    {
+      type: 'message_mike',
+      label: 'Message Mike',
+      priority: 6,
+      getData: () => ({})
+    }
+  ],
+
+  interest: [
+    {
+      type: 'query',
+      label: 'Related work',
+      priority: 7,
+      getData: (item) => {
+        const interest = item as any;
+        return {
+          query: `projects related to ${interest.interest}`,
+          intent: 'filter_query',
+          filters: { type: ['project'] }
+        };
+      }
+    },
+    {
+      type: 'message_mike',
+      label: 'Message Mike',
+      priority: 6,
+      getData: () => ({})
+    }
+  ],
+
+  // ========================================
+  // EDUCATION & BIO ACTIONS
+  // ========================================
+  education: [
+    {
+      type: 'query',
+      label: 'Classes at this school',
+      priority: 8,
+      getData: (item) => {
+        const edu = item as any;
+        return {
+          query: `classes at ${edu.school}`,
+          intent: 'filter_query',
+          filters: { type: ['class'] }
+        };
+      }
+    }
+  ],
+
+  bio: [
+    {
+      type: 'message_mike',
+      label: 'Message Mike',
+      priority: 10,
+      getData: () => ({})
+    }
+  ]
+};
+
+/**
+ * Get actions for a specific KB item
+ * Returns sorted array of action templates based on priority
+ */
+export function getActionsForItem(item: KBItem): ActionTemplate[] {
+  const config = ACTION_CONFIG[item.kind] || [];
+
+  // Filter by conditions
+  const applicable = config.filter(template => {
+    if (!template.condition) return true;
+    return template.condition(item);
+  });
+
+  // Sort by priority (descending)
+  return applicable.sort((a, b) => b.priority - a.priority);
+}
+
+/**
+ * Get actions for a list of items (list view)
+ * Returns aggregate actions like "See all projects", "Filter by skill"
+ */
+export function getActionsForList(
+  items: KBItem[],
+  listType: 'project' | 'experience' | 'class' | 'skill' | 'blog' | 'mixed',
+  rankings: Rankings
+): ActionTemplate[] {
+  // For list views, we want different actions
+  if (listType === 'project') {
+    return [
+      {
+        type: 'link',
+        label: 'GitHub Profile',
+        priority: 8,
+        getData: () => ({
+          link: 'https://github.com/mikedouzinas',
+          linkType: 'github'
+        })
+      },
+      {
+        type: 'dropdown',
+        label: 'Filter by skill',
+        priority: 9,
+        getData: (item, rankings) => {
+          // Get all unique skills from projects
+          const allSkills = new Set<string>();
+          items.forEach(item => {
+            if ('skills' in item) {
+              (item.skills as string[]).forEach(s => allSkills.add(s));
+            }
+          });
+
+          const skillOptions = Array.from(allSkills)
+            .map(skillId => {
+              const ranking = rankings.skills.find(s => s.id === skillId);
+              return {
+                id: skillId,
+                label: skillId,
+                importance: ranking?.importance || 50
+              };
+            })
+            .sort((a, b) => b.importance - a.importance);
+
+          return {
+            options: skillOptions
+          };
+        }
+      }
+    ];
+  }
+
+  if (listType === 'experience') {
+    return [
+      {
+        type: 'link',
+        label: 'LinkedIn',
+        priority: 8,
+        getData: () => ({
+          link: 'https://linkedin.com/in/mikedouzinas',
+          linkType: 'linkedin'
+        })
+      }
+    ];
+  }
+
+  if (listType === 'skill') {
+    return [
+      {
+        type: 'query',
+        label: 'See all projects',
+        priority: 7,
+        getData: () => ({
+          query: 'show me all projects',
+          intent: 'filter_query',
+          filters: { type: ['project'], show_all: true }
+        })
+      }
+    ];
+  }
+
+  // Mixed results - show both GitHub and LinkedIn
+  if (listType === 'mixed') {
+    return [
+      {
+        type: 'link',
+        label: 'GitHub',
+        priority: 7,
+        getData: () => ({
+          link: 'https://github.com/mikedouzinas',
+          linkType: 'github'
+        })
+      },
+      {
+        type: 'link',
+        label: 'LinkedIn',
+        priority: 7,
+        getData: () => ({
+          link: 'https://linkedin.com/in/mikedouzinas',
+          linkType: 'linkedin'
+        })
+      }
+    ];
+  }
+
+  return [];
+}
