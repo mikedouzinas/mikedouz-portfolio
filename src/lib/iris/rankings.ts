@@ -88,6 +88,7 @@ export function computeSkillImportance(skill: SkillT, allItems: KBItem[]): numbe
 /**
  * Compute project importance (0-100 scale)
  * Based on: skill complexity, skill count, recency, has demo/metrics
+ * Prioritizes: Iris (RAG/AI), HiLiTe (ML/CV), Knight Life (high user impact) over simpler projects
  */
 export function computeProjectImportance(project: ProjectT): number {
   const skillComplexity = getAverageComplexity(project.skills);
@@ -95,23 +96,35 @@ export function computeProjectImportance(project: ProjectT): number {
   const recency = computeRecency(project.dates);
   const hasDemo = 'demo' in (project.links || {}) ? 1 : 0;
   const hasGithub = 'github' in (project.links || {}) ? 1 : 0;
-  const hasMetrics = (project.specifics || []).some(s =>
-    /\d+[+%]|star|rating|users|downloads|clients|adopted/i.test(s)
+
+  // Check BOTH summary and specifics for USER IMPACT metrics
+  // Exclude competition placements like "top X%" - focus on adoption/usage metrics
+  const allText = [project.summary, ...(project.specifics || [])].join(' ');
+  const hasMetrics = /\d+\+?\s*(users|downloads|clients|installs)|star.*rating|rating.*star|\d+\.\d+\s*★|widely\s+adopted|adopted\s+by/i.test(allText);
+
+  // Bonus for live deployment (has image/screenshot indicating it's live)
+  const isLive = 'image' in (project.links || {}) ? 1 : 0;
+
+  // Bonus for cutting-edge AI/ML work (RAG, transformers, diffusion, etc.)
+  const hasCuttingEdgeAI = (project.skills as string[]).some(s =>
+    ['rag', 'transformers', 'diffusion_models', 'pytorch', 'opencv'].includes(s)
   );
 
-  // Weighted scoring (recency reduced, impact increased)
-  const complexityScore = skillComplexity * 5;            // Complexity is key
+  // Weighted scoring (prioritize complexity and impact over recency)
+  const complexityScore = skillComplexity * 6;            // Increased from 5 to 6 (most important)
   const diversityScore = Math.min(skillCount * 3, 25);    // Cap at 25 (8+ skills)
-  const recencyScore = recency * 1.5;                     // Recency reduced from 3x to 1.5x
-  const demoScore = hasDemo * 15;                         // Shipped work scores high
+  const recencyScore = recency * 1.0;                     // Reduced from 1.5 to 1.0 (less important)
+  const demoScore = hasDemo * 12;                         // Demo/shipped work (HiLiTe)
+  const liveScore = isLive * 12;                          // Live projects equal value (Iris)
   const githubScore = hasGithub * 5;                      // Code availability
-  const impactScore = hasMetrics ? 20 : 0;                // Impact increased from 15 to 20
+  const impactScore = hasMetrics ? 25 : 0;                // User adoption/impact (Knight Life)
+  const aiBonus = hasCuttingEdgeAI ? 10 : 0;              // Cutting-edge AI bonus (HiLiTe, Iris)
 
-  const rawScore = complexityScore + diversityScore + recencyScore + demoScore + githubScore + impactScore;
+  const rawScore = complexityScore + diversityScore + recencyScore + demoScore + liveScore + githubScore + impactScore + aiBonus;
 
   // Normalize to 0-100
-  // Max possible: 50 + 25 + 15 + 15 + 5 + 20 = 130
-  return Math.min(Math.round((rawScore / 130) * 100), 100);
+  // Max possible: 60 + 25 + 10 + 12 + 12 + 5 + 25 + 10 = 159
+  return Math.min(Math.round((rawScore / 159) * 100), 100);
 }
 
 /**
