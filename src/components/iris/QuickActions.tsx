@@ -418,10 +418,10 @@ export default function QuickActions({
           <button
             type="button"
             disabled
-            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap ${gradientDirection} ${getActionColor(selectedAction)} text-white opacity-70`}
+            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium max-w-sm ${gradientDirection} ${getActionColor(selectedAction)} text-white opacity-70`}
           >
             {getActionIcon(selectedAction)}
-            <span>{selectedAction.label}</span>
+            <span className="break-words">{selectedAction.label}</span>
           </button>
           {/* X button to cancel and show all actions again */}
           <button
@@ -449,10 +449,10 @@ export default function QuickActions({
           <button
             type="button"
             disabled
-            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap ${gradientDirection} ${getActionColor(selectedAction)} text-white opacity-70 cursor-not-allowed`}
+            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium max-w-sm ${gradientDirection} ${getActionColor(selectedAction)} text-white opacity-70 cursor-not-allowed`}
           >
             {getActionIcon(selectedAction)}
-            <span>{selectedAction.label}</span>
+            <span className="break-words">{selectedAction.label}</span>
           </button>
         </div>
       </div>
@@ -464,9 +464,9 @@ export default function QuickActions({
       {/* Show submitted follow-up query as a visual indicator - shows the actual question asked */}
       {submittedFollowUp && !showCustomInput ? (
         <div className="mb-2">
-          <div className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600 text-white opacity-70">
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>{submittedFollowUp}</span>
+          <div className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium max-w-sm bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600 text-white opacity-70">
+            <MessageSquare className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="break-words">{submittedFollowUp}</span>
           </div>
         </div>
       ) : null}
@@ -479,10 +479,10 @@ export default function QuickActions({
             <button
               type="button"
               disabled
-              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600 text-white opacity-70"
+              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium max-w-sm bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600 text-white opacity-70"
             >
-              <MessageSquare className="w-3.5 h-3.5" />
-              <span>Ask a follow up...</span>
+              <MessageSquare className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="break-words">Ask a follow up...</span>
             </button>
             {/* X button to cancel and show all actions again */}
             <button
@@ -559,10 +559,10 @@ export default function QuickActions({
                 type="button"
                 onClick={() => handleActionClick(action)}
                 disabled={disabled}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 transform whitespace-nowrap ${gradientDirection} ${getActionColor(action)} text-white hover:scale-105 disabled:opacity-50 disabled:scale-100`}
+                className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 transform max-w-sm ${gradientDirection} ${getActionColor(action)} text-white hover:scale-105 disabled:opacity-50 disabled:scale-100`}
               >
-                {getActionIcon(action)}
-                <span>{action.label}</span>
+                <span className="flex-shrink-0">{getActionIcon(action)}</span>
+                <span className="break-words">{action.label}</span>
               </button>
             );
           })}
