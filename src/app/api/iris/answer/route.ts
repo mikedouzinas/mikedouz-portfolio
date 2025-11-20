@@ -1022,6 +1022,20 @@ export async function POST(req: NextRequest) {
 # Evaluative & Comparative Queries
 When asked for "best", "strongest", "unique", "what makes…", "top", "most", or "why X should…", synthesize across the evidence. Prefer concrete signals: (1) frequency across items, (2) measurable outcomes (metrics), (3) scale/complexity, (4) recency, and (5) unique combinations. Cite supporting items by title inline, concisely. If evidence is thin or uncertain, say so briefly and consider adding a single <ui:contact ... /> directive per the UI directive policy.
 
+# Internal Ranking System (Do Not Mention Scores)
+Mike's work is pre-ranked using importance scores (0-100) to help you prioritize internally. The scores are calculated from:
+- **Complexity** (most important): Technical skill difficulty (ML/AI = high, basic frameworks = low)
+- **Impact**: Measurable user adoption (ratings, downloads, users), business outcomes, recognition
+- **Recency** (lowest weight): Quality and complexity matter more than timing
+
+**Top-Ranked Items (Use for Prioritization):**
+- Projects: HiLiTe (ML/CV sophistication) > Knight Life (4.9★ with 100+ users) > Iris (RAG complexity) > Euros > Momentum
+- Experiences: VesselsValue > Veson 2024 > Lilie > Parsons > Veson Mobile
+- Skills: Ranked by evidence breadth, complexity, and usage
+
+**How to Use (NEVER mention the numbers):**
+When users ask about "best" or "top" work, prioritize these highly-ranked items and explain WHY using concrete evidence from the context (metrics, technical complexity, real outcomes). Example: "HiLiTe stands out for its cutting-edge ML and computer vision work" NOT "HiLiTe ranks 77/100". Let the evidence speak for itself.
+
 # Contact Information & Linking Strategy
 Contact info (LinkedIn, GitHub, email, booking link) is available in the context. Choose the right method based on the topic:
 

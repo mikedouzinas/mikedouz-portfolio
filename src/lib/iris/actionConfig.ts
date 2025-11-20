@@ -3,8 +3,7 @@
  * Defines what actions each KB item type should have
  */
 
-import type { KBItem, ProjectT, ExperienceT, ClassT, BlogT, SkillT } from './schema';
-import type { QuickAction } from '@/components/iris/QuickActions';
+import type { KBItem, ProjectT, ExperienceT, ClassT, BlogT, SkillT, InterestT, EducationT } from './schema';
 import type { Rankings } from './rankings';
 
 // Action types we can generate
@@ -65,6 +64,25 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
         link: (item as ProjectT).links?.demo,
         linkType: 'demo'
       })
+    },
+    {
+      type: 'query',
+      label: 'Fetch recent updates',
+      priority: 7,
+      condition: (item) => 'links' in item && 'github' in (item.links || {}),
+      getData: (item) => {
+        const project = item as ProjectT;
+        // Extract repo name from GitHub URL (https://github.com/user/repo)
+        const githubUrl = project.links?.github || '';
+        const repoMatch = githubUrl.match(/github\.com\/([^/]+\/[^/]+)/);
+        const repo = repoMatch ? repoMatch[1].replace('.git', '') : '';
+
+        return {
+          query: `show recent GitHub activity for ${project.title}`,
+          intent: 'github_activity',
+          filters: { repo }
+        };
+      }
     },
     {
       type: 'dropdown',
@@ -315,9 +333,7 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       type: 'query',
       label: 'Top skills often used with this',
       priority: 7,
-      getData: (item, rankings) => {
-        // Find top 3 skills by co-occurrence
-        const topSkills = rankings.skills.slice(0, 3).map(s => s.id);
+      getData: () => {
         return {
           query: `what other skills does Mike use?`,
           intent: 'filter_query',
@@ -372,7 +388,7 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       label: 'Related work',
       priority: 7,
       getData: (item) => {
-        const interest = item as any;
+        const interest = item as InterestT;
         return {
           query: `projects related to ${interest.interest}`,
           intent: 'filter_query',
@@ -397,7 +413,7 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       label: 'Classes at this school',
       priority: 8,
       getData: (item) => {
-        const edu = item as any;
+        const edu = item as EducationT;
         return {
           query: `classes at ${edu.school}`,
           intent: 'filter_query',
@@ -441,7 +457,8 @@ export function getActionsForItem(item: KBItem): ActionTemplate[] {
 export function getActionsForList(
   items: KBItem[],
   listType: 'project' | 'experience' | 'class' | 'skill' | 'blog' | 'mixed',
-  rankings: Rankings
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _rankings: Rankings
 ): ActionTemplate[] {
   // For list views, we want different actions
   if (listType === 'project') {
@@ -504,14 +521,26 @@ export function getActionsForList(
   if (listType === 'skill') {
     return [
       {
-        type: 'query',
-        label: 'See all projects',
-        priority: 7,
-        getData: () => ({
-          query: 'show me all projects',
-          intent: 'filter_query',
-          filters: { type: ['project'], show_all: true }
-        })
+        type: 'dropdown',
+        label: 'Learn about skill',
+        priority: 9,
+        getData: (item, rankings) => {
+          const skillOptions = items
+            .filter(i => i.kind === 'skill')
+            .map(skill => {
+              const ranking = rankings.skills.find(s => s.id === skill.id);
+              return {
+                id: skill.id,
+                label: skill.id,
+                importance: ranking?.importance || 50
+              };
+            })
+            .sort((a, b) => b.importance - a.importance);
+
+          return {
+            options: skillOptions
+          };
+        }
       }
     ];
   }

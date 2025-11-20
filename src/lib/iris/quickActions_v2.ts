@@ -16,8 +16,9 @@ interface ActionContext {
   results: Array<{ score: number; doc: Partial<KBItem> }>;
   fullAnswer: string;
   allItems: KBItem[];
-  rankings: Rankings;  // NEW: Rankings for sorting
+  rankings: Rankings;  // Rankings for sorting
   depth?: number;
+  visitedNodes?: string[];  // Track visited nodes to avoid repeating suggestions
 }
 
 /**
@@ -93,7 +94,7 @@ function templateToAction(
         type: 'specific',
         label,
         query: data.query!,
-        intent: data.intent as any,
+        intent: data.intent,
         filters: data.filters
       };
 
@@ -120,7 +121,8 @@ function templateToAction(
  */
 export function generateQuickActions(context: ActionContext): QuickAction[] {
   const actions: QuickAction[] = [];
-  const { fullAnswer, intent, results, rankings, depth = 0 } = context;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { fullAnswer, intent, results, rankings, depth = 0, visitedNodes: _visitedNodes = [] } = context;
 
   // Handle contact directive
   if (hasContactDirective(fullAnswer)) {
@@ -136,6 +138,12 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
   const isSingleItem = results.length === 1 && intent === 'specific_item';
   const isList = results.length > 1 || intent === 'filter_query';
   const isMixed = resultTypes.size > 1;
+
+  // Track current node visit (TODO: implement path tracking to avoid duplicate suggestions)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _currentNode: string | null = isSingleItem && results[0].doc.id
+    ? results[0].doc.id
+    : (isList && resultTypes.size === 1 ? `${Array.from(resultTypes)[0]}_list` : null);
 
   // Generate item-specific actions (only if depth < 2)
   if (canAddSpecificActions && isSingleItem && results[0].doc.id) {
@@ -160,7 +168,9 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
 
   // Generate list actions (only if depth < 2)
   if (canAddSpecificActions && isList) {
-    const listType = isMixed ? 'mixed' : (Array.from(resultTypes)[0] as any);
+    const firstType = Array.from(resultTypes)[0];
+    const listType: 'project' | 'experience' | 'class' | 'skill' | 'blog' | 'mixed' =
+      isMixed ? 'mixed' : (firstType as 'project' | 'experience' | 'class' | 'skill' | 'blog');
     const items = results.map(r => r.doc as KBItem);
     const templates = getActionsForList(items, listType, rankings);
 
