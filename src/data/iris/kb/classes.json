@@ -11,7 +11,7 @@
         "Intro algorithms and testing; AP subset of DSA",
         "Capstone led to first Swift app and early product habits"
       ],
-      "skills": ["java", "oop", "algorithms", "software_design_basics", "swift"]
+      "skills": ["java", "oop", "algorithms", "swift"]
     },
     {
       "id": "class_atcs_2022",
@@ -25,12 +25,12 @@
         "Jack/VM/Assembly and binary representations",
         "Systems thinking from hardware to software"
       ],
-      "skills": ["computer_architecture", "assembly", "compilers_parsing_basics", "systems_thinking"],
+      "skills": ["computer_architecture", "assembly", "parsing"],
       "mini_projects": [
         {
           "name": "Angry Circle Game",
           "description": "Assembly-based game built from first principles after constructing a full computer from logic gates to OS",
-          "skills": ["assembly", "computer_architecture", "systems_thinking"]
+          "skills": ["assembly", "computer_architecture"]
         }
       ]
     },
@@ -117,7 +117,8 @@
         "Realtime transcription (<1s) and adaptive TTS feedback",
         "Agile sprints, TestFlight feedback, user-centered iteration"
       ],
-      "skills": ["swiftui", "speech_recognition", "tts", "openai_api", "product_management", "ux_design"]
+      "skills": ["swiftui", "speech_recognition", "tts", "openai_api", "product_management", "ux_design"],
+      "related_projects": ["proj_momentum"]
     },
     {
       "id": "class_busi_360_2024",
@@ -209,7 +210,7 @@
         "Object detection, captioning, and text-to-image foundations",
         "Project: HiLiTe — highlight reels with VLM commentary"
       ],
-      "skills": ["deep_learning", "transformers", "computer_vision", "nlp", "diffusion_models", "project_hilite_link", "python"],
+      "skills": ["deep_learning", "transformers", "computer_vision", "nlp", "diffusion_models", "python"],
       "related_projects": ["proj_hilite"]
     },
     {

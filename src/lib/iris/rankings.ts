@@ -99,50 +99,45 @@ export function computeProjectImportance(project: ProjectT): number {
     /\d+[+%]|star|rating|users|downloads|clients|adopted/i.test(s)
   );
 
-  // Weighted scoring
-  const complexityScore = skillComplexity * 4;            // Complexity is key
+  // Weighted scoring (recency reduced, impact increased)
+  const complexityScore = skillComplexity * 5;            // Complexity is key
   const diversityScore = Math.min(skillCount * 3, 25);    // Cap at 25 (8+ skills)
-  const recencyScore = recency * 3;                       // Recency matters
+  const recencyScore = recency * 1.5;                     // Recency reduced from 3x to 1.5x
   const demoScore = hasDemo * 15;                         // Shipped work scores high
   const githubScore = hasGithub * 5;                      // Code availability
-  const impactScore = hasMetrics ? 15 : 0;                // Measurable impact
+  const impactScore = hasMetrics ? 20 : 0;                // Impact increased from 15 to 20
 
   const rawScore = complexityScore + diversityScore + recencyScore + demoScore + githubScore + impactScore;
 
   // Normalize to 0-100
-  // Max possible: 40 + 25 + 30 + 15 + 5 + 15 = 130
+  // Max possible: 50 + 25 + 15 + 15 + 5 + 20 = 130
   return Math.min(Math.round((rawScore / 130) * 100), 100);
 }
 
 /**
  * Compute experience importance (0-100 scale)
- * Based on: skill complexity, duration, recency, impact metrics
+ * Based on: skill complexity, recency, impact metrics, skill breadth
+ * Note: Duration removed as it's not a good quality indicator for internships/part-time work
  */
 export function computeExperienceImportance(exp: ExperienceT): number {
   const skillComplexity = getAverageComplexity(exp.skills);
   const recency = computeRecency(exp.dates);
 
-  // Compute duration in months
-  const startDate = new Date(exp.dates.start);
-  const endDate = exp.dates.end ? new Date(exp.dates.end) : new Date();
-  const durationMonths = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
-
   const hasImpact = (exp.specifics || []).some(s =>
-    /return offer|partnership|strategic|production|\d+[+%]|recognized|award/i.test(s)
+    /return offer|partnership|strategic|production|\d+[+%]|recognized|award|shipped|delivered|enabled/i.test(s)
   );
 
-  // Weighted scoring
-  const complexityScore = skillComplexity * 4;                        // Complexity is key
-  const durationScore = Math.min(durationMonths * 2, 25);            // Cap at 25 (12+ months)
-  const recencyScore = recency * 3;                                  // Recency matters
-  const impactScore = hasImpact ? 20 : 0;                            // Measurable impact
-  const roleScore = exp.skills.length * 2;                           // Skill breadth
+  // Weighted scoring (duration removed, recency reduced, impact increased)
+  const complexityScore = skillComplexity * 5;                        // Complexity is most important
+  const recencyScore = recency * 1.5;                                 // Recency reduced from 3x to 1.5x
+  const impactScore = hasImpact ? 30 : 0;                             // Impact increased from 20 to 30
+  const roleScore = exp.skills.length * 2.5;                          // Skill breadth
 
-  const rawScore = complexityScore + durationScore + recencyScore + impactScore + roleScore;
+  const rawScore = complexityScore + recencyScore + impactScore + roleScore;
 
   // Normalize to 0-100
-  // Max possible: 40 + 25 + 30 + 20 + 30 = 145
-  return Math.min(Math.round((rawScore / 145) * 100), 100);
+  // Max possible: 50 + 15 + 30 + 30 = 125
+  return Math.min(Math.round((rawScore / 125) * 100), 100);
 }
 
 /**

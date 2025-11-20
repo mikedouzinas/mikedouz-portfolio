@@ -188,6 +188,17 @@
       "aliases": ["parser_construction"],
       "description": "Grammars, ASTs, and the parsing toolchain.",
       "evidence": [
+        { "type": "class", "id": "class_comp_312_2025" },
+        { "type": "class", "id": "class_atcs_2022" }
+      ]
+    },
+    {
+      "id": "compilers",
+      "name": "Compilers",
+      "type": "domain",
+      "aliases": ["compiler_design"],
+      "description": "Compilation pipeline from source to executable.",
+      "evidence": [
         { "type": "class", "id": "class_comp_312_2025" }
       ]
     },
@@ -583,6 +594,37 @@
         { "type": "class", "id": "class_busi_221_2023" },
         { "type": "class", "id": "class_busi_369_2024" },
         { "type": "class", "id": "class_busi_360_2024" }
+      ]
+    },
+    {
+      "id": "product_discovery",
+      "name": "Product Discovery",
+      "type": "skill",
+      "aliases": ["customer_development"],
+      "description": "Identifying user needs and validating opportunities.",
+      "evidence": [
+        { "type": "class", "id": "class_busi_221_2023" }
+      ]
+    },
+    {
+      "id": "leadership",
+      "name": "Leadership",
+      "type": "skill",
+      "aliases": [],
+      "description": "Guiding teams and driving organizational outcomes.",
+      "evidence": [
+        { "type": "class", "id": "class_busi_360_2024" }
+      ]
+    },
+    {
+      "id": "writing",
+      "name": "Writing",
+      "type": "skill",
+      "aliases": ["technical_writing", "creative_writing"],
+      "description": "Clear communication through written content.",
+      "evidence": [
+        { "type": "class", "id": "class_busi_221_2023" },
+        { "type": "class", "id": "class_fwis_180_2023" }
       ]
     },
     {

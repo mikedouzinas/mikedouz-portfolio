@@ -67,6 +67,7 @@ export const SKILL_COMPLEXITY: Record<string, number> = {
   'functional_programming': 8, // Advanced (paradigm shift)
   'programming_languages': 9,  // Expert (language design, type systems)
   'parsing': 8,             // Advanced (compiler front-end)
+  'compilers': 9,           // Expert (full compilation pipeline)
 
   // ========================================
   // SYSTEMS & ARCHITECTURE
@@ -117,7 +118,9 @@ export const SKILL_COMPLEXITY: Record<string, number> = {
   'user_research': 5,       // Intermediate (interviews, testing)
   'ux_design': 6,           // Intermediate (wireframes, flows)
   'entrepreneurship': 5,    // Intermediate (venture building)
+  'product_discovery': 5,   // Intermediate (customer development)
   'leadership': 6,          // Intermediate (team management)
+  'writing': 5,             // Intermediate (communication)
   'research_writing': 5,    // Intermediate (academic writing)
   'ai_ethics_policy': 6,    // Intermediate (ethical considerations)
 
