@@ -84,10 +84,11 @@ export function boostWithImportance(
   query: string,
   isEvaluative: boolean
 ): Array<{ score: number; doc: Partial<KBItem> }> {
-  // For evaluative queries, prioritize importance over semantics
+  // For evaluative queries, heavily prioritize importance over semantics
+  // Semantic score just filters out irrelevant items (e.g., don't show HiLiTe for "database experience")
   // For non-evaluative queries, keep semantics dominant
-  const importanceWeight = isEvaluative ? 0.6 : 0.2;
-  const semanticWeight = isEvaluative ? 0.4 : 0.8;
+  const importanceWeight = isEvaluative ? 0.8 : 0.2;
+  const semanticWeight = isEvaluative ? 0.2 : 0.8;
 
   return results.map(r => {
     // Find importance score for this item

@@ -46,9 +46,10 @@ function selectFields<T extends Record<string, unknown>>(doc: T, fields?: string
       (out as Record<string, unknown>)[f] = doc[f];
     }
   }
-  // Always include id/title if present to keep results identifiable
+  // Always include id/title/kind if present to keep results identifiable
   if ("id" in doc) (out as Record<string, unknown>).id = doc.id;
   if ("title" in doc) (out as Record<string, unknown>).title = doc.title;
+  if ("kind" in doc) (out as Record<string, unknown>).kind = doc.kind;
   return out;
 }
 
