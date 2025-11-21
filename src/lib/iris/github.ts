@@ -244,11 +244,77 @@ export async function getRecentActivityContext(): Promise<string | null> {
     if (!summary) {
       return null;
     }
-    
+
     return summary.summary;
   } catch (error) {
     console.warn('Error getting recent activity context:', error);
     return null;
+  }
+}
+
+/**
+ * Fetch commits for a specific repository
+ * Used for "Fetch recent updates" quick action on projects
+ * @param repo - Repository in format "owner/name" (e.g., "mikedouzinas/hilite")
+ * @returns Formatted string with recent commits or null if unavailable
+ */
+export async function getRepoCommits(repo: string): Promise<string | null> {
+  const token = process.env.GITHUB_TOKEN;
+
+  if (!token) {
+    console.log('GitHub token not available, skipping repo commit fetch');
+    return null;
+  }
+
+  try {
+    // Fetch last 5 commits from the repository
+    const url = `https://api.github.com/repos/${repo}/commits?per_page=5`;
+
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'iris-portfolio-assistant'
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return `Repository ${repo} not found or not accessible.`;
+      }
+      if (response.status === 403) {
+        throw new Error('GitHub API rate limited');
+      }
+      throw new Error(`GitHub API error: ${response.status}`);
+    }
+
+    const commits = await response.json();
+
+    if (!commits || commits.length === 0) {
+      return `No recent commits found for ${repo}.`;
+    }
+
+    // Format commits as human-readable text
+    const formattedCommits = commits.map((commit: {
+      sha: string;
+      commit: { message: string; author: { name: string; date: string } };
+      html_url: string
+    }) => {
+      const shortSha = commit.sha.substring(0, 7);
+      const message = commit.commit.message.split('\n')[0]; // First line only
+      const date = new Date(commit.commit.author.date);
+      const daysAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+      const timeAgo = daysAgo === 0 ? 'today' :
+                      daysAgo === 1 ? 'yesterday' :
+                      `${daysAgo} days ago`;
+
+      return `- ${shortSha}: ${message} (${timeAgo})`;
+    }).join('\n');
+
+    return `Recent commits for ${repo}:\n${formattedCommits}`;
+  } catch (error) {
+    console.warn(`Failed to fetch commits for ${repo}:`, error);
+    return `Unable to fetch recent commits for ${repo}. GitHub may be unavailable or rate limited.`;
   }
 }
 

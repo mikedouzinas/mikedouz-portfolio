@@ -13,6 +13,11 @@
  *   npx tsx scripts/clear_cache.ts --direct              # Clear directly (Upstash only, won't work for in-memory)
  */
 
+// Load environment variables from .env.local before anything else
+import dotenv from "dotenv"
+import path from "path"
+dotenv.config({ path: path.join(process.cwd(), ".env.local") })
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 async function clearViaAPI(pattern?: string) {

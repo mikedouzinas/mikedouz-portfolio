@@ -98,9 +98,16 @@ export function buildContextEntities(items: KBItem[]): Set<string> {
 export function isClearlyOffTopic(query: string, contextEntities: Set<string>): boolean {
   const lowerQuery = query.toLowerCase();
 
-  // Allow queries that mention any entity in the knowledge base
-  // This makes the system automatically adapt to KB content
+  // Professional comment: Check for entity matches to allow queries about Mike's work
+  // Filter out very short entities (< 2 chars) to avoid false matches from single-letter skills like "C" or "R"
+  // These programming languages are valid but will match almost any query via substring matching
   for (const entity of contextEntities) {
+    // Skip single-letter entities to prevent false positives
+    // (e.g., "C" programming language shouldn't match "capital of france")
+    if (entity.length < 2) {
+      continue;
+    }
+    
     if (lowerQuery.includes(entity)) {
       return false; // NOT off-topic
     }

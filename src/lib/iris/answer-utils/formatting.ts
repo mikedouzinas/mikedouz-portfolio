@@ -222,28 +222,81 @@ export function formatContextByKind(
 
 /**
  * Builds a compact index so the LLM can reference documents deterministically.
+ * Includes both relevance score (from semantic search) and importance score (from rankings).
  *
  * @param results - Array of retrieval results
+ * @param rankings - Pre-computed importance rankings
  * @returns Formatted context index
  */
-export function buildContextIndex(results: Array<{ score: number; doc: Partial<KBItem> }>): string {
+export function buildContextIndex(
+  results: Array<{ score: number; doc: Partial<KBItem> }>,
+  rankings?: { skills: Array<{ id: string; importance: number }>; projects: Array<{ id: string; importance: number }>; experiences: Array<{ id: string; importance: number }>; classes: Array<{ id: string; importance: number }>; blogs: Array<{ id: string; importance: number }> }
+): string {
   if (results.length === 0) {
     return '';
   }
 
   const lines = results.map((result, idx) => {
     const doc = result.doc;
-    const label = ('title' in doc && doc.title)
-      ? doc.title
-      : ('role' in doc && doc.role)
-        ? doc.role
-        : doc.id || `Item ${idx + 1}`;
+
+    // Build human-readable label based on type
+    let label = '';
+    if ('title' in doc && doc.title) {
+      label = doc.title;
+    } else if ('name' in doc && doc.name) {
+      label = doc.name;
+    } else if ('role' in doc && doc.role) {
+      // For experiences: show "role at company"
+      label = doc.role;
+      if ('company' in doc && doc.company) {
+        label += ` at ${doc.company}`;
+      }
+    } else if ('value' in doc && doc.value) {
+      label = `Value: ${doc.value}`;
+    } else if ('interest' in doc && doc.interest) {
+      label = `Interest: ${doc.interest}`;
+    } else if ('school' in doc && doc.school) {
+      label = doc.school;
+      if ('degree' in doc && doc.degree) {
+        label += ` - ${doc.degree}`;
+      }
+    } else {
+      label = doc.id || `Item ${idx + 1}`;
+    }
 
     const kind = 'kind' in doc && doc.kind ? doc.kind : 'item';
     const year = extractPrimaryYear(doc);
-    const score = result.score.toFixed(2);
+    const relevanceScore = result.score.toFixed(2);
 
-    return `${idx + 1}. [${kind}] ${label}${year ? ` (${year})` : ''} - score ${score}`;
+    // Look up importance score from rankings if available
+    let importanceScore: number | null = null;
+    if (rankings && 'id' in doc && doc.id) {
+      const itemId = doc.id;
+      if (kind === 'project') {
+        const ranking = rankings.projects.find(p => p.id === itemId);
+        if (ranking) importanceScore = ranking.importance;
+      } else if (kind === 'experience') {
+        const ranking = rankings.experiences.find(e => e.id === itemId);
+        if (ranking) importanceScore = ranking.importance;
+      } else if (kind === 'skill') {
+        const ranking = rankings.skills.find(s => s.id === itemId);
+        if (ranking) importanceScore = ranking.importance;
+      } else if (kind === 'class') {
+        const ranking = rankings.classes.find(c => c.id === itemId);
+        if (ranking) importanceScore = ranking.importance;
+      } else if (kind === 'blog') {
+        const ranking = rankings.blogs.find(b => b.id === itemId);
+        if (ranking) importanceScore = ranking.importance;
+      }
+    }
+
+    // Format score display based on what's available
+    let scoreDisplay = `relevance ${relevanceScore}`;
+    if (importanceScore !== null) {
+      scoreDisplay += `, importance ${importanceScore}`;
+    }
+
+    return `${idx + 1}. [${kind}] ${label}${year ? ` (${year})` : ''} - ${scoreDisplay}`;
   });
 
   return `# Context Index\n${lines.join('\n')}`;

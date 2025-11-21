@@ -2,11 +2,15 @@
   "blog_posts": [
     {
       "title": "What Are You Going to Do With Your Life?",
+      "short_name": "Life Inspiration Blog",
       "url": "https://discovery.blogs.rice.edu/what-are-you-going-to-do-with-your-life/",
       "published_date": "September 21, 2023",
       "context": "Written for a Rice University entrepreneurship class, this post reflects on the intersection of family legacy and a personal drive for innovation in technology.",
       "summary": "This post explores Mike's entrepreneurial journey, deeply influenced by a family history in shipping software. It covers how observing his parents build Veson Nautical from the ground up demystified the process of starting a company. The narrative connects his early exposure to tech to his hands-on experience developing the first Veson Nautical Mobile App, illustrating a full-circle moment that solidified his passion for building impactful software.",
-      "class": "busi_220"
+      "class": "busi_220",
+      "related_class": "class_busi_220_2024",
+      "related_experiences": ["exp_veson_mobile_2021_2023", "exp_veson_2024"],
+      "related_projects": []
     }
   ]
 }

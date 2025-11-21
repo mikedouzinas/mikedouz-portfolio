@@ -44,7 +44,7 @@
       "name": "Java",
       "type": "language",
       "aliases": [],
-      "description": "OOP and large-scale program design.",
+      "description": "OOP and large-scale program design with object-oriented principles.",
       "evidence": [
         { "type": "class", "id": "class_ap_csa_2020" },
         { "type": "class", "id": "class_comp_215_2024" },
@@ -73,14 +73,18 @@
       ]
     },
     {
-      "id": "oop",
-      "name": "Object-Oriented Programming",
-      "type": "concept",
-      "aliases": ["object_oriented_programming"],
-      "description": "Modeling and designing extensible systems.",
+      "id": "swift",
+      "name": "Swift",
+      "type": "language",
+      "aliases": ["swiftui", "swift_ui", "av_foundation", "avfoundation", "xcode", "ios", "ios_dev", "ios_development", "iphone_app"],
+      "description": "Modern programming language for iOS, macOS, and Apple platform development including SwiftUI, AVFoundation, and Xcode tooling.",
       "evidence": [
         { "type": "class", "id": "class_ap_csa_2020" },
-        { "type": "class", "id": "class_comp_215_2024" }
+        { "type": "class", "id": "class_busi_221_2023" },
+        { "type": "experience", "id": "exp_veson_mobile_2021_2023" },
+        { "type": "project", "id": "proj_knight_life" },
+        { "type": "project", "id": "proj_momentum" },
+        { "type": "class", "id": "class_busi_220_2024" }
       ]
     },
     {
@@ -90,28 +94,21 @@
       "aliases": ["dsa"],
       "description": "Lists, hash tables, trees, heaps, tries; usage trade-offs.",
       "evidence": [
-        { "type": "class", "id": "class_comp_215_2024" }
+        { "type": "class", "id": "class_comp_215_2024" },
+        { "type": "class", "id": "class_comp_140_2023" },
+        { "type": "class", "id": "class_comp_182_2024" },
+        { "type": "class", "id": "class_ap_csa_2020" },
+        { "type": "project", "id": "proj_portfolio" }
       ]
     },
     {
       "id": "algorithms",
       "name": "Algorithms",
       "type": "domain",
-      "aliases": ["algorithm_design", "analysis_of_algorithms"],
-      "description": "Design techniques, complexity, and optimization.",
+      "aliases": ["algorithm_design", "analysis_of_algorithms", "graph_algorithms", "graph_traversal", "graphs"],
+      "description": "Design techniques, complexity, optimization, and graph algorithms including BFS/DFS.",
       "evidence": [
         { "type": "class", "id": "class_ap_csa_2020" },
-        { "type": "class", "id": "class_comp_140_2023" },
-        { "type": "class", "id": "class_comp_182_2024" }
-      ]
-    },
-    {
-      "id": "graphs",
-      "name": "Graph Algorithms",
-      "type": "domain",
-      "aliases": ["graph_traversal"],
-      "description": "BFS/DFS and related graph techniques.",
-      "evidence": [
         { "type": "class", "id": "class_comp_140_2023" },
         { "type": "class", "id": "class_comp_182_2024" }
       ]
@@ -120,18 +117,8 @@
       "id": "discrete_math",
       "name": "Discrete Mathematics",
       "type": "domain",
-      "aliases": [],
-      "description": "Mathematical foundations for algorithms.",
-      "evidence": [
-        { "type": "class", "id": "class_comp_182_2024" }
-      ]
-    },
-    {
-      "id": "proofs",
-      "name": "Correctness Proofs",
-      "type": "skill",
-      "aliases": ["proof_techniques"],
-      "description": "Proving algorithm correctness and analyzing runtime.",
+      "aliases": ["proofs", "proof_techniques", "correctness_proofs"],
+      "description": "Mathematical foundations for algorithms including correctness proofs and runtime analysis.",
       "evidence": [
         { "type": "class", "id": "class_comp_182_2024" }
       ]
@@ -140,13 +127,12 @@
       "id": "computer_architecture",
       "name": "Computer Architecture",
       "type": "domain",
-      "aliases": ["cpu_architecture", "isa"],
-      "description": "From logic gates to CPU pipelining and memory hierarchy.",
+      "aliases": ["cpu_architecture", "isa", "parallel_computing", "parallelism", "multicore", "multicore_systems", "performance_tuning", "performance_engineering"],
+      "description": "From logic gates to CPU pipelining, memory hierarchy, parallel architectures, and performance optimization.",
       "evidence": [
         { "type": "class", "id": "class_atcs_2022" },
         { "type": "class", "id": "class_comp_222_2024" },
-        { "type": "class", "id": "class_ep430_2025" },
-        { "type": "project", "id": "proj_hilite" }
+        { "type": "class", "id": "class_ep430_2025" }
       ]
     },
     {
@@ -157,7 +143,8 @@
       "description": "Image and video processing, object detection, and visual feature extraction.",
       "evidence": [
         { "type": "class", "id": "class_comp_646_2025" },
-        { "type": "project", "id": "proj_hilite" }
+        { "type": "project", "id": "proj_hilite" },
+        { "type": "experience", "id": "exp_veson_2024" }
       ]
     },
     {
@@ -172,53 +159,26 @@
       ]
     },
     {
-      "id": "programming_languages",
-      "name": "Programming Languages",
-      "type": "domain",
-      "aliases": ["pl_theory"],
-      "description": "Syntax/semantics, type systems, and language design trade-offs.",
-      "evidence": [
-        { "type": "class", "id": "class_comp_312_2025" }
-      ]
-    },
-    {
       "id": "parsing",
       "name": "Parsing",
       "type": "skill",
-      "aliases": ["parser_construction"],
-      "description": "Grammars, ASTs, and the parsing toolchain.",
+      "aliases": ["parser_construction", "antlr", "compilers", "compiler_design", "programming_languages", "pl_theory", "functional_programming", "fp"],
+      "description": "Grammars, ASTs, parsing toolchain including ANTLR, compilation pipeline, language design, and functional programming paradigms.",
       "evidence": [
-        { "type": "class", "id": "class_comp_312_2025" }
-      ]
-    },
-    {
-      "id": "antlr",
-      "name": "ANTLR",
-      "type": "tool",
-      "aliases": [],
-      "description": "Lexer/parser generator used for PL assignments.",
-      "evidence": [
-        { "type": "class", "id": "class_comp_312_2025" }
-      ]
-    },
-    {
-      "id": "functional_programming",
-      "name": "Functional Programming",
-      "type": "paradigm",
-      "aliases": ["fp"],
-      "description": "Immutability, recursion, and expressive composition.",
-      "evidence": [
-        { "type": "class", "id": "class_comp_312_2025" }
+        { "type": "class", "id": "class_comp_312_2025" },
+        { "type": "class", "id": "class_atcs_2022" }
       ]
     },
     {
       "id": "systems_programming",
       "name": "Systems Programming",
       "type": "domain",
-      "aliases": ["low_level_programming"],
-      "description": "Shells, allocators, threading libs, and performance.",
+      "aliases": ["low_level_programming", "os", "operating_systems", "concurrency", "multithreading", "synchronization"],
+      "description": "Shells, allocators, threading libs, processes, scheduling, memory, file systems, concurrency, and security fundamentals.",
       "evidence": [
-        { "type": "class", "id": "class_comp_321_2025" }
+        { "type": "class", "id": "class_comp_321_2025" },
+        { "type": "class", "id": "class_comp_222_2024" },
+        { "type": "class", "id": "class_atcs_2022" }
       ]
     },
     {
@@ -233,85 +193,14 @@
       ]
     },
     {
-      "id": "concurrency",
-      "name": "Concurrency",
-      "type": "domain",
-      "aliases": ["multithreading", "synchronization"],
-      "description": "Threads, races, synchronization, and correctness.",
-      "evidence": [
-        { "type": "class", "id": "class_comp_321_2025" }
-      ]
-    },
-    {
-      "id": "operating_systems",
-      "name": "Operating Systems",
-      "type": "domain",
-      "aliases": ["os"],
-      "description": "Processes, scheduling, memory, and file systems.",
-      "evidence": [
-        { "type": "class", "id": "class_comp_321_2025" }
-      ]
-    },
-    {
-      "id": "networking_basics",
-      "name": "Networking (Basics)",
-      "type": "domain",
-      "aliases": ["computer_networks_basics"],
-      "description": "Foundational networking concepts for systems courses.",
-      "evidence": [
-        { "type": "class", "id": "class_comp_321_2025" }
-      ]
-    },
-    {
-      "id": "systems_security_basics",
-      "name": "Systems Security (Basics)",
-      "type": "domain",
-      "aliases": ["rop_basics", "vulnerability_basics"],
-      "description": "Intro to ROP and defensive practices.",
-      "evidence": [
-        { "type": "class", "id": "class_comp_222_2024" }
-      ]
-    },
-    {
-      "id": "probability",
-      "name": "Probability",
-      "type": "domain",
-      "aliases": [],
-      "description": "Distributions, expectation, variance.",
-      "evidence": [
-        { "type": "class", "id": "class_stat_315_2024" },
-        { "type": "project", "id": "proj_euros" }
-      ]
-    },
-    {
       "id": "statistics",
-      "name": "Statistics",
+      "name": "Statistics & Probability",
       "type": "domain",
-      "aliases": [],
-      "description": "Inference and uncertainty quantification.",
+      "aliases": ["probability", "hypothesis_testing", "data_analysis", "eda"],
+      "description": "Distributions, expectation, variance, inference, uncertainty quantification, hypothesis testing, and exploratory data analysis.",
       "evidence": [
         { "type": "class", "id": "class_stat_315_2024" },
         { "type": "project", "id": "proj_euros" }
-      ]
-    },
-    {
-      "id": "hypothesis_testing",
-      "name": "Hypothesis Testing",
-      "type": "skill",
-      "aliases": [],
-      "description": "One-/two-sample tests and confidence intervals.",
-      "evidence": [
-        { "type": "class", "id": "class_stat_315_2024" }
-      ]
-    },
-    {
-      "id": "data_analysis_basics",
-      "name": "Data Analysis (Basics)",
-      "type": "skill",
-      "aliases": ["eda"],
-      "description": "Exploratory analysis and simulation.",
-      "evidence": [
-        { "type": "class", "id": "class_stat_315_2024" }
       ]
     },
     {
@@ -319,7 +208,7 @@
       "name": "Deep Learning",
       "type": "domain",
       "aliases": ["dl"],
-      "description": "Neural networks and representation learning.",
+      "description": "Neural networks, representation learning, transformers, and diffusion models.",
       "evidence": [
         { "type": "class", "id": "class_comp_646_2025" },
         { "type": "project", "id": "proj_hilite" }
@@ -329,35 +218,30 @@
       "id": "machine_learning",
       "name": "Machine Learning",
       "type": "domain",
-      "aliases": ["ml", "machine_learning"],
+      "aliases": ["ml"],
       "description": "End-to-end ML systems: data prep, modeling, and evaluation.",
       "evidence": [
         { "type": "class", "id": "class_comp_646_2025" },
         { "type": "project", "id": "proj_hilite" },
         { "type": "project", "id": "proj_euros" },
-        { "type": "experience", "id": "exp_vesselsvalue_2024" }
-      ]
-    },
-    {
-      "id": "transformers",
-      "name": "Transformers",
-      "type": "model_family",
-      "aliases": ["bert", "vit", "llama"],
-      "description": "Attention-based architectures for vision and language.",
-      "evidence": [
-        { "type": "class", "id": "class_comp_646_2025" },
-        { "type": "project", "id": "proj_hilite" }
+        { "type": "experience", "id": "exp_vesselsvalue_2024" },
+        { "type": "project", "id": "proj_portfolio" }
       ]
     },
     {
       "id": "nlp",
       "name": "Natural Language Processing",
       "type": "domain",
-      "aliases": ["natural_language_processing"],
-      "description": "Language modeling and multimodal grounding.",
+      "aliases": ["natural_language_processing", "speech_recognition", "asr", "tts", "text_to_speech"],
+      "description": "Language modeling, multimodal grounding, speech recognition, and text-to-speech synthesis.",
       "evidence": [
         { "type": "class", "id": "class_comp_646_2025" },
-        { "type": "project", "id": "proj_hilite" }
+        { "type": "project", "id": "proj_hilite" },
+        { "type": "class", "id": "class_busi_220_2024" },
+        { "type": "project", "id": "proj_momentum" },
+        { "type": "project", "id": "proj_portfolio" },
+        { "type": "experience", "id": "exp_veson_2024" },
+        { "type": "experience", "id": "exp_vesselsvalue_2024" }
       ]
     },
     {
@@ -365,7 +249,7 @@
       "name": "Diffusion Models",
       "type": "model_family",
       "aliases": ["vaes_diffusion_dits"],
-      "description": "Generation via denoising and latent diffusion.",
+      "description": "Generation via denoising and latent diffusion (part of Deep Learning).",
       "evidence": [
         { "type": "class", "id": "class_comp_646_2025" }
       ]
@@ -492,23 +376,12 @@
       "id": "data_mining",
       "name": "Data Mining",
       "type": "domain",
-      "aliases": [],
-      "description": "Pattern discovery, modeling, and evaluation.",
+      "aliases": ["feature_engineering", "data_warehousing", "olap", "olap_tools"],
+      "description": "Pattern discovery, modeling, evaluation, feature engineering, and data warehousing for analytics.",
       "evidence": [
         { "type": "class", "id": "class_cs430_2025" },
-        { "type": "project", "id": "proj_euros" }
-      ]
-    },
-    {
-      "id": "feature_engineering",
-      "name": "Feature Engineering",
-      "type": "skill",
-      "aliases": [],
-      "description": "Transformations that improve model signal.",
-      "evidence": [
-        { "type": "class", "id": "class_cs430_2025" },
-        { "type": "experience", "id": "exp_vesselsvalue_2024" },
-        { "type": "project", "id": "proj_euros" }
+        { "type": "project", "id": "proj_euros" },
+        { "type": "experience", "id": "exp_vesselsvalue_2024" }
       ]
     },
     {
@@ -519,114 +392,52 @@
       "description": "Measuring performance and generalization.",
       "evidence": [
         { "type": "class", "id": "class_cs430_2025" },
+        { "type": "class", "id": "class_comp_646_2025" },
         { "type": "experience", "id": "exp_vesselsvalue_2024" },
         { "type": "project", "id": "proj_euros" }
       ]
     },
     {
-      "id": "data_warehousing",
-      "name": "Data Warehousing",
-      "type": "domain",
-      "aliases": [],
-      "description": "Storage and organization for analytics at scale.",
-      "evidence": [
-        { "type": "class", "id": "class_cs430_2025" }
-      ]
-    },
-    {
-      "id": "olap",
-      "name": "OLAP",
-      "type": "tooling",
-      "aliases": ["olap_tools"],
-      "description": "Online analytical processing and cubes.",
-      "evidence": [
-        { "type": "class", "id": "class_cs430_2025" }
-      ]
-    },
-    {
-      "id": "parallel_computing",
-      "name": "Parallel Computing",
-      "type": "domain",
-      "aliases": ["parallelism"],
-      "description": "Architectures and methods for parallel execution.",
-      "evidence": [
-        { "type": "class", "id": "class_ep430_2025" }
-      ]
-    },
-    {
-      "id": "multicore_systems",
-      "name": "Multicore Systems",
-      "type": "domain",
-      "aliases": ["multicore"],
-      "description": "Multi-CPU architectures and scalability trade-offs.",
-      "evidence": [
-        { "type": "class", "id": "class_ep430_2025" }
-      ]
-    },
-    {
-      "id": "performance_engineering",
-      "name": "Performance Engineering",
+      "id": "leadership",
+      "name": "Leadership",
       "type": "skill",
-      "aliases": ["performance_tuning"],
-      "description": "Analyzing and improving system performance.",
-      "evidence": [
-        { "type": "class", "id": "class_ep430_2025" }
-      ]
-    },
-    {
-      "id": "entrepreneurship",
-      "name": "Entrepreneurship",
-      "type": "domain",
       "aliases": [],
-      "description": "Opportunity discovery, validation, and venture building.",
+      "description": "Guiding teams, driving organizational outcomes, and entrepreneurial thinking.",
       "evidence": [
+        { "type": "class", "id": "class_busi_360_2024" },
         { "type": "class", "id": "class_busi_221_2023" },
         { "type": "class", "id": "class_busi_369_2024" },
-        { "type": "class", "id": "class_busi_360_2024" }
+        { "type": "experience", "id": "exp_veson_2024" },
+        { "type": "project", "id": "proj_knight_life" }
+      ]
+    },
+    {
+      "id": "writing",
+      "name": "Writing",
+      "type": "skill",
+      "aliases": ["technical_writing", "creative_writing", "research_writing"],
+      "description": "Clear communication through written content including structured argumentation and literature integration.",
+      "evidence": [
+        { "type": "class", "id": "class_busi_221_2023" },
+        { "type": "class", "id": "class_fwis_180_2023" },
+        { "type": "project", "id": "proj_portfolio" }
       ]
     },
     {
       "id": "product_management",
       "name": "Product Management",
       "type": "skill",
-      "aliases": ["pm"],
-      "description": "Defining, prioritizing, and shipping user-centered features.",
+      "aliases": ["pm", "customer_development", "product_discovery", "user_research", "ux_design", "user_experience"],
+      "description": "Defining, prioritizing, shipping user-centered features, discovering opportunities through customer development, and conducting user research including interviews, testing, validation, interaction patterns, and accessibility.",
       "evidence": [
         { "type": "class", "id": "class_busi_369_2024" },
         { "type": "class", "id": "class_busi_220_2024" },
+        { "type": "class", "id": "class_busi_221_2023" },
         { "type": "experience", "id": "exp_lilie_2024" },
         { "type": "experience", "id": "exp_veson_mobile_2021_2023" },
+        { "type": "experience", "id": "exp_veson_2024" },
         { "type": "project", "id": "proj_portfolio" },
         { "type": "project", "id": "proj_momentum" },
-        { "type": "project", "id": "proj_knight_life" }
-      ]
-    },
-    {
-      "id": "user_research",
-      "name": "User Research",
-      "type": "skill",
-      "aliases": ["customer_discovery"],
-      "description": "Interviews, testing, and validation.",
-      "evidence": [
-        { "type": "class", "id": "class_busi_221_2023" },
-        { "type": "class", "id": "class_busi_369_2024" },
-        { "type": "class", "id": "class_busi_220_2024" },
-        { "type": "experience", "id": "exp_lilie_2024" },
-        { "type": "project", "id": "proj_portfolio" },
-        { "type": "project", "id": "proj_knight_life" }
-      ]
-    },
-    {
-      "id": "ux_design",
-      "name": "UX Design",
-      "type": "skill",
-      "aliases": ["user_experience"],
-      "description": "Interaction patterns, accessibility, and iteration.",
-      "evidence": [
-        { "type": "class", "id": "class_busi_220_2024" },
-        { "type": "experience", "id": "exp_lilie_2024" },
-        { "type": "project", "id": "proj_momentum" },
-        { "type": "project", "id": "proj_portfolio" },
         { "type": "project", "id": "proj_knight_life" }
       ]
     },
@@ -641,59 +452,6 @@
       ]
     },
     {
-      "id": "research_writing",
-      "name": "Research Writing",
-      "type": "skill",
-      "aliases": [],
-      "description": "Structured argumentation and literature integration.",
-      "evidence": [
-        { "type": "class", "id": "class_fwis_180_2023" }
-      ]
-    },
-    {
-      "id": "speech_recognition",
-      "name": "Speech Recognition",
-      "type": "domain",
-      "aliases": ["asr"],
-      "description": "Streaming transcription and voice UX.",
-      "evidence": [
-        { "type": "class", "id": "class_busi_220_2024" },
-        { "type": "project", "id": "proj_momentum" }
-      ]
-    },
-    {
-      "id": "tts",
-      "name": "Text-to-Speech",
-      "type": "domain",
-      "aliases": ["text_to_speech"],
-      "description": "Low-latency synthesis and barge-in handling.",
-      "evidence": [
-        { "type": "class", "id": "class_busi_220_2024" },
-        { "type": "project", "id": "proj_momentum" }
-      ]
-    },
-    {
-      "id": "swiftui",
-      "name": "SwiftUI",
-      "type": "framework",
-      "aliases": ["swift_ui"],
-      "description": "Declarative UI framework for building native iOS applications with reactive state management.",
-      "evidence": [
-        { "type": "class", "id": "class_busi_220_2024" },
-        { "type": "project", "id": "proj_momentum" }
-      ]
-    },
-    {
-      "id": "avfoundation",
-      "name": "AVFoundation",
-      "type": "framework",
-      "aliases": ["av_foundation"],
-      "description": "Apple framework for audio and video capture, playback, and processing.",
-      "evidence": [
-        { "type": "project", "id": "proj_momentum" }
-      ]
-    },
-    {
       "id": "firebase",
       "name": "Firebase",
       "type": "service",
@@ -701,30 +459,6 @@
       "description": "Google's platform for mobile and web app backend services including database, auth, and messaging.",
       "evidence": [
         { "type": "project", "id": "proj_knight_life" }
-      ]
-    },
-    {
-      "id": "swift",
-      "name": "Swift",
-      "type": "language",
-      "aliases": [],
-      "description": "Modern programming language for iOS, macOS, and Apple platform development.",
-      "evidence": [
-        { "type": "class", "id": "class_ap_csa_2020" },
-        { "type": "experience", "id": "exp_veson_mobile_2021_2023" },
-        { "type": "project", "id": "proj_knight_life" }
-      ]
-    },
-    {
-      "id": "ios_development",
-      "name": "iOS Development",
-      "type": "domain",
-      "aliases": ["ios", "ios_dev", "iphone_app"],
-      "description": "Native Swift/SwiftUI development for production iOS apps.",
-      "evidence": [
-        { "type": "project", "id": "proj_momentum" },
-        { "type": "project", "id": "proj_knight_life" },
-        { "type": "experience", "id": "exp_veson_mobile_2021_2023" }
       ]
     },
     {
@@ -738,7 +472,8 @@
         { "type": "class", "id": "class_comp_646_2025" },
         { "type": "project", "id": "proj_portfolio" },
         { "type": "project", "id": "proj_momentum" },
-        { "type": "project", "id": "proj_hilite" }
+        { "type": "project", "id": "proj_hilite" },
+        { "type": "experience", "id": "exp_veson_2024" }
       ]
     },
     {
@@ -760,7 +495,10 @@
       "evidence": [
         { "type": "experience", "id": "exp_parsons_2025" },
         { "type": "experience", "id": "exp_veson_2024" },
-        { "type": "experience", "id": "exp_veson_mobile_2021_2023" }
+        { "type": "experience", "id": "exp_veson_mobile_2021_2023" },
+        { "type": "project", "id": "proj_portfolio" },
+        { "type": "project", "id": "proj_momentum" },
+        { "type": "project", "id": "proj_knight_life" }
       ]
     },
     {
@@ -780,7 +518,8 @@
       "aliases": [],
       "description": "Rapid prototyping framework for data and ML applications.",
       "evidence": [
-        { "type": "experience", "id": "exp_veson_2024" }
+        { "type": "experience", "id": "exp_veson_2024" },
+        { "type": "project", "id": "proj_hilite" }
       ]
     },
     {
@@ -790,7 +529,18 @@
       "aliases": [],
       "description": "Open-source Firebase alternative with PostgreSQL backend for auth, database, and storage.",
       "evidence": [
-        { "type": "experience", "id": "exp_lilie_2024" }
+        { "type": "experience", "id": "exp_lilie_2024" },
+        { "type": "project", "id": "proj_portfolio" }
+      ]
+    },
+    {
+      "id": "redis",
+      "name": "Redis",
+      "type": "service",
+      "aliases": ["upstash"],
+      "description": "In-memory data structure store used for caching, rate limiting, and real-time applications.",
+      "evidence": [
+        { "type": "project", "id": "proj_portfolio" }
       ]
     },
     {
@@ -814,43 +564,15 @@
       ]
     },
     {
-      "id": "xcode",
-      "name": "Xcode",
-      "type": "tool",
-      "aliases": [],
-      "description": "Apple's integrated development environment for iOS and macOS applications.",
-      "evidence": [
-        { "type": "experience", "id": "exp_veson_mobile_2021_2023" }
-      ]
-    },
-    {
-      "id": "rule_engines",
-      "name": "Rule Engines",
-      "type": "skill",
-      "aliases": [],
-      "description": "Codifying business logic and decision rules programmatically.",
-      "evidence": [
-        { "type": "experience", "id": "exp_veson_2024" }
-      ]
-    },
-    {
-      "id": "data_extraction",
-      "name": "Data Extraction",
-      "type": "skill",
-      "aliases": [],
-      "description": "Extracting structured data from unstructured sources.",
-      "evidence": [
-        { "type": "experience", "id": "exp_veson_2024" }
-      ]
-    },
-    {
       "id": "sentence_transformers",
       "name": "Sentence Transformers",
       "type": "library",
-      "aliases": [],
-      "description": "Semantic embeddings for text similarity and clustering.",
+      "aliases": ["transformers", "bert", "vit", "llama"],
+      "description": "Semantic embeddings for text similarity and clustering using attention-based architectures (BERT, ViT, LLaMA).",
       "evidence": [
-        { "type": "experience", "id": "exp_vesselsvalue_2024" }
+        { "type": "experience", "id": "exp_vesselsvalue_2024" },
+        { "type": "class", "id": "class_comp_646_2025" },
+        { "type": "project", "id": "proj_hilite" }
       ]
     },
     {
@@ -875,4 +597,3 @@
       ]
     }
   ]
-  

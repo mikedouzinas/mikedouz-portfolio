@@ -8,7 +8,8 @@ import { OpenAI } from 'openai';
 import { config } from '@/lib/iris/config';
 import { getRecentActivityContext } from '@/lib/iris/github';
 import { logQuery, logQuickAction } from '@/lib/iris/analytics';
-import { generateQuickActions } from '@/lib/iris/quickActions';
+import { generateQuickActions } from '@/lib/iris/quickActions_v2';
+import { loadRankings } from '@/lib/iris/loadRankings';
 import type { QuickAction } from '@/components/iris/QuickActions';
 
 // Import types from answer-utils modules
@@ -39,7 +40,7 @@ import { streamTextResponse, buildNoMatchResponse, buildClarificationPrompt, bui
 import { detectPromptInjection, buildContextEntities, isClearlyOffTopic } from '@/lib/iris/answer-utils/security';
 
 // Import ranking utilities
-import { reranktechnical } from '@/lib/iris/answer-utils/ranking';
+import { reranktechnical, boostWithImportance } from '@/lib/iris/answer-utils/ranking';
 
 // Import planning utilities
 import { preRoute, planAutoContact, needsComparisonQuery, expandResultsForComparativeQuery } from '@/lib/iris/answer-utils/planning';
@@ -51,15 +52,53 @@ import { detectIntent, runMicroPlanner } from '@/lib/iris/answer-utils/intent';
 export const runtime = 'nodejs';
 
 /**
+ * Helper function to log retrieval results to console (DRY principle)
+ * Used for both filtered results and semantic search results
+ */
+function logRetrievalResults(
+  query: string,
+  intent: string,
+  results: Array<{ score: number; doc: Partial<KBItem> }>,
+  filters?: QueryFilter
+) {
+  console.log('\n═══════════════════════════════════════════════════════════════');
+  console.log(filters ? '🔍 RAG RESPONSE (Filtered Results)' : '🔍 RAG RESPONSE (Retrieval Results)');
+  console.log('═══════════════════════════════════════════════════════════════');
+  console.log(`Query: "${query}"`);
+  console.log(`Intent: ${intent}`);
+  if (filters) {
+    console.log(`Filters: ${JSON.stringify(filters, null, 2)}`);
+  }
+  console.log(`Results Count: ${results.length}`);
+  console.log(filters ? '\nFiltered Documents:' : '\nRetrieved Documents:');
+  results.forEach((result, idx) => {
+    const doc = result.doc;
+    const title = 'title' in doc && doc.title ? doc.title :
+                 'role' in doc && doc.role ? `${doc.role}${'company' in doc && doc.company ? ` at ${doc.company}` : ''}` :
+                 'school' in doc && doc.school ? doc.school :
+                 'value' in doc && doc.value ? doc.value :
+                 'interest' in doc && doc.interest ? doc.interest :
+                 doc.id || 'unknown';
+    const kind = 'kind' in doc ? doc.kind : 'unknown';
+    console.log(`  ${idx + 1}. [${kind}] ${title} (score: ${result.score.toFixed(4)})`);
+    if ('summary' in doc && doc.summary) {
+      console.log(`     Summary: ${doc.summary.substring(0, 100)}${doc.summary.length > 100 ? '...' : ''}`);
+    }
+  });
+  console.log('═══════════════════════════════════════════════════════════════\n');
+}
+
+/**
  * Field map for each intent
  * Determines which fields to retrieve from the knowledge base
  */
 const FIELD_MAP: Record<Intent, string[]> = {
-  contact: [],         // Fast-path, handled separately
-  filter_query: [],    // All fields - determined by the specific filter
-  specific_item: [],   // All fields - complete info for specific items
-  personal: [],        // All fields from profile (stories, values, interests)
-  general: []          // All fields - let semantic search find what's relevant
+  contact: [],          // Fast-path, handled separately
+  filter_query: [],     // All fields - determined by the specific filter
+  specific_item: [],    // All fields - complete info for specific items
+  personal: [],         // All fields from profile (stories, values, interests)
+  github_activity: [],  // Fast-path, handled separately with GitHub API
+  general: []           // All fields - let semantic search find what's relevant
 };
 
 /**
@@ -71,6 +110,7 @@ const TYPE_FILTERS: Record<Intent, Array<'project' | 'experience' | 'class' | 'b
   filter_query: null,                                        // Types determined by filters
   specific_item: null,                                       // Search all types for specific items
   personal: ['story', 'value', 'interest', 'education', 'bio'],  // Personal/family info including education and bio
+  github_activity: null,                                     // Fast-path, no retrieval needed (uses GitHub API)
   general: null                                              // Search all types - let semantic search decide
 };
 
@@ -223,13 +263,32 @@ export async function POST(req: NextRequest) {
     // Heuristic filter derivation (type, show_all, companies) in case LLM classification missed details.
     aliasIndex = aliasIndex.length > 0 ? aliasIndex : await getAliasIndexLazy();
     const aliasMatches = collectAliasMatches(query, aliasIndex);
+    
+    // Debug: Log filters before derivation
+    console.log('[Intent Detection] Filters from LLM:', JSON.stringify(filters, null, 2));
+    
     filters = deriveFilterDefaults(query, filters, aliasMatches);
+    
+    // Debug: Log filters after derivation
+    console.log('[Intent Detection] Filters after derivation:', JSON.stringify(filters, null, 2));
+
+    // Professional comment: If deriveFilterDefaults added a title_match from alias matching,
+    // override intent to specific_item. This ensures queries like "tell me about iris" go
+    // directly to the specific item rather than doing a general search.
+    if (filters?.title_match && intent !== 'specific_item') {
+      console.log('[Intent Detection] Overriding intent to specific_item due to title_match from alias');
+      intent = 'specific_item';
+    }
 
     const profileFilters = detectProfileFilter(query);
     if (profileFilters) {
       intent = 'filter_query';
       filters = mergeFilters(filters, profileFilters);
     }
+    
+    // Debug: Log final filters and intent before retrieval
+    console.log('[Intent Detection] Final intent:', intent);
+    console.log('[Intent Detection] Final filters:', JSON.stringify(filters, null, 2));
 
     // Override intent if pre-routing found a match (unless contact explicit)
     if (preRouted && intent !== 'contact') {
@@ -344,7 +403,8 @@ export async function POST(req: NextRequest) {
           try {
             // Load all items for context (needed for quick action generation)
             const allItems = await getAllItems();
-            
+            const rankings = loadRankings();
+
             // Generate quick actions based on cached answer content
             generatedQuickActions = generateQuickActions({
               query,
@@ -353,6 +413,7 @@ export async function POST(req: NextRequest) {
               results: [], // No results available from cache, but quick actions can still be generated
               fullAnswer: cachedData.answer,
               allItems,
+              rankings, // Pass rankings for action sorting
               depth, // Pass depth for enforcing follow-up limits
             });
 
@@ -590,12 +651,192 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Handle GitHub activity intent - fetch recent commits for a specific repository
+    if (intent === 'github_activity' && filters && filters.repo && typeof filters.repo === 'string') {
+      // Professional comment: Reuse outer startTime variable instead of shadowing it
+      // This ensures analytics logging uses the correct request start time
+      const repo = filters.repo as string;
+
+      console.log(`[GitHub Activity] Fetching commits for ${repo}...`);
+
+      try {
+        const { getRepoCommits } = await import('@/lib/iris/github');
+        const commits = await getRepoCommits(repo);
+
+        if (!commits) {
+          // GitHub token not available or fetch failed
+          const fallbackMessage = `I don't have access to GitHub right now, so I can't fetch the latest commits for ${repo}. The repository information is in my knowledge base though - would you like me to tell you about the project instead?`;
+
+          const latencyMs = Date.now() - startTime;
+
+          // Log to analytics
+          logQuery({
+            query,
+            intent: 'github_activity',
+            filters: { repo },
+            results_count: 0,
+            context_items: undefined,
+            answer_length: fallbackMessage.length,
+            latency_ms: latencyMs,
+            cached: false,
+            session_id: req.headers.get('x-session-id') || undefined,
+            user_agent: req.headers.get('user-agent') || undefined
+          }).catch(error => {
+            console.warn('[Analytics] Failed to log GitHub activity query:', error);
+          });
+
+          // Return streaming response
+          const encoder = new TextEncoder();
+          const readable = new ReadableStream({
+            start(controller) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: fallbackMessage })}\n\n`));
+              controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+              controller.close();
+            }
+          });
+
+          return new Response(readable, {
+            headers: {
+              'Content-Type': 'text/event-stream',
+              'Cache-Control': 'no-cache',
+              'Connection': 'keep-alive'
+            }
+          });
+        }
+
+        // We have commits! Build context and ask Iris to explain them
+        const githubContext = commits;
+
+        // Create a system prompt that instructs Iris to summarize the commits
+        const githubSystemPrompt = `You are Iris, Mike's AI assistant. The user asked about recent updates to the ${repo} repository.
+
+Here are the most recent commits:
+
+${githubContext}
+
+Your job is to:
+1. Summarize what's been worked on recently (features, fixes, improvements)
+2. Be concise and highlight the most interesting changes
+3. Use a conversational tone
+4. If commits mention bugs or issues, explain what was fixed
+5. If commits add features, explain what was added
+
+Keep your response to 2-3 short paragraphs max.`;
+
+        // Stream LLM response with GitHub context
+        // Professional comment: Use the already-initialized openai client from line 194
+        // No need to call getClient() which doesn't exist - openai is in scope
+        const stream = await openai.chat.completions.create({
+          model: config.models.chat,
+          stream: true,
+          messages: [
+            { role: 'system', content: githubSystemPrompt },
+            { role: 'user', content: query }
+          ],
+          temperature: config.chatSettings.temperature,
+          max_tokens: config.chatSettings.maxTokens
+        });
+
+        // Stream response to client
+        const encoder = new TextEncoder();
+        let fullAnswer = '';
+
+        const readable = new ReadableStream({
+          async start(controller) {
+            try {
+              for await (const chunk of stream) {
+                const delta = chunk.choices[0]?.delta?.content || '';
+                if (delta) {
+                  fullAnswer += delta;
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: delta })}\n\n`));
+                }
+              }
+
+              // Add quick actions after streaming
+              const githubQuickActions: QuickAction[] = [
+                {
+                  type: 'contact_link',
+                  label: 'View on GitHub',
+                  link: `https://github.com/${repo}`,
+                  linkType: 'github',
+                },
+                {
+                  type: 'custom_input',
+                  label: 'Ask a follow up...',
+                }
+              ];
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ quickActions: githubQuickActions })}\n\n`));
+
+              controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+              controller.close();
+
+              // Log to analytics
+              const latencyMs = Date.now() - startTime;
+              logQuery({
+                query,
+                intent: 'github_activity',
+                filters: { repo },
+                results_count: 1,
+                // Professional comment: Format context_items as objects with type/title for analytics
+                context_items: [{ type: 'github', title: 'Recent Commits' }],
+                answer_length: fullAnswer.length,
+                latency_ms: latencyMs,
+                cached: false,
+                session_id: req.headers.get('x-session-id') || undefined,
+                user_agent: req.headers.get('user-agent') || undefined
+              }).catch(error => {
+                console.warn('[Analytics] Failed to log GitHub activity query:', error);
+              });
+
+            } catch (error) {
+              console.error('[GitHub Activity] Streaming error:', error);
+              controller.error(error);
+            }
+          }
+        });
+
+        return new Response(readable, {
+          headers: {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive'
+          }
+        });
+
+      } catch (error) {
+        console.error('[GitHub Activity] Error fetching commits:', error);
+
+        // Return error message
+        const errorMessage = `I encountered an error trying to fetch recent commits for ${repo}. This might be a temporary GitHub issue. Would you like me to tell you about the project from my knowledge base instead?`;
+
+        const encoder = new TextEncoder();
+        const readable = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: errorMessage })}\n\n`));
+            controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+            controller.close();
+          }
+        });
+
+        return new Response(readable, {
+          headers: {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive'
+          }
+        });
+      }
+    }
+
     let context: string;
     let results: Array<{ score: number; doc: Partial<KBItem> }> = [];
     let isEvaluative = false; // Track if query is evaluative for evidence signal building
 
     // Load skills once for ID-to-name resolution (cached for performance)
     const skillMap = await buildSkillNameMap();
+
+    // Load importance rankings once (used for scoring and context display)
+    const rankings = loadRankings();
 
     // Handle filter queries and specific item queries - use structured filtering instead of semantic search
     if ((intent === 'filter_query' || intent === 'specific_item') && filters) {
@@ -614,33 +855,20 @@ export async function POST(req: NextRequest) {
       }));
 
       // Determine if we should show all results or limit
-      const limit = filters.show_all ? results.length : 10; // Show more for filter queries
+      // Professional comment: For skills queries, cap at 20-30 top skills even with show_all to avoid overwhelming output.
+      // Users expect comprehensive but curated lists (top skills), not exhaustive inventories (100+ skills).
+      // For other types (projects, experiences, classes), show all matching items.
+      let limit = filters.show_all ? results.length : 10;
+      
+      if (filters.show_all && filters.type && filters.type.includes('skill') && !filters.skills) {
+        // Skills overview query without specific skill filters - show top 25 skills by importance
+        limit = Math.min(results.length, 25);
+      }
+      
       results = results.slice(0, limit);
 
       // Debug: Log RAG response (filtered results) to terminal
-      console.log('\n═══════════════════════════════════════════════════════════════');
-      console.log('🔍 RAG RESPONSE (Filtered Results)');
-      console.log('═══════════════════════════════════════════════════════════════');
-      console.log(`Query: "${query}"`);
-      console.log(`Intent: ${intent}`);
-      console.log(`Filters: ${JSON.stringify(filters, null, 2)}`);
-      console.log(`Results Count: ${results.length}`);
-      console.log('\nFiltered Documents:');
-      results.forEach((result, idx) => {
-        const doc = result.doc;
-        const title = 'title' in doc && doc.title ? doc.title :
-                     'role' in doc && doc.role ? `${doc.role}${'company' in doc && doc.company ? ` at ${doc.company}` : ''}` :
-                     'school' in doc && doc.school ? doc.school :
-                     'value' in doc && doc.value ? doc.value :
-                     'interest' in doc && doc.interest ? doc.interest :
-                     doc.id || 'unknown';
-        const kind = 'kind' in doc ? doc.kind : 'unknown';
-        console.log(`  ${idx + 1}. [${kind}] ${title} (score: ${result.score.toFixed(4)})`);
-        if ('summary' in doc && doc.summary) {
-          console.log(`     Summary: ${doc.summary.substring(0, 100)}${doc.summary.length > 100 ? '...' : ''}`);
-        }
-      });
-      console.log('═══════════════════════════════════════════════════════════════\n');
+      logRetrievalResults(query, intent, results, filters);
 
 
       // If no results found, return fallback response with contact info instead of generating with LLM
@@ -830,29 +1058,11 @@ export async function POST(req: NextRequest) {
       const retrievalResults = await retrieve(query, retrievalOptions);
       results = retrievalResults.results;
 
+      // Boost results with importance rankings
+      results = boostWithImportance(results, rankings, query, isEvaluative);
+
       // Debug: Log RAG response (retrieval results) to terminal
-      console.log('\n═══════════════════════════════════════════════════════════════');
-      console.log('🔍 RAG RESPONSE (Retrieval Results)');
-      console.log('═══════════════════════════════════════════════════════════════');
-      console.log(`Query: "${query}"`);
-      console.log(`Intent: ${intent}`);
-      console.log(`Results Count: ${results.length}`);
-      console.log('\nRetrieved Documents:');
-      results.forEach((result, idx) => {
-        const doc = result.doc;
-        const title = 'title' in doc && doc.title ? doc.title :
-                     'role' in doc && doc.role ? `${doc.role}${'company' in doc && doc.company ? ` at ${doc.company}` : ''}` :
-                     'school' in doc && doc.school ? doc.school :
-                     'value' in doc && doc.value ? doc.value :
-                     'interest' in doc && doc.interest ? doc.interest :
-                     doc.id || 'unknown';
-        const kind = 'kind' in doc ? doc.kind : 'unknown';
-        console.log(`  ${idx + 1}. [${kind}] ${title} (score: ${result.score.toFixed(4)})`);
-        if ('summary' in doc && doc.summary) {
-          console.log(`     Summary: ${doc.summary.substring(0, 100)}${doc.summary.length > 100 ? '...' : ''}`);
-        }
-      });
-      console.log('═══════════════════════════════════════════════════════════════\n');
+      logRetrievalResults(query, intent, results);
 
       // If we have no results, use fallback response with contact info
       // The anti-hallucination instructions in the system prompt are strong enough to prevent
@@ -916,15 +1126,18 @@ export async function POST(req: NextRequest) {
     }
 
 
-    // Get recent GitHub activity for additional context (production only)
+    // Get recent GitHub activity for additional context
     let recentActivity: string | null = null;
-    if (process.env.NODE_ENV === 'production') {
-      try {
+    try {
+      // Only attempt if GITHUB_TOKEN is configured
+      if (process.env.GITHUB_TOKEN) {
         recentActivity = await getRecentActivityContext();
-      } catch (error) {
-        console.warn('[Answer API] GitHub activity fetch failed:', error);
-        // Continue without GitHub context
+      } else {
+        console.log('[Answer API] Skipping GitHub activity: GITHUB_TOKEN not configured');
       }
+    } catch (error) {
+      console.error('[Answer API] GitHub activity fetch failed:', error);
+      // Continue without GitHub context
     }
 
     // Load contact information to include in context
@@ -950,7 +1163,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Build enhanced context with optional GitHub activity and contact info
-    const contextIndex = buildContextIndex(results);
+    const contextIndex = buildContextIndex(results, rankings);
     let enhancedContext = contextIndex ? `${contextIndex}\n\n${context}` : context;
     if (recentActivity) {
       enhancedContext += `\n\nRecent Development Activity:\n${recentActivity}`;
@@ -996,9 +1209,9 @@ export async function POST(req: NextRequest) {
 - CRITICAL: Never tell users to "check his portfolio with Iris" or "ask Iris" - they're already talking to you! Instead suggest: "Want me to dive deeper into [X]?" or "I can share [Y] next" or "Message Mike for details"
 
 # Truth & Safety (Zero Hallucinations)
-- Use ONLY facts in the context. Do NOT invent projects, roles, dates, skills, links, people, or claims.
+- Use ONLY facts in the context. Do NOT invent projects, roles, dates, skills, people, or claims.
 - If context is insufficient, say so plainly, offer 1–2 focused follow-ups you can answer.
-- If you mention links, they MUST match the exact URLs shown in context.
+- Never include URLs or links in your response - quick actions provide all links automatically.
 
 # Scope & Relevance
 - You ONLY answer questions about Mike's professional background, projects, skills, education, experience, and interests.
@@ -1011,8 +1224,10 @@ export async function POST(req: NextRequest) {
 - Prefer concrete outcomes, metrics, technologies, and Mike's role when present.
 - When dates exist, state them; otherwise avoid implying timeframes.
 - If user asks for comparisons or summaries, give a tight, structured overview first, then a short suggestion for where to dig deeper.
-- When you answer list/filter queries, synthesize and format the list clearly so users don't need to read raw data.
-- **IMPORTANT: Category Merging** - If there are more than 6 individual items in a response, merge related categories together. For example, instead of listing 10 individual skills separately, group them by theme or by technology stack. This makes the response more digestible and prevents overwhelming the user with too many individual items.
+- **CRITICAL: Listing vs. Merging** - When answering list/filter queries:
+  - **6 or fewer items:** List ALL items comprehensively. Don't skip any—users expect to see everything that matches.
+  - **More than 6 items:** Merge related categories together for digestibility (e.g., group 10 skills by theme or tech stack, but still show them all).
+  - Format clearly and include key details (dates, companies, metrics) so users don't need to read raw data.
 
 # Capabilities & Next Steps
 - You know which filters were applied (e.g., type, skills, years). Use that to explain why results are focused ("Here's his 2024 experience…").
@@ -1024,26 +1239,54 @@ export async function POST(req: NextRequest) {
 # Evaluative & Comparative Queries
 When asked for "best", "strongest", "unique", "what makes…", "top", "most", or "why X should…", synthesize across the evidence. Prefer concrete signals: (1) frequency across items, (2) measurable outcomes (metrics), (3) scale/complexity, (4) recency, and (5) unique combinations. Cite supporting items by title inline, concisely. If evidence is thin or uncertain, say so briefly and consider adding a single <ui:contact ... /> directive per the UI directive policy.
 
+# Internal Ranking System (Do Not Mention Scores)
+Mike's work is pre-ranked using importance scores (0-100) to help you prioritize internally. The scores are calculated from:
+- **Complexity** (most important): Technical skill difficulty (ML/AI = high, basic frameworks = low)
+- **Impact**: Measurable user adoption (ratings, downloads, users), business outcomes, recognition
+- **Recency** (lowest weight): Quality and complexity matter more than timing
+
+**Top-Ranked Items (Use for Prioritization):**
+- Projects: HiLiTe (ML/CV sophistication) > Knight Life (4.9★ with 100+ users) > Iris (RAG complexity) > Euros > Momentum
+- Experiences: VesselsValue > Veson 2024 > Lilie > Parsons > Veson Mobile
+- Skills: Ranked by evidence breadth, complexity, and usage
+
+**How to Use (NEVER mention the numbers):**
+When users ask about "best" or "top" work, prioritize these highly-ranked items and explain WHY using concrete evidence from the context (metrics, technical complexity, real outcomes). Example: "HiLiTe stands out for its cutting-edge ML and computer vision work" NOT "HiLiTe ranks 77/100". Let the evidence speak for itself.
+
 # Contact Information & Linking Strategy
-Contact info (LinkedIn, GitHub, email, booking link) is available in the context. Choose the right method based on the topic:
 
-**For Projects & Technical Work:**
-- If there's a GitHub link in context: "Check out the code on GitHub: [link]"
-- For project deep-dives without public code: "Message Mike for implementation details"
+**CRITICAL: Never include raw URLs or links in your response text.**
 
-**For Work Experience & Companies:**
-- LinkedIn is best for professional background: "Connect on LinkedIn: [link]"
-- For insider details about roles/companies: "Message Mike for behind-the-scenes insights"
+All links (GitHub, LinkedIn, demo links, company websites) are automatically provided via quick action buttons that appear below your answer. Your job is to reference that these resources exist without including the actual URLs.
 
-**For Collaboration/Hiring/Speaking:**
-- Always suggest messaging: "Message Mike to discuss [topic]"
-- Include scheduling link if available: "Or schedule a chat: [link]"
+**Quick Actions System:**
+After you finish answering, the system automatically generates relevant quick action buttons based on the context:
+- Projects with GitHub repos → "GitHub" button appears
+- Work experiences → "LinkedIn" button appears
+- Projects with demos → "Live Demo" button appears
+- All responses → "Message Mike" and "Ask a follow up..." buttons
 
-**For Personal Topics:**
-- If context has some info: Share it, then: "Want to know more? Message Mike"
-- If context is thin: "Message Mike to discuss [topic] directly"
+**How to Reference Links (Without Including URLs):**
 
-**General Rule:** Prioritize GitHub for code, LinkedIn for professional connections, and messaging for everything requiring back-and-forth or personal insight.
+✅ **CORRECT - Reference without URL:**
+- "The code is on GitHub" (GitHub button will appear automatically)
+- "Connect with Mike on LinkedIn" (LinkedIn button will appear)
+- "There's a live demo you can check out" (Demo button will appear)
+- "You can see it on the company website" (Company button will appear)
+
+❌ **INCORRECT - Never do this:**
+- "Check out the code: https://github.com/..." (DON'T include URLs!)
+- "Connect on LinkedIn: https://linkedin.com/..." (DON'T include URLs!)
+- "Visit: https://..." (DON'T include URLs!)
+
+**Contact Methods:**
+When users need more information or want to connect:
+- Technical details not in context → "Message Mike for implementation details"
+- Professional networking → "Mike's LinkedIn profile is available" (button appears)
+- Code repositories → "The code is on GitHub" (button appears)
+- Collaboration/hiring → "Message Mike to discuss [topic]"
+
+**Remember:** The quick actions system handles ALL linking. Just reference that resources exist, and the appropriate buttons will appear automatically.
 
 # Contact vs Explore (UI Directive Contract)
 Only suggest contacting Mike when one of these is true:
@@ -1249,13 +1492,17 @@ ${enhancedContext}`;
             // Generate quick actions after answer is complete
             let generatedQuickActions: ReturnType<typeof generateQuickActions> = [];
             try {
+              const allItems = await getAllItems();
+              const rankings = loadRankings();
+
               generatedQuickActions = generateQuickActions({
                 query,
                 intent,
                 filters,
                 results,
                 fullAnswer,
-                allItems: await getAllItems(),
+                allItems,
+                rankings, // Pass rankings for action sorting
                 depth, // Pass depth for enforcing follow-up limits
               });
 

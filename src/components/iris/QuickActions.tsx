@@ -12,7 +12,7 @@ export interface QuickAction {
   intent?: string;          // Skip re-classification
   filters?: Record<string, unknown>;  // Direct filter application
   link?: string;            // For contact_link type
-  linkType?: 'github' | 'linkedin' | 'email' | 'external';  // Icon selection
+  linkType?: 'github' | 'linkedin' | 'email' | 'external' | 'demo' | 'company';  // Icon selection
 }
 
 interface QuickActionsProps {

@@ -79,40 +79,63 @@ export function deriveFilterDefaults(
   let mutated = false;
   const next: QueryFilter = filters ? { ...filters } : {};
 
-  if (/\b(list|show|give me|display|enumerate|all|every|everything)\b/.test(normalized)) {
+  // Professional comment: If there's a single clear alias match and the query looks like a specific item request,
+  // set title_match to route to specific_item intent. This catches queries like "tell me about iris" or "what is HiLiTe"
+  // that should go directly to a specific item rather than doing a general search.
+  if (aliasMatches.length === 1 && !next.title_match) {
+    const isSpecificQuery = /\b(tell me about|what is|show me|about|explain|describe)\b/.test(normalized);
+    if (isSpecificQuery) {
+      next.title_match = aliasMatches[0].id;
+      mutated = true;
+    }
+  }
+
+  // Professional comment: Detect queries that expect comprehensive listings (not just top results).
+  // Patterns include explicit list requests ("list", "show", "all") and viewing verbs ("see", "view").
+  // For skills/classes/projects queries, users typically want to see the full set, not just top 5-10.
+  if (/\b(list|show|see|view|give me|display|enumerate|all|every|everything)\b/.test(normalized)) {
     if (!next.show_all) {
       next.show_all = true;
       mutated = true;
     }
   }
 
-  if (/\bskill(s)?\b|\btech\b|\btechnology\b|\bstack\b|\blanguage(s)?\b|\btools?\b/.test(normalized)) {
-    ensureType(next, 'skill');
-    mutated = true;
-  }
+  // Professional comment: Only derive type filters from query patterns when there's NO specific title_match.
+  // When title_match is set, the query targets a specific item by ID, and pattern-based type filtering
+  // could incorrectly exclude it (e.g., "tell me about proj_portfolio work" shouldn't add type: ["experience"]).
+  if (!next.title_match) {
+    if (/\bskill(s)?\b|\btech\b|\btechnology\b|\bstack\b|\blanguage(s)?\b|\btools?\b/.test(normalized)) {
+      ensureType(next, 'skill');
+      mutated = true;
+    }
 
-  if (/\bproject(s)?\b/.test(normalized)) {
-    ensureType(next, 'project');
-    mutated = true;
-  }
+    if (/\bproject(s)?\b/.test(normalized)) {
+      ensureType(next, 'project');
+      mutated = true;
+    }
 
-  if (/\bexperience(s)?\b|\bwork\b|\brole(s)?\b|\bjob(s)?\b|\bintern(ship|ships)?\b/.test(normalized)) {
-    ensureType(next, 'experience');
-    mutated = true;
-  }
+    if (/\bexperience(s)?\b|\bwork\b|\brole(s)?\b|\bjob(s)?\b|\bintern(ship|ships)?\b/.test(normalized)) {
+      ensureType(next, 'experience');
+      mutated = true;
+    }
 
-  if (/\bclass(es)?\b|\bcourse(s)?\b/.test(normalized)) {
-    ensureType(next, 'class');
-    mutated = true;
+    if (/\bclass(es)?\b|\bcourse(s)?\b/.test(normalized)) {
+      ensureType(next, 'class');
+      mutated = true;
+    }
   }
 
   // Company detection via alias matches
+  // Professional comment: Only derive company/type filters when there's NO specific title_match.
+  // If title_match is already set, the query is targeting a specific item by ID,
+  // and adding derived type filters could incorrectly exclude the target item
+  // (e.g., searching for "interest_software_development" with derived type: ["experience"]).
   const companyMatches = aliasMatches
     .filter(match => match.type === 'experience')
     .map(match => match.name)
     .filter(Boolean);
 
-  if (companyMatches.length > 0) {
+  if (companyMatches.length > 0 && !next.title_match) {
     ensureType(next, 'experience');
     const existing = new Set(next.company ?? []);
     companyMatches.forEach(name => existing.add(name));
@@ -216,10 +239,19 @@ export function applyFilters(items: KBItem[], filters: QueryFilter): KBItem[] {
   }
 
   // Filter by title match (for specific item queries)
+  // CRITICAL: Check ID first for exact matches from quick actions
+  // Quick actions pass IDs like "proj_portfolio", not display names
   if (filters.title_match) {
     const searchTitle = filters.title_match.toLowerCase();
     filtered = filtered.filter(item => {
-      // Check title field
+      // Check ID field first (exact match from quick actions)
+      if ('id' in item && item.id) {
+        if (item.id.toLowerCase() === searchTitle) {
+          return true;
+        }
+      }
+
+      // Check title field (substring match for partial queries)
       if ('title' in item && item.title) {
         return item.title.toLowerCase().includes(searchTitle);
       }

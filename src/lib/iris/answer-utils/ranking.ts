@@ -3,6 +3,7 @@
  */
 
 import { type KBItem } from '@/lib/iris/schema';
+import type { Rankings } from '@/lib/iris/rankings';
 
 /**
  * Calculates a technical complexity score for an experience
@@ -65,4 +66,64 @@ export function reranktechnical(results: Array<{ score: number; doc: Partial<KBI
     }
     return r;
   }).sort((a, b) => b.score - a.score); // Re-sort after boosting
+}
+
+/**
+ * Boosts retrieval results using pre-computed importance rankings
+ * Combines semantic similarity score with importance score for evaluative queries
+ *
+ * @param results - The retrieval results from semantic search
+ * @param rankings - Pre-computed importance rankings
+ * @param query - The user's query
+ * @param isEvaluative - Whether this is an evaluative query ("best", "top", etc.)
+ * @returns Reranked results with boosted scores
+ */
+export function boostWithImportance(
+  results: Array<{ score: number; doc: Partial<KBItem> }>,
+  rankings: Rankings,
+  query: string,
+  isEvaluative: boolean
+): Array<{ score: number; doc: Partial<KBItem> }> {
+  // For evaluative queries, heavily prioritize importance over semantics
+  // Semantic score just filters out irrelevant items (e.g., don't show HiLiTe for "database experience")
+  // For non-evaluative queries, keep semantics dominant
+  const importanceWeight = isEvaluative ? 0.8 : 0.2;
+  const semanticWeight = isEvaluative ? 0.2 : 0.8;
+
+  return results.map(r => {
+    // Find importance score for this item
+    let importance = 50; // Default middling score if not found
+
+    if ('id' in r.doc && r.doc.id) {
+      const itemId = r.doc.id;
+      const kind = 'kind' in r.doc ? r.doc.kind : null;
+
+      // Look up importance based on kind
+      if (kind === 'project') {
+        const ranking = rankings.projects.find(p => p.id === itemId);
+        if (ranking) importance = ranking.importance;
+      } else if (kind === 'experience') {
+        const ranking = rankings.experiences.find(e => e.id === itemId);
+        if (ranking) importance = ranking.importance;
+      } else if (kind === 'skill') {
+        const ranking = rankings.skills.find(s => s.id === itemId);
+        if (ranking) importance = ranking.importance;
+      } else if (kind === 'class') {
+        const ranking = rankings.classes.find(c => c.id === itemId);
+        if (ranking) importance = ranking.importance;
+      } else if (kind === 'blog') {
+        const ranking = rankings.blogs.find(b => b.id === itemId);
+        if (ranking) importance = ranking.importance;
+      }
+    }
+
+    // Normalize importance to 0-1 range (from 0-100)
+    const normalizedImportance = importance / 100;
+
+    // Combine semantic score with importance score
+    // Semantic score is already 0-1 from cosine similarity
+    const boostedScore = (r.score * semanticWeight) + (normalizedImportance * importanceWeight);
+
+    return { ...r, score: boostedScore };
+  }).sort((a, b) => b.score - a.score); // Re-sort by boosted scores
 }

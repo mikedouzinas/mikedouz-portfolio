@@ -46,9 +46,29 @@ function selectFields<T extends Record<string, unknown>>(doc: T, fields?: string
       (out as Record<string, unknown>)[f] = doc[f];
     }
   }
-  // Always include id/title if present to keep results identifiable
+  // Always include essential fields for display names and identification
   if ("id" in doc) (out as Record<string, unknown>).id = doc.id;
+  if ("kind" in doc) (out as Record<string, unknown>).kind = doc.kind;
+
+  // Include display name fields based on type
   if ("title" in doc) (out as Record<string, unknown>).title = doc.title;
+  if ("name" in doc) (out as Record<string, unknown>).name = doc.name;
+
+  // For experiences: include role and company for "role at company" display
+  if ("role" in doc) (out as Record<string, unknown>).role = doc.role;
+  if ("company" in doc) (out as Record<string, unknown>).company = doc.company;
+
+  // For classes: include course name
+  if ("course_name" in doc) (out as Record<string, unknown>).course_name = doc.course_name;
+
+  // For education: include school and degree
+  if ("school" in doc) (out as Record<string, unknown>).school = doc.school;
+  if ("degree" in doc) (out as Record<string, unknown>).degree = doc.degree;
+
+  // For personal items: include value/interest
+  if ("value" in doc) (out as Record<string, unknown>).value = doc.value;
+  if ("interest" in doc) (out as Record<string, unknown>).interest = doc.interest;
+
   return out;
 }
 
