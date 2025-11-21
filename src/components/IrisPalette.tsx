@@ -989,10 +989,25 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     accumulatedAnswer += parsed.text;
                     setAnswer(accumulatedAnswer);
                     // Clear loading config when answer starts streaming (only once)
+                    // Professional comment: Add minimum display time (300ms) to ensure loader is visible
+                    // even for fast responses (cached, contact intent, GitHub activity)
                     if (accumulatedAnswer.length > 0 && !loadingClearedRef.current) {
-                      setMainLoadingConfig(null);
-                      setMainLoadingStartTime(null);
-                      loadingClearedRef.current = true;
+                      const elapsedTime = mainLoadingStartTime ? Date.now() - mainLoadingStartTime : 0;
+                      const minDisplayTime = 300; // Minimum 300ms to show loader
+                      
+                      if (elapsedTime >= minDisplayTime) {
+                        // Enough time has passed, clear immediately
+                        setMainLoadingConfig(null);
+                        setMainLoadingStartTime(null);
+                        loadingClearedRef.current = true;
+                      } else {
+                        // Schedule clearing after minimum display time
+                        setTimeout(() => {
+                          setMainLoadingConfig(null);
+                          setMainLoadingStartTime(null);
+                        }, minDisplayTime - elapsedTime);
+                        loadingClearedRef.current = true;
+                      }
                     }
                   } else if (parsed.debug) {
                     // Capture debug information
@@ -1463,8 +1478,23 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                 {/* Render all previous exchanges from conversation history */}
                 {conversationHistory.map((exchange, index) => (
                   <div key={index} className="space-y-2">
-                    {/* Render the answer */}
-                    {renderMarkdownContent(autoLinkText(simplifyContactAnswer(exchange.answer)))}
+                    {/* Render the answer with special styling for GitHub activity */}
+                    {exchange.intent === 'github_activity' ? (
+                      <div className="relative rounded-lg border border-purple-500/30 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-indigo-500/10 p-4">
+                        {/* GitHub logo badge */}
+                        <div className="absolute -top-3 left-4 flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 px-3 py-1 rounded-full">
+                          <FaGithub className="w-4 h-4 text-white" />
+                          <span className="text-xs font-medium text-white">GitHub Activity</span>
+                        </div>
+                        
+                        {/* Answer content */}
+                        <div className="mt-2">
+                          {renderMarkdownContent(autoLinkText(simplifyContactAnswer(exchange.answer)))}
+                        </div>
+                      </div>
+                    ) : (
+                      renderMarkdownContent(autoLinkText(simplifyContactAnswer(exchange.answer)))
+                    )}
 
                     {/* Render quick actions for this exchange */}
                     {exchange.quickActions.length > 0 && (
@@ -1485,12 +1515,33 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
                 {/* Render current streaming answer (if any) */}
                 {answer ? (
-                  <div className="space-y-2">
-                    {/* Render current streaming answer */}
-                    {renderMarkdownContent(renderedAnswer)}
-                  </div>
+                  debugInfo?.intent === 'github_activity' ? (
+                    // Professional comment: Special styling for GitHub activity responses
+                    // Purple-blue gradient with GitHub logo to distinguish from regular queries
+                    <div className="space-y-2">
+                      <div className="relative rounded-lg border border-purple-500/30 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-indigo-500/10 p-4">
+                        {/* GitHub logo badge */}
+                        <div className="absolute -top-3 left-4 flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 px-3 py-1 rounded-full">
+                          <FaGithub className="w-4 h-4 text-white" />
+                          <span className="text-xs font-medium text-white">GitHub Activity</span>
+                        </div>
+                        
+                        {/* Answer content */}
+                        <div className="mt-2">
+                          {renderMarkdownContent(renderedAnswer)}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {/* Render current streaming answer */}
+                      {renderMarkdownContent(renderedAnswer)}
+                    </div>
+                  )
                 ) : conversationHistory.length === 0 && isProcessingQuery && mainLoadingConfig ? (
-                  /* Show loading state when no answer yet and no history - use random loading messages */
+                  /* Show loading state when no answer yet AND no history - use random loading messages */
+                  /* Professional comment: Only show main loader for first query. Follow-ups use QuickActions loader instead
+                     to avoid duplicate loaders (one from QuickActions, one from main IrisPalette) */
                   (() => {
                     // Use persisted loading config
                     const loadingConfig = mainLoadingConfig;

@@ -7,11 +7,12 @@ import type { ContactReason, ContactOpenBehavior } from '@/lib/types';
  * These are now handled by filter_query with appropriate filters, reducing code complexity
  */
 export type Intent =
-  | 'contact'        // Fast-path for contact information (no LLM needed)
-  | 'filter_query'   // Structured filtering (e.g., "Python projects", "2025 work", "ML classes")
-  | 'specific_item'  // Query about a specific item (e.g., "tell me about HiLiTe")
-  | 'personal'       // Personal/family questions (stories, values, interests, education, bio/headline)
-  | 'general';       // Catch-all semantic search for everything else
+  | 'contact'          // Fast-path for contact information (no LLM needed)
+  | 'filter_query'     // Structured filtering (e.g., "Python projects", "2025 work", "ML classes")
+  | 'specific_item'    // Query about a specific item (e.g., "tell me about HiLiTe")
+  | 'personal'         // Personal/family questions (stories, values, interests, education, bio/headline)
+  | 'github_activity'  // Fetch recent GitHub commits for a repository
+  | 'general';         // Catch-all semantic search for everything else
 
 /**
  * Structured filter for precise KB queries
@@ -25,6 +26,7 @@ export interface QueryFilter {
   year?: number[];            // Filter by year (works across all types)
   tags?: string[];            // General tags
   title_match?: string;       // For specific item queries (e.g., "APCS A", "HiLiTe")
+  repo?: string;              // GitHub repository (user/repo format) for github_activity intent
   // Operations
   operation?: 'contains' | 'exact' | 'any';
   show_all?: boolean;         // Return all matches, not just top 5

@@ -79,6 +79,17 @@ export function deriveFilterDefaults(
   let mutated = false;
   const next: QueryFilter = filters ? { ...filters } : {};
 
+  // Professional comment: If there's a single clear alias match and the query looks like a specific item request,
+  // set title_match to route to specific_item intent. This catches queries like "tell me about iris" or "what is HiLiTe"
+  // that should go directly to a specific item rather than doing a general search.
+  if (aliasMatches.length === 1 && !next.title_match) {
+    const isSpecificQuery = /\b(tell me about|what is|show me|about|explain|describe)\b/.test(normalized);
+    if (isSpecificQuery) {
+      next.title_match = aliasMatches[0].id;
+      mutated = true;
+    }
+  }
+
   // Professional comment: Detect queries that expect comprehensive listings (not just top results).
   // Patterns include explicit list requests ("list", "show", "all") and viewing verbs ("see", "view").
   // For skills/classes/projects queries, users typically want to see the full set, not just top 5-10.

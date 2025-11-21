@@ -7,6 +7,80 @@ import type { KBItem, ProjectT, ExperienceT, ClassT, BlogT, SkillT, InterestT, E
 import type { Rankings } from './rankings';
 
 /**
+ * Get human-readable display name for any KB item
+ * This is the universal solution to prevent raw IDs (like "education_0") from appearing in quick actions
+ * 
+ * Priority order for display names:
+ * 1. title (projects, classes, blogs)
+ * 2. short_name (blogs - concise display)
+ * 3. name (skills, profile)
+ * 4. role + company (experiences)
+ * 5. school (education)
+ * 6. interest (interests)
+ * 7. value (values)
+ * 8. Formatted ID as fallback (for skills only - formats "nlp" -> "NLP")
+ * 
+ * @param item - The KB item to get display name for
+ * @returns Human-readable display name
+ */
+function getDisplayName(item: KBItem): string {
+  // For title-based items (projects, classes, blogs, stories)
+  if ('title' in item && item.title) {
+    // For blogs, prefer short_name over full title for concise display
+    const blog = item as BlogT;
+    if ('short_name' in item && blog.short_name) {
+      return blog.short_name;
+    }
+    return item.title;
+  }
+  
+  // Professional comment: For bio items (profile), use friendly label instead of legal name
+  // "Michael (Mike) Konstantinos Veson" → "Mike's Profile"
+  if (item.kind === 'bio') {
+    return "Mike's Profile";
+  }
+  
+  // For skills with name field
+  if ('name' in item && item.name && item.kind === 'skill') {
+    return item.name;
+  }
+  
+  // For experiences: "Company (Role Type)" with alias support
+  if ('role' in item && item.role) {
+    if ('company' in item && item.company) {
+      const exp = item as ExperienceT;
+      return getShortExperienceLabel(exp.company, exp.role, exp.aliases);
+    }
+    return item.role;
+  }
+  
+  // For education items
+  if ('school' in item && item.school) {
+    const edu = item as EducationT;
+    // Professional comment: For quick action buttons, just use school name (not full degree)
+    // "Rice University" fits better than "Rice University - B.S. Computer Science"
+    return edu.school;
+  }
+  
+  // For interests (not used in individual quick actions - interests are aggregated)
+  if ('interest' in item && item.interest) {
+    return item.interest;
+  }
+  
+  // For values (not used in individual quick actions - values are aggregated)
+  if ('value' in item && item.value) {
+    return item.value;
+  }
+  
+  // Fallback: For skills, format the ID nicely; for others, use raw ID
+  if (item.kind === 'skill') {
+    return formatSkillId(item.id);
+  }
+  
+  return item.id;
+}
+
+/**
  * Format skill ID to readable display name
  * Transforms raw IDs like "nlp" -> "NLP", "machine_learning" -> "Machine Learning"
  * Used ONLY for skills to provide shorter, cleaner labels in quick actions
@@ -109,14 +183,29 @@ function getShortRoleType(role: string): string {
 /**
  * Generate short label for experience: "Company (Role Type)"
  * Example: "Veson Nautical (SWE Intern)" or "Veson (SWE)"
+ * 
+ * Professional comment: Prefers aliases over company name abbreviation for better readability.
+ * For example, "Liu Idea Lab for Innovation..." has alias "Lilie", which is more recognizable
+ * than the abbreviated "Liu".
  */
-function getShortExperienceLabel(company: string, role: string): string {
+function getShortExperienceLabel(company: string, role: string, aliases?: string[]): string {
   const roleType = getShortRoleType(role);
 
-  // If company name is long, use abbreviated version
-  const shortCompany = company.length > 20
-    ? company.split(/[\s\-]/)[0] // Take first word
-    : company;
+  // Professional comment: If there's a short alias (≤15 chars), prefer it over abbreviation
+  // This handles cases like "Lilie" (alias) vs "Liu" (first word of long company name)
+  let shortCompany = company;
+  if (aliases && aliases.length > 0) {
+    const shortAlias = aliases.find(alias => alias.length <= 15 && alias.length > 0);
+    if (shortAlias) {
+      shortCompany = shortAlias;
+    } else if (company.length > 20) {
+      // No short alias found, fall back to abbreviation
+      shortCompany = company.split(/[\s\-]/)[0]; // Take first word
+    }
+  } else if (company.length > 20) {
+    // No aliases at all, use abbreviation for long names
+    shortCompany = company.split(/[\s\-]/)[0]; // Take first word
+  }
 
   return `${shortCompany} (${roleType})`;
 }
@@ -139,7 +228,9 @@ export interface ActionTemplate {
   condition?: (item: KBItem) => boolean;
 
   // Data extraction functions
-  getData?: (item: KBItem, rankings: Rankings) => ActionData;
+  // Professional note: allItems parameter added to enable ID-to-title lookups
+  // This prevents raw IDs like "education_0" from appearing in action labels
+  getData?: (item: KBItem, rankings: Rankings, allItems: KBItem[]) => ActionData;
 }
 
 export interface ActionData {
@@ -204,14 +295,18 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       label: 'Skills',
       priority: 8,
       condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
-      getData: (item, rankings) => {
+      getData: (item, rankings, allItems) => {
         const project = item as ProjectT;
+        // Professional note: Look up skill items to get proper display names
         const skillOptions = project.skills
           .map(skillId => {
+            // Find the actual skill item to get its display name
+            const skillItem = allItems.find(kbItem => kbItem.id === skillId && kbItem.kind === 'skill');
             const ranking = rankings.skills.find(s => s.id === skillId);
             return {
               id: skillId,
-              label: formatSkillId(skillId), // Format skill ID for display
+              // Use getDisplayName if skill item found, otherwise format the ID
+              label: skillItem ? getDisplayName(skillItem) : formatSkillId(skillId),
               importance: ranking?.importance || 50
             };
           })
@@ -273,14 +368,18 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       label: 'Skills',
       priority: 8,
       condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
-      getData: (item, rankings) => {
+      getData: (item, rankings, allItems) => {
         const exp = item as ExperienceT;
+        // Professional note: Look up skill items to get proper display names
         const skillOptions = exp.skills
           .map(skillId => {
+            // Find the actual skill item to get its display name
+            const skillItem = allItems.find(kbItem => kbItem.id === skillId && kbItem.kind === 'skill');
             const ranking = rankings.skills.find(s => s.id === skillId);
             return {
               id: skillId,
-              label: formatSkillId(skillId), // Format skill ID for display
+              // Use getDisplayName if skill item found, otherwise format the ID
+              label: skillItem ? getDisplayName(skillItem) : formatSkillId(skillId),
               importance: ranking?.importance || 50
             };
           })
@@ -337,14 +436,18 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       label: 'Skills',
       priority: 8,
       condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
-      getData: (item, rankings) => {
+      getData: (item, rankings, allItems) => {
         const cls = item as ClassT;
+        // Professional note: Look up skill items to get proper display names
         const skillOptions = cls.skills
           .map(skillId => {
+            // Find the actual skill item to get its display name
+            const skillItem = allItems.find(kbItem => kbItem.id === skillId && kbItem.kind === 'skill');
             const ranking = rankings.skills.find(s => s.id === skillId);
             return {
               id: skillId,
-              label: formatSkillId(skillId), // Format skill ID for display
+              // Use getDisplayName if skill item found, otherwise format the ID
+              label: skillItem ? getDisplayName(skillItem) : formatSkillId(skillId),
               importance: ranking?.importance || 50
             };
           })
@@ -446,16 +549,31 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       label: 'See evidence',
       priority: 9,
       condition: (item) => 'evidence' in item && (item as SkillT).evidence.length > 0,
-      getData: (item, rankings) => {
+      getData: (item, rankings, allItems) => {
         const skill = item as SkillT;
-        const evidenceOptions = skill.evidence.map(e => {
-          const ranking = rankings.all.find(r => r.id === e.id);
-          return {
-            id: e.id,
-            label: `${e.type}: ${e.id}`,
-            importance: ranking?.importance || 50
-          };
-        }).sort((a, b) => b.importance - a.importance);
+        // Professional note: Look up actual KB items by ID to get human-readable names
+        // This prevents raw IDs like "education_0" from appearing in quick actions
+        const evidenceOptions = skill.evidence
+          .map(e => {
+            // Find the actual KB item to get its display name
+            const evidenceItem = allItems.find(kbItem => kbItem.id === e.id);
+            if (!evidenceItem) {
+              console.warn(`[actionConfig] Evidence item not found: ${e.id}`);
+              return null;
+            }
+            
+            // Get human-readable display name for the evidence item
+            const displayName = getDisplayName(evidenceItem);
+            
+            const ranking = rankings.all.find(r => r.id === e.id);
+            return {
+              id: e.id,
+              label: displayName, // Use display name instead of raw ID
+              importance: ranking?.importance || 50
+            };
+          })
+          .filter((opt): opt is NonNullable<typeof opt> => opt !== null) // Remove any null entries
+          .sort((a, b) => b.importance - a.importance);
 
         return {
           options: evidenceOptions
@@ -466,9 +584,14 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       type: 'query',
       label: 'Top skills often used with this',
       priority: 7,
-      getData: () => {
+      getData: (item) => {
+        const skill = item as SkillT;
+        const skillName = getDisplayName(skill);
+        // Professional comment: Make query contextual to the specific skill
+        // This ensures the query meaning matches the action label ("skills often used with THIS")
+        // Example: "What skills does Mike often use with NLP?" instead of generic "what other skills?"
         return {
-          query: `what other skills does Mike use?`,
+          query: `What skills does Mike often use with ${skillName}?`,
           intent: 'filter_query',
           filters: { type: ['skill'] }
         };
@@ -619,7 +742,9 @@ export function getActionsForList(
         label: `See ${displayName}`,
         priority: 10,
         getData: () => ({
-          query: `tell me about ${topProject.id}`,
+          // Professional comment: Use display name in query so Iris understands the reference
+          // Raw IDs like "proj_portfolio" confuse the LLM when context shows "Portfolio & Iris"
+          query: `tell me about ${displayName}`,
           intent: 'specific_item',
           filters: { title_match: topProject.id }
         })
@@ -636,11 +761,11 @@ export function getActionsForList(
       })
     });
 
-    actions.push({
+    actions.push(    {
       type: 'dropdown',
       label: 'Filter by skill',
       priority: 9,
-      getData: (item, rankings) => {
+      getData: (item, rankings, allItems) => {
         // Get all unique skills from projects
         const allSkills = new Set<string>();
         items.forEach(item => {
@@ -649,12 +774,16 @@ export function getActionsForList(
           }
         });
 
+        // Professional note: Look up skill names from allItems for consistent labeling
         const skillOptions = Array.from(allSkills)
           .map(skillId => {
+            // Find the actual skill item to get its display name
+            const skillItem = allItems.find(kbItem => kbItem.id === skillId && kbItem.kind === 'skill');
             const ranking = rankings.skills.find(s => s.id === skillId);
             return {
               id: skillId,
-              label: formatSkillId(skillId), // Format skill ID for display
+              // Use getDisplayName if skill item found, otherwise format the ID
+              label: skillItem ? getDisplayName(skillItem) : formatSkillId(skillId),
               importance: ranking?.importance || 50
             };
           })
@@ -677,8 +806,9 @@ export function getActionsForList(
       const topExp = items[0];
       let displayName = '';
       if ('role' in topExp && topExp.role && 'company' in topExp && topExp.company) {
-        // Use short label for experiences: "Company (Role Type)"
-        displayName = getShortExperienceLabel(topExp.company, topExp.role);
+        // Use short label for experiences: "Company (Role Type)" with alias support
+        const exp = topExp as ExperienceT;
+        displayName = getShortExperienceLabel(exp.company, exp.role, exp.aliases);
       } else if ('role' in topExp && topExp.role) {
         displayName = topExp.role;
       } else {
@@ -690,7 +820,9 @@ export function getActionsForList(
         label: `See ${displayName}`,
         priority: 10,
         getData: () => ({
-          query: `tell me about ${topExp.id}`,
+          // Professional comment: Use display name in query for clarity with Iris
+          // Experience IDs like "exp_veson_2024" aren't meaningful to the LLM
+          query: `tell me about ${displayName}`,
           intent: 'specific_item',
           filters: { title_match: topExp.id }
         })
@@ -716,14 +848,15 @@ export function getActionsForList(
         type: 'dropdown',
         label: 'Skills',
         priority: 9,
-        getData: (item, rankings) => {
+        getData: (item, rankings, allItems) => {
+          // Professional note: Use getDisplayName for consistent skill labeling
           const skillOptions = items
             .filter(i => i.kind === 'skill')
             .map(skill => {
               const ranking = rankings.skills.find(s => s.id === skill.id);
               return {
                 id: skill.id,
-                label: formatSkillId(skill.id), // Format skill ID for display
+                label: getDisplayName(skill), // Use getDisplayName instead of formatSkillId
                 importance: ranking?.importance || 50
               };
             })
@@ -741,12 +874,19 @@ export function getActionsForList(
   if (listType === 'mixed') {
     const actions: ActionTemplate[] = [];
 
-    // Add drill-down actions for top 2 items
-    const topItems = items.slice(0, 2);
+    // Professional comment: Check for aggregatable profile attributes
+    const hasValues = items.some(item => item.kind === 'value');
+    const hasInterests = items.some(item => item.kind === 'interest');
+    
+    // Add drill-down actions for top 2 items, excluding values and interests
+    // Values and interests get aggregated into group actions for cleaner UX
+    const topItems = items.filter(item => 
+      item.kind !== 'value' && item.kind !== 'interest'
+    ).slice(0, 2);
     for (const item of topItems) {
       // Build display name based on type
       // Professional note: We check for type-specific display fields before falling back to ID
-      // This ensures interests, values, and other KB item types show human-readable labels
+      // Values and interests are filtered out above and handled as aggregated actions
       let displayName = '';
       if ('title' in item && item.title) {
         // For blogs, prefer short_name over full title for concise display in quick actions
@@ -756,23 +896,20 @@ export function getActionsForList(
         } else {
           displayName = item.title;
         }
+      } else if (item.kind === 'bio') {
+        // Professional comment: Bio items show full legal name in 'name' field
+        // Use friendly label "Mike's Profile" instead for quick actions
+        displayName = "Mike's Profile";
       } else if ('name' in item && item.name) {
         displayName = item.name;
       } else if ('role' in item && item.role) {
-        // For experiences, use short label: "Company (Role Type)"
+        // For experiences, use short label: "Company (Role Type)" with alias support
         if ('company' in item && item.company) {
-          displayName = getShortExperienceLabel(item.company, item.role);
+          const exp = item as ExperienceT;
+          displayName = getShortExperienceLabel(exp.company, exp.role, exp.aliases);
         } else {
           displayName = item.role;
         }
-      } else if ('interest' in item && item.interest) {
-        // For interests (e.g., "Software Development", "Creative Writing")
-        // Use the interest field directly for clean display
-        displayName = item.interest;
-      } else if ('value' in item && item.value) {
-        // For values (e.g., "Integrity", "Ambition")
-        // Use the value field directly for clean display
-        displayName = item.value;
       } else {
         // Fallback to ID if no display field is available
         displayName = item.id;
@@ -783,9 +920,38 @@ export function getActionsForList(
         label: `See ${displayName}`,
         priority: 9,
         getData: () => ({
-          query: `tell me about ${item.id}`,
+          // Professional comment: Use display name in query to match what Iris sees in context
+          // This prevents confusion when query says "proj_portfolio" but context shows "Portfolio & Iris"
+          query: `tell me about ${displayName}`,
           intent: 'specific_item',
           filters: { title_match: item.id }
+        })
+      });
+    }
+
+    // Add aggregated actions for profile attributes
+    if (hasValues) {
+      actions.push({
+        type: 'query',
+        label: "See Mike's values",
+        priority: 8,
+        getData: () => ({
+          query: "what are Mike's core values?",
+          intent: 'filter_query',
+          filters: { type: ['value'], show_all: true }
+        })
+      });
+    }
+
+    if (hasInterests) {
+      actions.push({
+        type: 'query',
+        label: "See Mike's interests",
+        priority: 8,
+        getData: () => ({
+          query: "what are Mike's interests?",
+          intent: 'filter_query',
+          filters: { type: ['interest'], show_all: true }
         })
       });
     }

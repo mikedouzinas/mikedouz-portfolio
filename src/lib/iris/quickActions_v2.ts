@@ -162,10 +162,11 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
     const templates = getActionsForItem(mainItem);
 
     // Generate actions from templates
+    // Professional note: Pass allItems to enable ID-to-title lookups in action labels
     for (const template of templates) {
       if (!template.getData) continue;
 
-      const data = template.getData(mainItem, rankings);
+      const data = template.getData(mainItem, rankings, context.allItems);
       const action = templateToAction(template, data);
 
       if (action) {
@@ -195,7 +196,8 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
     for (const template of templates) {
       if (!template.getData) continue;
 
-      const data = template.getData(items[0], rankings);
+      // Professional note: Pass allItems to enable ID-to-title lookups in action labels
+      const data = template.getData(items[0], rankings, context.allItems);
       const action = templateToAction(template, data);
 
       console.log('[QuickActions v2] Generated list action:', {

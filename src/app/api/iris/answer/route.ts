@@ -93,11 +93,12 @@ function logRetrievalResults(
  * Determines which fields to retrieve from the knowledge base
  */
 const FIELD_MAP: Record<Intent, string[]> = {
-  contact: [],         // Fast-path, handled separately
-  filter_query: [],    // All fields - determined by the specific filter
-  specific_item: [],   // All fields - complete info for specific items
-  personal: [],        // All fields from profile (stories, values, interests)
-  general: []          // All fields - let semantic search find what's relevant
+  contact: [],          // Fast-path, handled separately
+  filter_query: [],     // All fields - determined by the specific filter
+  specific_item: [],    // All fields - complete info for specific items
+  personal: [],         // All fields from profile (stories, values, interests)
+  github_activity: [],  // Fast-path, handled separately with GitHub API
+  general: []           // All fields - let semantic search find what's relevant
 };
 
 /**
@@ -109,6 +110,7 @@ const TYPE_FILTERS: Record<Intent, Array<'project' | 'experience' | 'class' | 'b
   filter_query: null,                                        // Types determined by filters
   specific_item: null,                                       // Search all types for specific items
   personal: ['story', 'value', 'interest', 'education', 'bio'],  // Personal/family info including education and bio
+  github_activity: null,                                     // Fast-path, no retrieval needed (uses GitHub API)
   general: null                                              // Search all types - let semantic search decide
 };
 
@@ -269,6 +271,14 @@ export async function POST(req: NextRequest) {
     
     // Debug: Log filters after derivation
     console.log('[Intent Detection] Filters after derivation:', JSON.stringify(filters, null, 2));
+
+    // Professional comment: If deriveFilterDefaults added a title_match from alias matching,
+    // override intent to specific_item. This ensures queries like "tell me about iris" go
+    // directly to the specific item rather than doing a general search.
+    if (filters?.title_match && intent !== 'specific_item') {
+      console.log('[Intent Detection] Overriding intent to specific_item due to title_match from alias');
+      intent = 'specific_item';
+    }
 
     const profileFilters = detectProfileFilter(query);
     if (profileFilters) {
@@ -643,7 +653,8 @@ export async function POST(req: NextRequest) {
 
     // Handle GitHub activity intent - fetch recent commits for a specific repository
     if (intent === 'github_activity' && filters && filters.repo && typeof filters.repo === 'string') {
-      const startTime = Date.now();
+      // Professional comment: Reuse outer startTime variable instead of shadowing it
+      // This ensures analytics logging uses the correct request start time
       const repo = filters.repo as string;
 
       console.log(`[GitHub Activity] Fetching commits for ${repo}...`);
@@ -713,7 +724,8 @@ Your job is to:
 Keep your response to 2-3 short paragraphs max.`;
 
         // Stream LLM response with GitHub context
-        const openai = getClient();
+        // Professional comment: Use the already-initialized openai client from line 194
+        // No need to call getClient() which doesn't exist - openai is in scope
         const stream = await openai.chat.completions.create({
           model: config.models.chat,
           stream: true,
@@ -765,7 +777,8 @@ Keep your response to 2-3 short paragraphs max.`;
                 intent: 'github_activity',
                 filters: { repo },
                 results_count: 1,
-                context_items: ['github_commits'],
+                // Professional comment: Format context_items as objects with type/title for analytics
+                context_items: [{ type: 'github', title: 'Recent Commits' }],
                 answer_length: fullAnswer.length,
                 latency_ms: latencyMs,
                 cached: false,
@@ -796,6 +809,7 @@ Keep your response to 2-3 short paragraphs max.`;
         // Return error message
         const errorMessage = `I encountered an error trying to fetch recent commits for ${repo}. This might be a temporary GitHub issue. Would you like me to tell you about the project from my knowledge base instead?`;
 
+        // Professional comment: Use outer startTime from line 120 for consistent analytics
         const latencyMs = Date.now() - startTime;
 
         const encoder = new TextEncoder();
