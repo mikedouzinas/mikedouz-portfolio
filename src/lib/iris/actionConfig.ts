@@ -462,60 +462,107 @@ export function getActionsForList(
 ): ActionTemplate[] {
   // For list views, we want different actions
   if (listType === 'project') {
-    return [
-      {
-        type: 'link',
-        label: 'GitHub Profile',
-        priority: 8,
+    const actions: ActionTemplate[] = [];
+
+    // Add drill-down for top project
+    if (items.length > 0) {
+      const topProject = items[0];
+      const displayName = ('title' in topProject && topProject.title) ? topProject.title : topProject.id;
+
+      actions.push({
+        type: 'query',
+        label: `Learn more about ${displayName}`,
+        priority: 10,
         getData: () => ({
-          link: 'https://github.com/mikedouzinas',
-          linkType: 'github'
+          query: `tell me about ${topProject.id}`,
+          intent: 'specific_item',
+          filters: { title_match: topProject.id }
         })
-      },
-      {
-        type: 'dropdown',
-        label: 'Filter by skill',
-        priority: 9,
-        getData: (item, rankings) => {
-          // Get all unique skills from projects
-          const allSkills = new Set<string>();
-          items.forEach(item => {
-            if ('skills' in item) {
-              (item.skills as string[]).forEach(s => allSkills.add(s));
-            }
-          });
+      });
+    }
 
-          const skillOptions = Array.from(allSkills)
-            .map(skillId => {
-              const ranking = rankings.skills.find(s => s.id === skillId);
-              return {
-                id: skillId,
-                label: skillId,
-                importance: ranking?.importance || 50
-              };
-            })
-            .sort((a, b) => b.importance - a.importance);
+    actions.push({
+      type: 'link',
+      label: 'GitHub Profile',
+      priority: 8,
+      getData: () => ({
+        link: 'https://github.com/mikedouzinas',
+        linkType: 'github'
+      })
+    });
 
-          return {
-            options: skillOptions
-          };
-        }
+    actions.push({
+      type: 'dropdown',
+      label: 'Filter by skill',
+      priority: 9,
+      getData: (item, rankings) => {
+        // Get all unique skills from projects
+        const allSkills = new Set<string>();
+        items.forEach(item => {
+          if ('skills' in item) {
+            (item.skills as string[]).forEach(s => allSkills.add(s));
+          }
+        });
+
+        const skillOptions = Array.from(allSkills)
+          .map(skillId => {
+            const ranking = rankings.skills.find(s => s.id === skillId);
+            return {
+              id: skillId,
+              label: skillId,
+              importance: ranking?.importance || 50
+            };
+          })
+          .sort((a, b) => b.importance - a.importance);
+
+        return {
+          options: skillOptions
+        };
       }
-    ];
+    });
+
+    return actions;
   }
 
   if (listType === 'experience') {
-    return [
-      {
-        type: 'link',
-        label: 'LinkedIn',
-        priority: 8,
-        getData: () => ({
-          link: 'https://linkedin.com/in/mikedouzinas',
-          linkType: 'linkedin'
-        })
+    const actions: ActionTemplate[] = [];
+
+    // Add drill-down for top experience
+    if (items.length > 0) {
+      const topExp = items[0];
+      let displayName = '';
+      if ('role' in topExp && topExp.role) {
+        displayName = topExp.role;
+        if ('company' in topExp && topExp.company) {
+          displayName += ` at ${topExp.company}`;
+        }
+      } else {
+        displayName = topExp.id;
       }
-    ];
+
+      actions.push({
+        type: 'query',
+        label: `Learn more about ${displayName}`,
+        priority: 10,
+        getData: () => ({
+          query: `tell me about ${topExp.id}`,
+          intent: 'specific_item',
+          filters: { title_match: topExp.id }
+        })
+      });
+    }
+
+    actions.push({
+      type: 'link',
+      label: 'LinkedIn',
+      priority: 8,
+      getData: () => ({
+        link: 'https://linkedin.com/in/mikedouzinas',
+        linkType: 'linkedin'
+      })
+    });
+
+    return actions;
   }
 
   if (listType === 'skill') {
@@ -545,28 +592,61 @@ export function getActionsForList(
     ];
   }
 
-  // Mixed results - show both GitHub and LinkedIn
+  // Mixed results - show drill-down actions for top items + social links
   if (listType === 'mixed') {
-    return [
-      {
-        type: 'link',
-        label: 'GitHub',
-        priority: 7,
-        getData: () => ({
-          link: 'https://github.com/mikedouzinas',
-          linkType: 'github'
-        })
-      },
-      {
-        type: 'link',
-        label: 'LinkedIn',
-        priority: 7,
-        getData: () => ({
-          link: 'https://linkedin.com/in/mikedouzinas',
-          linkType: 'linkedin'
-        })
+    const actions: ActionTemplate[] = [];
+
+    // Add drill-down actions for top 2 items
+    const topItems = items.slice(0, 2);
+    for (const item of topItems) {
+      // Build display name based on type
+      let displayName = '';
+      if ('title' in item && item.title) {
+        displayName = item.title;
+      } else if ('name' in item && item.name) {
+        displayName = item.name;
+      } else if ('role' in item && item.role) {
+        displayName = item.role;
+        if ('company' in item && item.company) {
+          displayName += ` at ${item.company}`;
+        }
+      } else {
+        displayName = item.id;
       }
-    ];
+
+      actions.push({
+        type: 'query',
+        label: `Learn more about ${displayName}`,
+        priority: 9,
+        getData: () => ({
+          query: `tell me about ${item.id}`,
+          intent: 'specific_item',
+          filters: { title_match: item.id }
+        })
+      });
+    }
+
+    // Add social links
+    actions.push({
+      type: 'link',
+      label: 'GitHub',
+      priority: 7,
+      getData: () => ({
+        link: 'https://github.com/mikedouzinas',
+        linkType: 'github'
+      })
+    });
+    actions.push({
+      type: 'link',
+      label: 'LinkedIn',
+      priority: 7,
+      getData: () => ({
+        link: 'https://linkedin.com/in/mikedouzinas',
+        linkType: 'linkedin'
+      })
+    });
+
+    return actions;
   }
 
   return [];

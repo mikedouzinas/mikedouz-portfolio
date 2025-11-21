@@ -233,11 +233,31 @@ export function buildContextIndex(results: Array<{ score: number; doc: Partial<K
 
   const lines = results.map((result, idx) => {
     const doc = result.doc;
-    const label = ('title' in doc && doc.title)
-      ? doc.title
-      : ('role' in doc && doc.role)
-        ? doc.role
-        : doc.id || `Item ${idx + 1}`;
+
+    // Build human-readable label based on type
+    let label = '';
+    if ('title' in doc && doc.title) {
+      label = doc.title;
+    } else if ('name' in doc && doc.name) {
+      label = doc.name;
+    } else if ('role' in doc && doc.role) {
+      // For experiences: show "role at company"
+      label = doc.role;
+      if ('company' in doc && doc.company) {
+        label += ` at ${doc.company}`;
+      }
+    } else if ('value' in doc && doc.value) {
+      label = `Value: ${doc.value}`;
+    } else if ('interest' in doc && doc.interest) {
+      label = `Interest: ${doc.interest}`;
+    } else if ('school' in doc && doc.school) {
+      label = doc.school;
+      if ('degree' in doc && doc.degree) {
+        label += ` - ${doc.degree}`;
+      }
+    } else {
+      label = doc.id || `Item ${idx + 1}`;
+    }
 
     const kind = 'kind' in doc && doc.kind ? doc.kind : 'item';
     const year = extractPrimaryYear(doc);
