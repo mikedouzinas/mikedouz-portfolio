@@ -848,7 +848,7 @@ export function getActionsForList(
         type: 'dropdown',
         label: 'Skills',
         priority: 9,
-        getData: (item, rankings, allItems) => {
+        getData: (item, rankings) => {
           // Professional note: Use getDisplayName for consistent skill labeling
           const skillOptions = items
             .filter(i => i.kind === 'skill')

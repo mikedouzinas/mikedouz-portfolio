@@ -809,9 +809,6 @@ Keep your response to 2-3 short paragraphs max.`;
         // Return error message
         const errorMessage = `I encountered an error trying to fetch recent commits for ${repo}. This might be a temporary GitHub issue. Would you like me to tell you about the project from my knowledge base instead?`;
 
-        // Professional comment: Use outer startTime from line 120 for consistent analytics
-        const latencyMs = Date.now() - startTime;
-
         const encoder = new TextEncoder();
         const readable = new ReadableStream({
           start(controller) {
