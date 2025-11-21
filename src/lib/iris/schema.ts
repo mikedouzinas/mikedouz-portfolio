@@ -145,6 +145,7 @@ const ClassBase = BaseContent.extend({
 const BlogBase = z.object({
   id: Id.optional(),
   title: z.string(),
+  short_name: z.string().optional(),         // Optional short name for concise display in quick actions
   url: z.string(),
   published_date: z.string(),
   context: z.string().optional(),

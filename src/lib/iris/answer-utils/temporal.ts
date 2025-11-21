@@ -4,6 +4,7 @@
 
 import { type KBItem } from '@/lib/iris/schema';
 import { type TemporalHints } from './types';
+import { loadRankings } from '@/lib/iris/loadRankings';
 
 /**
  * Shared helper to extract the most relevant year from a document.
@@ -122,30 +123,63 @@ export function applyTemporalBoost(
  * Reorders filtered items so that the latest work shows up first and
  * ambiguous "list" responses feel intentional.
  *
+ * Professional comment: For items with dates (projects, experiences, classes), sort by recency.
+ * For items without dates (skills, values, interests), sort by importance ranking instead of alphabetically.
+ * This ensures "see Mike's skills" shows top skills first, not alphabetically random ones.
+ *
  * @param items - The items to sort
  * @param hints - Temporal hints from the query
  * @returns Sorted items
  */
 export function sortItemsForFilter(items: KBItem[], hints: TemporalHints): KBItem[] {
+  // Load importance rankings for non-temporal sorting (cached, so fast)
+  const rankings = loadRankings();
+  const rankingMap = new Map(rankings.all.map(r => [r.id, r.importance]));
+  
   return [...items].sort((a, b) => {
-    const yearDiff = (extractPrimaryYear(b) ?? 0) - (extractPrimaryYear(a) ?? 0);
-    if (yearDiff !== 0) {
-      return yearDiff;
-    }
-
-    if (hints.years.length) {
-      const distance = (doc: KBItem) => {
-        const year = extractPrimaryYear(doc) ?? 0;
-        return hints.years.reduce((min, target) => Math.min(min, Math.abs(target - year)), Infinity);
-      };
-      const diff = distance(a) - distance(b);
-      if (diff !== 0 && Number.isFinite(diff)) {
-        return diff;
+    // For items with dates (projects, experiences, classes): sort by recency
+    const yearA = extractPrimaryYear(a);
+    const yearB = extractPrimaryYear(b);
+    
+    if (yearA !== null && yearB !== null) {
+      // Both have dates - sort by recency
+      const yearDiff = yearB - yearA;
+      if (yearDiff !== 0) {
+        return yearDiff;
       }
+
+      // If same year and temporal hints provided, sort by distance to hint
+      if (hints.years.length) {
+        const distance = (doc: KBItem) => {
+          const year = extractPrimaryYear(doc) ?? 0;
+          return hints.years.reduce((min, target) => Math.min(min, Math.abs(target - year)), Infinity);
+        };
+        const diff = distance(a) - distance(b);
+        if (diff !== 0 && Number.isFinite(diff)) {
+          return diff;
+        }
+      }
+    } else if (yearA !== null) {
+      // Only A has date - prefer A (dated items first)
+      return -1;
+    } else if (yearB !== null) {
+      // Only B has date - prefer B (dated items first)
+      return 1;
+    }
+    
+    // For items without dates (skills, values, interests): sort by importance ranking
+    const importanceA = rankingMap.get(a.id) ?? 0;
+    const importanceB = rankingMap.get(b.id) ?? 0;
+    
+    if (importanceA !== importanceB) {
+      // Higher importance first
+      return importanceB - importanceA;
     }
 
+    // Fallback: alphabetical by label
     const label = (doc: KBItem) => {
       if ('title' in doc && doc.title) return doc.title;
+      if ('name' in doc && doc.name) return doc.name;
       if ('role' in doc && doc.role) return doc.role;
       return doc.id;
     };

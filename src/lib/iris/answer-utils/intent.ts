@@ -83,7 +83,7 @@ ALWAYS include title_match filter with the item name/title extracted from the qu
 
 ## 3. FILTER_QUERY Intent
 Use when query asks for MULTIPLE items or a LIST of items matching certain criteria.
-Key indicators: "list", "show me", "what [items]", "all [items]", "find", "search for", "discover"
+Key indicators: "list", "show me", "see", "view", "what [items]", "all [items]", "find", "search for", "discover", "tell me about [items]" (plural)
 
 **Type Filter Rules (Multiple types can be combined with OR logic):**
 - If query explicitly mentions "projects" → type: ["project"]
@@ -124,9 +124,10 @@ When query uses action words or asks broadly about work, consider multiple types
 - Only applies to experience items (but don't limit type filter if company is mentioned)
 
 **Show All Rules:**
-- If query asks for "all", "every", "list", "show me" → show_all: true
+- If query asks for "all", "every", "list", "show me", "see", "view" → show_all: true
 - If query asks "what" or "which" (multiple items expected) → show_all: true
 - If query asks "has [Mike] done X" or "used X" → show_all: true
+- For queries about skills/classes/projects that expect comprehensive lists (e.g., "see Mike's skills") → show_all: true
 - Single specific question → show_all: false (limit to top results)
 
 **Operation Rules:**
@@ -188,7 +189,15 @@ These examples demonstrate when and how to use multiple types:
 
 **Example 6: Broad work discovery**
 - Query: "discover what Mike's built" → filter_query with type: ["project", "experience"], show_all: true
-  Reason: "Built" without explicit type should include both categories`
+  Reason: "Built" without explicit type should include both categories
+
+**Example 7: Skills/Technologies overview**
+- Query: "see Mike's skills" or "view Mike's technologies" → filter_query with type: ["skill"], show_all: true
+  Reason: Skills queries typically expect comprehensive listings, not just top 5 results
+  
+**Example 8: Classes overview**
+- Query: "what classes has Mike taken?" → filter_query with type: ["class"], show_all: true
+  Reason: Academic history queries expect full course list`
           },
           {
             role: 'user',

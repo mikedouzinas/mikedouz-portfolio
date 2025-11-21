@@ -877,7 +877,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     }
 
     // Calculate current depth from conversation history
-    const currentDepth = conversationHistory.length > 0
+    // CRITICAL: If this is a fresh query (not continuing conversation), depth must be 0
+    // We can't rely on reading conversationHistory state after setConversationHistory([])
+    // because state updates are asynchronous - we'd read the OLD value before it clears
+    const currentDepth = continueConversation && conversationHistory.length > 0
       ? conversationHistory[conversationHistory.length - 1].depth + 1
       : 0;
 

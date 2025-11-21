@@ -7,6 +7,79 @@ import type { KBItem, ProjectT, ExperienceT, ClassT, BlogT, SkillT, InterestT, E
 import type { Rankings } from './rankings';
 
 /**
+ * Format skill ID to readable display name
+ * Transforms raw IDs like "nlp" -> "NLP", "machine_learning" -> "Machine Learning"
+ * Used ONLY for skills to provide shorter, cleaner labels in quick actions
+ * 
+ * Rules:
+ * - Known acronyms: uppercase all letters (nlp -> NLP, aws -> AWS)
+ * - Special cases: use custom mappings (csharp -> C#, dotnet -> .NET)
+ * - Underscore-separated: title case each word (machine_learning -> Machine Learning)
+ * - Simple words: capitalize first letter (python -> Python)
+ * 
+ * @param skillId - The skill ID to format
+ * @returns Formatted display name
+ */
+function formatSkillId(skillId: string): string {
+  // Known acronyms - uppercase all letters
+  const acronyms = new Set([
+    'nlp', 'rag', 'aws', 'api', 'ci_cd', 'ai', 'ml', 'cv', 'ui', 'ux',
+    'html', 'css', 'sql', 'nosql', 'rest', 'grpc', 'json', 'xml', 'http',
+    'tcp', 'udp', 'ssh', 'tls', 'ssl', 'gpu', 'cpu'
+  ]);
+  
+  // Special cases - custom formatting
+  const specialCases: Record<string, string> = {
+    'csharp': 'C#',
+    'c_lang': 'C',
+    'r_lang': 'R',
+    'dotnet': '.NET',
+    'nextjs': 'Next.js',
+    'opencv': 'OpenCV',
+    'pytorch': 'PyTorch',
+    'scikit_learn': 'Scikit-Learn',
+    'openai_api': 'OpenAI API',
+    'google_document_ai': 'Google Document AI',
+    'tailwind_css': 'Tailwind CSS',
+    'framer_motion': 'Framer Motion',
+    'power_bi': 'Power BI',
+    'sentence_transformers': 'Sentence Transformers',
+    'ai_ethics_policy': 'AI Ethics & Policy'
+  };
+  
+  // Check special cases first
+  if (specialCases[skillId]) {
+    return specialCases[skillId];
+  }
+  
+  // Check if it's a known acronym
+  if (acronyms.has(skillId)) {
+    return skillId.toUpperCase();
+  }
+  
+  // Check if it ends with _api, _integration, etc.
+  if (skillId.includes('_')) {
+    const parts = skillId.split('_');
+    
+    // Check if last part is an acronym (e.g., "openai_api")
+    if (acronyms.has(parts[parts.length - 1])) {
+      return parts.map((part, idx) => {
+        if (idx === parts.length - 1 && acronyms.has(part)) {
+          return part.toUpperCase();
+        }
+        return part.charAt(0).toUpperCase() + part.slice(1);
+      }).join(' ');
+    }
+    
+    // Otherwise, title case each word
+    return parts.map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+  }
+  
+  // Simple word - capitalize first letter
+  return skillId.charAt(0).toUpperCase() + skillId.slice(1);
+}
+
+/**
  * Generate short display label for experiences
  * Converts "Software Engineering Intern (IMOS – Laytime Automation)" to role type abbreviation
  * Used in quick action labels to keep them concise
@@ -128,7 +201,7 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
     },
     {
       type: 'dropdown',
-      label: 'Learn about skill',
+      label: 'Skills',
       priority: 8,
       condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
       getData: (item, rankings) => {
@@ -138,7 +211,7 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
             const ranking = rankings.skills.find(s => s.id === skillId);
             return {
               id: skillId,
-              label: skillId,  // Will be resolved to display name in UI
+              label: formatSkillId(skillId), // Format skill ID for display
               importance: ranking?.importance || 50
             };
           })
@@ -197,7 +270,7 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
     },
     {
       type: 'dropdown',
-      label: 'Learn about skill',
+      label: 'Skills',
       priority: 8,
       condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
       getData: (item, rankings) => {
@@ -207,7 +280,7 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
             const ranking = rankings.skills.find(s => s.id === skillId);
             return {
               id: skillId,
-              label: skillId,
+              label: formatSkillId(skillId), // Format skill ID for display
               importance: ranking?.importance || 50
             };
           })
@@ -261,7 +334,7 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
   class: [
     {
       type: 'dropdown',
-      label: 'Learn about skill',
+      label: 'Skills',
       priority: 8,
       condition: (item) => 'skills' in item && (item.skills as string[]).length > 0,
       getData: (item, rankings) => {
@@ -271,7 +344,7 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
             const ranking = rankings.skills.find(s => s.id === skillId);
             return {
               id: skillId,
-              label: skillId,
+              label: formatSkillId(skillId), // Format skill ID for display
               importance: ranking?.importance || 50
             };
           })
@@ -543,7 +616,7 @@ export function getActionsForList(
 
       actions.push({
         type: 'query',
-        label: `Learn more about ${displayName}`,
+        label: `See ${displayName}`,
         priority: 10,
         getData: () => ({
           query: `tell me about ${topProject.id}`,
@@ -581,7 +654,7 @@ export function getActionsForList(
             const ranking = rankings.skills.find(s => s.id === skillId);
             return {
               id: skillId,
-              label: skillId,
+              label: formatSkillId(skillId), // Format skill ID for display
               importance: ranking?.importance || 50
             };
           })
@@ -614,7 +687,7 @@ export function getActionsForList(
 
       actions.push({
         type: 'query',
-        label: `Learn more about ${displayName}`,
+        label: `See ${displayName}`,
         priority: 10,
         getData: () => ({
           query: `tell me about ${topExp.id}`,
@@ -641,7 +714,7 @@ export function getActionsForList(
     return [
       {
         type: 'dropdown',
-        label: 'Learn about skill',
+        label: 'Skills',
         priority: 9,
         getData: (item, rankings) => {
           const skillOptions = items
@@ -650,7 +723,7 @@ export function getActionsForList(
               const ranking = rankings.skills.find(s => s.id === skill.id);
               return {
                 id: skill.id,
-                label: skill.id,
+                label: formatSkillId(skill.id), // Format skill ID for display
                 importance: ranking?.importance || 50
               };
             })
@@ -674,7 +747,13 @@ export function getActionsForList(
       // Build display name based on type
       let displayName = '';
       if ('title' in item && item.title) {
-        displayName = item.title;
+        // For blogs, prefer short_name over full title for concise display in quick actions
+        const blog = item as BlogT;
+        if ('short_name' in item && blog.short_name) {
+          displayName = blog.short_name;
+        } else {
+          displayName = item.title;
+        }
       } else if ('name' in item && item.name) {
         displayName = item.name;
       } else if ('role' in item && item.role) {
@@ -690,7 +769,7 @@ export function getActionsForList(
 
       actions.push({
         type: 'query',
-        label: `Learn more about ${displayName}`,
+        label: `See ${displayName}`,
         priority: 9,
         getData: () => ({
           query: `tell me about ${item.id}`,

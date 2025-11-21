@@ -79,7 +79,10 @@ export function deriveFilterDefaults(
   let mutated = false;
   const next: QueryFilter = filters ? { ...filters } : {};
 
-  if (/\b(list|show|give me|display|enumerate|all|every|everything)\b/.test(normalized)) {
+  // Professional comment: Detect queries that expect comprehensive listings (not just top results).
+  // Patterns include explicit list requests ("list", "show", "all") and viewing verbs ("see", "view").
+  // For skills/classes/projects queries, users typically want to see the full set, not just top 5-10.
+  if (/\b(list|show|see|view|give me|display|enumerate|all|every|everything)\b/.test(normalized)) {
     if (!next.show_all) {
       next.show_all = true;
       mutated = true;

@@ -261,13 +261,24 @@ export async function POST(req: NextRequest) {
     // Heuristic filter derivation (type, show_all, companies) in case LLM classification missed details.
     aliasIndex = aliasIndex.length > 0 ? aliasIndex : await getAliasIndexLazy();
     const aliasMatches = collectAliasMatches(query, aliasIndex);
+    
+    // Debug: Log filters before derivation
+    console.log('[Intent Detection] Filters from LLM:', JSON.stringify(filters, null, 2));
+    
     filters = deriveFilterDefaults(query, filters, aliasMatches);
+    
+    // Debug: Log filters after derivation
+    console.log('[Intent Detection] Filters after derivation:', JSON.stringify(filters, null, 2));
 
     const profileFilters = detectProfileFilter(query);
     if (profileFilters) {
       intent = 'filter_query';
       filters = mergeFilters(filters, profileFilters);
     }
+    
+    // Debug: Log final filters and intent before retrieval
+    console.log('[Intent Detection] Final intent:', intent);
+    console.log('[Intent Detection] Final filters:', JSON.stringify(filters, null, 2));
 
     // Override intent if pre-routing found a match (unless contact explicit)
     if (preRouted && intent !== 'contact') {
@@ -657,7 +668,16 @@ export async function POST(req: NextRequest) {
       }));
 
       // Determine if we should show all results or limit
-      const limit = filters.show_all ? results.length : 10; // Show more for filter queries
+      // Professional comment: For skills queries, cap at 20-30 top skills even with show_all to avoid overwhelming output.
+      // Users expect comprehensive but curated lists (top skills), not exhaustive inventories (100+ skills).
+      // For other types (projects, experiences, classes), show all matching items.
+      let limit = filters.show_all ? results.length : 10;
+      
+      if (filters.show_all && filters.type && filters.type.includes('skill') && !filters.skills) {
+        // Skills overview query without specific skill filters - show top 25 skills by importance
+        limit = Math.min(results.length, 25);
+      }
+      
       results = results.slice(0, limit);
 
       // Debug: Log RAG response (filtered results) to terminal
@@ -1009,8 +1029,10 @@ export async function POST(req: NextRequest) {
 - Prefer concrete outcomes, metrics, technologies, and Mike's role when present.
 - When dates exist, state them; otherwise avoid implying timeframes.
 - If user asks for comparisons or summaries, give a tight, structured overview first, then a short suggestion for where to dig deeper.
-- When you answer list/filter queries, synthesize and format the list clearly so users don't need to read raw data.
-- **IMPORTANT: Category Merging** - If there are more than 6 individual items in a response, merge related categories together. For example, instead of listing 10 individual skills separately, group them by theme or by technology stack. This makes the response more digestible and prevents overwhelming the user with too many individual items.
+- **CRITICAL: Listing vs. Merging** - When answering list/filter queries:
+  - **6 or fewer items:** List ALL items comprehensively. Don't skip any—users expect to see everything that matches.
+  - **More than 6 items:** Merge related categories together for digestibility (e.g., group 10 skills by theme or tech stack, but still show them all).
+  - Format clearly and include key details (dates, companies, metrics) so users don't need to read raw data.
 
 # Capabilities & Next Steps
 - You know which filters were applied (e.g., type, skills, years). Use that to explain why results are focused ("Here's his 2024 experience…").
