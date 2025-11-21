@@ -166,6 +166,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   }>>([]);
   const [currentQueryId, setCurrentQueryId] = useState<string | null>(null);
 
+  // Track parent query ID for conversation threading
+  const parentQueryIdRef = useRef<string | null>(null);
+
   // Track UI directives from streaming
   const uiDirective = useUiDirectives(answer || '');
   const [persistedDirective, setPersistedDirective] = useState<typeof uiDirective>(null);
@@ -874,6 +877,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       setShowComposer(false); // Close composer for fresh queries
       setPersistedDirective(null); // Clear persisted directive
       lastDirectiveRef.current = null; // Reset directive tracking
+      parentQueryIdRef.current = null; // Reset parent query ID for new conversation
     }
 
     // Calculate current depth from conversation history
@@ -930,9 +934,20 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         params.set('filters', JSON.stringify(preFilters));
       }
 
+      // Pass parent query ID for threading if this is a follow-up
+      if (parentQueryIdRef.current) {
+        params.set('parentQueryId', parentQueryIdRef.current);
+      }
+
       const response = await fetch(
         `/api/iris/answer?${params.toString()}`,
-        { signal: controller.signal }
+        {
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+            'x-screen-size': `${window.innerWidth}x${window.innerHeight}`,
+          }
+        }
       );
 
       clearTimeout(timeoutId);
@@ -1004,6 +1019,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   } else if (parsed.queryId) {
                     // Capture query ID for analytics tracking
                     setCurrentQueryId(parsed.queryId);
+                    // Set as parent for next query in conversation
+                    parentQueryIdRef.current = parsed.queryId;
                   }
                 } catch {
                   // Skip invalid JSON - silently ignore parse errors

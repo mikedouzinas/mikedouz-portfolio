@@ -10,6 +10,8 @@ import { getRecentActivityContext } from '@/lib/iris/github';
 import { logQuery, logQuickAction } from '@/lib/iris/analytics';
 import { generateQuickActions } from '@/lib/iris/quickActions';
 import type { QuickAction } from '@/components/iris/QuickActions';
+import { extractRequestMetadata } from '@/lib/iris/metadata';
+import { track } from '@vercel/analytics/server';
 
 // Import types from answer-utils modules
 import type { Intent, QueryFilter, IntentResult } from '@/lib/iris/answer-utils/types';
@@ -92,11 +94,15 @@ export async function POST(req: NextRequest) {
     const previousAnswer = body.previousAnswer;
     const inConversation = !!previousQuery; // In conversation if there's previous context
     const depth = typeof body.depth === 'number' ? body.depth : 0;
+    const parentQueryId = body.parentQueryId; // For threading
 
     // Extract skip classification flag and pre-set values
     const skipClassification = body.skipClassification === true;
     const presetIntent = body.intent;
     const presetFilters = body.filters;
+
+    // Extract enhanced metadata for analytics
+    const metadata = extractRequestMetadata(req);
 
     // Validate query parameter
     if (!rawQuery || typeof rawQuery !== 'string' || !rawQuery.trim()) {
@@ -332,9 +338,23 @@ export async function POST(req: NextRequest) {
             latency_ms: latencyMs,
             cached: true,
             session_id: req.headers.get('x-session-id') || undefined,
-            user_agent: req.headers.get('user-agent') || undefined
+            user_agent: req.headers.get('user-agent') || undefined,
+            ...metadata,
+            parent_query_id: parentQueryId,
+            conversation_depth: depth
           }).catch(error => {
             console.warn('[Analytics] Failed to log cached query:', error);
+          });
+
+          // Track in Vercel Analytics (non-blocking)
+          track('iris_query', {
+            intent,
+            cached: true,
+            latency_ms: latencyMs,
+            country: metadata.country || 'unknown',
+            device: metadata.device_type || 'unknown'
+          }).catch(() => {
+            // Silently fail - don't break user experience
           });
 
           // Generate quick actions for cached answers (same as non-cached)
@@ -535,9 +555,23 @@ export async function POST(req: NextRequest) {
         latency_ms: latencyMs,
         cached: false,
         session_id: req.headers.get('x-session-id') || undefined,
-        user_agent: req.headers.get('user-agent') || undefined
+        user_agent: req.headers.get('user-agent') || undefined,
+        ...metadata,
+        parent_query_id: parentQueryId,
+        conversation_depth: depth
       }).catch(error => {
         console.warn('[Analytics] Failed to log contact query:', error);
+      });
+
+      // Track in Vercel Analytics (non-blocking)
+      track('iris_query', {
+        intent: 'contact',
+        cached: false,
+        latency_ms: latencyMs,
+        country: metadata.country || 'unknown',
+        device: metadata.device_type || 'unknown'
+      }).catch(() => {
+        // Silently fail - don't break user experience
       });
 
       // Return as streaming response
@@ -1297,10 +1331,25 @@ ${enhancedContext}`;
               latency_ms: latencyMs,
               cached: false,
               session_id: req.headers.get('x-session-id') || undefined,
-              user_agent: req.headers.get('user-agent') || undefined
+              user_agent: req.headers.get('user-agent') || undefined,
+              ...metadata,
+              parent_query_id: parentQueryId,
+              conversation_depth: depth
             }).catch(error => {
               console.warn('[Analytics] Failed to log query:', error);
               return null;
+            });
+
+            // Track in Vercel Analytics (non-blocking)
+            track('iris_query', {
+              intent,
+              cached: false,
+              latency_ms: latencyMs,
+              results_count: results.length,
+              country: metadata.country || 'unknown',
+              device: metadata.device_type || 'unknown'
+            }).catch(() => {
+              // Silently fail - don't break user experience
             });
 
             // Log quick actions if query was logged successfully

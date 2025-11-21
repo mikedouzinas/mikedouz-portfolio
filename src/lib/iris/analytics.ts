@@ -41,6 +41,17 @@ export interface QueryLog {
   cached: boolean
   session_id?: string
   user_agent?: string
+  // Enhanced tracking fields
+  visitor_id?: string
+  ip_address?: string
+  country?: string
+  city?: string
+  region?: string
+  referrer?: string
+  device_type?: string
+  screen_size?: string
+  parent_query_id?: string
+  conversation_depth?: number
 }
 
 export interface QuickActionLog {
@@ -262,5 +273,152 @@ export async function checkAnalyticsHealth(): Promise<boolean> {
     return !error
   } catch {
     return false
+  }
+}
+
+/**
+ * Get enhanced analytics dashboard data
+ * Includes visitor tracking, geo data, and conversation threading
+ */
+export async function getEnhancedAnalytics(days: number = 7) {
+  const supabase = getSupabase()
+  if (!supabase) return null
+
+  try {
+    const since = new Date()
+    since.setDate(since.getDate() - days)
+
+    // Get all queries for the period
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: queries, error } = await (supabase as any)
+      .from('iris_queries')
+      .select('*')
+      .gte('created_at', since.toISOString())
+      .order('created_at', { ascending: false })
+
+    if (error || !queries) {
+      console.warn('[Analytics] Failed to fetch enhanced analytics:', error)
+      return null
+    }
+
+    // Calculate overview metrics
+    const uniqueVisitors = new Set(queries.filter((q: any) => q.visitor_id).map((q: any) => q.visitor_id)).size
+    const totalQueries = queries.length
+    const avgLatency = queries.reduce((sum: number, q: any) => sum + (q.latency_ms || 0), 0) / totalQueries
+    const cacheHitRate = queries.filter((q: any) => q.cached).length / totalQueries
+
+    // Geographic distribution
+    const geoDistribution = queries
+      .filter((q: any) => q.country)
+      .reduce((acc: Record<string, number>, q: any) => {
+        acc[q.country] = (acc[q.country] || 0) + 1
+        return acc
+      }, {})
+
+    // Device type distribution
+    const deviceDistribution = queries
+      .filter((q: any) => q.device_type)
+      .reduce((acc: Record<string, number>, q: any) => {
+        acc[q.device_type] = (acc[q.device_type] || 0) + 1
+        return acc
+      }, {})
+
+    // Intent distribution
+    const intentDistribution = queries.reduce((acc: Record<string, number>, q: any) => {
+      acc[q.intent] = (acc[q.intent] || 0) + 1
+      return acc
+    }, {})
+
+    // Top queries
+    const queryFrequency = queries.reduce((acc: Record<string, number>, q: any) => {
+      acc[q.query] = (acc[q.query] || 0) + 1
+      return acc
+    }, {})
+
+    const topQueries = Object.entries(queryFrequency)
+      .map(([query, count]) => ({ query, count: count as number }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10)
+
+    // Time series data (queries by day)
+    const queriesByDay = queries.reduce((acc: Record<string, number>, q: any) => {
+      const date = new Date(q.created_at).toISOString().split('T')[0]
+      acc[date] = (acc[date] || 0) + 1
+      return acc
+    }, {})
+
+    // Conversation threads (root queries with follow-ups)
+    const conversations = queries
+      .filter((q: any) => !q.parent_query_id)
+      .map((root: any) => {
+        const followUps = queries.filter((q: any) => q.parent_query_id === root.id)
+        return {
+          id: root.id,
+          query: root.query,
+          created_at: root.created_at,
+          visitor_id: root.visitor_id,
+          follow_up_count: followUps.length,
+          follow_ups: followUps.map((f: any) => ({
+            id: f.id,
+            query: f.query,
+            created_at: f.created_at,
+            depth: f.conversation_depth
+          }))
+        }
+      })
+      .slice(0, 20) // Latest 20 conversations
+
+    return {
+      overview: {
+        total_queries: totalQueries,
+        unique_visitors: uniqueVisitors,
+        avg_latency_ms: Math.round(avgLatency),
+        cache_hit_rate: cacheHitRate,
+        date_range: { start: since.toISOString(), end: new Date().toISOString() }
+      },
+      geographic: Object.entries(geoDistribution)
+        .map(([country, count]) => ({ country, count: count as number }))
+        .sort((a, b) => b.count - a.count),
+      devices: Object.entries(deviceDistribution)
+        .map(([device, count]) => ({ device, count: count as number }))
+        .sort((a, b) => b.count - a.count),
+      intents: Object.entries(intentDistribution)
+        .map(([intent, count]) => ({ intent, count: count as number }))
+        .sort((a, b) => b.count - a.count),
+      top_queries: topQueries,
+      time_series: Object.entries(queriesByDay)
+        .map(([date, count]) => ({ date, count: count as number }))
+        .sort((a, b) => a.date.localeCompare(b.date)),
+      conversations: conversations
+    }
+  } catch (error) {
+    console.warn('[Analytics] Enhanced analytics fetch error:', error)
+    return null
+  }
+}
+
+/**
+ * Get a specific conversation thread
+ * Returns all queries in a conversation from root to leaves
+ */
+export async function getConversationThread(rootQueryId: string) {
+  const supabase = getSupabase()
+  if (!supabase) return null
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any).rpc('get_conversation_thread', {
+      root_query_id: rootQueryId
+    })
+
+    if (error) {
+      console.warn('[Analytics] Failed to fetch conversation thread:', error)
+      return null
+    }
+
+    return data
+  } catch (error) {
+    console.warn('[Analytics] Conversation thread fetch error:', error)
+    return null
   }
 }
