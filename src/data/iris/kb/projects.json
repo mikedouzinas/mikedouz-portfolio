@@ -24,7 +24,7 @@
   },
   {
     "id": "proj_portfolio",
-    "title": "Personal Portfolio & Iris",
+    "title": "Portfolio & Iris",
     "summary": "Full-stack portfolio built with Next.js and TypeScript featuring Iris — a custom AI assistant that powers conversational navigation and contextual Q&A.",
     "aliases": ["Iris", "Iris assistant"],
     "specifics": [

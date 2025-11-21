@@ -1,8 +1,11 @@
 [
   {
     "id": "exp_parsons_2025",
-    "company": "Parsons Corporation",
+    "company": "Parsons",
     "role": "Software Engineer Intern",
+    "aliases": [
+      "Parsons Corporation"
+    ],
     "dates": {
       "start": "2025-05",
       "end": "2025-08"
