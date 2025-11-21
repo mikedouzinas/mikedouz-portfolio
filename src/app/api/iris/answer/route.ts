@@ -52,6 +52,43 @@ import { detectIntent, runMicroPlanner } from '@/lib/iris/answer-utils/intent';
 export const runtime = 'nodejs';
 
 /**
+ * Helper function to log retrieval results to console (DRY principle)
+ * Used for both filtered results and semantic search results
+ */
+function logRetrievalResults(
+  query: string,
+  intent: string,
+  results: Array<{ score: number; doc: Partial<KBItem> }>,
+  filters?: QueryFilter
+) {
+  console.log('\n═══════════════════════════════════════════════════════════════');
+  console.log(filters ? '🔍 RAG RESPONSE (Filtered Results)' : '🔍 RAG RESPONSE (Retrieval Results)');
+  console.log('═══════════════════════════════════════════════════════════════');
+  console.log(`Query: "${query}"`);
+  console.log(`Intent: ${intent}`);
+  if (filters) {
+    console.log(`Filters: ${JSON.stringify(filters, null, 2)}`);
+  }
+  console.log(`Results Count: ${results.length}`);
+  console.log(filters ? '\nFiltered Documents:' : '\nRetrieved Documents:');
+  results.forEach((result, idx) => {
+    const doc = result.doc;
+    const title = 'title' in doc && doc.title ? doc.title :
+                 'role' in doc && doc.role ? `${doc.role}${'company' in doc && doc.company ? ` at ${doc.company}` : ''}` :
+                 'school' in doc && doc.school ? doc.school :
+                 'value' in doc && doc.value ? doc.value :
+                 'interest' in doc && doc.interest ? doc.interest :
+                 doc.id || 'unknown';
+    const kind = 'kind' in doc ? doc.kind : 'unknown';
+    console.log(`  ${idx + 1}. [${kind}] ${title} (score: ${result.score.toFixed(4)})`);
+    if ('summary' in doc && doc.summary) {
+      console.log(`     Summary: ${doc.summary.substring(0, 100)}${doc.summary.length > 100 ? '...' : ''}`);
+    }
+  });
+  console.log('═══════════════════════════════════════════════════════════════\n');
+}
+
+/**
  * Field map for each intent
  * Determines which fields to retrieve from the knowledge base
  */
@@ -624,29 +661,7 @@ export async function POST(req: NextRequest) {
       results = results.slice(0, limit);
 
       // Debug: Log RAG response (filtered results) to terminal
-      console.log('\n═══════════════════════════════════════════════════════════════');
-      console.log('🔍 RAG RESPONSE (Filtered Results)');
-      console.log('═══════════════════════════════════════════════════════════════');
-      console.log(`Query: "${query}"`);
-      console.log(`Intent: ${intent}`);
-      console.log(`Filters: ${JSON.stringify(filters, null, 2)}`);
-      console.log(`Results Count: ${results.length}`);
-      console.log('\nFiltered Documents:');
-      results.forEach((result, idx) => {
-        const doc = result.doc;
-        const title = 'title' in doc && doc.title ? doc.title :
-                     'role' in doc && doc.role ? `${doc.role}${'company' in doc && doc.company ? ` at ${doc.company}` : ''}` :
-                     'school' in doc && doc.school ? doc.school :
-                     'value' in doc && doc.value ? doc.value :
-                     'interest' in doc && doc.interest ? doc.interest :
-                     doc.id || 'unknown';
-        const kind = 'kind' in doc ? doc.kind : 'unknown';
-        console.log(`  ${idx + 1}. [${kind}] ${title} (score: ${result.score.toFixed(4)})`);
-        if ('summary' in doc && doc.summary) {
-          console.log(`     Summary: ${doc.summary.substring(0, 100)}${doc.summary.length > 100 ? '...' : ''}`);
-        }
-      });
-      console.log('═══════════════════════════════════════════════════════════════\n');
+      logRetrievalResults(query, intent, results, filters);
 
 
       // If no results found, return fallback response with contact info instead of generating with LLM
@@ -840,28 +855,7 @@ export async function POST(req: NextRequest) {
       results = boostWithImportance(results, rankings, query, isEvaluative);
 
       // Debug: Log RAG response (retrieval results) to terminal
-      console.log('\n═══════════════════════════════════════════════════════════════');
-      console.log('🔍 RAG RESPONSE (Retrieval Results)');
-      console.log('═══════════════════════════════════════════════════════════════');
-      console.log(`Query: "${query}"`);
-      console.log(`Intent: ${intent}`);
-      console.log(`Results Count: ${results.length}`);
-      console.log('\nRetrieved Documents:');
-      results.forEach((result, idx) => {
-        const doc = result.doc;
-        const title = 'title' in doc && doc.title ? doc.title :
-                     'role' in doc && doc.role ? `${doc.role}${'company' in doc && doc.company ? ` at ${doc.company}` : ''}` :
-                     'school' in doc && doc.school ? doc.school :
-                     'value' in doc && doc.value ? doc.value :
-                     'interest' in doc && doc.interest ? doc.interest :
-                     doc.id || 'unknown';
-        const kind = 'kind' in doc ? doc.kind : 'unknown';
-        console.log(`  ${idx + 1}. [${kind}] ${title} (score: ${result.score.toFixed(4)})`);
-        if ('summary' in doc && doc.summary) {
-          console.log(`     Summary: ${doc.summary.substring(0, 100)}${doc.summary.length > 100 ? '...' : ''}`);
-        }
-      });
-      console.log('═══════════════════════════════════════════════════════════════\n');
+      logRetrievalResults(query, intent, results);
 
       // If we have no results, use fallback response with contact info
       // The anti-hallucination instructions in the system prompt are strong enough to prevent
