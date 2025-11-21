@@ -678,6 +678,110 @@ const testSuites: Record<string, TestCase[]> = {
       ],
     },
   ],
+
+  'GitHub Integration & Quick Actions v2': [
+    {
+      query: 'what has mike been working on recently?',
+      expected: 'Recent portfolio updates from GitHub commits (if GITHUB_TOKEN configured)',
+      category: 'github-activity',
+      verifyPoints: [
+        'Includes recent commit summaries (if GitHub token available)',
+        'Graceful fallback if GitHub unavailable',
+        'No fabricated commit messages',
+      ],
+    },
+    {
+      query: 'tell me about HiLiTe',
+      expected: 'Project details + quick action for "Fetch recent updates"',
+      category: 'quick-actions-github',
+      verifyPoints: [
+        'Project description accurate',
+        'Quick actions appear (GitHub, Skills, Fetch recent updates)',
+        '"Fetch recent updates" button (if repo has GitHub link)',
+        'NO inline GitHub URLs in answer text',
+      ],
+    },
+    {
+      query: 'show me your best projects',
+      expected: 'Projects ranked by importance (HiLiTe, Knight Life, Iris prioritized)',
+      category: 'ranking-system',
+      verifyPoints: [
+        'Projects appear in importance order',
+        'HiLiTe/Knight Life/Iris emphasized',
+        'Reasoning explains metrics/complexity/impact',
+        'NO mention of numerical scores (rankings are internal)',
+      ],
+    },
+    {
+      query: 'what are your strongest skills?',
+      expected: 'Skills ranked by importance (high complexity + evidence)',
+      category: 'ranking-system',
+      verifyPoints: [
+        'Skills prioritized by complexity/evidence',
+        'ML/AI/RAG skills ranked high',
+        'Skills formatted cleanly (e.g., "NLP" not "nlp")',
+        'Evidence or usage counts mentioned',
+      ],
+    },
+    {
+      query: 'tell me about your veson internship',
+      expected: 'Experience details + short label quick action (e.g., "Veson (SWE)")',
+      category: 'quick-actions-short-labels',
+      verifyPoints: [
+        'Experience described accurately',
+        'Quick action labels concise (not full role title)',
+        'Example: "Veson (SWE)" instead of "Software Engineering Intern at Veson"',
+        'LinkedIn button appears',
+      ],
+    },
+  ],
+
+  'Link Policy & URL Handling': [
+    {
+      query: 'how can i see the iris code?',
+      expected: 'References GitHub WITHOUT including URL',
+      category: 'link-policy',
+      verifyPoints: [
+        'Answer says "code is on GitHub" or similar',
+        'NO inline URLs (https://github.com/...)',
+        'GitHub button appears in quick actions',
+        'User can click button to visit',
+      ],
+    },
+    {
+      query: 'where can i connect with mike professionally?',
+      expected: 'Mentions LinkedIn WITHOUT URL, button appears',
+      category: 'link-policy',
+      verifyPoints: [
+        'References LinkedIn profile',
+        'NO inline LinkedIn URL',
+        'LinkedIn button in quick actions',
+        'Professional tone',
+      ],
+    },
+    {
+      query: 'does hilite have a demo?',
+      expected: 'Mentions demo availability WITHOUT URL',
+      category: 'link-policy',
+      verifyPoints: [
+        'Says demo exists or is available',
+        'NO inline demo URL',
+        'Demo button appears in quick actions (if applicable)',
+        'Accurate info about demo',
+      ],
+    },
+    {
+      query: 'tell me about the iris project',
+      expected: 'Project details with GitHub reference, no URLs',
+      category: 'link-policy',
+      verifyPoints: [
+        'Describes Iris (RAG, AI assistant, portfolio)',
+        'May mention "code is on GitHub"',
+        'NO inline URLs anywhere in text',
+        'Quick actions provide all links',
+      ],
+    },
+  ],
 };
 
 // Test results tracking

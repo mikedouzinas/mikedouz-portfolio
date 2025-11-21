@@ -209,19 +209,105 @@ interface BaseKBItem {
 - **Cache Clearing**: `npm run clear:cache` or `/api/iris/cache/clear` endpoint
 - **Development**: Cache may need clearing when testing same queries
 
-#### Quick Actions
+#### Quick Actions v2 (Config-Driven System)
 
-**File**: `src/lib/iris/quickActions.ts`
+**Core Files**:
+- `src/lib/iris/quickActions_v2.ts` - Main generation logic
+- `src/lib/iris/actionConfig.ts` - Declarative action templates (818 lines)
+- `src/lib/iris/rankings.ts` - Importance scoring algorithm
+- `src/components/iris/QuickActions.tsx` - UI component
 
-5 action types generated after each response:
+**System Overview**:
+Quick Actions v2 is a config-driven system that automatically generates contextual follow-up actions after each Iris response. Actions are determined by:
+1. **KB item type** (project, experience, class, skill, blog, etc.)
+2. **Available data** (GitHub link, demo, company website, skills)
+3. **Importance rankings** (0-100 scores based on complexity, impact, recency)
+4. **Conversation depth** (limits follow-ups to prevent infinite loops)
 
-1. **Affirmative**: "Tell me more", "Show details"
-2. **Specific**: Pre-filled queries about specific items
-3. **Custom Input**: Inline text field for freeform follow-ups
-4. **Contact Links**: GitHub, LinkedIn, email with toast notifications
-5. **Message Mike**: Opens MessageComposer with smart drafts
+**5 Action Types**:
+1. **link** - External links (GitHub, demo, article, company website)
+2. **dropdown** - Searchable dropdowns (skills, evidence) [TODO: implement UI]
+3. **query** - Pre-filled Iris queries (related projects, work using skills)
+4. **message_mike** - Opens MessageComposer
+5. **custom_input** - Generic "Ask a follow up..." text field
 
-**Depth Limiting**: Max 2 follow-up levels to prevent infinite threading
+**Action Configuration** (`actionConfig.ts`):
+Each KB item type has declarative action templates:
+```typescript
+ACTION_CONFIG['project'] = [
+  {
+    type: 'link',
+    label: 'GitHub',
+    priority: 9,
+    condition: (item) => 'links' in item && 'github' in (item.links || {}),
+    getData: (item) => ({ link: item.links?.github, linkType: 'github' })
+  },
+  {
+    type: 'dropdown',
+    label: 'Skills',
+    priority: 8,
+    getData: (item, rankings) => ({
+      options: item.skills
+        .map(skillId => ({
+          id: skillId,
+          label: formatSkillId(skillId), // "nlp" → "NLP"
+          importance: rankings.skills.find(s => s.id === skillId)?.importance || 50
+        }))
+        .sort((a, b) => b.importance - a.importance)
+    })
+  },
+  // ... more actions
+]
+```
+
+**Importance Ranking System** (`rankings.ts`):
+All KB items are scored 0-100 based on:
+
+- **Skills**: Evidence count (projects/experience using it), complexity (ML > basic), recency
+- **Projects**: Complexity (60%), diversity (25%), impact metrics (25%), demo/production (12%), AI cutting-edge (10%)
+- **Experiences**: Complexity (50%), impact (30%), skill breadth (20%), recency (15%)
+- **Classes**: Complexity, recency, has projects
+
+**Example Rankings** (internal use only, never shown to users):
+- **Top Projects**: HiLiTe (ML/CV sophistication), Knight Life (4.9★ + 100+ users), Iris (RAG complexity)
+- **Top Experiences**: VesselsValue, Veson 2024, Lilie, Parsons
+- **Top Skills**: RAG, NLP, PyTorch, Machine Learning (high complexity + evidence)
+
+Rankings influence:
+1. Which quick actions appear first (priority)
+2. Which skills show in dropdowns (top by importance)
+3. Which drill-down actions suggest (top items)
+
+**Short Label System** (`actionConfig.ts:23-122`):
+Clean, concise labels for better UX:
+
+- **Skills**: `formatSkillId()` transforms raw IDs
+  - `nlp` → `NLP` (uppercase acronyms)
+  - `machine_learning` → `Machine Learning` (title case)
+  - `pytorch` → `PyTorch` (special cases)
+  - `csharp` → `C#`, `nextjs` → `Next.js`
+
+- **Experiences**: `getShortExperienceLabel()` creates compact labels
+  - Full: "Software Engineering Intern (IMOS – Laytime Automation)"
+  - Short: "Veson (SWE)"
+  - Pattern: `Company (Role Type)`
+
+**Depth Limiting**:
+- **Specific actions** (drill-downs): Only until depth 2
+- **Generic follow-up** ("Ask a follow up..."): Until depth 4
+- **Contact actions**: Always available
+- Prevents infinite suggestion loops while allowing continued conversation
+
+**GitHub Activity Integration**:
+- "Fetch recent updates" action for projects with GitHub links
+- Triggers `github_activity` intent
+- Fetches real commits via GitHub API (`src/lib/iris/github.ts:getRepoCommits()`)
+- Iris summarizes commit messages in conversational tone
+
+**Link Policy**:
+Quick actions provide ALL links (GitHub, LinkedIn, demo, company).
+Iris is instructed to NEVER include raw URLs in response text - only reference that resources exist (e.g., "The code is on GitHub").
+This prevents duplicate links (text + button) and provides consistent UX.
 
 ### 2. Ask Mike Inbox System
 
