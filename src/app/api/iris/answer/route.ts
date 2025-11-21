@@ -600,6 +600,9 @@ export async function POST(req: NextRequest) {
     // Load skills once for ID-to-name resolution (cached for performance)
     const skillMap = await buildSkillNameMap();
 
+    // Load importance rankings once (used for scoring and context display)
+    const rankings = loadRankings();
+
     // Handle filter queries and specific item queries - use structured filtering instead of semantic search
     if ((intent === 'filter_query' || intent === 'specific_item') && filters) {
 
@@ -834,7 +837,6 @@ export async function POST(req: NextRequest) {
       results = retrievalResults.results;
 
       // Boost results with importance rankings
-      const rankings = loadRankings();
       results = boostWithImportance(results, rankings, query, isEvaluative);
 
       // Debug: Log RAG response (retrieval results) to terminal
@@ -957,7 +959,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Build enhanced context with optional GitHub activity and contact info
-    const contextIndex = buildContextIndex(results);
+    const contextIndex = buildContextIndex(results, rankings);
     let enhancedContext = contextIndex ? `${contextIndex}\n\n${context}` : context;
     if (recentActivity) {
       enhancedContext += `\n\nRecent Development Activity:\n${recentActivity}`;

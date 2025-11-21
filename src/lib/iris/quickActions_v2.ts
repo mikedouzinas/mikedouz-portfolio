@@ -139,6 +139,17 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
   const isList = results.length > 1 || intent === 'filter_query';
   const isMixed = resultTypes.size > 1;
 
+  console.log('[QuickActions v2] Context analysis:', {
+    resultsCount: results.length,
+    intent,
+    resultTypes: Array.from(resultTypes),
+    isSingleItem,
+    isList,
+    isMixed,
+    canAddSpecificActions,
+    depth
+  });
+
   // Track current node visit (TODO: implement path tracking to avoid duplicate suggestions)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _currentNode: string | null = isSingleItem && results[0].doc.id

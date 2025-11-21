@@ -6,6 +6,48 @@
 import type { KBItem, ProjectT, ExperienceT, ClassT, BlogT, SkillT, InterestT, EducationT } from './schema';
 import type { Rankings } from './rankings';
 
+/**
+ * Generate short display label for experiences
+ * Converts "Software Engineering Intern (IMOS – Laytime Automation)" to role type abbreviation
+ * Used in quick action labels to keep them concise
+ */
+function getShortRoleType(role: string): string {
+  // Software Engineer variants
+  if (/software.*engineer/i.test(role)) return 'SWE';
+  // Data Science variants
+  if (/data.*scien/i.test(role)) return 'Data Science';
+  // Mobile/iOS dev variants
+  if (/(ios|mobile).*dev/i.test(role)) return 'iOS Dev';
+  // Frontend/Backend variants
+  if (/frontend/i.test(role)) return 'Frontend';
+  if (/backend/i.test(role)) return 'Backend';
+  // General dev/engineering
+  if (/developer/i.test(role)) return 'Dev';
+  if (/engineer/i.test(role)) return 'Engineer';
+  // Product/Design
+  if (/product/i.test(role)) return 'Product';
+  if (/design/i.test(role)) return 'Design';
+
+  // Fallback: First 2-3 words of role
+  const words = role.split(/[\s\-()]+/).filter(w => w.length > 2);
+  return words.slice(0, 2).join(' ');
+}
+
+/**
+ * Generate short label for experience: "Company (Role Type)"
+ * Example: "Veson Nautical (SWE Intern)" or "Veson (SWE)"
+ */
+function getShortExperienceLabel(company: string, role: string): string {
+  const roleType = getShortRoleType(role);
+
+  // If company name is long, use abbreviated version
+  const shortCompany = company.length > 20
+    ? company.split(/[\s\-]/)[0] // Take first word
+    : company;
+
+  return `${shortCompany} (${roleType})`;
+}
+
 // Action types we can generate
 export type ActionType =
   | 'link'              // External link (GitHub, demo, article, company site)
@@ -561,11 +603,11 @@ export function getActionsForList(
     if (items.length > 0) {
       const topExp = items[0];
       let displayName = '';
-      if ('role' in topExp && topExp.role) {
+      if ('role' in topExp && topExp.role && 'company' in topExp && topExp.company) {
+        // Use short label for experiences: "Company (Role Type)"
+        displayName = getShortExperienceLabel(topExp.company, topExp.role);
+      } else if ('role' in topExp && topExp.role) {
         displayName = topExp.role;
-        if ('company' in topExp && topExp.company) {
-          displayName += ` at ${topExp.company}`;
-        }
       } else {
         displayName = topExp.id;
       }
@@ -636,9 +678,11 @@ export function getActionsForList(
       } else if ('name' in item && item.name) {
         displayName = item.name;
       } else if ('role' in item && item.role) {
-        displayName = item.role;
+        // For experiences, use short label: "Company (Role Type)"
         if ('company' in item && item.company) {
-          displayName += ` at ${item.company}`;
+          displayName = getShortExperienceLabel(item.company, item.role);
+        } else {
+          displayName = item.role;
         }
       } else {
         displayName = item.id;
