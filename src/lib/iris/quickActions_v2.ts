@@ -174,11 +174,24 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
     const items = results.map(r => r.doc as KBItem);
     const templates = getActionsForList(items, listType, rankings);
 
+    console.log('[QuickActions v2] List actions:', {
+      listType,
+      templateCount: templates.length,
+      isMixed,
+      resultTypesCount: resultTypes.size
+    });
+
     for (const template of templates) {
       if (!template.getData) continue;
 
       const data = template.getData(items[0], rankings);
       const action = templateToAction(template, data);
+
+      console.log('[QuickActions v2] Generated list action:', {
+        templateType: template.type,
+        templateLabel: template.label,
+        action: action ? action.type : 'null'
+      });
 
       if (action) {
         actions.push(action);

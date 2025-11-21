@@ -84,10 +84,10 @@ export function boostWithImportance(
   query: string,
   isEvaluative: boolean
 ): Array<{ score: number; doc: Partial<KBItem> }> {
-  // For evaluative queries, apply stronger importance boosting
-  // For non-evaluative queries, apply lighter boosting
-  const importanceWeight = isEvaluative ? 0.4 : 0.2;
-  const semanticWeight = isEvaluative ? 0.6 : 0.8;
+  // For evaluative queries, prioritize importance over semantics
+  // For non-evaluative queries, keep semantics dominant
+  const importanceWeight = isEvaluative ? 0.6 : 0.2;
+  const semanticWeight = isEvaluative ? 0.4 : 0.8;
 
   return results.map(r => {
     // Find importance score for this item
