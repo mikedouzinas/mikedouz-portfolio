@@ -166,6 +166,11 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   }>>([]);
   const [currentQueryId, setCurrentQueryId] = useState<string | null>(null);
 
+  // Generate stable session ID for tracking conversations
+  const [sessionId] = useState(() =>
+    `sess_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
+  );
+
   // Track UI directives from streaming
   const uiDirective = useUiDirectives(answer || '');
   const [persistedDirective, setPersistedDirective] = useState<typeof uiDirective>(null);
@@ -616,7 +621,12 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
       const response = await fetch(
         `/api/iris/suggest?q=${encodeURIComponent(searchQuery)}&signals=${encodeURIComponent(JSON.stringify(signals))}`,
-        { signal: controller.signal }
+        {
+          signal: controller.signal,
+          headers: {
+            'x-session-id': sessionId,
+          },
+        }
       );
 
       clearTimeout(timeoutId);
@@ -935,7 +945,12 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
       const response = await fetch(
         `/api/iris/answer?${params.toString()}`,
-        { signal: controller.signal }
+        {
+          signal: controller.signal,
+          headers: {
+            'x-session-id': sessionId,
+          },
+        }
       );
 
       clearTimeout(timeoutId);
@@ -1172,7 +1187,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     if (currentQueryId) {
       fetch('/api/iris/analytics/quick-action-click', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': sessionId,
+        },
         body: JSON.stringify({
           queryId: currentQueryId,
           suggestion: action.label,

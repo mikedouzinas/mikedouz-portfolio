@@ -7,7 +7,17 @@ import { type KBItem, type PlannerResult, type EvidenceSignals } from '@/lib/iri
 import { OpenAI } from 'openai';
 import { config } from '@/lib/iris/config';
 import { getRecentActivityContext } from '@/lib/iris/github';
-import { logQuery, logQuickAction } from '@/lib/iris/analytics';
+import {
+  logQuery,
+  logQuickAction,
+  calculateQueryComplexity,
+  calculateRetrievalQuality,
+  classifyFailure,
+  extractTopics,
+  logFailureMetadata,
+  upsertKBGap,
+  updateSessionFlow,
+} from '@/lib/iris/analytics';
 import { generateQuickActions } from '@/lib/iris/quickActions_v2';
 import { loadRankings } from '@/lib/iris/loadRankings';
 import type { QuickAction } from '@/components/iris/QuickActions';
@@ -1525,6 +1535,11 @@ ${enhancedContext}`;
 
             // Log query to analytics BEFORE closing stream (capture query ID for quick actions)
             const latencyMs = Date.now() - startTime;
+
+            // Calculate complexity and retrieval quality metrics
+            const complexity = calculateQueryComplexity(query, filters as Record<string, unknown> | undefined);
+            const retrievalQuality = calculateRetrievalQuality(results);
+
             const queryId = await logQuery({
               query,
               intent,
@@ -1544,11 +1559,73 @@ ${enhancedContext}`;
               latency_ms: latencyMs,
               cached: false,
               session_id: req.headers.get('x-session-id') || undefined,
-              user_agent: req.headers.get('user-agent') || undefined
+              user_agent: req.headers.get('user-agent') || undefined,
+              complexity,
+              retrieval_quality: retrievalQuality,
             }).catch(error => {
               console.warn('[Analytics] Failed to log query:', error);
               return null;
             });
+
+            // Detect and log failures (non-blocking)
+            if (queryId && (results.length === 0 || retrievalQuality.max_score < 0.3)) {
+              const failureType = classifyFailure(
+                query,
+                intent,
+                filters as Record<string, unknown> | undefined,
+                results
+              );
+
+              // Log failure metadata
+              logFailureMetadata({
+                query_id: queryId,
+                failure_type: failureType,
+                word_count: complexity.word_count,
+                filter_count: complexity.filter_count,
+                has_negation: complexity.has_negation,
+                has_multiple_intents: false, // Could enhance with multi-intent detection
+                char_length: complexity.char_length,
+                max_score: retrievalQuality.max_score,
+                score_gap: retrievalQuality.score_gap,
+                total_candidates: retrievalQuality.total_candidates,
+                top_5_avg_score: retrievalQuality.top_5_avg,
+                extracted_topics: extractTopics(query),
+              }).catch(error => {
+                console.warn('[Analytics] Failed to log failure metadata:', error);
+              });
+
+              // Track KB gaps for no-results queries
+              if (results.length === 0) {
+                const topics = extractTopics(query);
+                const suggestedType = intent === 'filter_query' ? 'project' : 'experience';
+
+                for (const topic of topics) {
+                  upsertKBGap({
+                    topic,
+                    suggested_kb_type: suggestedType,
+                    example_query: query,
+                  }).catch(error => {
+                    console.warn('[Analytics] Failed to upsert KB gap:', error);
+                  });
+                }
+              }
+            }
+
+            // Update session flow (non-blocking)
+            const sessionId = req.headers.get('x-session-id');
+            if (queryId && sessionId) {
+              const success = results.length > 0 && retrievalQuality.max_score >= 0.4;
+              updateSessionFlow(
+                sessionId,
+                queryId,
+                intent,
+                success,
+                req.headers.get('user-agent') || undefined,
+                query
+              ).catch(error => {
+                console.warn('[Analytics] Failed to update session flow:', error);
+              });
+            }
 
             // Log quick actions if query was logged successfully
             if (queryId && generatedQuickActions.length > 0) {
