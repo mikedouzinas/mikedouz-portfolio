@@ -130,8 +130,10 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
   }
 
   // Depth limiting
+  // Professional comment: At depth >= 4, only contact-related actions (message_mike, contact_link) are allowed
+  // This allows 5 levels of conversation (0-3) before encouraging direct contact
   const canAddSpecificActions = depth < 2;  // Specific item actions only until depth 2
-  const canAddGenericFollowUp = depth < 4; // Generic follow-up until depth 4
+  const canAddGenericFollowUp = depth < 4; // Generic follow-up (custom_input) until depth 4
 
   // Determine result type (single item, list, or mixed)
   const resultTypes = new Set(results.map(r => r.doc.kind));
@@ -237,6 +239,7 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
   }
 
   // Fallback: Ensure at least one action
+  // Professional comment: At depth >= 4, fallback to message_mike to encourage direct contact
   if (actions.length === 0) {
     if (depth < 4) {
       actions.push({
@@ -244,6 +247,7 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
         label: 'Ask a follow up...',
       });
     } else {
+      // At depth >= 4, only show contact option
       actions.push({
         type: 'message_mike',
         label: 'Message Mike',
