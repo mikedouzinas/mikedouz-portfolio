@@ -745,6 +745,8 @@ export function getActionsForList(
     const topItems = items.slice(0, 2);
     for (const item of topItems) {
       // Build display name based on type
+      // Professional note: We check for type-specific display fields before falling back to ID
+      // This ensures interests, values, and other KB item types show human-readable labels
       let displayName = '';
       if ('title' in item && item.title) {
         // For blogs, prefer short_name over full title for concise display in quick actions
@@ -763,7 +765,16 @@ export function getActionsForList(
         } else {
           displayName = item.role;
         }
+      } else if ('interest' in item && item.interest) {
+        // For interests (e.g., "Software Development", "Creative Writing")
+        // Use the interest field directly for clean display
+        displayName = item.interest;
+      } else if ('value' in item && item.value) {
+        // For values (e.g., "Integrity", "Ambition")
+        // Use the value field directly for clean display
+        displayName = item.value;
       } else {
+        // Fallback to ID if no display field is available
         displayName = item.id;
       }
 

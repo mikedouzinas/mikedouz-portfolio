@@ -89,33 +89,42 @@ export function deriveFilterDefaults(
     }
   }
 
-  if (/\bskill(s)?\b|\btech\b|\btechnology\b|\bstack\b|\blanguage(s)?\b|\btools?\b/.test(normalized)) {
-    ensureType(next, 'skill');
-    mutated = true;
-  }
+  // Professional comment: Only derive type filters from query patterns when there's NO specific title_match.
+  // When title_match is set, the query targets a specific item by ID, and pattern-based type filtering
+  // could incorrectly exclude it (e.g., "tell me about proj_portfolio work" shouldn't add type: ["experience"]).
+  if (!next.title_match) {
+    if (/\bskill(s)?\b|\btech\b|\btechnology\b|\bstack\b|\blanguage(s)?\b|\btools?\b/.test(normalized)) {
+      ensureType(next, 'skill');
+      mutated = true;
+    }
 
-  if (/\bproject(s)?\b/.test(normalized)) {
-    ensureType(next, 'project');
-    mutated = true;
-  }
+    if (/\bproject(s)?\b/.test(normalized)) {
+      ensureType(next, 'project');
+      mutated = true;
+    }
 
-  if (/\bexperience(s)?\b|\bwork\b|\brole(s)?\b|\bjob(s)?\b|\bintern(ship|ships)?\b/.test(normalized)) {
-    ensureType(next, 'experience');
-    mutated = true;
-  }
+    if (/\bexperience(s)?\b|\bwork\b|\brole(s)?\b|\bjob(s)?\b|\bintern(ship|ships)?\b/.test(normalized)) {
+      ensureType(next, 'experience');
+      mutated = true;
+    }
 
-  if (/\bclass(es)?\b|\bcourse(s)?\b/.test(normalized)) {
-    ensureType(next, 'class');
-    mutated = true;
+    if (/\bclass(es)?\b|\bcourse(s)?\b/.test(normalized)) {
+      ensureType(next, 'class');
+      mutated = true;
+    }
   }
 
   // Company detection via alias matches
+  // Professional comment: Only derive company/type filters when there's NO specific title_match.
+  // If title_match is already set, the query is targeting a specific item by ID,
+  // and adding derived type filters could incorrectly exclude the target item
+  // (e.g., searching for "interest_software_development" with derived type: ["experience"]).
   const companyMatches = aliasMatches
     .filter(match => match.type === 'experience')
     .map(match => match.name)
     .filter(Boolean);
 
-  if (companyMatches.length > 0) {
+  if (companyMatches.length > 0 && !next.title_match) {
     ensureType(next, 'experience');
     const existing = new Set(next.company ?? []);
     companyMatches.forEach(name => existing.add(name));
