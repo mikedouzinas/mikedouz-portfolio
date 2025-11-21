@@ -121,6 +121,12 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
           filters: { type: ['project'], skills: topSkills }
         };
       }
+    },
+    {
+      type: 'message_mike',
+      label: 'Message Mike',
+      priority: 5,
+      getData: () => ({})
     }
   ],
 
@@ -198,6 +204,12 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
           filters: { type: ['experience', 'project'], skills: topSkills }
         };
       }
+    },
+    {
+      type: 'message_mike',
+      label: 'Message Mike',
+      priority: 5,
+      getData: () => ({})
     }
   ],
 
@@ -257,6 +269,12 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
           filters: { type: ['class'], skills: topSkills }
         };
       }
+    },
+    {
+      type: 'message_mike',
+      label: 'Message Mike',
+      priority: 5,
+      getData: () => ({})
     }
   ],
 
@@ -340,6 +358,12 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
           filters: { type: ['skill'] }
         };
       }
+    },
+    {
+      type: 'message_mike',
+      label: 'Message Mike',
+      priority: 5,
+      getData: () => ({})
     }
   ],
 
@@ -420,6 +444,12 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
           filters: { type: ['class'] }
         };
       }
+    },
+    {
+      type: 'message_mike',
+      label: 'Message Mike',
+      priority: 5,
+      getData: () => ({})
     }
   ],
 

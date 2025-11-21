@@ -216,10 +216,19 @@ export function applyFilters(items: KBItem[], filters: QueryFilter): KBItem[] {
   }
 
   // Filter by title match (for specific item queries)
+  // CRITICAL: Check ID first for exact matches from quick actions
+  // Quick actions pass IDs like "proj_portfolio", not display names
   if (filters.title_match) {
     const searchTitle = filters.title_match.toLowerCase();
     filtered = filtered.filter(item => {
-      // Check title field
+      // Check ID field first (exact match from quick actions)
+      if ('id' in item && item.id) {
+        if (item.id.toLowerCase() === searchTitle) {
+          return true;
+        }
+      }
+
+      // Check title field (substring match for partial queries)
       if ('title' in item && item.title) {
         return item.title.toLowerCase().includes(searchTitle);
       }
