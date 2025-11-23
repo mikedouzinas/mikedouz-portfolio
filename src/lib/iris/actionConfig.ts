@@ -7,6 +7,49 @@ import type { KBItem, ProjectT, ExperienceT, ClassT, BlogT, SkillT, InterestT, E
 import type { Rankings } from './rankings';
 
 /**
+ * Generate short display name for class titles
+ * Used in quick actions to keep class names concise
+ * 
+ * Rules:
+ * - If title contains a course code (e.g., "COMP 646", "BUSI 221"), extract just the code
+ * - If no course code, take first 2-3 meaningful words (up to ~25 characters)
+ * - Handles patterns like "COMP 646 – Deep Learning..." → "COMP 646"
+ * 
+ * @param title - The full class title
+ * @returns Shortened class name for quick actions
+ */
+function getShortClassName(title: string): string {
+  // Pattern: Course code at start (e.g., "COMP 646", "BUSI 221", "FWIS 180")
+  // Matches: 2-5 uppercase letters, space, 3-4 digits, optionally followed by "–" or "-"
+  const courseCodeMatch = title.match(/^([A-Z]{2,5}\s+\d{3,4})/);
+  if (courseCodeMatch) {
+    return courseCodeMatch[1]; // Return just the course code (e.g., "COMP 646")
+  }
+  
+  // No course code found - take first meaningful words
+  // Remove common prefixes like "Introduction to", "Advanced Topics in"
+  const cleaned = title
+    .replace(/^(Introduction to|Advanced Topics in|Intro to)\s+/i, '')
+    .trim();
+  
+  // Take first 2-3 words, but cap at 25 characters
+  const words = cleaned.split(/\s+/);
+  let shortName = words[0];
+  
+  // Add words until we hit 25 characters or run out of meaningful words
+  for (let i = 1; i < Math.min(words.length, 3); i++) {
+    const next = `${shortName} ${words[i]}`;
+    if (next.length <= 25) {
+      shortName = next;
+    } else {
+      break;
+    }
+  }
+  
+  return shortName;
+}
+
+/**
  * Get human-readable display name for any KB item
  * This is the universal solution to prevent raw IDs (like "education_0") from appearing in quick actions
  * 
@@ -20,6 +63,9 @@ import type { Rankings } from './rankings';
  * 7. value (values)
  * 8. Formatted ID as fallback (for skills only - formats "nlp" -> "NLP")
  * 
+ * Professional comment: For classes, uses shortened names to keep quick action labels concise.
+ * Full titles like "COMP 646 – Deep Learning for Vision and Language" become "COMP 646" in quick actions.
+ * 
  * @param item - The KB item to get display name for
  * @returns Human-readable display name
  */
@@ -31,6 +77,14 @@ function getDisplayName(item: KBItem): string {
     if ('short_name' in item && blog.short_name) {
       return blog.short_name;
     }
+    
+    // Professional comment: For classes, use shortened names to keep quick action labels concise
+    // This prevents labels like "Skills: COMP 646 – Deep Learning for Vision and Language"
+    // from being too long in the quick actions UI
+    if (item.kind === 'class') {
+      return getShortClassName(item.title);
+    }
+    
     return item.title;
   }
   
@@ -884,45 +938,26 @@ export function getActionsForList(
       item.kind !== 'value' && item.kind !== 'interest'
     ).slice(0, 2);
     for (const item of topItems) {
-      // Build display name based on type
-      // Professional note: We check for type-specific display fields before falling back to ID
+      // Professional note: Use getDisplayName for consistent display name generation
+      // This ensures classes get shortened names, blogs use short_name, experiences use short labels, etc.
       // Values and interests are filtered out above and handled as aggregated actions
-      let displayName = '';
-      if ('title' in item && item.title) {
-        // For blogs, prefer short_name over full title for concise display in quick actions
-        const blog = item as BlogT;
-        if ('short_name' in item && blog.short_name) {
-          displayName = blog.short_name;
-        } else {
-          displayName = item.title;
-        }
-      } else if (item.kind === 'bio') {
-        // Professional comment: Bio items show full legal name in 'name' field
-        // Use friendly label "Mike's Profile" instead for quick actions
-        displayName = "Mike's Profile";
-      } else if ('name' in item && item.name) {
-        displayName = item.name;
-      } else if ('role' in item && item.role) {
-        // For experiences, use short label: "Company (Role Type)" with alias support
-        if ('company' in item && item.company) {
-          const exp = item as ExperienceT;
-          displayName = getShortExperienceLabel(exp.company, exp.role, exp.aliases);
-        } else {
-          displayName = item.role;
-        }
-      } else {
-        // Fallback to ID if no display field is available
-        displayName = item.id;
-      }
+      const displayName = getDisplayName(item);
 
+      // Professional comment: For classes, ask about Mike's work/experience, not generic course description
+      // This ensures Iris describes what Mike did in the class rather than what the course is about
+      const isClass = item.kind === 'class';
+      const queryText = isClass 
+        ? `What did Mike do in ${displayName}?` 
+        : `tell me about ${displayName}`;
+      
       actions.push({
         type: 'query',
         label: `See ${displayName}`,
         priority: 9,
         getData: () => ({
           // Professional comment: Use display name in query to match what Iris sees in context
-          // This prevents confusion when query says "proj_portfolio" but context shows "Portfolio & Iris"
-          query: `tell me about ${displayName}`,
+          // For classes, specifically ask about Mike's work to get his experience/projects rather than generic course info
+          query: queryText,
           intent: 'specific_item',
           filters: { title_match: item.id }
         })

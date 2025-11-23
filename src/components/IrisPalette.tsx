@@ -48,7 +48,7 @@ const SUGGESTIONS = [
       id: 'contact',
       icon: Mail,
       primary: 'How can I contact Mike?',
-      secondary: 'Ask Iris to draft a message to send directly',
+      secondary: 'Ask Iris to draft feedback or questions to send directly',
     },
     {
       id: 'problem-solving',
@@ -398,6 +398,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const panelRef = useRef<HTMLDivElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
   const loadingClearedRef = useRef(false); // Track if loading config has been cleared
+  const scrollPositionRef = useRef<number>(0); // Store scroll position when locking body scroll
 
   /**
    * Check if content overflows and user is not at bottom
@@ -525,6 +526,92 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     
     checkMobile();
   }, []);
+
+  /**
+   * Prevent body scrolling when palette is open
+   * This fixes the issue where background scrolls behind the palette,
+   * especially on mobile devices where it can cause scroll conflicts
+   * 
+   * Professional comment: We need to lock both html and body elements on mobile
+   * to completely prevent scrolling. On mobile, we use position: fixed which is
+   * more reliable than overflow: hidden for touch devices.
+   */
+  useEffect(() => {
+    if (!isOpen) {
+      // Palette is closed - restore original scroll behavior
+      const scrollY = scrollPositionRef.current;
+      
+      // Restore html element styles
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.touchAction = '';
+      
+      // Restore body element styles
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.touchAction = '';
+      
+      // Restore scroll position on mobile
+      if (isMobile && scrollY > 0) {
+        // Use requestAnimationFrame to ensure DOM has updated before restoring scroll
+        requestAnimationFrame(() => {
+          window.scrollTo(0, scrollY);
+        });
+      }
+      
+      return;
+    }
+
+    // Palette is open - prevent body scrolling
+    // Store original values before modifying
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalHtmlTouchAction = document.documentElement.style.touchAction;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalBodyPosition = document.body.style.position;
+    const originalBodyTouchAction = document.body.style.touchAction;
+
+    // Lock scroll on both html and body
+    // Professional comment: On mobile, we lock body with position: fixed and html with overflow: hidden
+    // This combination is the most reliable way to prevent scrolling on touch devices
+    if (isMobile) {
+      // Mobile: Use fixed position on body to prevent scroll completely
+      // This is more reliable on mobile devices where overflow: hidden can be inconsistent
+      const scrollY = window.scrollY;
+      scrollPositionRef.current = scrollY; // Store for restoration
+      
+      // Lock html element - use overflow hidden, not position fixed
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.touchAction = 'none';
+      
+      // Lock body element with position fixed
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none'; // Prevent touch scrolling on body
+      
+      // Cleanup function to restore scroll behavior
+      return () => {
+        document.documentElement.style.overflow = originalHtmlOverflow;
+        document.documentElement.style.touchAction = originalHtmlTouchAction;
+        document.body.style.overflow = originalBodyOverflow;
+        document.body.style.position = originalBodyPosition;
+        document.body.style.touchAction = originalBodyTouchAction;
+        document.body.style.top = '';
+        document.body.style.width = '';
+      };
+    } else {
+      // Desktop: Lock both html and body with overflow hidden
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      
+      return () => {
+        document.documentElement.style.overflow = originalHtmlOverflow;
+        document.body.style.overflow = originalBodyOverflow;
+      };
+    }
+  }, [isOpen, isMobile]);
 
   /**
    * Sync with controlled open prop if provided
@@ -1206,6 +1293,11 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     // For all other actions, submit a query
     const queryToSubmit = customQuery || action.query || action.label;
 
+    // Professional comment: Set isProcessingQuery immediately to show loader right away
+    // This provides immediate visual feedback when user clicks a quick action, before streaming starts
+    // handleSubmitQuery will also set this, but setting it here ensures no delay in showing the loader
+    setIsProcessingQuery(true);
+
     // Determine if we should skip classification
     const skipClassification = !!action.intent;
 
@@ -1264,6 +1356,16 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               // Unlock animation state when animation finishes (both open and close)
               setIsAnimating(false);
             }}
+            // Professional comment: Prevent touch events from propagating to body
+            // This ensures scrolling within the palette doesn't affect the background
+            onTouchStart={(e) => {
+              // Stop propagation to prevent body scroll on mobile
+              e.stopPropagation();
+            }}
+            onTouchMove={(e) => {
+              // Allow touch move within palette, but prevent body scroll
+              e.stopPropagation();
+            }}
             className={`
               fixed left-1/2 z-[1000]
               ${isMobile 
@@ -1281,9 +1383,15 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               after:absolute after:inset-0 after:rounded-2xl
               after:bg-gradient-to-tr after:from-transparent after:via-white/[0.03] after:to-transparent
               after:pointer-events-none
-              overflow-hidden
+              ${isMobile ? '' : 'overflow-hidden'}
+              touch-pan-y
               ${isInputFocused ? 'ring-2 ring-sky-400/20 border-sky-400/30' : ''}
             `}
+            style={{
+              // Professional comment: Enable touch scrolling within palette on mobile
+              // touch-action: pan-y allows vertical scrolling but prevents horizontal panning
+              touchAction: isMobile ? 'pan-y' : 'auto',
+            }}
           >
         {/* Input row */}
         <div className="relative flex items-center pl-4 pr-[52px] min-h-[56px]">
@@ -1473,7 +1581,21 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               <div
                 ref={answerRef}
                 onScroll={handleScroll}
+                // Professional comment: Prevent touch events from bubbling to body
+                // This ensures scrolling within the answer area doesn't affect background
+                onTouchStart={(e) => {
+                  e.stopPropagation();
+                }}
+                onTouchMove={(e) => {
+                  e.stopPropagation();
+                }}
                 className="p-4 overflow-y-auto space-y-4 max-h-96"
+                style={{
+                  // Professional comment: Enable vertical touch scrolling within answer area
+                  touchAction: 'pan-y',
+                  // Professional comment: Ensure smooth scrolling on mobile
+                  WebkitOverflowScrolling: 'touch',
+                }}
               >
                 {/* Render all previous exchanges from conversation history */}
                 {conversationHistory.map((exchange, index) => (
@@ -1708,6 +1830,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
       {/* Invisible backdrop for click-outside detection (doesn't dim) */}
       {/* Also animated to fade in/out with the palette */}
+      {/* Professional comment: Prevent touch scrolling on backdrop while allowing clicks */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -1715,6 +1838,17 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         transition={{ duration: 0.2 }}
         className="fixed inset-0 z-[999]"
         onClick={() => handleOpenChange(false)}
+        // Professional comment: Prevent touch scrolling on backdrop
+        // Only prevent default on touchMove to stop scrolling, allow touchStart for clicks
+        onTouchMove={(e) => {
+          e.preventDefault(); // Prevent scrolling gestures
+          e.stopPropagation(); // Stop event propagation to body
+        }}
+        style={{
+          // Professional comment: Disable touch panning/scrolling on backdrop
+          // This prevents scroll gestures while still allowing tap/click events
+          touchAction: 'none',
+        }}
         aria-hidden="true"
       />
     </>
