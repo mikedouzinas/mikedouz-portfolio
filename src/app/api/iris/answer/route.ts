@@ -173,7 +173,6 @@ function shouldSynthesizeMultipleMatches(
   // Professional comment: This is a fallback for when company name isn't explicitly mentioned
   // but the query clearly asks about work/experience at that company
   if (types.size === 1 && companies.size === 1) {
-    const companyName = Array.from(companies)[0];
     // Check if query mentions work/experience (even if company name isn't explicitly mentioned)
     if (queryLower.includes('work') || queryLower.includes('experience') || queryLower.includes('internship')) {
       return true;
