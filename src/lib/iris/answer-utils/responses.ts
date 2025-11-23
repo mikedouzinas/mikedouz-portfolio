@@ -143,6 +143,8 @@ export function buildClarificationPrompt(query: string, results: Array<{ doc: Pa
     return `${idx + 1}. ${label}${year ? ` (${year})` : ''} - ${kind}`;
   }).join('\n');
 
+  // Professional comment: Include a follow-up suggestion to help users continue the conversation
+  // This makes the clarification prompt more actionable and guides users on next steps
   return `I found multiple matches for "${query}". Which one do you want to dive into?\n${options}\n\nReply with the number or title so I can focus on the right work.`;
 }
 

@@ -622,6 +622,88 @@ const testCases: TestCase[] = [
     ],
   },
 
+  // ==================== CLARIFICATION PROMPTS & MULTIPLE MATCHES ====================
+  {
+    query: 'tell me about veson',
+    category: 'Clarification Prompt: Multiple Matches (Ambiguous)',
+    checks: [
+      {
+        description: 'Asks for clarification when multiple matches found',
+        validator: (r) => {
+          const text = r.text?.toLowerCase() || '';
+          return text.includes('multiple matches') || text.includes('which one') || 
+                 (text.includes('1.') && text.includes('2.'));
+        },
+      },
+      {
+        description: 'Lists multiple options with numbers',
+        validator: (r) => {
+          const text = r.text || '';
+          return text.includes('1.') && text.includes('2.');
+        },
+      },
+      {
+        description: 'Quick actions present (CRITICAL: clarification should have actions)',
+        validator: (r) => Array.isArray(r.quickActions) && r.quickActions.length > 0,
+      },
+      {
+        description: 'Has follow-up quick action',
+        validator: (r) => r.quickActions?.some((qa: any) => 
+          qa.type === 'custom_input' || qa.type === 'preset'
+        ),
+      },
+    ],
+  },
+  {
+    query: 'tell me about his mobile work at veson',
+    category: 'Synthesis: Related Multiple Matches (Same Company)',
+    checks: [
+      {
+        description: 'Synthesizes answer instead of asking for clarification',
+        validator: (r) => {
+          const text = r.text?.toLowerCase() || '';
+          return !text.includes('multiple matches') && !text.includes('which one') &&
+                 (text.includes('mobile') || text.includes('veson'));
+        },
+      },
+      {
+        description: 'Provides information about mobile work',
+        validator: (r) => {
+          const text = r.text?.toLowerCase() || '';
+          return text.includes('mobile') || text.includes('ios') || text.includes('app');
+        },
+      },
+      {
+        description: 'Quick actions present',
+        validator: (r) => Array.isArray(r.quickActions) && r.quickActions.length > 0,
+      },
+      {
+        description: 'Has follow-up options',
+        validator: (r) => r.quickActions?.some((qa: any) => 
+          qa.type === 'custom_input' || qa.type === 'preset'
+        ),
+      },
+    ],
+  },
+  {
+    query: 'what internships has mike done?',
+    category: 'Synthesis: Multiple Related Experiences',
+    checks: [
+      {
+        description: 'Synthesizes multiple internships',
+        validator: (r) => {
+          const text = r.text?.toLowerCase() || '';
+          return !text.includes('multiple matches') && 
+                 (text.includes('intern') || text.includes('veson') || text.includes('parsons'));
+        },
+      },
+      {
+        description: 'Quick actions present',
+        validator: (r) => Array.isArray(r.quickActions) && r.quickActions.length > 0,
+      },
+    ],
+  },
+
   // ==================== COMPARATIVE QUERIES ====================
   {
     query: 'compare mikes internships at parsons and veson',

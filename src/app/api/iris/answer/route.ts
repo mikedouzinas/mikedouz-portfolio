@@ -115,6 +115,169 @@ const TYPE_FILTERS: Record<Intent, Array<'project' | 'experience' | 'class' | 'b
 };
 
 /**
+ * Determines if multiple results should be synthesized instead of asking for clarification.
+ * When results are clearly related (same company, same type, query mentions that company),
+ * we should synthesize an answer about all of them rather than asking the user to choose.
+ *
+ * @param query - The user's query
+ * @param results - The matching results
+ * @param filters - The applied filters
+ * @returns true if results should be synthesized, false if clarification is needed
+ */
+function shouldSynthesizeMultipleMatches(
+  query: string,
+  results: Array<{ doc: Partial<KBItem> }>,
+  filters?: QueryFilter
+): boolean {
+  // If show_all is set, always synthesize (user wants to see all matches)
+  if (filters?.show_all) {
+    return true;
+  }
+
+  // Need at least 2 results to consider synthesis
+  if (results.length < 2) {
+    return false;
+  }
+
+  // Extract company names and types from results
+  const queryLower = query.toLowerCase();
+  const companies = new Set<string>();
+  const types = new Set<string>();
+  
+  for (const result of results) {
+    const doc = result.doc;
+    
+    // Extract company if it's an experience
+    if ('company' in doc && doc.company) {
+      companies.add(doc.company.toLowerCase());
+    }
+    
+    // Extract type/kind
+    const kind = 'kind' in doc ? doc.kind : 'type' in doc ? doc.type : null;
+    if (kind) {
+      types.add(kind);
+    }
+  }
+
+  // If all results share the same company, check if query mentions that company
+  if (companies.size === 1) {
+    const companyName = Array.from(companies)[0];
+    // If query mentions the company name, synthesize (handles "work at veson", "veson internship", etc.)
+    if (queryLower.includes(companyName)) {
+      return true;
+    }
+  }
+
+  // If all results are the same type and same company, and query mentions work/experience, synthesize
+  // This handles cases like "mobile work at veson" where both experiences are from Veson
+  // Professional comment: This is a fallback for when company name isn't explicitly mentioned
+  // but the query clearly asks about work/experience at that company
+  if (types.size === 1 && companies.size === 1) {
+    const companyName = Array.from(companies)[0];
+    // Check if query mentions work/experience (even if company name isn't explicitly mentioned)
+    if (queryLower.includes('work') || queryLower.includes('experience') || queryLower.includes('internship')) {
+      return true;
+    }
+  }
+
+  // If query mentions a skill/technology and all results use that skill, synthesize
+  if (filters?.skills && filters.skills.length > 0) {
+    // All results share the same skill filter, so synthesize
+    if (types.size === 1) {
+      return true;
+    }
+  }
+
+  // Otherwise, ask for clarification (results are ambiguous/unrelated)
+  return false;
+}
+
+/**
+ * Streams a clarification prompt with quick actions attached.
+ * Professional comment: Clarification prompts should always include quick actions
+ * so users can continue the conversation or explore related content.
+ *
+ * @param query - The user's query
+ * @param results - The matching results that need clarification
+ * @param intent - The detected intent
+ * @param filters - The applied filters
+ * @param depth - Current conversation depth
+ * @param getAllItems - Function to get all KB items
+ * @returns Response with clarification prompt and quick actions
+ */
+async function streamClarificationWithActions(
+  query: string,
+  results: Array<{ score: number; doc: Partial<KBItem> }>,
+  intent: Intent,
+  filters: QueryFilter | undefined,
+  depth: number,
+  getAllItems: () => Promise<KBItem[]>
+): Promise<Response> {
+  const encoder = new TextEncoder();
+  // Build clarification prompt - convert results to format expected by buildClarificationPrompt
+  const clarificationText = buildClarificationPrompt(
+    query,
+    results.map(r => ({ doc: r.doc }))
+  );
+
+  const readable = new ReadableStream({
+    async start(controller) {
+      // Send the clarification prompt text
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: clarificationText })}\n\n`));
+
+      // Generate quick actions for clarification prompts
+      // Professional comment: Even when asking for clarification, we should provide
+      // quick actions so users can explore the options or ask follow-up questions
+      try {
+        const allItems = await getAllItems();
+        const rankings = loadRankings();
+
+        // Generate quick actions based on the results
+        // For clarification, we want to show actions that help users explore the options
+        const generatedQuickActions = generateQuickActions({
+          query,
+          intent,
+          filters,
+          results, // Results already have scores, so this is correct
+          fullAnswer: clarificationText, // Use clarification text as the "answer"
+          allItems,
+          rankings,
+          depth,
+        });
+
+        // Send quick actions to client
+        if (generatedQuickActions.length > 0) {
+          const quickActionsData = `data: ${JSON.stringify({ quickActions: generatedQuickActions })}\n\n`;
+          controller.enqueue(encoder.encode(quickActionsData));
+
+          console.log('\n═══════════════════════════════════════════════════════════════');
+          console.log('💡 CLARIFICATION QUICK ACTIONS');
+          console.log('═══════════════════════════════════════════════════════════════');
+          console.log(`Count: ${generatedQuickActions.length}`);
+          console.log('Actions:', JSON.stringify(generatedQuickActions, null, 2));
+          console.log('═══════════════════════════════════════════════════════════════\n');
+        }
+      } catch (error) {
+        console.error('[Answer API] Failed to generate quick actions for clarification:', error);
+        // Don't fail the response if quick actions fail - just log the error
+      }
+
+      // Close the stream
+      controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+      controller.close();
+    }
+  });
+
+  return new Response(readable, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive'
+    }
+  });
+}
+
+/**
  * POST /api/iris/answer
  * Main answer endpoint with intent-based routing, streaming, and error handling
  */
@@ -930,9 +1093,29 @@ Keep your response to 2-3 short paragraphs max.`;
 
       results = expandResultsForComparativeQuery(query, results, await getAllItems(), aliasMatches);
 
+      // Professional comment: When multiple items match a specific_item query, check if they're
+      // clearly related (same company, same type, query mentions that company). If so, synthesize
+      // an answer about all of them rather than asking for clarification. Only ask for clarification
+      // when matches are truly ambiguous/unrelated.
       if (intent === 'specific_item' && results.length > 1 && !filters.show_all) {
-        // Ask for clarification instead of guessing when multiple items match.
-        return streamTextResponse(buildClarificationPrompt(query, results));
+        // Check if results should be synthesized instead of asking for clarification
+        if (shouldSynthesizeMultipleMatches(query, results, filters)) {
+          // Results are clearly related - synthesize an answer about all of them
+          // Continue to normal response generation (don't return early)
+          // This will generate a proper LLM response with quick actions and follow-ups
+        } else {
+          // Results are ambiguous/unrelated - ask for clarification
+          // Professional comment: Include quick actions with clarification so users
+          // can explore options or ask follow-up questions
+          return await streamClarificationWithActions(
+            query,
+            results,
+            intent,
+            filters,
+            depth,
+            getAllItems
+          );
+        }
       }
 
       // For specific_item queries with exactly one match, we can return direct info
