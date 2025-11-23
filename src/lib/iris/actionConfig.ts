@@ -379,8 +379,11 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       getData: (item) => {
         const project = item as ProjectT;
         const topSkills = project.skills.slice(0, 2);
+        const skillsList = topSkills.join(' and ');
+        // Professional comment: Describe what we're showing (the project with these skills)
+        // and what we should say (other projects using these skills)
         return {
-          query: `projects using ${topSkills.join(' and ')}`,
+          query: `We just showed the project ${project.title} which uses ${skillsList}. Now show me other projects Mike built that also use ${skillsList} and explain how he used these skills in each project, including the technical implementation and outcomes.`,
           intent: 'filter_query',
           filters: { type: ['project'], skills: topSkills }
         };
@@ -451,8 +454,10 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       condition: (item) => 'company' in item,
       getData: (item) => {
         const exp = item as ExperienceT;
+        // Professional comment: Describe what we're showing (other experiences at this company)
+        // and what we should say (talk about each role, what Mike did, impact)
         return {
-          query: `work at ${exp.company}`,
+          query: `We just showed Mike's experience at ${exp.company}. Now show me all of Mike's other work experiences at ${exp.company} and describe each role - what he did, the technical work, and the impact he made in each position.`,
           intent: 'filter_query',
           filters: { type: ['experience'], company: [exp.company] }
         };
@@ -466,8 +471,11 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       getData: (item) => {
         const exp = item as ExperienceT;
         const topSkills = exp.skills.slice(0, 2);
+        const skillsList = topSkills.join(' and ');
+        // Professional comment: Describe what we're showing (work using these skills)
+        // and what we should say (talk about projects and experiences where Mike used these skills)
         return {
-          query: `work using ${topSkills.join(' and ')}`,
+          query: `We just showed Mike's experience using ${skillsList}. Now show me other work (projects and experiences) where Mike used ${skillsList} and explain how he applied these skills in each project or role, including the technical implementation and outcomes.`,
           intent: 'filter_query',
           filters: { type: ['experience', 'project'], skills: topSkills }
         };
@@ -520,8 +528,11 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       getData: (item) => {
         const cls = item as ClassT;
         const topSkills = cls.skills.slice(0, 3);
+        const skillsList = topSkills.join(', ');
+        // Professional comment: Describe what we're showing (class covering these skills)
+        // and what we should say (show projects and experiences where Mike used these skills)
         return {
-          query: `work using ${topSkills.join(', ')}`,
+          query: `We just showed the class ${cls.title} which covers ${skillsList}. Now show me Mike's projects and work experiences where he used ${skillsList} and explain how he applied what he learned from this class in each project or role.`,
           intent: 'filter_query',
           filters: { type: ['project', 'experience'], skills: topSkills }
         };
@@ -535,8 +546,11 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
       getData: (item) => {
         const cls = item as ClassT;
         const topSkills = cls.skills.slice(0, 2);
+        const skillsList = topSkills.join(' and ');
+        // Professional comment: Describe what we're showing (classes covering similar skills)
+        // and what we should say (talk about each class and what Mike did in them)
         return {
-          query: `classes covering ${topSkills.join(' and ')}`,
+          query: `We just showed the class ${cls.title} which covers ${skillsList}. Now show me other classes Mike took that also cover ${skillsList} and explain what Mike did in each class, including the projects and work he completed.`,
           intent: 'filter_query',
           filters: { type: ['class'], skills: topSkills }
         };
@@ -579,8 +593,9 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
           ...(blog.related_experiences || []),
           ...(blog.related_projects || [])
         ];
+        // Professional comment: Describe what we're showing (the blog) and what we should say (related work)
         return {
-          query: `tell me about ${related[0]}`,
+          query: `We just showed the blog post ${blog.title || blog.short_name || 'this blog'}. Now tell me about the related work ${related[0]} - describe what it is, what Mike did, the technical details, and how it relates to this blog post.`,
           intent: 'specific_item',
           filters: { title_match: related[0] }
         };
@@ -643,9 +658,9 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
         const skillName = getDisplayName(skill);
         // Professional comment: Make query contextual to the specific skill
         // This ensures the query meaning matches the action label ("skills often used with THIS")
-        // Example: "What skills does Mike often use with NLP?" instead of generic "what other skills?"
+        // Describe what we're showing (the skill) and what we should say (related skills)
         return {
-          query: `What skills does Mike often use with ${skillName}?`,
+          query: `We just showed the skill ${skillName}. Now show me what other skills Mike often uses together with ${skillName} and explain how he combines these skills in his projects and work experiences.`,
           intent: 'filter_query',
           filters: { type: ['skill'] }
         };
@@ -798,7 +813,8 @@ export function getActionsForList(
         getData: () => ({
           // Professional comment: Use display name in query so Iris understands the reference
           // Raw IDs like "proj_portfolio" confuse the LLM when context shows "Portfolio & Iris"
-          query: `tell me about ${displayName}`,
+          // Describe what we're showing (the project) and what we should say (details, technical work, impact)
+          query: `We just showed a list of projects. Now tell me about the project ${displayName} - describe what it is, what technical work Mike did on it, the technologies used, and the impact or results it achieved.`,
           intent: 'specific_item',
           filters: { title_match: topProject.id }
         })
@@ -876,7 +892,8 @@ export function getActionsForList(
         getData: () => ({
           // Professional comment: Use display name in query for clarity with Iris
           // Experience IDs like "exp_veson_2024" aren't meaningful to the LLM
-          query: `tell me about ${displayName}`,
+          // Describe what we're showing (the experience) and what we should say (role, work, impact)
+          query: `We just showed a list of work experiences. Now tell me about ${displayName} - describe what company Mike worked at, what role he had, what technical work he did there, the skills he used, and the impact he made in this position.`,
           intent: 'specific_item',
           filters: { title_match: topExp.id }
         })
@@ -945,10 +962,17 @@ export function getActionsForList(
 
       // Professional comment: For classes, ask about Mike's work/experience, not generic course description
       // This ensures Iris describes what Mike did in the class rather than what the course is about
+      // For bio/profile items, ask about Mike himself, not "Mike's Profile" which sounds like a document
       const isClass = item.kind === 'class';
-      const queryText = isClass 
-        ? `What did Mike do in ${displayName}?` 
-        : `tell me about ${displayName}`;
+      const isBio = item.kind === 'bio';
+      
+      let queryText = `We just showed a list. Now tell me about ${displayName} - describe what it is, what Mike did with it, the technical details, and the impact or results.`;
+      
+      if (isClass) {
+        queryText = `We just showed a list that includes the class ${displayName}. Now tell me what Mike did in the class ${displayName} - describe the projects he worked on, what technical skills he learned and applied, and what work or experience he gained from taking this class.`;
+      } else if (isBio) {
+        queryText = `We just showed a list. Now tell me about Mike - his background, biography, what he's currently doing, and his key strengths.`;
+      }
       
       actions.push({
         type: 'query',
@@ -957,9 +981,10 @@ export function getActionsForList(
         getData: () => ({
           // Professional comment: Use display name in query to match what Iris sees in context
           // For classes, specifically ask about Mike's work to get his experience/projects rather than generic course info
+          // Describe what we're showing and what we should say for each item type
           query: queryText,
-          intent: 'specific_item',
-          filters: { title_match: item.id }
+          intent: isBio ? 'personal' : 'specific_item',
+          filters: isBio ? undefined : { title_match: item.id }
         })
       });
     }

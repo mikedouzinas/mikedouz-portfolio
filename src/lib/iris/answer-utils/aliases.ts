@@ -25,17 +25,38 @@ export function collectAliasMatches(query: string, aliasIndex: AliasEntry[]): Al
  * @param normalizedQuery - The normalized query string
  * @param entry - The alias entry to check
  * @returns True if the query matches the alias
+ * 
+ * Professional comment: This function handles both exact substring matches and token-based matching.
+ * For short aliases (like "Lilie"), it checks for exact substring inclusion. For longer names,
+ * it also checks if significant tokens (4+ characters) appear in the query to handle partial matches.
  */
 export function matchesAlias(normalizedQuery: string, entry: AliasEntry): boolean {
   const candidates = [entry.name, ...(entry.aliases || [])];
   return candidates.some(candidate => {
     const normalizedCandidate = normalizeQueryText(candidate || '');
     if (!normalizedCandidate) return false;
+    
+    // Professional comment: Check for exact substring match first (handles "Lilie" in "whats lilie")
     if (normalizedQuery.includes(normalizedCandidate)) {
       return true;
     }
+    
+    // Professional comment: For multi-word candidates, check if the query contains significant tokens
+    // This handles cases like "Liu Idea Lab" matching "liu idea lab" in complex queries
     const tokens = normalizedCandidate.split(' ').filter(token => token.length >= 4);
-    return tokens.some(token => normalizedQuery.includes(token));
+    if (tokens.length > 0) {
+      return tokens.some(token => normalizedQuery.includes(token));
+    }
+    
+    // Professional comment: For short single-word aliases (like "Lilie"), also check if the alias
+    // appears as a standalone word or as part of a longer phrase
+    if (normalizedCandidate.length >= 4) {
+      // Check if the alias appears as a word boundary (handles "lilie" in "worked for lilie")
+      const wordBoundaryRegex = new RegExp(`\\b${normalizedCandidate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+      return wordBoundaryRegex.test(normalizedQuery);
+    }
+    
+    return false;
   });
 }
 

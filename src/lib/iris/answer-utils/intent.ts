@@ -77,8 +77,9 @@ Patterns: "contact", "email", "reach out", "get in touch", "linkedin", "how to c
 
 ## 2. SPECIFIC_ITEM Intent
 Use when query asks about a SINGLE, SPECIFIC item by name/title.
-Patterns: "tell me about [ITEM]", "how was [ITEM] built?", "when did [ITEM] happen?", "what is [ITEM]?"
-Examples: "HiLiTe", "APCS A", "Veson internship", "IMOS laytime"
+Patterns: "tell me about [ITEM]", "how was [ITEM] built?", "when did [ITEM] happen?", "what is [ITEM]?", "whats [ITEM]?", "what's [ITEM]?"
+Examples: "HiLiTe", "APCS A", "Veson internship", "IMOS laytime", "Lilie", "what is Lilie", "mike worked for Lilie what is that", "tell me about the parsons company"
+**CRITICAL:** If query mentions a company name (e.g., "Lilie", "Parsons", "Veson") and asks "what is" or "tell me about", use SPECIFIC_ITEM with title_match.
 ALWAYS include title_match filter with the item name/title extracted from the query.
 
 ## 3. FILTER_QUERY Intent
@@ -137,18 +138,18 @@ When query uses action words or asks broadly about work, consider multiple types
 
 ## 4. PERSONAL Intent
 Use when query asks about personal information, background, values, interests, education, or biography.
-Patterns: "values", "interests", "story", "background", "education", "school", "degree", "bio", "headline", "name", "why"
+Patterns: "who is mike", "tell me about mike", "mike douzinas", "values", "interests", "story", "background", "education", "school", "degree", "bio", "headline", "name", "why"
 
 ## 5. GENERAL Intent
 Use ONLY as fallback when query doesn't fit any specific intent and requires semantic search across all item types.
-Typically for exploratory questions like "what technical work", "what has Mike done", "tell me about Mike's work"
+Typically for exploratory questions like "what technical work", "what has Mike done", "tell me about Mike's work", "what does mike think about X"
 
 # Decision Process
 
 1. Does the query explicitly ask for contact info OR ask about future availability (e.g., "is mike available for X")? → CONTACT
 2. Does the query mention a specific item name/title? → SPECIFIC_ITEM (with title_match)
 3. Does the query ask for a list or multiple items? → FILTER_QUERY (extract type, skills, year, company filters)
-4. Does the query ask about personal/background information? → PERSONAL
+4. Does the query ask about personal/background information (including "who is mike")? → PERSONAL
 5. Otherwise → GENERAL
 
 # Critical Guidelines
@@ -160,8 +161,9 @@ Typically for exploratory questions like "what technical work", "what has Mike d
 - For ambiguous queries, prefer more specific filters over general ones
 
 # Scope Guardrail
-- Set "about_mike" to false when the query is unrelated to Mike (generic trivia, other people, off-topic asks)
-- Set "about_mike" to true when the user references Mike, Iris, "you", or clearly intends to discuss his work/life
+- Set "about_mike" to true when the user references Mike, Iris, "you", or clearly intends to discuss his work, life, opinions, or thoughts (even if the topic is general, like "what does Mike think about AI?").
+- Set "about_mike" to false ONLY when the query is completely unrelated to Mike (generic trivia, other people, calculations, jokes).
+- **CRITICAL:** Questions about "Mike's opinion/thoughts on X" are ABOUT MIKE. Set about_mike: true.
 
 # Multi-Type Query Examples
 

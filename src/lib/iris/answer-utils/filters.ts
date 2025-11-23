@@ -82,8 +82,11 @@ export function deriveFilterDefaults(
   // Professional comment: If there's a single clear alias match and the query looks like a specific item request,
   // set title_match to route to specific_item intent. This catches queries like "tell me about iris" or "what is HiLiTe"
   // that should go directly to a specific item rather than doing a general search.
+  // Professional comment: Pattern includes contractions like "whats" (what's/what is) and handles various question formats
   if (aliasMatches.length === 1 && !next.title_match) {
-    const isSpecificQuery = /\b(tell me about|what is|show me|about|explain|describe)\b/.test(normalized);
+    // Match "what is", "whats", "what's", "tell me about", "show me", "about", "explain", "describe"
+    // Also handle "what is X" patterns even when X is mentioned elsewhere in query
+    const isSpecificQuery = /\b(tell me about|what is|whats|what s|show me|about|explain|describe|what.*is|what.*was)\b/.test(normalized);
     if (isSpecificQuery) {
       next.title_match = aliasMatches[0].id;
       mutated = true;
@@ -130,12 +133,19 @@ export function deriveFilterDefaults(
   // If title_match is already set, the query is targeting a specific item by ID,
   // and adding derived type filters could incorrectly exclude the target item
   // (e.g., searching for "interest_software_development" with derived type: ["experience"]).
+  // Professional comment: Also check if query has "what is" pattern - if so, prefer title_match over company filter
+  // to route to specific_item intent (e.g., "mike worked for Lilie what is that" should use title_match, not company filter)
+  const hasWhatIsPattern = /\b(what is|whats|what s|what.*is|what.*was)\b/.test(normalized);
   const companyMatches = aliasMatches
     .filter(match => match.type === 'experience')
     .map(match => match.name)
     .filter(Boolean);
 
-  if (companyMatches.length > 0 && !next.title_match) {
+  // Professional comment: Only add company filter if:
+  // 1. No title_match is set yet
+  // 2. Query doesn't have "what is" pattern (which should use title_match instead)
+  // 3. There are company matches
+  if (companyMatches.length > 0 && !next.title_match && !hasWhatIsPattern) {
     ensureType(next, 'experience');
     const existing = new Set(next.company ?? []);
     companyMatches.forEach(name => existing.add(name));
@@ -148,20 +158,25 @@ export function deriveFilterDefaults(
   // 1. Query is asking for a specific item (not a list/overview query)
   // 2. The match hasn't already been added as a company filter
   // 3. The query pattern suggests a specific item lookup (not "all X" or "list X")
+  // Professional comment: Use ID instead of name for title_match to ensure exact item matching
   if (!next.title_match) {
     const isListQuery = /\b(list|show|give me|display|enumerate|all|every|everything|what.*has|what.*did)\b/.test(normalized);
+    // Professional comment: Also check for "what is" patterns (including contractions) for specific item queries
+    const isWhatIsQuery = /\b(what is|whats|what s|what.*is|what.*was)\b/.test(normalized);
     const specificMatch = aliasMatches.find(match => {
       // Only match projects or experiences that aren't already in company filters
       if (match.type !== 'project' && match.type !== 'experience') return false;
       // Don't set title_match if this name is already in company filters
       if (next.company && next.company.includes(match.name)) return false;
-      // For list queries, prefer company filters over title_match
-      if (isListQuery && match.type === 'experience') return false;
+      // For list queries, prefer company filters over title_match (unless it's a "what is" query)
+      if (isListQuery && match.type === 'experience' && !isWhatIsQuery) return false;
       return true;
     });
     
     if (specificMatch) {
-      next.title_match = specificMatch.name;
+      // Professional comment: Use ID for exact matching, not name. This ensures we match the correct item
+      // even when aliases have different casing or formatting than the actual item name.
+      next.title_match = specificMatch.id;
       mutated = true;
     }
   }

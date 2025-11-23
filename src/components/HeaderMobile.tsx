@@ -43,7 +43,7 @@ export default function HeaderMobile({ onOpenAbout }: HeaderMobileProps) {
 
   return (
     <header 
-      className="md:hidden sticky top-0 z-50 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50"
+      className="md:hidden sticky top-0 z-[1000] bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50"
     >
       <div className="px-4 py-3 flex items-center justify-between gap-3">
         {/* Left section: Name + Info icon + Subtitle */}

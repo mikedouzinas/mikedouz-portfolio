@@ -41,9 +41,17 @@ export const metadata: Metadata = {
   },
 };
 
-// Viewport configuration for mobile browser theme colors
+// Viewport configuration for mobile browser theme colors and zoom prevention
 // Moved from metadata as per Next.js 15 requirements
+// Professional comment: width=device-width ensures proper mobile rendering
+// initial-scale=1 prevents automatic zoom on page load
+// maximum-scale=5 allows user zooming for accessibility while preventing excessive zoom
+// user-scalable=yes maintains accessibility (users can still zoom if needed)
 export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#0f172a" }, // slate-900 for light mode
     { media: "(prefers-color-scheme: dark)", color: "#0f172a" }, // slate-900 for dark mode

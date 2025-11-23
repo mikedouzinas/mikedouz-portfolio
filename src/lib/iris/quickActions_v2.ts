@@ -81,10 +81,13 @@ function templateToAction(
 
       // Take top 3 options
       const topOptions = data.options.slice(0, 3);
+      const optionLabel = topOptions[0].label;
+      // Professional comment: Make query descriptive to tell Iris what we're showing and what to answer
+      // Use the display label instead of ID for better context
       return {
         type: 'specific',
-        label: `${label}: ${topOptions[0].label}`,
-        query: `tell me about ${topOptions[0].id}`,
+        label: `${label}: ${optionLabel}`,
+        query: `We just showed ${label.toLowerCase()} options. Now tell me about ${optionLabel} - describe what it is, what Mike did with it, the technical details, and the impact or results.`,
         intent: 'specific_item',
         filters: { title_match: topOptions[0].id }
       };
