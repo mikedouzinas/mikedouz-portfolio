@@ -20,6 +20,16 @@ import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { SiCalendly } from 'react-icons/si';
 import { getSignalSummary } from '@/lib/iris/signals';
 import { useRouter } from 'next/navigation';
+import {
+  trackIrisOpen,
+  trackIrisClose,
+  trackIrisQuerySubmit,
+  trackIrisAnswerReceived,
+  trackQuickActionClick,
+  trackContactComposerOpen,
+  type IrisIntentType,
+  type QuickActionType,
+} from '@/lib/analytics/gtag';
 import ReactMarkdown from 'react-markdown';
 import { useUiDirectives, defaultOpenFor, stripUiDirectives, detectContactDirective } from './iris/useUiDirectives';
 import MessageComposer from './iris/MessageComposer';
@@ -388,6 +398,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     // Only auto-open if it's a new directive we haven't seen before
     const shouldAutoOpen = (persistedDirective.open ?? defaultOpenFor(persistedDirective.reason)) === 'auto';
     if (shouldAutoOpen && directiveId !== lastDirectiveRef.current) {
+      // Track composer open with reason
+      trackContactComposerOpen({
+        reason: persistedDirective.reason as 'user_request' | 'insufficient_context' | 'more_detail' | 'auto',
+      });
       setShowComposer(true);
       lastDirectiveRef.current = directiveId;
     }
@@ -609,6 +623,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     // This ensures IrisButton can start its reverse animation immediately
     // AnimatePresence will handle the palette's exit animation before unmounting
     if (!open) {
+      trackIrisClose();
       window.dispatchEvent(new CustomEvent('mv-close-cmdk'));
     }
     
@@ -715,6 +730,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    */
   useEffect(() => {
     const handleCustomOpen = () => {
+      trackIrisOpen('button');
       handleOpenChange(true);
     };
 
@@ -728,6 +744,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    */
   useEffect(() => {
     const handleToggle = () => {
+      if (!isOpen) {
+        trackIrisOpen('keyboard');
+      }
       handleOpenChange(!isOpen);
     };
 
@@ -929,6 +948,12 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       ? conversationHistory[conversationHistory.length - 1].depth + 1
       : 0;
 
+    // Track query submission
+    trackIrisQuerySubmit({
+      query_length: q.length,
+      intent_type: preIntent as IrisIntentType | undefined,
+    });
+
     // Immediately switch to answer view with loading state
     setIsProcessingQuery(true);
     setSubmittedQuery(q);
@@ -1078,6 +1103,14 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
         // After streaming completes, add this exchange to conversation history
         if (accumulatedAnswer) {
+          // Track answer received with latency
+          const latency = mainLoadingStartTime ? Date.now() - mainLoadingStartTime : 0;
+          trackIrisAnswerReceived({
+            answer_length: accumulatedAnswer.length,
+            latency_ms: latency,
+            intent_type: finalIntent as IrisIntentType | undefined,
+          });
+
           // IMPORTANT: Detect and persist directive from accumulatedAnswer BEFORE clearing answer
           // This ensures the directive is captured even if answer state is cleared
           // The directive detection happens here to avoid race conditions with state updates
@@ -1085,7 +1118,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
           if (detectedDirective) {
             setPersistedDirective(detectedDirective);
           }
-          
+
           setConversationHistory(prev => [...prev, {
             query: q,
             answer: accumulatedAnswer,
@@ -1227,10 +1260,17 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       });
     }
 
+    // Track quick action click in GA
+    trackQuickActionClick({
+      action_type: action.type as QuickActionType,
+      action_label: action.label,
+    });
+
     // For message_mike action, open the composer
     // Create a synthetic directive to allow the composer to render
     // This simulates a user_request directive without a draft
     if (action.type === 'message_mike') {
+      trackContactComposerOpen({ reason: 'user_request' });
       setPersistedDirective({
         type: 'contact',
         reason: 'user_request',
