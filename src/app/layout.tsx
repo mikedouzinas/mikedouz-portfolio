@@ -60,6 +60,11 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Professional comment: GoogleAnalytics component from @next/third-parties/google
+  // handles script deduplication automatically, but we ensure it only renders when
+  // the measurement ID is configured to prevent unnecessary renders
+  const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
@@ -68,8 +73,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <IrisPalette />
         </ThemeProvider>
         <Analytics />
-        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+        {/* Professional comment: GoogleAnalytics component handles script loading and deduplication.
+            The @next/third-parties/google package ensures the script only loads once even in React StrictMode */}
+        {gaMeasurementId && (
+          <GoogleAnalytics gaId={gaMeasurementId} />
         )}
       </body>
     </html>
