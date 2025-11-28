@@ -189,7 +189,17 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
     const listType: 'project' | 'experience' | 'class' | 'skill' | 'blog' | 'mixed' =
       isMixed ? 'mixed' : (firstType as 'project' | 'experience' | 'class' | 'skill' | 'blog');
     const items = results.map(r => r.doc as KBItem);
-    const templates = getActionsForList(items, listType, rankings);
+
+    // Professional comment: Sort items by importance ranking before generating actions
+    // This ensures we suggest the most important items first, not just semantic search order
+    const rankingMap = new Map(rankings.all.map(r => [r.id, r.importance]));
+    const sortedItems = [...items].sort((a, b) => {
+      const importanceA = rankingMap.get(a.id) ?? 0;
+      const importanceB = rankingMap.get(b.id) ?? 0;
+      return importanceB - importanceA; // Higher importance first
+    });
+
+    const templates = getActionsForList(sortedItems, listType, rankings);
 
     console.log('[QuickActions v2] List actions:', {
       listType,
@@ -202,8 +212,19 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
       if (!template.getData) continue;
 
       // Professional note: Pass allItems to enable ID-to-title lookups in action labels
-      const data = template.getData(items[0], rankings, context.allItems);
+      const data = template.getData(sortedItems[0], rankings, context.allItems);
       const action = templateToAction(template, data);
+
+      // Professional comment: Skip actions for items that have already been visited
+      // This prevents suggesting the same item again (e.g., Parsons after clicking Parsons)
+      if (action && action.filters?.title_match) {
+        const itemId = action.filters.title_match as string;
+        // Check against both historical visited nodes and the current node we are viewing
+        if ((_visitedNodes && _visitedNodes.includes(itemId)) || itemId === _currentNode) {
+          console.log(`[QuickActions v2] Skipping already visited/current item: ${itemId}`);
+          continue;
+        }
+      }
 
       console.log('[QuickActions v2] Generated list action:', {
         templateType: template.type,

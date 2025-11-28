@@ -446,8 +446,39 @@ Output JSON:
       jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
     }
 
-    const plannerResult = JSON.parse(jsonText) as PlannerResult;
-    return plannerResult;
+    // Professional comment: Attempt JSON repair for common LLM JSON generation issues
+    // LLMs sometimes generate trailing commas, unescaped quotes, or other minor syntax errors
+    try {
+      const plannerResult = JSON.parse(jsonText) as PlannerResult;
+      return plannerResult;
+    } catch (parseError) {
+      // Try to repair common JSON issues
+      console.warn('[Answer API] Initial JSON parse failed, attempting repair...', parseError);
+      
+      try {
+        // Remove trailing commas before closing braces/brackets
+        let repaired = jsonText.replace(/,(\s*[}\]])/g, '$1');
+        
+        // Fix unescaped quotes in string values (basic heuristic)
+        // This is a simple fix - more complex cases may still fail
+        repaired = repaired.replace(/([{,]\s*"[^"]*":\s*")([^"]*)"([^"]*)"/g, (match, prefix, part1, part2) => {
+          // Only fix if there's an unescaped quote in the middle
+          if (part2 && !part2.startsWith('\\')) {
+            return `${prefix}${part1}\\"${part2}"`;
+          }
+          return match;
+        });
+        
+        const plannerResult = JSON.parse(repaired) as PlannerResult;
+        console.log('[Answer API] JSON repair successful');
+        return plannerResult;
+      } catch (repairError) {
+        // Log the original content for debugging
+        console.warn('[Answer API] Planner failed after repair attempt:', repairError);
+        console.warn('[Answer API] Original content (first 500 chars):', jsonText.substring(0, 500));
+        return null;
+      }
+    }
   } catch (error) {
     console.warn('[Answer API] Planner failed:', error);
     return null;

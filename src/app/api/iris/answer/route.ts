@@ -294,6 +294,7 @@ export async function POST(req: NextRequest) {
     const previousAnswer = body.previousAnswer;
     const inConversation = !!previousQuery; // In conversation if there's previous context
     const depth = typeof body.depth === 'number' ? body.depth : 0;
+    const visitedNodes = Array.isArray(body.visitedNodes) ? body.visitedNodes : [];
 
     // Extract skip classification flag and pre-set values
     const skipClassification = body.skipClassification === true;
@@ -419,20 +420,30 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Merge heuristic timeframe hints whenever the classifier missed them.
-    filters = applyTemporalHintsToFilters(filters, temporalHints);
+    // Professional comment: Only run filter derivation if we don't have a specific title_match from a quick action.
+    // Quick actions with title_match provide exact filters that shouldn't be modified by heuristics.
+    const isSpecificQuickAction = skipClassification && filters?.title_match;
 
     // Heuristic filter derivation (type, show_all, companies) in case LLM classification missed details.
     aliasIndex = aliasIndex.length > 0 ? aliasIndex : await getAliasIndexLazy();
+    // Professional comment: Always collect alias matches as they are used later for comparative query expansion
+    // independent of filter derivation.
     const aliasMatches = collectAliasMatches(query, aliasIndex);
-    
-    // Debug: Log filters before derivation
-    console.log('[Intent Detection] Filters from LLM:', JSON.stringify(filters, null, 2));
-    
-    filters = deriveFilterDefaults(query, filters, aliasMatches);
-    
-    // Debug: Log filters after derivation
-    console.log('[Intent Detection] Filters after derivation:', JSON.stringify(filters, null, 2));
+
+    if (!isSpecificQuickAction) {
+      // Merge heuristic timeframe hints whenever the classifier missed them.
+      filters = applyTemporalHintsToFilters(filters, temporalHints);
+
+      // Debug: Log filters before derivation
+      console.log('[Intent Detection] Filters from LLM:', JSON.stringify(filters, null, 2));
+      
+      filters = deriveFilterDefaults(query, filters, aliasMatches);
+      
+      // Debug: Log filters after derivation
+      console.log('[Intent Detection] Filters after derivation:', JSON.stringify(filters, null, 2));
+    } else {
+      console.log('[Intent Detection] Skipping filter derivation for specific quick action');
+    }
 
     // Professional comment: If deriveFilterDefaults added a title_match from alias matching,
     // override intent to specific_item. This ensures queries like "tell me about iris" go
@@ -442,8 +453,10 @@ export async function POST(req: NextRequest) {
       intent = 'specific_item';
     }
 
+    // Professional comment: Only apply profile filters if we don't have a specific quick action.
+    // Quick actions with title_match should use specific_item intent, not be overridden by profile filters.
     const profileFilters = detectProfileFilter(query);
-    if (profileFilters) {
+    if (profileFilters && !(skipClassification && filters?.title_match)) {
       intent = 'filter_query';
       filters = mergeFilters(filters, profileFilters);
     }
@@ -452,8 +465,10 @@ export async function POST(req: NextRequest) {
     console.log('[Intent Detection] Final intent:', intent);
     console.log('[Intent Detection] Final filters:', JSON.stringify(filters, null, 2));
 
-    // Override intent if pre-routing found a match (unless contact explicit)
-    if (preRouted && intent !== 'contact') {
+    // Override intent if pre-routing found a match (unless contact explicit or we have a specific quick action)
+    // Professional comment: Don't override specific_item intent from quick actions with pre-routing
+    // Quick actions provide exact intent that should be preserved
+    if (preRouted && intent !== 'contact' && !(skipClassification && filters?.title_match)) {
       intent = preRouted;
     }
 
@@ -1605,7 +1620,8 @@ ${enhancedContext}`;
                   })),
                   fields,
                   isEvaluative,
-                  detailLevel: intent === 'filter_query' && filters?.show_all ? 'minimal' :
+                  detailLevel: (intent === 'specific_item' && filters?.title_match) ? 'full' :
+                               (intent === 'filter_query' && filters?.show_all) ? 'minimal' :
                                isEvaluative ? 'compact' : 'full'
                 }
               };
@@ -1689,6 +1705,7 @@ ${enhancedContext}`;
                 allItems,
                 rankings, // Pass rankings for action sorting
                 depth, // Pass depth for enforcing follow-up limits
+                visitedNodes, // Pass visited nodes to avoid repeating suggestions
               });
 
               // Send quick actions to client
@@ -1857,6 +1874,8 @@ export async function GET(request: Request) {
     const intent = searchParams.get('intent') || undefined;
     const filtersParam = searchParams.get('filters');
     const filters = filtersParam ? JSON.parse(filtersParam) : undefined;
+    const visitedNodesParam = searchParams.get('visitedNodes');
+    const visitedNodes = visitedNodesParam ? JSON.parse(visitedNodesParam) : undefined;
 
     // Create a new Request object with POST method and JSON body
     const postRequest = new NextRequest(request.url, {
@@ -1871,7 +1890,8 @@ export async function GET(request: Request) {
         depth,
         skipClassification,
         intent,
-        filters
+        filters,
+        visitedNodes
       })
     });
 

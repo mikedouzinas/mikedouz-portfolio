@@ -175,6 +175,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     quickActions: QuickAction[]; // Track actions for each exchange
   }>>([]);
   const [currentQueryId, setCurrentQueryId] = useState<string | null>(null);
+  // Professional comment: Track visited nodes (item IDs) to prevent suggesting the same item again
+  // This ensures that clicking "See Veson" doesn't suggest "See Veson" again in the next quick actions
+  const [visitedNodes, setVisitedNodes] = useState<string[]>([]);
 
   // Track UI directives from streaming
   const uiDirective = useUiDirectives(answer || '');
@@ -935,6 +938,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     // Reset conversation history if this is a fresh query (not from quick action)
     if (!continueConversation) {
       setConversationHistory([]);
+      setVisitedNodes([]); // Reset visited nodes for fresh queries
       setShowComposer(false); // Close composer for fresh queries
       setPersistedDirective(null); // Clear persisted directive
       lastDirectiveRef.current = null; // Reset directive tracking
@@ -1001,6 +1005,11 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       // Pass pre-filters if provided
       if (preFilters) {
         params.set('filters', JSON.stringify(preFilters));
+      }
+
+      // Pass visited nodes to prevent suggesting already-visited items
+      if (visitedNodes.length > 0) {
+        params.set('visitedNodes', JSON.stringify(visitedNodes));
       }
 
       const response = await fetch(
@@ -1298,6 +1307,18 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
     // Determine if we should skip classification
     const skipClassification = !!action.intent;
+
+    // Professional comment: Add the clicked item ID to visited nodes to prevent suggesting it again
+    // This ensures that clicking "See Veson" doesn't suggest "See Veson" again in subsequent quick actions
+    if (action.filters?.title_match && typeof action.filters.title_match === 'string') {
+      const itemId = action.filters.title_match;
+      setVisitedNodes(prev => {
+        if (!prev.includes(itemId)) {
+          return [...prev, itemId];
+        }
+        return prev;
+      });
+    }
 
     handleSubmitQuery(
       queryToSubmit,

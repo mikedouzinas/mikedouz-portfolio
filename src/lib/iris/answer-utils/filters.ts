@@ -324,7 +324,7 @@ export function applyFilters(items: KBItem[], filters: QueryFilter): KBItem[] {
     });
   }
 
-  // Filter by year (extract from dates field or term field)
+  // Filter by year (extract from dates field, term field, or published_date field)
   // Note: We prioritize date ranges to check if the year falls within the project/experience period
   if (filters.year && filters.year.length > 0) {
     filtered = filtered.filter(item => {
@@ -340,6 +340,17 @@ export function applyFilters(items: KBItem[], filters: QueryFilter): KBItem[] {
       // Check term field for classes (e.g., "Spring 2025")
       if ('term' in item && item.term && typeof item.term === 'string') {
         const yearMatch = item.term.match(/\d{4}/);
+        if (yearMatch) {
+          const year = parseInt(yearMatch[0]);
+          return filters.year!.includes(year);
+        }
+      }
+
+      // Check published_date field for blogs (e.g., "September 21, 2023")
+      // Professional comment: Blogs use published_date as a string, so we extract the year
+      // from various date formats (e.g., "September 21, 2023", "2023-09-21", "2023")
+      if ('published_date' in item && item.published_date && typeof item.published_date === 'string') {
+        const yearMatch = item.published_date.match(/\b(19|20)\d{2}\b/);
         if (yearMatch) {
           const year = parseInt(yearMatch[0]);
           return filters.year!.includes(year);
