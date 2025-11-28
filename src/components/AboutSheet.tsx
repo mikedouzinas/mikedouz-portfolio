@@ -113,7 +113,7 @@ export default function AboutSheet({ open, onClose }: AboutSheetProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[2000] bg-black/40 backdrop-blur-sm"
             aria-hidden="true"
           />
 
@@ -128,7 +128,7 @@ export default function AboutSheet({ open, onClose }: AboutSheetProps) {
               damping: 30, 
               stiffness: 300 
             }}
-            className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl bg-gradient-to-b from-blue-200 to-blue-300 dark:bg-gradient-to-b dark:from-blue-950 dark:to-blue-900 shadow-2xl max-h-[85vh] overflow-y-auto"
+            className="fixed inset-x-0 bottom-0 z-[2001] rounded-t-2xl bg-gradient-to-b from-blue-200 to-blue-300 dark:bg-gradient-to-b dark:from-blue-950 dark:to-blue-900 shadow-2xl max-h-[85vh] overflow-y-auto"
             role="dialog"
             aria-modal="true"
             aria-labelledby="about-sheet-title"

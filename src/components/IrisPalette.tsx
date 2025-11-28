@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
   ArrowRight,
+  ArrowLeft,
   CornerDownLeft,
   Briefcase,
   Loader2,
@@ -530,17 +531,19 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     }
   }, []);
 
-  /**
-   * Detect mobile devices for mobile-optimized UI
-   * Mobile detection based on User-Agent containing Mobi|Android
-   */
   useEffect(() => {
     const checkMobile = () => {
-      const userAgent = navigator.userAgent;
-      setIsMobile(/Mobi|Android/i.test(userAgent));
+      // Match Tailwind's md breakpoint (768px)
+      // If width is < 768px, treat as mobile
+      setIsMobile(window.innerWidth < 768);
     };
     
+    // Check initially
     checkMobile();
+    
+    // Add resize listener
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   /**
@@ -574,10 +577,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     // Professional comment: This approach prevents background scrolling while
     // allowing the palette's internal content to scroll naturally. Much simpler
     // than position: fixed and doesn't require scroll position restoration.
+    // Note: We do NOT set touch-action: none here because it can break scrolling
+    // within the modal on some mobile browsers. overflow: hidden is sufficient.
     document.documentElement.style.overflow = 'hidden';
-    document.documentElement.style.touchAction = 'none';
     document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
     
     // Cleanup function to restore scroll behavior
     return () => {
@@ -1360,9 +1363,24 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             role="dialog"
             aria-label="Iris command palette"
             aria-modal="false"
-            initial={{ opacity: 0, x: "-50%", scale: 0.95 }}
-            animate={{ opacity: 1, x: "-50%", scale: 1 }}
-            exit={{ opacity: 0, x: "-50%", scale: 0.95 }}
+            initial={{ 
+              opacity: 0, 
+              x: isMobile ? 0 : "-50%", 
+              scale: isMobile ? 1 : 0.95,
+              y: isMobile ? 20 : 0
+            }}
+            animate={{ 
+              opacity: 1, 
+              x: isMobile ? 0 : "-50%", 
+              scale: 1,
+              y: 0
+            }}
+            exit={{ 
+              opacity: 0, 
+              x: isMobile ? 0 : "-50%", 
+              scale: isMobile ? 1 : 0.95,
+              y: isMobile ? 20 : 0
+            }}
             transition={{ 
               duration: 0.35, 
               ease: [0.16, 1, 0.3, 1], // Spring-like easing for liquid feel
@@ -1378,43 +1396,65 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             // Professional comment: Prevent touch events from propagating to body
             // This ensures scrolling within the palette doesn't affect the background
             // Note: With overflow: hidden on body, this is mainly for extra safety
-            onTouchStart={(e) => {
-              // Stop propagation to prevent body scroll on mobile
-              e.stopPropagation();
+            onTouchStart={() => {
+              // Allow touch events to propagate for native scrolling
             }}
-            onTouchMove={(e) => {
-              // Allow touch move within palette, but prevent body scroll
-              e.stopPropagation();
+            onTouchMove={() => {
+              // Allow touch events to propagate for native scrolling
             }}
             className={`
-              fixed left-1/2 z-[1001]
-              ${isMobile 
-                ? 'top-16 w-[calc(100vw-2rem)] max-h-[calc(100vh-5rem)] overflow-y-auto' 
-                : 'top-[20vh] w-[720px] max-w-[calc(100vw-2rem)]'
-              }
-              rounded-2xl 
+              fixed z-[1001] flex flex-col
+              /* Mobile layout (default) */
+              inset-0 w-full h-full rounded-none top-0 left-0 overflow-hidden
+              /* Desktop layout (md and up) */
+              md:left-1/2 md:top-[20vh] md:w-[720px] md:max-w-[calc(100vw-2rem)] md:h-auto md:rounded-2xl md:overflow-hidden md:inset-auto
+              
               bg-gradient-to-br from-blue-600/[0.12] via-blue-500/[0.15] to-blue-600/[0.12]
               backdrop-blur-3xl backdrop-saturate-[2.2]
               border border-white/[0.18] dark:border-white/[0.12]
               shadow-[0_8px_40px_rgba(37,99,235,0.15),0_0_0_1px_rgba(255,255,255,0.08),inset_0_0_0_1px_rgba(255,255,255,0.08)]
-              before:absolute before:inset-0 before:rounded-2xl
-              before:bg-gradient-to-b before:from-white/[0.15] before:via-blue-400/[0.05] before:to-transparent
-              before:pointer-events-none
-              after:absolute after:inset-0 after:rounded-2xl
-              after:bg-gradient-to-tr after:from-transparent after:via-white/[0.03] after:to-transparent
-              after:pointer-events-none
-              ${isMobile ? '' : 'overflow-hidden'}
+              
+              /* Gradient borders - Desktop only */
+              md:before:absolute md:before:inset-0 md:before:rounded-2xl
+              md:before:bg-gradient-to-b md:before:from-white/[0.15] md:before:via-blue-400/[0.05] md:before:to-transparent
+              md:before:pointer-events-none
+              md:after:absolute md:after:inset-0 md:after:rounded-2xl
+              md:after:bg-gradient-to-tr md:after:from-transparent md:after:via-white/[0.03] md:after:to-transparent
+              md:after:pointer-events-none
+
               touch-pan-y
               ${isInputFocused ? 'ring-2 ring-sky-400/20 border-sky-400/30' : ''}
             `}
             style={{
               // Professional comment: Enable touch scrolling within palette on mobile
               // touch-action: pan-y allows vertical scrolling but prevents horizontal panning
-              touchAction: isMobile ? 'pan-y' : 'auto',
+              touchAction: 'pan-y',
             }}
           >
+        {/* Mobile Header - sticky at top, hidden on desktop */}
+        <div className="flex-none sticky top-0 z-20 grid grid-cols-[40px_1fr_40px] items-center px-4 py-3 bg-transparent md:hidden">
+          {/* Left: Back Button */}
+          <button
+            onClick={() => handleOpenChange(false)}
+            className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/10 active:scale-95 transition-all duration-200"
+            aria-label="Close Iris"
+          >
+            <ArrowLeft className="w-5 h-5 text-black/70 dark:text-white/70" />
+          </button>
+
+          {/* Center: Iris Title */}
+          <div className="flex justify-center items-center">
+            <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 via-blue-600 to-emerald-500">
+              Iris
+            </span>
+          </div>
+
+          {/* Right: Spacer for alignment */}
+          <div />
+        </div>
+
         {/* Input row */}
-        <div className="relative flex items-center pl-4 pr-[52px] min-h-[56px]">
+        <div className="flex-none relative flex items-center pl-4 pr-[52px] min-h-[56px]">
           {/* Left search icon */}
           <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-black/50 dark:text-white/50 pointer-events-none" />
           
@@ -1492,7 +1532,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         </div>
 
         {/* Divider */}
-        <div className="relative mx-3">
+        <div className="flex-none relative mx-3">
           <div className="absolute inset-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
           <div className="border-t border-black/5 dark:border-white/10"></div>
         </div>
@@ -1502,7 +1542,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
           <div
             id="iris-suggestions"
             role="listbox"
-            className="py-2 px-2"
+            className="py-2 px-2 flex-1 overflow-y-auto min-h-0 md:flex-none md:overflow-visible"
           >
             {(() => {
               // Use the same suggestions list as everywhere else
@@ -1597,20 +1637,20 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         {/* Answer display - only show in answer view */}
         {viewMode === 'answer' && (
           <>
-            <div className="relative">
+            <div className={`relative flex flex-col ${isMobile ? 'flex-1 min-h-0 overflow-hidden' : ''}`}>
               <div
                 ref={answerRef}
                 onScroll={handleScroll}
                 // Professional comment: Prevent touch events from bubbling to body
                 // This ensures scrolling within the answer area doesn't affect background
                 // Note: With overflow: hidden on body, this is mainly for extra safety
-                onTouchStart={(e) => {
-                  e.stopPropagation();
+                onTouchStart={() => {
+                  // Allow touch events to propagate for native scrolling
                 }}
-                onTouchMove={(e) => {
-                  e.stopPropagation();
+                onTouchMove={() => {
+                  // Allow touch events to propagate for native scrolling
                 }}
-                className="p-4 overflow-y-auto space-y-4 max-h-96"
+                className={`p-4 overflow-y-auto space-y-4 ${isMobile ? 'flex-1 w-full' : 'max-h-96'}`}
                 style={{
                   // Professional comment: Enable vertical touch scrolling within answer area
                   touchAction: 'pan-y',
