@@ -301,6 +301,13 @@ export async function POST(req: NextRequest) {
     const presetIntent = body.intent;
     const presetFilters = body.filters;
 
+    // Debug: Log intent routing details
+    if (skipClassification) {
+      console.log(`[Answer API] Fast-path routing: intent=${presetIntent}, skipClassification=${skipClassification}`);
+    } else if (body.intent) {
+      console.log(`[Answer API] Normal routing with hint: intent=${body.intent}, skipClassification=${body.skipClassification}`);
+    }
+
     // Validate query parameter
     if (!rawQuery || typeof rawQuery !== 'string' || !rawQuery.trim()) {
       return NextResponse.json(
@@ -420,9 +427,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Professional comment: Only run filter derivation if we don't have a specific title_match from a quick action.
-    // Quick actions with title_match provide exact filters that shouldn't be modified by heuristics.
-    const isSpecificQuickAction = skipClassification && filters?.title_match;
+    // Professional comment: Only run filter derivation if we don't have a specific title_match from a quick action
+    // OR if it's a GitHub activity action (which uses repo, not title_match).
+    // Quick actions with title_match/repo provide exact filters that shouldn't be modified by heuristics.
+    const isSpecificQuickAction = skipClassification && (filters?.title_match || intent === 'github_activity');
 
     // Heuristic filter derivation (type, show_all, companies) in case LLM classification missed details.
     aliasIndex = aliasIndex.length > 0 ? aliasIndex : await getAliasIndexLazy();
@@ -448,7 +456,8 @@ export async function POST(req: NextRequest) {
     // Professional comment: If deriveFilterDefaults added a title_match from alias matching,
     // override intent to specific_item. This ensures queries like "tell me about iris" go
     // directly to the specific item rather than doing a general search.
-    if (filters?.title_match && intent !== 'specific_item') {
+    // But allow github_activity to persist if it's already set
+    if (filters?.title_match && intent !== 'specific_item' && intent !== 'github_activity') {
       console.log('[Intent Detection] Overriding intent to specific_item due to title_match from alias');
       intent = 'specific_item';
     }
@@ -468,7 +477,7 @@ export async function POST(req: NextRequest) {
     // Override intent if pre-routing found a match (unless contact explicit or we have a specific quick action)
     // Professional comment: Don't override specific_item intent from quick actions with pre-routing
     // Quick actions provide exact intent that should be preserved
-    if (preRouted && intent !== 'contact' && !(skipClassification && filters?.title_match)) {
+    if (preRouted && intent !== 'contact' && !skipClassification) {
       intent = preRouted;
     }
 
@@ -477,7 +486,9 @@ export async function POST(req: NextRequest) {
     // Load alias index for micro-planner (if enabled)
     let planner: PlannerResult | null = null;
 
-    if (config.features?.microPlannerEnabled) {
+    // Professional comment: Skip planner if we're using fast-path routing (quick actions)
+    // Quick actions provide explicit intent that shouldn't be second-guessed by the planner
+    if (config.features?.microPlannerEnabled && !skipClassification) {
       aliasIndex = await getAliasIndexLazy();
 
       // Run micro-planner if enabled and query meets criteria
@@ -832,7 +843,40 @@ export async function POST(req: NextRequest) {
     if (intent === 'github_activity' && filters && filters.repo && typeof filters.repo === 'string') {
       // Professional comment: Reuse outer startTime variable instead of shadowing it
       // This ensures analytics logging uses the correct request start time
-      const repo = filters.repo as string;
+      let repo = filters.repo as string;
+
+      // Check if repo looks like a full slug (owner/name)
+      // If not, try to find a project in the KB with matching name and extract its GitHub link
+      if (!repo.includes('/')) {
+        console.log(`[GitHub Activity] Repo "${repo}" missing owner, attempting resolution from KB...`);
+        const allItems = await getAllItems();
+        const matchingProject = allItems.find(item => {
+          // Only check items that are likely to have GitHub repos (projects/experiences)
+          if (item.kind !== 'project' && item.kind !== 'experience') return false;
+          
+          // Check title match
+          if ('title' in item && item.title && item.title.toLowerCase() === repo.toLowerCase()) return true;
+          
+          // Check aliases
+          if ('aliases' in item && item.aliases && item.aliases.some(alias => alias.toLowerCase() === repo.toLowerCase())) return true;
+          
+          return false;
+        });
+        
+        if (matchingProject && 'links' in matchingProject && matchingProject.links) {
+           const githubLink = matchingProject.links['github'] || matchingProject.links['repo'];
+           
+           if (githubLink) {
+             // Extract owner/name from github.com/owner/name
+             // Handle optional trailing slash and query params
+             const match = githubLink.match(/github\.com\/([^\/]+\/[^\/\?#]+)/);
+             if (match) {
+               repo = match[1].replace(/\/$/, ''); // Remove trailing slash if captured
+               console.log(`[GitHub Activity] Resolved repo name "${filters.repo}" to "${repo}" from KB`);
+             }
+           }
+        }
+      }
 
       console.log(`[GitHub Activity] Fetching commits for ${repo}...`);
 

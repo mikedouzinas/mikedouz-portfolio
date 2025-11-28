@@ -124,7 +124,6 @@ function templateToAction(
  */
 export function generateQuickActions(context: ActionContext): QuickAction[] {
   const actions: QuickAction[] = [];
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { fullAnswer, intent, results, rankings, depth = 0, visitedNodes: _visitedNodes = [] } = context;
 
   // Handle contact directive
@@ -156,7 +155,6 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
   });
 
   // Track current node visit (TODO: implement path tracking to avoid duplicate suggestions)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _currentNode: string | null = isSingleItem && results[0].doc.id
     ? results[0].doc.id
     : (isList && resultTypes.size === 1 ? `${Array.from(resultTypes)[0]}_list` : null);

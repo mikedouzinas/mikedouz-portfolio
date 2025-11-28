@@ -59,7 +59,7 @@ export const config = {
   features: {
     evaluativeRoutingV2: true,           // Toggle new routing for evaluative queries (best/strongest/what makes)
     microPlannerEnabled: true,           // Toggle optional micro-planner for alias resolution
-    plannerTokenBudget: { in: 150, out: 80 }, // Token budget for planner (input/output)
+    plannerTokenBudget: { in: 150, out: 250 }, // Token budget for planner (input/output)
     generalTopK: 5,                       // Total items to retrieve for general queries
     perTypeQuotas: {                     // Quotas per type for diversified retrieval
       project: 3,
