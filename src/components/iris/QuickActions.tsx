@@ -408,6 +408,95 @@ export default function QuickActions({
     return 'from-blue-500 to-indigo-600';
   };
 
+  /**
+   * Render the loading indicator
+   * Extracted to a variable to be used in both the main return and early returns
+   */
+  const loaderElement = shouldShowLoading && loadingConfig ? (() => {
+    const animConfig = getAnimationConfig(loadingConfig.animation);
+    
+    // Render appropriate animation based on component type
+    let indicator;
+    if (animConfig.component === 'spinner-thin') {
+      // Very thin spinner
+      indicator = (
+        <div className="w-3.5 h-3.5 rounded-full border border-white/90 border-r-transparent animate-spin" style={{ borderWidth: '1.5px' }} />
+      );
+    } else if (animConfig.component === 'bars-vertical') {
+      // Vertical bars
+      indicator = (
+        <div className="flex gap-0.5 items-center h-3">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="w-0.5 bg-white/90 rounded-full animate-pulse"
+              style={{
+                animationDelay: `${i * 0.15}s`,
+                animationDuration: '0.7s',
+                height: `${(i === 0 ? 8 : i === 1 ? 12 : 10)}px`,
+              }}
+            />
+          ))}
+        </div>
+      );
+    } else if (animConfig.component === 'wave-minimal') {
+      // Minimal wave - smaller and tighter
+      indicator = (
+        <div className="flex gap-0.5 items-center h-2.5">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="w-0.5 bg-white/90 rounded-full animate-pulse"
+              style={{
+                animationDelay: `${i * 0.1}s`,
+                animationDuration: '0.5s',
+                height: `${(i % 2 === 0 ? 6 : 10)}px`,
+              }}
+            />
+          ))}
+        </div>
+      );
+    } else if (animConfig.component === 'grid-minimal') {
+      // Smaller, tighter grid
+      indicator = (
+        <div className="grid grid-cols-3 gap-0.5 w-3 h-3">
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div
+              key={i}
+              className="w-0.5 h-0.5 rounded-full bg-white/90 animate-pulse"
+              style={{
+                animationDelay: `${(i % 3 + Math.floor(i / 3)) * 0.08}s`,
+                animationDuration: '0.6s',
+              }}
+            />
+          ))}
+        </div>
+      );
+    } else if (animConfig.component === 'spinner-minimal') {
+      // Minimal spinner - thinner border
+      indicator = (
+        <div className="w-3 h-3 rounded-full border border-white/90 border-t-transparent animate-spin" />
+      );
+    } else if (animConfig.component === 'fade') {
+      // Fading in/out circle
+      indicator = (
+        <div className="w-3 h-3 rounded-full bg-white/90 animate-pulse" style={{ animationDuration: '1s' }} />
+      );
+    } else {
+      // Fallback to spinner-minimal
+      indicator = (
+        <div className="w-3 h-3 rounded-full border border-white/90 border-t-transparent animate-spin" />
+      );
+    }
+    
+    return (
+      <div className="mt-2 flex items-center gap-2 text-sm text-white/70">
+        {indicator}
+        <span className="text-white/70">{loadingConfig.message}</span>
+      </div>
+    );
+  })() : null;
+
   // If message_mike is selected, show only that button with X to cancel
   if (selectedAction && selectedAction.type === 'message_mike') {
     const gradientDirection = 'bg-gradient-to-r';
@@ -455,6 +544,8 @@ export default function QuickActions({
             <span className="break-words">{selectedAction.label}</span>
           </button>
         </div>
+        {/* Professional comment: Include loader here for specific actions like "Veson Nautical" */}
+        {loaderElement}
       </div>
     );
   }
@@ -570,90 +661,7 @@ export default function QuickActions({
       ) : null}
 
       {/* Loading message - shown when processing a query from quick actions */}
-      {shouldShowLoading && loadingConfig && (() => {
-        const animConfig = getAnimationConfig(loadingConfig.animation);
-        
-        // Render appropriate animation based on component type
-        let indicator;
-        if (animConfig.component === 'spinner-thin') {
-          // Very thin spinner
-          indicator = (
-            <div className="w-3.5 h-3.5 rounded-full border border-white/90 border-r-transparent animate-spin" style={{ borderWidth: '1.5px' }} />
-          );
-        } else if (animConfig.component === 'bars-vertical') {
-          // Vertical bars
-          indicator = (
-            <div className="flex gap-0.5 items-center h-3">
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="w-0.5 bg-white/90 rounded-full animate-pulse"
-                  style={{
-                    animationDelay: `${i * 0.15}s`,
-                    animationDuration: '0.7s',
-                    height: `${(i === 0 ? 8 : i === 1 ? 12 : 10)}px`,
-                  }}
-                />
-              ))}
-            </div>
-          );
-        } else if (animConfig.component === 'wave-minimal') {
-          // Minimal wave - smaller and tighter
-          indicator = (
-            <div className="flex gap-0.5 items-center h-2.5">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="w-0.5 bg-white/90 rounded-full animate-pulse"
-                  style={{
-                    animationDelay: `${i * 0.1}s`,
-                    animationDuration: '0.5s',
-                    height: `${(i % 2 === 0 ? 6 : 10)}px`,
-                  }}
-                />
-              ))}
-            </div>
-          );
-        } else if (animConfig.component === 'grid-minimal') {
-          // Smaller, tighter grid
-          indicator = (
-            <div className="grid grid-cols-3 gap-0.5 w-3 h-3">
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <div
-                  key={i}
-                  className="w-0.5 h-0.5 rounded-full bg-white/90 animate-pulse"
-                  style={{
-                    animationDelay: `${(i % 3 + Math.floor(i / 3)) * 0.08}s`,
-                    animationDuration: '0.6s',
-                  }}
-                />
-              ))}
-            </div>
-          );
-        } else if (animConfig.component === 'spinner-minimal') {
-          // Minimal spinner - thinner border
-          indicator = (
-            <div className="w-3 h-3 rounded-full border border-white/90 border-t-transparent animate-spin" />
-          );
-        } else if (animConfig.component === 'fade') {
-          // Fading in/out circle
-          indicator = (
-            <div className="w-3 h-3 rounded-full bg-white/90 animate-pulse" style={{ animationDuration: '1s' }} />
-          );
-        } else {
-          // Fallback to spinner-minimal
-          indicator = (
-            <div className="w-3 h-3 rounded-full border border-white/90 border-t-transparent animate-spin" />
-          );
-        }
-        
-        return (
-          <div className="mt-2 flex items-center gap-2 text-sm text-white/70">
-            {indicator}
-            <span className="text-white/70">{loadingConfig.message}</span>
-          </div>
-        );
-      })()}
+      {loaderElement}
 
       {/* Email copied success toast - shows when email is copied to clipboard */}
       {showEmailCopiedToast && (
