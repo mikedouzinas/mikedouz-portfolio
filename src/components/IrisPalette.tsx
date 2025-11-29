@@ -1405,10 +1405,13 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             className={`
               fixed z-[1001] flex flex-col
               /* Mobile layout (default) */
-              inset-0 w-full h-full rounded-none top-0 left-0 overflow-hidden
+              inset-0 w-full h-[100dvh] rounded-none top-0 left-0 overflow-hidden overscroll-none
               /* Desktop layout (md and up) */
               md:left-1/2 md:top-[20vh] md:w-[720px] md:max-w-[calc(100vw-2rem)] md:h-auto md:rounded-2xl md:overflow-hidden md:inset-auto
               
+              /* Add solid background on mobile to hide page content */
+              bg-gray-900/95 md:bg-transparent
+
               bg-gradient-to-br from-blue-600/[0.12] via-blue-500/[0.15] to-blue-600/[0.12]
               backdrop-blur-3xl backdrop-saturate-[2.2]
               border border-white/[0.18] dark:border-white/[0.12]
@@ -1426,9 +1429,9 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               ${isInputFocused ? 'ring-2 ring-sky-400/20 border-sky-400/30' : ''}
             `}
             style={{
-              // Professional comment: Enable touch scrolling within palette on mobile
-              // touch-action: pan-y allows vertical scrolling but prevents horizontal panning
-              touchAction: 'pan-y',
+              // Professional comment: Disable touch scrolling on container to prevent body scroll
+              // We explicitly enable it on scrollable children
+              touchAction: 'none',
             }}
           >
         {/* Mobile Header - sticky at top, hidden on desktop */}
@@ -1542,7 +1545,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
           <div
             id="iris-suggestions"
             role="listbox"
-            className="py-2 px-2 flex-1 overflow-y-auto min-h-0 md:flex-none md:overflow-visible"
+            className="py-2 px-2 flex-1 overflow-y-auto min-h-0 md:flex-none md:overflow-visible touch-pan-y"
           >
             {(() => {
               // Use the same suggestions list as everywhere else

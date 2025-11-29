@@ -53,9 +53,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  viewportFit: 'cover',
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#0f172a" }, // slate-900 for light mode
-    { media: "(prefers-color-scheme: dark)", color: "#0f172a" }, // slate-900 for dark mode
+    { media: "(prefers-color-scheme: light)", color: "#f9fafb" }, // Matches light mode background
+    { media: "(prefers-color-scheme: dark)", color: "#111827" }, // Matches dark mode background (gray-900)
   ],
 };
 

@@ -76,6 +76,21 @@ export function formatSingleDoc(
 
   parts.push(`### ${displayName}${dateInfo}`);
 
+  if ('aliases' in doc && Array.isArray(doc.aliases) && doc.aliases.length > 0) {
+    parts.push(`**Also known as:** ${doc.aliases.join(', ')}`);
+    parts.push('');
+  }
+
+  if ('short_name' in doc && doc.short_name) {
+    parts.push(`**Short Name:** ${doc.short_name}`);
+    parts.push('');
+  }
+
+  if ('location' in doc && doc.location) {
+    parts.push(`**Location:** ${doc.location}`);
+    parts.push('');
+  }
+
   if ('summary' in doc && doc.summary) {
     parts.push(`${doc.summary}`);
     parts.push('');
@@ -155,6 +170,10 @@ export function formatSingleDoc(
 
     if ('tech_stack' in doc && Array.isArray(doc.tech_stack) && doc.tech_stack.length > 0) {
       parts.push(`**Tech Stack:** ${doc.tech_stack.join(', ')}`);
+    }
+
+    if ('tags' in doc && Array.isArray(doc.tags) && doc.tags.length > 0) {
+      parts.push(`**Tags:** ${doc.tags.join(', ')}`);
     }
   }
 
