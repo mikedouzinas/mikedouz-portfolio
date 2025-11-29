@@ -551,31 +551,60 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    * Ensures the status bar matches the Iris background when open
    */
   useEffect(() => {
-    // Only run on mobile and when open state changes
-    if (!isMobile && !isOpen) return;
+    // Only run on mobile
+    if (!isMobile) return;
 
-    const originalThemeColors: { element: HTMLMetaElement; originalContent: string }[] = [];
+    const originalMetaTags: { element: HTMLMetaElement; originalContent: string; originalMedia: string }[] = [];
     
     if (isOpen) {
       // Find all theme-color meta tags
       const metaTags = document.querySelectorAll('meta[name="theme-color"]');
       
-      // If no tags exist (rare but possible), we don't create one to avoid hydration mismatches,
-      // but usually Next.js creates them.
-      
       metaTags.forEach((tag) => {
         const meta = tag as HTMLMetaElement;
-        originalThemeColors.push({ element: meta, originalContent: meta.content });
-        // Force dark background color for status bar to match Iris modal
-        // Using #111827 (gray-900) to match the mobile background
+        // Save original state
+        originalMetaTags.push({ 
+          element: meta, 
+          originalContent: meta.content,
+          originalMedia: meta.getAttribute('media') || ''
+        });
+        
+        // Force dark background color for status bar
+        // CRITICAL: Remove media attribute to ensure this color applies regardless of system theme
         meta.content = '#111827';
+        meta.removeAttribute('media');
       });
+      
+      // Fallback: If no tags exist, create one
+      if (metaTags.length === 0) {
+        const meta = document.createElement('meta');
+        meta.name = 'theme-color';
+        meta.content = '#111827';
+        document.head.appendChild(meta);
+        // Mark for removal
+        originalMetaTags.push({ 
+          element: meta, 
+          originalContent: '', 
+          originalMedia: 'CREATED_BY_IRIS' 
+        });
+      }
     }
 
-    // Cleanup function restores original colors
+    // Cleanup function restores original colors and media attributes
     return () => {
-      originalThemeColors.forEach(({ element, originalContent }) => {
-        element.content = originalContent;
+      originalMetaTags.forEach(({ element, originalContent, originalMedia }) => {
+        if (originalMedia === 'CREATED_BY_IRIS') {
+          // Remove created tag
+          if (document.head.contains(element)) {
+            document.head.removeChild(element);
+          }
+        } else {
+          // Restore original tag
+          element.content = originalContent;
+          if (originalMedia) {
+            element.setAttribute('media', originalMedia);
+          }
+        }
       });
     };
   }, [isOpen, isMobile]);
@@ -1444,7 +1473,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               md:left-1/2 md:top-[20vh] md:w-[720px] md:max-w-[calc(100vw-2rem)] md:h-auto md:rounded-2xl md:overflow-hidden md:inset-auto
               
               /* Add solid background on mobile to hide page content */
-              bg-gray-900/95 md:bg-transparent
+              bg-gray-900 md:bg-transparent
 
               bg-gradient-to-br from-blue-600/[0.12] via-blue-500/[0.15] to-blue-600/[0.12]
               backdrop-blur-3xl backdrop-saturate-[2.2]
