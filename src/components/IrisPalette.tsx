@@ -547,6 +547,40 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   }, []);
 
   /**
+   * Manage theme color for mobile status bar
+   * Ensures the status bar matches the Iris background when open
+   */
+  useEffect(() => {
+    // Only run on mobile and when open state changes
+    if (!isMobile && !isOpen) return;
+
+    const originalThemeColors: { element: HTMLMetaElement; originalContent: string }[] = [];
+    
+    if (isOpen) {
+      // Find all theme-color meta tags
+      const metaTags = document.querySelectorAll('meta[name="theme-color"]');
+      
+      // If no tags exist (rare but possible), we don't create one to avoid hydration mismatches,
+      // but usually Next.js creates them.
+      
+      metaTags.forEach((tag) => {
+        const meta = tag as HTMLMetaElement;
+        originalThemeColors.push({ element: meta, originalContent: meta.content });
+        // Force dark background color for status bar to match Iris modal
+        // Using #111827 (gray-900) to match the mobile background
+        meta.content = '#111827';
+      });
+    }
+
+    // Cleanup function restores original colors
+    return () => {
+      originalThemeColors.forEach(({ element, originalContent }) => {
+        element.content = originalContent;
+      });
+    };
+  }, [isOpen, isMobile]);
+
+  /**
    * Prevent body scrolling when palette is open
    * This fixes the issue where background scrolls behind the palette,
    * especially on mobile devices where it can cause scroll conflicts

@@ -616,7 +616,10 @@ export default function QuickActions({
         </div>
       ) : !submittedFollowUp ? (
         /* Horizontal scrollable bubbles - only show if no follow-up has been submitted */
-        <div className="flex gap-2 overflow-x-auto py-2 -mx-1 px-1 scrollbar-none">
+        <div 
+          className="flex gap-2 overflow-x-auto py-2 -mx-1 px-1 scrollbar-none"
+          style={{ touchAction: 'pan-x pan-y' }}
+        >
           {/* Hide scrollbar completely while keeping scroll functionality */}
           <style jsx>{`
             div::-webkit-scrollbar {
