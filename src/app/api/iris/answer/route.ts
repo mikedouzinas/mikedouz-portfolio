@@ -50,6 +50,7 @@ import { detectIntent, runMicroPlanner } from '@/lib/iris/answer-utils/intent';
 
 // Ensure Node.js runtime for streaming support
 export const runtime = 'nodejs';
+export const maxDuration = 60; // Allow up to 60 seconds for execution (Vercel Pro)
 
 /**
  * Helper function to log retrieval results to console (DRY principle)

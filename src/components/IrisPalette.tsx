@@ -531,6 +531,26 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     }
   }, []);
 
+  /**
+   * Auto-scroll to bottom when processing finishes (e.g. follow-ups)
+   * This ensures the user sees the full answer/follow-up when generation is done
+   */
+  const prevIsProcessingQuery = useRef(isProcessingQuery);
+  
+  useEffect(() => {
+    // Check if we just finished processing (transition from true -> false)
+    if (prevIsProcessingQuery.current && !isProcessingQuery) {
+      // Check if we have content to show (either in history or current answer)
+      if (conversationHistory.length > 0 || answer) {
+        // Small timeout to ensure DOM update is complete
+        setTimeout(() => {
+          scrollToBottom();
+        }, 100);
+      }
+    }
+    prevIsProcessingQuery.current = isProcessingQuery;
+  }, [isProcessingQuery, conversationHistory.length, answer, scrollToBottom]);
+
   useEffect(() => {
     const checkMobile = () => {
       // Match Tailwind's md breakpoint (768px)
@@ -1112,6 +1132,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         let accumulatedAnswer = '';
         let finalIntent = '';
         let capturedQuickActions: QuickAction[] = [];
+        let streamCompleted = false;
 
         if (reader) {
           while (true) {
@@ -1125,6 +1146,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               if (line.startsWith('data: ')) {
                 const data = line.slice(6);
                 if (data === '[DONE]') {
+                  streamCompleted = true;
                   break;
                 }
 
@@ -1174,6 +1196,15 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               }
             }
           }
+        }
+
+        // Check if stream was interrupted
+        if (accumulatedAnswer && !streamCompleted) {
+          // Append a visual indicator that the response was cut off
+          // Professional comment: Use a subtle message or ellipsis to indicate truncation
+          // so the user knows it's not the complete thought.
+          accumulatedAnswer += ' ...\n\n_(Response interrupted due to network timeout)_';
+          setAnswer(accumulatedAnswer);
         }
 
         // After streaming completes, add this exchange to conversation history
