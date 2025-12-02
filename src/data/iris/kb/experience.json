@@ -10,13 +10,14 @@
       "start": "2025-05",
       "end": "2025-08"
     },
-    "summary": "Built automated .NET/C# data-integration services feeding Power BI for Air Force infrastructure management; learned C# and .NET on the job and delivered production features within weeks.",
+    "summary": "Learned C# and .NET on the job, shipped production features for Air Force infrastructure systems within weeks, and got a return offer.",
     "specifics": [
-      "Designed a C#/.NET pipeline to consume external APIs, normalize facility inspection records, and sync into SQL databases with schema optimizations for Power BI report performance.",
-      "Implemented automated request batching and caching logic to reduce redundant third-party API calls while maintaining data freshness requirements.",
-      "Integrated with AWS-hosted services and Power BI Embedded for real-time Air Force infrastructure monitoring dashboards.",
-      "Refactored dashboard layouts in collaboration with Air Force analysts to improve report clarity for facility condition tracking and predictive maintenance.",
-      "Recognized with a 2026 return offer for rapid technical adaptability and production-quality delivery despite minimal prior C# and .NET experience."
+      "Designed data pipelines to consume external APIs and normalize facility inspection records",
+      "Built schema optimizations for Power BI report performance",
+      "Implemented request batching and caching to reduce redundant API calls",
+      "Integrated with AWS services and Power BI Embedded for real time monitoring dashboards",
+      "Refactored dashboard layouts with Air Force analysts to improve clarity for facility tracking",
+      "Recognized with a 2026 return offer for quick learning and production quality delivery"
     ],
     "skills": [
       "csharp",
@@ -43,17 +44,19 @@
       "start": "2024-02",
       "end": "2024-11"
     },
-    "summary": "Conducted extensive user research and product strategy for Rice's entrepreneurship platform, combining UX design with technical prototyping to inform curriculum improvements and founder support programs.",
+    "summary": "Embedded in Rice's startup ecosystem doing user research, prototyping, and helping shape what the entrepreneurship program could become.",
     "aliases": [
       "Lilie",
       "Liu Idea Lab",
       "Rice Lilie"
     ],
     "specifics": [
-      "Conducted 40+ user interviews with student founders and faculty to identify key needs in entrepreneurship education, resource access, and technical support gaps.",
-      "Designed and prototyped full-stack platform concepts in React, TypeScript, and Supabase, creating mockups and wireframes for course management, venture tracking, and mentorship tools.",
-      "Met weekly with 30+ student startup teams to understand technical and operational challenges, providing insights to faculty on curriculum enhancements.",
-      "Collaborated with professors to design software-focused entrepreneurship coursework, taking multiple entrepreneurship classes to better understand student founder perspectives and inform program improvements."
+      "Conducted 40+ interviews with student founders and faculty to identify gaps in the program",
+      "Met weekly with 30+ startup teams to understand their technical and operational challenges",
+      "Took the entrepreneurship classes myself to understand the student experience firsthand",
+      "Built full stack prototypes in React, TypeScript, and Supabase for course management and venture tracking tools",
+      "Collaborated with professors to design software-focused entrepreneurship coursework",
+      "Provided insights to faculty on curriculum improvements based on what I was hearing from teams"
     ],
     "skills": [
       "typescript",
@@ -79,12 +82,15 @@
       "start": "2024-06",
       "end": "2024-09"
     },
-    "summary": "Built production-ready laytime calculation PoC in 1-week sprint under critical client deadline, reducing client's manual 3-day workflows to 8 minutes and directly enabling major strategic partnership.",
+    "summary": "Built a document parsing system in one week that turned a three day manual process into eight minutes, earning a long term strategic partnership.",
     "specifics": [
-      "Parsed PDFs/EMLs/XLSX and nested attachments at scale (100+ docs per batch) using Google Document AI with parallel execution, automating extraction of Statement of Facts, Charter Parties, and 15+ maritime document types.",
-      "Implemented rule engines that codified complex client-specific laytime clauses from contract documents, cross-checking vendor demurrage calculations against computed results for accuracy verification.",
-      "Served as primary technical consultant between client representatives, product teams, and engineering, conducting daily requirement sessions to ensure PoC met all contractual specifications under tight 1-week deadline.",
-      "Delivered interactive Streamlit demonstrations and initiated IMOS platform integration, completing production handoff to engineering team ahead of client expectations, with strategic agreement signed one month post-internship."
+      "Client needed proof we were the right company to proceed with, and we had one week",
+      "Built a pipeline in Streamlit to parse PDFs, emails, spreadsheets, and nested attachments at scale using Google Document AI in parallel",
+      "Automated laytime calculations from 15+ maritime document types including Statement of Facts and Charter Parties",
+      "Implemented rule engines to codify complex client-specific contract clauses",
+      "Served as primary technical contact between client reps, product, and engineering",
+      "Continued iterating on the system for the rest of my internship, helped the team implement into main system",
+      "Multi deal partnership signed one month after I left after going far beyond client's expectations"
     ],
     "skills": [
       "python",
@@ -117,12 +123,14 @@
       "start": "2024-05",
       "end": "2024-06"
     },
-    "summary": "Shipped NLP clustering and entity-matching pipelines (Sentence Transformers + FAISS) achieving ~97% title-category accuracy; improved company merge precision >20%.",
+    "summary": "Built NLP pipelines that turned 600k+ messy prospect data into a clean, searchable system and cut the sales team's outreach cycle by 70%.",
     "specifics": [
-      "Built job-title classifier using SentenceTransformer embeddings; tuned thresholds and stop-word handling for noisy maritime data.",
-      "Designed FAISS-based similarity search to merge 600k+ companies; improved matching precision by >20% versus legacy methods.",
-      "Automated an ingestion/cleaning pipeline to refresh leads and segmentation; cut outreach cycle time ~70%.",
-      "Partnered with PMs to productize insights and tighten feedback loops into roadmap decisions."
+      "Inherited four separate datasets of company prospects (over 600k+) with inconsistent naming and duplicates from acquisitions, I was tasked with merging them into one clean dataset",
+      "Merged them into one clean dataset, handling edge cases in noisy maritime data",
+      "Built a job title classifier using Sentence Transformer embeddings",
+      "Designed FAISS-based similarity search for entity matching",
+      "Achieved 97% accuracy on title category classification",
+      "Improved company merge precision by over 20% compared to legacy methods"
     ],
     "skills": [
       "python",
@@ -152,12 +160,14 @@
       "start": "2021-06",
       "end": "2023-06"
     },
-    "summary": "One of three frontend iOS devs on Veson’s first mobile app; enabled on-the-go access to voyage/cargo data and drove broad client adoption.",
+    "summary": "One of three iOS devs building how Veson's enterprise clients experienced mobile, from initial app to React platform transition.",
     "specifics": [
-      "Built Swift UI features, API client, and offline-tolerant data flows; coordinated sprint integration with the platform team.",
-      "Presented builds to enterprise users; incorporated feedback for usability and reliability improvements.",
-      "Introduced >50% of surveyed clients to mobile workflows; reduced time-to-data by ~30% versus desktop access.",
-      "Established CI/CD hygiene and release rituals with Atlassian tooling."
+      "Built the first version of the app from scratch in my first summer with the team",
+      "Stayed on part time during the school year to add features and integrate client feedback",
+      "Returned the next summer to bring in features from companies Veson had acquired",
+      "Led the transition when we noticed clients preferred web over downloading an app",
+      "Helped translate our mobile designs and layout into the new React platform",
+      "Presented builds directly to enterprise users throughout the process"
     ],
     "skills": [
       "swift",

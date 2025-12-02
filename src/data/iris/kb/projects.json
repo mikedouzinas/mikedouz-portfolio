@@ -2,11 +2,16 @@
   {
     "id": "proj_hilite",
     "title": "HiLiTe",
-    "summary": "Developed a machine learning pipeline that transforms full-length soccer matches into engaging highlight reels with AI-generated commentary.",
+    "summary": "A machine learning pipeline that turns full-length soccer matches into highlight reels with AI-generated commentary in minutes.",
     "specifics": [
-      "Vision pipeline: frame/clip extraction, event detection, and scoring",
-      "Commentary generation for key moments with sports-style narration",
-      "Synchronization of narration with selected clips for coherent highlights"
+      "Soccer has been part of my life forever, and I've always wanted to understand the game through data",
+      "Whenever I missed a soccer game, I would have to wait hours for the highlights to be uploaded to YouTube. So I built this.",
+      "Built a vision pipeline for frame and clip extraction, event detection, and moment scoring",
+      "Used PyTorch and OpenCV for video processing and feature extraction",
+      "Generated sports-style commentary for key moments using vision-language methods",
+      "Synchronized narration with selected clips to create coherent highlight reels",
+      "Built an interactive Streamlit demo for testing and showcasing the system",
+      "Combined computer vision, NLP, and deep learning into one end-to-end pipeline"
     ],
     "skills": ["python", "opencv", "pytorch", "computer_vision", "deep_learning", "machine_learning", "sentence_transformers", "nlp", "streamlit"],
     "tech_stack": ["Python", "OpenCV", "PyTorch", "Vision–Language methods"],
@@ -25,18 +30,17 @@
   {
     "id": "proj_portfolio",
     "title": "Portfolio & Iris",
-    "summary": "Full-stack portfolio built with Next.js and TypeScript featuring Iris — a custom AI assistant that powers conversational navigation and contextual Q&A.",
+    "summary": "This site. Built to show who I am, with Iris as a conversational way to learn exactly what you want to know. Custom RAG pipeline under the hood.",
     "aliases": ["Iris", "Iris assistant"],
     "specifics": [
-      "Iris: Named after the Greek messenger goddess, part of a long-term vision for Mike's AI assistants (Iris for digital, Hermes for physical robot form)",
-      "Custom RAG pipeline: embeddings retrieval, semantic search, intent detection, and streaming LLM responses",
-      "Intelligent quick actions with ranking-based prioritization: suggests related items, skills, and navigation paths using importance scores (complexity × impact × recency)",
-      "Config-driven action system with path tracking: avoids suggesting already-visited nodes and adapts suggestions based on conversation depth",
-      "Production deployment with Redis caching, rate limiting, and Supabase PostgreSQL backend for message storage",
-      "⌘K command palette for instant search and Iris chat integration",
-      "Structured knowledge base with filter queries, year-based filtering, and personal context retrieval",
-      "Cross-type navigation: seamlessly connect projects ↔ skills ↔ experiences ↔ classes with smart suggestions",
-      "Accessibility-first design with responsive layout and smooth Framer Motion animations"
+      "Named Iris after the Greek messenger goddess, part of a longer-term vision for personal AI assistants to help me work faster and smarter (Iris for digital, Hermes eventually for a physical robot)",
+      "Built a custom RAG pipeline with embeddings retrieval, semantic search, intent detection, and streaming LLM responses (like what ChatGPT does but for my own data)",
+      "Designed intelligent quick actions that suggest related items based on complexity, impact, and recency scores",
+      "Config-driven action system that tracks what you've already visited and adapts suggestions based on conversation depth",
+      "Command palette (⌘K) for instant search and Iris chat integration",
+      "Structured knowledge base with filters, year-based queries, and personal context retrieval",
+      "Production deployment with Redis caching, rate limiting, and Supabase for message storage",
+      "Cross type navigation connecting projects, skills, experiences, and classes with smart suggestions"
     ],
     "skills": ["openai_api", "rag", "product_management", "typescript", "react", "nextjs", "tailwind_css", "framer_motion", "supabase", "api_integration", "redis", "nlp", "machine_learning", "writing", "data_structures"],
     "tech_stack": ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion", "OpenAI API"],
@@ -53,11 +57,16 @@
   {
     "id": "proj_euros",
     "title": "Euros 2024 Predictor",
-    "summary": "Predicted Euro 2024 outcomes by scraping datasets and training classical ML models; reached ~top 3% in UEFA predictions.",
+    "summary": "Predicted Euro 2024 outcomes by scraping data and training ML models. Reached top 3% in UEFA's prediction game.",
+    "aliases": ["Euros", "UEFA European Football Championship"],
     "specifics": [
-      "Feature engineering from fixtures, form, and team stats with Pandas/NumPy",
-      "Random Forest classification with CV and hyperparameter tuning",
-      "Produced xG-style expectations and discrete scoreline predictions; error analysis and calibration"
+      "My friends and I were competing with one another about the UEFA European Football Championship in 2024, so I built this to help me out.",
+      "Built web scrapers to collect fixtures, team stats, and historical form data",
+      "Engineered features using Pandas and NumPy to capture what actually predicted match outcomes",
+      "Trained Random Forest classifiers with cross-validation and hyperparameter tuning",
+      "Produced expected goals style predictions and discrete scoreline forecasts",
+      "Ran error analysis and calibration to understand where the model was breaking down",
+      "Top 3% finish validated the approach against thousands of other predictors (and won my fantasy league)"
     ],
     "skills": ["python", "pandas", "numpy", "scikit_learn", "data_mining", "model_evaluation", "machine_learning", "statistics"],
     "tech_stack": ["Python", "Pandas", "NumPy", "scikit-learn"],
@@ -75,11 +84,14 @@
   {
     "id": "proj_momentum",
     "title": "Momentum",
-    "summary": "SwiftUI iOS app for voice-first productivity: real-time transcription, GPT intent parsing, and adaptive TTS feedback.",
+    "summary": "A voice-first iOS app for productivity. Real-time transcription, GPT intent parsing, and adaptive text-to-speech feedback.",
     "specifics": [
-      "Streaming ASR pipeline with <1s perceived latency",
-      "Intent parsing → actions (reminders, calendar, to-dos) via GPT",
-      "Low-latency TTS with interruption handling; privacy-aware UX"
+      "Built a streaming speech recognition pipeline with under one second perceived latency",
+      "Used GPT to parse intent from transcribed speech and trigger actions like reminders, calendar events, and to-dos",
+      "Implemented low latency text to speech with interruption handling so the app feels responsive",
+      "Designed the UX around privacy and minimal friction",
+      "Built entirely in SwiftUI with AVFoundation for audio capture",
+      "Ran TestFlight feedback cycles and iterated based on what users actually needed"
     ],
     "skills": ["nlp", "openai_api", "product_management", "swift", "api_integration"],
     "tech_stack": ["SwiftUI", "AVFoundation", "OpenAI API"],
@@ -97,11 +109,16 @@
   {
     "id": "proj_knight_life",
     "title": "BB&N's Knight Life",
-    "summary": "Native iOS app that streamlined school scheduling at BB&N; widely adopted and rated 4.9★ on the App Store.",
+    "summary": "An iOS app I built in high school that became the way everyone checked schedules, read news, and got notified of school updates. 4.9 stars on the App Store.",
     "specifics": [
-      "Centralized schedules with reliable local caching and notifications",
-      "Continuous releases using student feedback loops",
-      "End-to-end App Store deployment and support"
+      "Built because the school's schedule was confusing and nobody had a good way to check it",
+      "Made the first version in just 3 days, App Store in a week",
+      "Centralized schedules with reliable local caching so it worked offline",
+      "Added notifications so students knew when things changed",
+      "Released updates continuously based on feedback from classmates",
+      "Handled end-to-end App Store deployment and support",
+      "Became widely adopted across the school and maintained a 4.9 star rating",
+      "Created and taught a Knight Life team (Calavrian LLC) to work in Swift and take over from me after I left; app is still used and updated with over 80% of the school as daily active users"
     ],
     "skills": ["swift", "firebase", "product_management", "leadership", "api_integration"],
     "tech_stack": ["Swift", "Firebase"],

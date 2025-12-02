@@ -68,7 +68,7 @@ export default function HeaderMobile({ onOpenAbout }: HeaderMobileProps) {
             
             {/* Subtitle - small text under the name */}
             <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
-              Builder · Leader · Writer
+              Builder · Storyteller · Student
             </p>
           </div>
         </div>

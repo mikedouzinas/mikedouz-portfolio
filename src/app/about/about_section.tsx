@@ -6,7 +6,7 @@ export default function AboutSection() {
   return (
     <section
       id="about"
-      className="min-h-[50vh] py-4 bg-gray-50 dark:bg-gray-900 flex flex-col items-center"
+      className="min-h-[30vh] py-4 bg-gray-50 dark:bg-gray-900 flex flex-col items-center"
     >
       <div className="max-w-[42rem] mx-auto w-full relative">
         <div className="max-w-2xl mx-auto px-4">
