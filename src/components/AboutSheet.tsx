@@ -102,6 +102,18 @@ export default function AboutSheet({ open, onClose }: AboutSheetProps) {
     },
   ];
 
+  /**
+   * Handle Iris click from within About content
+   * Closes the sheet first, then opens Iris
+   */
+  const handleIrisClick = () => {
+    onClose();
+    // Small delay to allow sheet to close before opening Iris
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('mv-open-cmdk'));
+    }, 300);
+  };
+
   return (
     <AnimatePresence>
       {open && (
@@ -176,6 +188,7 @@ export default function AboutSheet({ open, onClose }: AboutSheetProps) {
                       <AboutContent 
                         expanded={false}
                         textClassName="text-sm font-light text-blue-950 dark:text-blue-50"
+                        onIrisClick={handleIrisClick}
                       />
                     </motion.div>
                   ) : (
@@ -189,6 +202,7 @@ export default function AboutSheet({ open, onClose }: AboutSheetProps) {
                       <AboutContent 
                         expanded={true}
                         textClassName="text-sm font-light text-blue-950 dark:text-blue-50"
+                        onIrisClick={handleIrisClick}
                       />
                     </motion.div>
                   )}

@@ -433,12 +433,24 @@ export default function IrisButton() {
       triggerReverseAnimation();
     };
 
+    /**
+     * Listen for open event from other components (e.g. About link)
+     * Triggers the forward animation if not already animating/open
+     */
+    const handlePaletteOpen = () => {
+      if (!isPaletteOpen.current) {
+        triggerForwardAnimation();
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('mv-close-cmdk', handlePaletteClose);
+    window.addEventListener('mv-open-cmdk', handlePaletteOpen);
     
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('mv-close-cmdk', handlePaletteClose);
+      window.removeEventListener('mv-open-cmdk', handlePaletteOpen);
     };
   }, []);
 

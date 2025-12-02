@@ -15,6 +15,11 @@ interface AboutContentProps {
    * Additional CSS classes for the container
    */
   containerClassName?: string;
+  /**
+   * Callback for when the Iris link is clicked
+   * If not provided, defaults to dispatching 'mv-open-cmdk'
+   */
+  onIrisClick?: () => void;
 }
 
 /**
@@ -24,68 +29,82 @@ interface AboutContentProps {
 export default function AboutContent({ 
   expanded = false, 
   textClassName = "text-sm font-light text-gray-600 dark:text-gray-400", 
-  containerClassName = ""
+  containerClassName = "",
+  onIrisClick
 }: AboutContentProps) {
+  const handleIrisClick = () => {
+    if (onIrisClick) {
+      onIrisClick();
+    } else {
+      window.dispatchEvent(new CustomEvent('mv-open-cmdk'));
+    }
+  };
+
   return (
     <div className={containerClassName}>
       <p className={`mb-3 ${textClassName} leading-relaxed`}>
-        I&apos;m <strong className="font-semibold">Mike Veson</strong>, a{" "}
-        <span className="font-semibold bg-gradient-to-r from-blue-700 to-blue-400 dark:from-blue-400 dark:to-white text-transparent bg-clip-text">
-          Greek
-        </span>
-        -
-        <span className="font-semibold bg-gradient-to-r from-red-600 via-blue-400 to-blue-700 dark:from-red-500 dark:via-white dark:to-blue-300 text-transparent bg-clip-text">
-          American{" "}
-        </span>
+        I&apos;m <strong className="font-semibold">Mike Veson</strong>, a
         Computer Science major at{" "}
-        <span className="font-semibold bg-gradient-to-r from-blue-600 to-gray-600 dark:from-blue-400 dark:to-gray-400 text-transparent bg-clip-text">
-          Rice University
-        </span>{" "}
-        🦉 who loves building things that make life easier. I grew up around{" "}
-        <span className="font-semibold bg-gradient-to-r from-blue-700 to-orange-600 dark:from-blue-400 dark:to-orange-400 text-transparent bg-clip-text">
-          shipping software
-        </span>{" "}
-        🚢 and learned early how tech can transform industries and power
-        products that people rely on.
+        <a 
+          href="https://www.rice.edu" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="hover:opacity-80 transition-opacity"
+        >
+          <span className="font-semibold bg-gradient-to-r from-blue-600 to-gray-600 dark:from-blue-400 dark:to-gray-400 text-transparent bg-clip-text">
+            Rice University
+          </span>
+        </a>{" "}
+        studying abroad in{" "}
+        <a 
+          href="https://www.salleurl.edu/en" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="hover:opacity-80 transition-opacity"
+        >
+          <span className="font-semibold bg-gradient-to-r from-red-600 to-yellow-500 dark:from-red-500 dark:to-yellow-400 text-transparent bg-clip-text">
+            Barcelona
+          </span>
+        </a>
+        . I grew up around{" "}
+        <a 
+          href="https://veson.com" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="hover:opacity-80 transition-opacity"
+        >
+          <span className="font-semibold bg-gradient-to-r from-blue-700 to-orange-600 dark:from-blue-400 dark:to-orange-400 text-transparent bg-clip-text">
+            shipping software
+          </span>
+        </a>{" "}
+        and learned early that the best products don&apos;t just solve problems, they change how people{" "}
+        <em className="italic">experience</em> their work.
       </p>
 
       {expanded && (
         <>
           <p className={`mb-3 ${textClassName} leading-relaxed`}>
-            I&apos;m a fast learner, I break down big problems into clear steps, and always
-            put users first. I&apos;ve worked in supporting
-            startups, shipping software, and defense, mainly in software engineering,
-            product, and client-facing roles. My primary technical skillset spans{" "}
-            <strong className="font-semibold">
-              Mobile, Web, Backend, and Data Engineering
-            </strong>
-            , but I&apos;m always learning new skills and pushing myself to take on new challenges.
+            I&apos;ve shipped{" "}
+            <strong className="font-semibold">mobile apps</strong>,{" "}
+            <strong className="font-semibold">AI systems</strong>,{" "}
+            <strong className="font-semibold">data pipelines</strong>, and tools
+            that compress days of work into minutes. But what I obsess over is that experience itself: the details most people skip, 
+            that gap between something that works and something you keep coming back to.
           </p>
-
           <p className={`mb-3 ${textClassName} leading-relaxed`}>
-            Outside of CS, I love soccer ⚽ (or football, wherever you&apos;re
-            from). It&apos;s been a life goal of mine to understand players and
-            teams better through data. I&apos;ve built analytics tools, highlight
-            generators, and reached the{" "}
-            <strong className="font-semibold">top 3%</strong> in Euro 2024
-            predictions. I&apos;m also studying abroad in{" "}
-            <span className="font-semibold bg-gradient-to-r from-red-600 to-blue-700 dark:from-red-500 dark:to-blue-400 text-transparent bg-clip-text">
-              Barcelona
-            </span>{" "}
-            this year, exploring new cultures while
-            improving my Greek and Spanish.
+            Explore my work below.
           </p>
-
           <p className={`${textClassName} leading-relaxed`}>
-            Long-term, I want to build products that meaningfully help people
-            at scale. If you&apos;re working on challenges in{" "}
-            <strong className="font-semibold">big tech</strong> 🖥️,{" "}
-            <strong className="font-semibold">finance</strong> 💰,{" "}
-            <strong className="font-semibold">shipping</strong> 🚢, or any space
-            where fast learners who connect{" "}
-            <strong className="font-semibold">customer needs</strong> to{" "}
-            <strong className="font-semibold">fast output</strong> are valuable,
-            let&apos;s connect.
+            
+            Or, you could <strong className="font-semibold">experience</strong>{" "} it.{" "} With {" "}
+            <button 
+              onClick={handleIrisClick}
+              className="hover:opacity-80 transition-opacity inline-block focus:outline-none"
+            >
+              <span className="font-semibold bg-gradient-to-r from-blue-500 via-emerald-500 to-blue-500 dark:from-blue-400 dark:via-emerald-400 dark:to-blue-400 text-transparent bg-clip-text">
+                Iris.
+              </span>
+            </button>{" "}
           </p>
         </>
       )}
