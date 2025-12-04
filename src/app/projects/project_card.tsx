@@ -46,13 +46,23 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         }}
       >
         <div className="mt-6 md:mt-0">
-          <Image
-            src={project.imageUrl || "/path/to/default/image.jpg"}
-            alt={project.title}
-            width={400}
-            height={300}
-            className="rounded-md object-cover w-[50%] md:w-full h-auto min-w-[150px]"
-          />
+          {/* Professional comment: Image component updated for Next.js 16 compatibility */}
+          {/* Using explicit width/height as required by Next.js Image component */}
+          {/* The imageUrl comes from projects.json links.image field (e.g., /Portfolio.png) */}
+          {project.imageUrl ? (
+            <Image
+              src={project.imageUrl}
+              alt={project.title}
+              width={400}
+              height={300}
+              className="rounded-md object-cover w-[50%] md:w-full h-auto min-w-[150px]"
+              // Professional comment: Image optimization handled by Next.js 16 with configuration in next.config.ts
+            />
+          ) : (
+            <div className="w-full h-[300px] bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center">
+              <span className="text-gray-500 dark:text-gray-400">No image available</span>
+            </div>
+          )}
         </div>
         <div className="flex flex-col">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-2 group-hover:text-blue-800 dark:group-hover:text-blue-300">

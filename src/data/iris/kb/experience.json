@@ -78,6 +78,9 @@
     "id": "exp_veson_2024",
     "company": "Veson Nautical",
     "role": "Software Engineering Intern (IMOS – Laytime Automation)",
+    "aliases": [
+      "Veson Laytime Automation"
+    ],
     "dates": {
       "start": "2024-06",
       "end": "2024-09"
@@ -156,6 +159,11 @@
     "id": "exp_veson_mobile_2021_2023",
     "company": "Veson Nautical",
     "role": "Software Development Intern (Mobile)",
+    "aliases": [
+      "Veson Mobile",
+      "Veson iOS",
+      "High school internship"
+    ],
     "dates": {
       "start": "2021-06",
       "end": "2023-06"
