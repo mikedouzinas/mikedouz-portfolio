@@ -2,6 +2,7 @@
 import React from "react";
 import { WorkExperience } from "@/data/loaders";
 import BaseCard from "@/components/base_card";
+import AskIrisButton from "@/components/AskIrisButton";
 
 interface ExperienceCardProps {
   item: WorkExperience;
@@ -15,9 +16,17 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
           {item.period}
         </div>
         <div className="flex flex-col flex-1">
-          <h3 className="text-xl text-gray-900 dark:text-gray-200 group-hover:text-blue-800 dark:group-hover:text-blue-300">
-            {item.title}
-          </h3>
+          <div className="flex flex-wrap justify-between items-start gap-x-2 gap-y-3">
+            {/* Full title shown on lg+ screens, short role title on medium and smaller */}
+            <h3 className="text-xl text-gray-900 dark:text-gray-200 group-hover:text-blue-800 dark:group-hover:text-blue-300 min-w-0 break-words">
+              <span className="hidden lg:inline">{item.title}</span>
+              <span className="lg:hidden">{item.shortTitle}</span>
+            </h3>
+            {/* Action button: hidden on desktop idle, fade in on hover; always visible on mobile */}
+            <div className="flex-shrink-0 mb-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-[50ms]">
+              <AskIrisButton item={item} type="experience" />
+            </div>
+          </div>
           <div className="mb-2 text-sm">
             <a
               href={item.companyUrl}

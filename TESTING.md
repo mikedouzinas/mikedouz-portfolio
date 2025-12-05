@@ -26,7 +26,7 @@ These queries should work perfectly with relevant context from the knowledge bas
 
 | Query | Expected Result | What to Verify |
 |-------|----------------|----------------|
-| "what projects has mike worked on?" | Lists HiLiTe, Portfolio, Euros Predictor, Momentum, Knight Life | ✅ All major projects mentioned<br>✅ Brief descriptions included |
+| "what projects has mike worked on?" | Lists HiLiTe, Portfolio, Euro Predictor, Momentum, Knight Life | ✅ All major projects mentioned<br>✅ Brief descriptions included |
 | "where does mike go to school?" | Rice University, Computer Science, mentions junior year | ✅ School name correct<br>✅ Degree mentioned |
 | "what is mike's headline?" | Junior, Computer Science @ Rice University \| AI, Full-Stack, and Data-Driven Product Builder | ✅ Exact headline returned |
 | "tell me about mike's work experience" | Mentions Parsons, Veson, VesselsValue, Liu Idea Lab | ✅ Recent experiences listed<br>✅ Role details included |

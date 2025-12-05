@@ -30,6 +30,7 @@ export interface Project {
   id: string;
   imageUrl?: string;
   title: string;
+  shortTitle?: string;  // Optional condensed title for mobile/reduced screen layouts
   description: string;
   githubLink: string;
   projectLink?: string;
@@ -42,6 +43,7 @@ export interface Project {
 export interface WorkExperience {
   id: string;
   title: string;
+  shortTitle: string;  // Condensed title for mobile/small screens (e.g., "Lilie (SWE)")
   company: string;
   period: string;
   description: string;
@@ -72,6 +74,67 @@ function mapSkillIdsToNames(skillIds: string[], limit: number = 5): string[] {
     .slice(0, limit) // Take only the top N skills
     .map((id) => skillIdToNameMap.get(id) || id) // Map ID to name, fallback to ID if not found
     .filter(Boolean); // Remove any undefined values
+}
+
+// ============================================================================
+// SHORT TITLE UTILITIES
+// ============================================================================
+
+/**
+ * Generates a condensed role title for mobile/reduced screen layouts
+ * Focuses on the role type only (no company name) to save space
+ * 
+ * Examples:
+ * - "Software Engineer in Residence" → "SWE in Residence"
+ * - "Software Engineering Intern (Automation)" → "SWE Intern"
+ * - "Software Development Intern (Mobile)" → "SWE Intern (Mobile)"
+ * - "Data Science Intern" → "Data Science Intern"
+ */
+function getShortRoleTitle(role: string): string {
+  // Handle "Software Engineer in Residence" → "SWE in Residence"
+  if (/software.*engineer.*in.*residence/i.test(role)) {
+    return 'SWE in Residence';
+  }
+  
+  // Handle "Software Engineering/Development Intern" with optional suffix
+  // Special case: Remove "(Automation)" but keep "(Mobile)"
+  const internMatch = role.match(/software\s+(engineering|development)\s+intern\s*(\([^)]+\))?/i);
+  if (internMatch) {
+    const suffix = internMatch[2];
+    // Skip "(Automation)" suffix, but keep others like "(Mobile)"
+    if (suffix && !/automation/i.test(suffix)) {
+      return `SWE Intern ${suffix}`;
+    }
+    return 'SWE Intern';
+  }
+  
+  // Handle "Software Engineer Intern" (without Engineering/Development)
+  if (/software\s+engineer\s+intern/i.test(role)) {
+    return 'SWE Intern';
+  }
+  
+  // Data Science roles stay as-is (already concise)
+  if (/data.*scien/i.test(role)) {
+    return role; // "Data Science Intern" is already short enough
+  }
+  
+  // iOS/Mobile dev - keep descriptive
+  if (/(ios|mobile).*dev/i.test(role)) {
+    return role;
+  }
+  
+  // Fallback: return original role if it's short enough, otherwise truncate
+  if (role.length <= 25) {
+    return role;
+  }
+  
+  // For longer roles, take first meaningful words
+  const words = role.split(/[\s]+/).filter(w => w.length > 0);
+  let short = words[0];
+  for (let i = 1; i < words.length && short.length < 20; i++) {
+    short += ` ${words[i]}`;
+  }
+  return short;
 }
 
 // ============================================================================
@@ -116,7 +179,7 @@ function formatDateRange(dates: { start: string; end?: string }): string {
  * Maps the kb JSON structure to the Blog interface expected by components
  */
 export const blogs: Blog[] = blogsData.blog_posts.map((post, index) => ({
-  id: String(index + 1), // Generate sequential IDs since blogs.json doesn't have them
+  id: `blog_${index}`, // Match backend ID generation (0-based index)
   title: post.title,
   imageUrl: "/blog1.png", // Default image - could be enhanced to use post-specific images
   date: new Date(post.published_date).getFullYear().toString(), // Extract just the year
@@ -126,11 +189,14 @@ export const blogs: Blog[] = blogsData.blog_posts.map((post, index) => ({
 /**
  * Loads and transforms project data from projects.json
  * Uses the summary field for descriptions and maps the top 5 skills
+ * Includes optional short_title for reduced screen layouts
  */
 export const projects: Project[] = projectsData.map((proj) => ({
   id: proj.id,
   imageUrl: proj.links.image,
   title: proj.title,
+  // Use short_title if available in JSON (e.g., "Knight Life" for "BB&N's Knight Life")
+  shortTitle: (proj as any).short_title,
   description: proj.summary, // Using summary as requested, not specifics
   githubLink: proj.links.github,
   // Prefer app_store link, fall back to demo if available
@@ -142,10 +208,13 @@ export const projects: Project[] = projectsData.map((proj) => ({
 /**
  * Loads and transforms work experience data from experience.json
  * Formats date ranges and maps the top 5 skills for each role
+ * Generates short titles for reduced screen layouts (role only, no company)
  */
 export const workExperiences: WorkExperience[] = experienceData.map((exp) => ({
   id: exp.id,
   title: exp.role, // 'role' in JSON maps to 'title' in the UI
+  // Generate condensed role title for reduced layouts: "SWE Intern" or "SWE in Residence"
+  shortTitle: getShortRoleTitle(exp.role),
   company: exp.company,
   period: formatDateRange(exp.dates), // Convert date object to readable format
   description: exp.summary, // Using summary as requested, not specifics

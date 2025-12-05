@@ -56,9 +56,9 @@
   },
   {
     "id": "proj_euros",
-    "title": "Euros 2024 Predictor",
+    "title": "Euro Predictor",
     "summary": "Predicted Euro 2024 outcomes by scraping data and training ML models. Reached top 3% in UEFA's prediction game.",
-    "aliases": ["Euros", "UEFA European Football Championship"],
+    "aliases": ["Euros", "UEFA European Football Championship", "euro 2024"],
     "specifics": [
       "My friends and I were competing with one another about the UEFA European Football Championship in 2024, so I built this to help me out.",
       "Built web scrapers to collect fixtures, team stats, and historical form data",
@@ -109,6 +109,7 @@
   {
     "id": "proj_knight_life",
     "title": "BB&N's Knight Life",
+    "short_title": "Knight Life",
     "summary": "An iOS app I built in high school that became the way everyone checked schedules, read news, and got notified of school updates. 4.9 stars on the App Store.",
     "specifics": [
       "Built because the school's schedule was confusing and nobody had a good way to check it",

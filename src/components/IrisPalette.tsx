@@ -813,19 +813,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
    * This prevents duplicate handlers and ensures button animation always runs with Cmd+K
    */
 
-  /**
-   * Listen for custom 'mv-open-cmdk' event
-   * Dispatched by button clicks - always opens the palette
-   */
-  useEffect(() => {
-    const handleCustomOpen = () => {
-      trackIrisOpen('button');
-      handleOpenChange(true);
-    };
-
-    window.addEventListener('mv-open-cmdk', handleCustomOpen);
-    return () => window.removeEventListener('mv-open-cmdk', handleCustomOpen);
-  }, [handleOpenChange]);
 
   /**
    * Listen for custom 'mv-toggle-cmdk' event
@@ -1269,6 +1256,44 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     // Keep focus in input (Arc behavior)
     inputRef.current?.focus();
   };
+
+  /**
+   * Listen for custom 'mv-open-cmdk' event
+   * Dispatched by button clicks - always opens the palette
+   */
+  // Keep a ref to handleSubmitQuery to avoid dependency cycles in event listener
+  const handleSubmitQueryRef = useRef(handleSubmitQuery);
+  useEffect(() => {
+    handleSubmitQueryRef.current = handleSubmitQuery;
+  });
+
+  useEffect(() => {
+    const handleCustomOpen = (e: Event) => {
+      trackIrisOpen('button');
+      handleOpenChange(true);
+
+      // Handle custom query parameters from event detail
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail && customEvent.detail.query) {
+        const { query: customQuery, filters, intent } = customEvent.detail;
+        setQuery(customQuery);
+        
+        // Submit the query using the ref to avoid dependency issues
+        // skipClassification is true if we have explicit filters or intent
+        if (handleSubmitQueryRef.current) {
+          handleSubmitQueryRef.current(
+            customQuery,
+            !!(filters || intent), 
+            filters,
+            intent
+          );
+        }
+      }
+    };
+
+    window.addEventListener('mv-open-cmdk', handleCustomOpen);
+    return () => window.removeEventListener('mv-open-cmdk', handleCustomOpen);
+  }, [handleOpenChange]);
 
   /**
    * Select a suggestion and either submit it or fill the input

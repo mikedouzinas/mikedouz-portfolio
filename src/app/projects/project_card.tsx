@@ -5,6 +5,7 @@ import { ExternalLink } from "lucide-react";
 import { Project } from "@/data/loaders";
 import Image from "next/image";
 import BaseCard from "@/components/base_card";
+import AskIrisButton from "@/components/AskIrisButton";
 
 interface ProjectCardProps {
   project: Project;
@@ -17,28 +18,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       glowColor="34, 197, 94"  // Green glow for projects
       glowIntensity={0.35}
     >
-      <div className="absolute top-2 right-2 flex space-x-2">
-        <a
-          href={project.githubLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="GitHub"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 mt-5 hover:text-blue-700 dark:hover:text-orange-500" />
-        </a>
-        {project.projectLink && project.projectLink.length > 0 && (
-          <a
-            href={project.projectLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Live Project"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-300 mt-5 hover:text-blue-700 dark:hover:text-orange-500" />
-          </a>
-        )}
-      </div>
       <div
         className="flex flex-col-reverse md:grid gap-x-4 items-start"
         style={{
@@ -65,9 +44,45 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           )}
         </div>
         <div className="flex flex-col">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-2 group-hover:text-blue-800 dark:group-hover:text-blue-300">
-            {project.title}
-          </h3>
+          <div className="flex flex-wrap justify-between items-start mb-1">
+            {/* Full title shown on lg+ screens, short title (if available) on medium and smaller */}
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200 group-hover:text-blue-800 dark:group-hover:text-blue-300 min-w-0 break-words">
+              {project.shortTitle ? (
+                <>
+                  <span className="hidden lg:inline">{project.title}</span>
+                  <span className="lg:hidden">{project.shortTitle}</span>
+                </>
+              ) : (
+                project.title
+              )}
+            </h3>
+            {/* Action buttons: hidden on desktop idle, fade in on hover; always visible on mobile */}
+            <div className="flex items-center gap-2 flex-shrink-0 mb-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-[50ms]">
+              <AskIrisButton item={project} type="project" />
+              <a
+                href={project.githubLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-block hover:scale-105 transition-all duration-200 ease-out"
+              >
+                <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
+              </a>
+              {project.projectLink && project.projectLink.length > 0 && (
+                <a
+                  href={project.projectLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Live Project"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-block hover:scale-105 transition-all duration-200 ease-out"
+                >
+                  <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
+                </a>
+              )}
+            </div>
+          </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {project.description}
           </p>
