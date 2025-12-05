@@ -245,11 +245,11 @@ These examples demonstrate when and how to use multiple types:
 
 Multi-type usage (combine with OR logic):
 - For broad queries like "what has Mike built?" → type: ["project", "experience"] (includes both personal projects and professional work)
-- For skill-focused queries without explicit type → type: ["project", "experience"] to cover both personal and professional usage
+- For queries asking about skill experience/usage/learning (e.g., "what has he done with X", "experience with X", "learned X", "used X") → type: ["project", "experience", "class"] to cover personal projects, professional work, AND academic coursework where skills are learned/applied. This ensures classes are included when users ask about skill experience.
 - For "technical work" → type: ["project", "experience", "blog"] to span multiple content types
 - When user explicitly mentions a type (e.g., "projects"), respect that intent - don't add other types unless semantically appropriate
 
-If user mentions skills but not types, omit this filter to search all types.`
+If user mentions skills in a general way without asking about usage/experience, omit this filter to search all types.`
                     },
                     skills: {
                       type: 'array',

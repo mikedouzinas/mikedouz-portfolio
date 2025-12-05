@@ -266,6 +266,14 @@ export function applyFilters(items: KBItem[], filters: QueryFilter): KBItem[] {
         }
       }
 
+      // Professional comment: Check aliases field to match common names and variations
+      // This enables queries like "Veson Mobile" to match items with that alias
+      if ('aliases' in item && Array.isArray(item.aliases)) {
+        if (item.aliases.some(alias => alias.toLowerCase().includes(searchTitle))) {
+          return true;
+        }
+      }
+
       // Check title field (substring match for partial queries)
       if ('title' in item && item.title) {
         return item.title.toLowerCase().includes(searchTitle);
