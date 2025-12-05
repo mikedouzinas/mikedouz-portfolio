@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Sparkles } from 'lucide-react';
+import { trackEvent } from '@/lib/analytics/gtag';
 
 interface AskIrisButtonProps {
   item: {
@@ -16,6 +17,14 @@ export default function AskIrisButton({ item, type, className = '' }: AskIrisBut
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+
+    // Track Google Analytics event when "See Details" button is clicked
+    // This helps understand user engagement with the Iris AI feature across different content types
+    trackEvent('see_details_click', {
+      item_type: type,
+      item_id: item.id,
+      item_title: item.title
+    });
 
     // Construct query and filters
     // For specific items, we want "Tell me about [Title]"
@@ -43,7 +52,7 @@ export default function AskIrisButton({ item, type, className = '' }: AskIrisBut
         bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600
         hover:scale-105 
         text-white 
-        text-[10px] font-medium 
+        text-xs font-medium 
         rounded-lg shadow-sm border border-white/20
         transition-all duration-200 ease-out hover:shadow-md
         hover:from-blue-500 hover:via-emerald-400 hover:to-blue-500
