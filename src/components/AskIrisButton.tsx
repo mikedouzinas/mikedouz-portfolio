@@ -57,6 +57,7 @@ export default function AskIrisButton({ item, type, className = '' }: AskIrisBut
         transition-all duration-200 ease-out hover:shadow-md
         hover:from-blue-500 hover:via-emerald-400 hover:to-blue-500
         backdrop-blur-xl z-20
+        opacity-75 hover:opacity-100
         ${className}
       `}
       aria-label={`See details for ${item.title}`}
