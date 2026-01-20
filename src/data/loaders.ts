@@ -166,13 +166,14 @@ function isDateInFuture(startDateStr: string): boolean {
  */
 function formatDateRange(dates: { start: string; end?: string }): string {
   const startDate = new Date(dates.start + "-01"); // Add day for valid date parsing
-  const startMonth = startDate.toLocaleString("en-US", { month: "short" }).toUpperCase();
-  const startYear = startDate.getFullYear();
+  // Use UTC to avoid timezone shifting (e.g., May 1 UTC becoming Apr 30 local)
+  const startMonth = startDate.toLocaleString("en-US", { month: "short", timeZone: "UTC" }).toUpperCase();
+  const startYear = startDate.getUTCFullYear();
 
   if (dates.end) {
     const endDate = new Date(dates.end + "-01");
-    const endMonth = endDate.toLocaleString("en-US", { month: "short" }).toUpperCase();
-    const endYear = endDate.getFullYear();
+    const endMonth = endDate.toLocaleString("en-US", { month: "short", timeZone: "UTC" }).toUpperCase();
+    const endYear = endDate.getUTCFullYear();
     
     // If same year, show "MAY - AUG 2024", otherwise "MAY 2024 - AUG 2025"
     if (startYear === endYear) {
