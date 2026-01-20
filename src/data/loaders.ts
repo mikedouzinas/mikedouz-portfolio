@@ -49,6 +49,7 @@ export interface WorkExperience {
   description: string;
   companyUrl: string;
   skills: string[];
+  isIncoming: boolean;  // True if start date is in the future
 }
 
 // ============================================================================
@@ -142,6 +143,20 @@ function getShortRoleTitle(role: string): string {
 // ============================================================================
 
 /**
+ * Checks if a start date is in the future (for "incoming" experiences)
+ * @param startDateStr - Start date string in "YYYY-MM" format
+ * @returns True if the start date is after the current date
+ */
+function isDateInFuture(startDateStr: string): boolean {
+  const startDate = new Date(startDateStr + "-01");
+  const now = new Date();
+  // Compare year and month only (ignore day)
+  const startYearMonth = startDate.getFullYear() * 12 + startDate.getMonth();
+  const nowYearMonth = now.getFullYear() * 12 + now.getMonth();
+  return startYearMonth > nowYearMonth;
+}
+
+/**
  * Formats a date object with start and optional end dates into a display string
  * Examples:
  * - { start: "2024-05", end: "2024-08" } → "MAY - AUG 2024"
@@ -209,6 +224,7 @@ export const projects: Project[] = projectsData.map((proj) => ({
  * Loads and transforms work experience data from experience.json
  * Formats date ranges and maps the top 5 skills for each role
  * Generates short titles for reduced screen layouts (role only, no company)
+ * Automatically detects "incoming" experiences based on future start dates
  */
 export const workExperiences: WorkExperience[] = experienceData.map((exp) => ({
   id: exp.id,
@@ -221,5 +237,7 @@ export const workExperiences: WorkExperience[] = experienceData.map((exp) => ({
   companyUrl: exp.links.company,
   // Map skill IDs to display names, limited to top 5
   skills: mapSkillIdsToNames(exp.skills, 5),
+  // Automatically detect incoming status from future start date
+  isIncoming: isDateInFuture(exp.dates.start),
 }));
 

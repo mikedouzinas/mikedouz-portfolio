@@ -1,5 +1,35 @@
 [
   {
+    "id": "exp_google_2026",
+    "company": "Google",
+    "role": "Software Engineering Intern",
+    "aliases": [
+      "Google SWE",
+      "Google Internship",
+      "Gmail iOS",
+      "Gmail team"
+    ],
+    "dates": {
+      "start": "2026-05",
+      "end": "2026-08"
+    },
+    "summary": "Incoming Software Engineering Intern on the Gmail iOS team in San Francisco.",
+    "specifics": [],
+    "skills": [
+      "swift"
+    ],
+    "links": {
+      "company": "https://google.com/"
+    },
+    "tags": [
+      "internship",
+      "big-tech",
+      "incoming",
+      "ios",
+      "mobile"
+    ]
+  },
+  {
     "id": "exp_parsons_2025",
     "company": "Parsons",
     "role": "Software Engineer Intern",

@@ -27,7 +27,7 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
               <AskIrisButton item={item} type="experience" />
             </div>
           </div>
-          <div className="mb-2 text-sm">
+          <div className="mb-2 text-sm flex items-center gap-2">
             <a
               href={item.companyUrl}
               target="_blank"
@@ -37,6 +37,11 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
             >
               {item.company}
             </a>
+            {item.isIncoming && (
+              <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gradient-to-r from-green-100 to-emerald-200 text-green-800 dark:from-green-900 dark:to-emerald-800 dark:text-green-300">
+                Incoming
+              </span>
+            )}
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {item.description}
