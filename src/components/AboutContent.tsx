@@ -88,10 +88,10 @@ export default function AboutContent({
             play week in week out at the new Camp Nou, and spent the semester getting better at Spanish and Greek. Had a lot of conversations about what people should want out of life. I learned that it doesn&apos;t matter if you&apos;re being productive if you&apos;re being productive about the wrong things. So I started spending more time figuring out what&apos;s worth doing in the first place, and now I&apos;m building products to help with that.
           </p>
           <p className={`mb-3 ${textClassName} leading-relaxed`}>
-            I love talking to people about what success means to them. Not success in the typical sense, but a life that actually feels fulfilling. Learning more every day through writing books, blogs, movie scripts, and having conversations with people who push me forward.
+            I love talking to people about what success means to them. Not success in the typical sense, but a life that feels fulfilling every day. Learning more every day through writing books, blogs, movie scripts, and having conversations with people who push me forward.
           </p>
           <p className={`${textClassName} leading-relaxed`}>
-            Check out{" "}
+            Learn more about me, shoot me a message, or schedule a meeting through{" "}
             <button
               onClick={handleIrisClick}
               className="hover:opacity-80 transition-opacity inline-block focus:outline-none"
@@ -99,8 +99,7 @@ export default function AboutContent({
               <span className="font-semibold bg-gradient-to-r from-blue-500 via-emerald-500 to-blue-500 dark:from-blue-400 dark:via-emerald-400 dark:to-blue-400 text-transparent bg-clip-text">
                 Iris
               </span>
-            </button>{" "}
-            to learn more about me. Feel free to shoot me a message or schedule something through there.
+            </button>.
           </p>
         </>
       )}
