@@ -82,16 +82,23 @@ export default function AboutContent({
               </span>
             </a>
             . Traveled around Europe, got to see my lifelong club{" "}
-            <span className="font-semibold bg-gradient-to-r from-blue-800 to-red-700 dark:from-blue-500 dark:to-red-500 text-transparent bg-clip-text">
-              Barça
-            </span>{" "}
-            play week in week out at the new Camp Nou, and spent the semester getting better at Spanish and Greek. Had a lot of conversations about what people should want out of life. I learned that it doesn&apos;t matter if you&apos;re being productive if you&apos;re being productive about the wrong things. So I started spending more time figuring out what&apos;s worth doing in the first place, and now I&apos;m building products to help with that.
+            <a
+              href="https://youtu.be/9V2guLT3S14?si=I8x2_s2vhjppaj-d"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity"
+            >
+              <span className="font-semibold bg-gradient-to-r from-blue-800 to-red-700 dark:from-blue-500 dark:to-red-500 text-transparent bg-clip-text">
+                Barça
+              </span>
+            </a>{" "}
+            play week in week out at the new Camp Nou, and spent the semester getting better at Spanish and Greek. Had a lot of conversations about what people should want out of life. I learned the hard way that it doesn&apos;t matter how hard you work if you&apos;re working hard for the wrong reasons. So I started spending more time figuring out what&apos;s worth doing in the first place, and now I&apos;m building products to help with that.
           </p>
           <p className={`mb-3 ${textClassName} leading-relaxed`}>
-            I love talking to people about what success means to them. Not success in the typical sense, but a life that feels fulfilling every day. Learning more every day through writing books, blogs, movie scripts, and having conversations with people who push me forward.
+            I love talking to people about what success means to them. Not success in the typical sense, but a life that fulfills you every day for reasons true to who you are. Learning more every day through writing books, blogs, movie scripts, and having conversations with people who push me forward.
           </p>
           <p className={`${textClassName} leading-relaxed`}>
-            Learn more about me, shoot me a message, or schedule a meeting through{" "}
+            Learn more about me, shoot me a message, or schedule a chat with me through{" "}
             <button
               onClick={handleIrisClick}
               className="hover:opacity-80 transition-opacity inline-block focus:outline-none"
