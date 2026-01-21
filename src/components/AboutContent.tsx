@@ -98,7 +98,7 @@ export default function AboutContent({
             I love talking to people about what success means to them. Not success in the typical sense, but a life that fulfills you every day for reasons true to who you are. Learning more every day through writing books, blogs, movie scripts, and having conversations with people who push me forward.
           </p>
           <p className={`${textClassName} leading-relaxed`}>
-            Learn more about me, shoot me a message, or schedule a chat with me through{" "}
+            I always want to meet and talk to more people, so if you&apos;ve made it this far, say hi through{" "}
             <button
               onClick={handleIrisClick}
               className="hover:opacity-80 transition-opacity inline-block focus:outline-none"
