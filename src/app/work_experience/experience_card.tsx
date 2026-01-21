@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import { WorkExperience } from "@/data/loaders";
 import BaseCard from "@/components/base_card";
 import AskIrisButton from "@/components/AskIrisButton";
@@ -35,7 +36,17 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
               className="text-blue-600 dark:text-blue-400 hover:underline"
               onClick={(e) => e.stopPropagation()}
             >
-              {item.company}
+              {item.company === "Google" ? (
+                <Image
+                  src="/google-logo.png"
+                  alt="Google"
+                  width={54}
+                  height={18}
+                  className="inline-block align-middle"
+                />
+              ) : (
+                item.company
+              )}
             </a>
             {item.isIncoming && (
               <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gradient-to-r from-green-100 to-emerald-200 text-green-800 dark:from-green-900 dark:to-emerald-800 dark:text-green-300">
