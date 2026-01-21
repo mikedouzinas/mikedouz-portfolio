@@ -43,11 +43,10 @@ export default function AboutContent({
   return (
     <div className={containerClassName}>
       <p className={`mb-3 ${textClassName} leading-relaxed`}>
-        I&apos;m <strong className="font-semibold">Mike Veson</strong>, a
-        Computer Science major at{" "}
-        <a 
-          href="https://www.rice.edu" 
-          target="_blank" 
+        I&apos;m <strong className="font-semibold">Mike Veson</strong>, a junior at{" "}
+        <a
+          href="https://www.rice.edu"
+          target="_blank"
           rel="noopener noreferrer"
           className="hover:opacity-80 transition-opacity"
         >
@@ -55,56 +54,53 @@ export default function AboutContent({
             Rice University
           </span>
         </a>{" "}
-        studying abroad in{" "}
-        <a 
-          href="https://www.salleurl.edu/en" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="hover:opacity-80 transition-opacity"
-        >
-          <span className="font-semibold bg-gradient-to-r from-red-600 to-yellow-500 dark:from-red-500 dark:to-yellow-400 text-transparent bg-clip-text">
-            Barcelona
-          </span>
-        </a>
-        . I grew up around{" "}
-        <a 
-          href="https://veson.com" 
-          target="_blank" 
+        studying computer science, probably graduating May 2027. Grew up in Boston watching my parents build{" "}
+        <a
+          href="https://veson.com"
+          target="_blank"
           rel="noopener noreferrer"
           className="hover:opacity-80 transition-opacity"
         >
           <span className="font-semibold bg-gradient-to-r from-blue-700 to-orange-600 dark:from-blue-400 dark:to-orange-400 text-transparent bg-clip-text">
-            shipping software
+            Veson Nautical
           </span>
-        </a>{" "}
-        and learned early that the best products don&apos;t just solve problems, they change how people{" "}
-        <em className="italic">experience</em> their work.
+        </a>; learned early that you can make something meaningful if you care about the problem and the people.
       </p>
 
       {expanded && (
         <>
           <p className={`mb-3 ${textClassName} leading-relaxed`}>
-            I&apos;ve shipped{" "}
-            <strong className="font-semibold">mobile apps</strong>,{" "}
-            <strong className="font-semibold">AI systems</strong>,{" "}
-            <strong className="font-semibold">data pipelines</strong>, and tools
-            that compress days of work into minutes. But what I obsess over is that experience itself: the details most people skip, 
-            that gap between something that works and something you keep coming back to.
+            Spent Fall 2025 studying abroad in{" "}
+            <a
+              href="https://www.salleurl.edu/en"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity"
+            >
+              <span className="font-semibold bg-gradient-to-r from-red-600 to-yellow-500 dark:from-red-500 dark:to-yellow-400 text-transparent bg-clip-text">
+                Barcelona
+              </span>
+            </a>
+            . Traveled around Europe, got to see my lifelong club{" "}
+            <span className="font-semibold bg-gradient-to-r from-blue-800 to-red-700 dark:from-blue-500 dark:to-red-500 text-transparent bg-clip-text">
+              Barça
+            </span>{" "}
+            play week in week out at the new Camp Nou, and spent the semester getting better at Spanish and Greek. Had a lot of conversations about what people should want out of life. I learned that it doesn&apos;t matter if you&apos;re being productive if you&apos;re being productive about the wrong things. So I started spending more time figuring out what&apos;s worth doing in the first place, and now I&apos;m building products to help with that.
           </p>
           <p className={`mb-3 ${textClassName} leading-relaxed`}>
-            Explore my work below.
+            I love talking to people about what success means to them. Not success in the typical sense, but a life that actually feels fulfilling. Learning more every day through writing books, blogs, movie scripts, and having conversations with people who push me forward.
           </p>
           <p className={`${textClassName} leading-relaxed`}>
-            
-            Or, you could <strong className="font-semibold">experience</strong>{" "} it.{" "} With {" "}
-            <button 
+            Check out{" "}
+            <button
               onClick={handleIrisClick}
               className="hover:opacity-80 transition-opacity inline-block focus:outline-none"
             >
               <span className="font-semibold bg-gradient-to-r from-blue-500 via-emerald-500 to-blue-500 dark:from-blue-400 dark:via-emerald-400 dark:to-blue-400 text-transparent bg-clip-text">
-                Iris.
+                Iris
               </span>
             </button>{" "}
+            to learn more about me. Feel free to shoot me a message or schedule something through there.
           </p>
         </>
       )}
