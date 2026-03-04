@@ -4,7 +4,15 @@
       "Bash(npm run typecheck:*)",
       "Bash(npm run:*)",
       "Bash(npx tsc:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd Google wordmark logo to experience card\n\nReplace \"Google\" text with the official wordmark for better visual recognition.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push)",
+      "Bash(npx eslint:*)",
+      "Bash(curl:*)",
+      "WebSearch",
+      "Bash(npx next build:*)"
     ],
     "deny": []
   }
