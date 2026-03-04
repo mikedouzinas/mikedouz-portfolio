@@ -1,5 +1,29 @@
 [
   {
+    "id": "proj_olympus",
+    "title": "Project Olympus",
+    "summary": "A unified AI system for human flourishing—not productivity optimization, but helping people spend their time on what actually matters. Three components: Iris (voice interface), Apollo (intelligence layer), Hermes (autonomous execution).",
+    "aliases": ["Olympus", "Iris AI", "Apollo AI", "Hermes AI"],
+    "specifics": [
+      "The core insight: AI can either help humans do more tasks (productivity) or help humans live better lives (flourishing). I'm building for flourishing.",
+      "Iris is the voice-first conversational interface—the way you interact with the system naturally",
+      "Apollo is the multi-LLM intelligence layer that maximizes signal (what matters) over noise (busywork, passive consumption)",
+      "Hermes is the autonomous agent that executes tasks on your behalf, so you can focus on things only humans can do",
+      "Grounded in Aristotle's concept of eudaimonia—flourishing by living excellently according to who you actually are",
+      "The goal: help people transition from survival-mode (working to afford to live) to flourishing-mode (living to become who they want to be)",
+      "Currently in active development—architecture defined, core systems being built"
+    ],
+    "skills": ["product_management", "openai_api", "rag", "nlp", "machine_learning", "typescript", "python", "philosophical_thinking", "systems_thinking"],
+    "tech_stack": ["TypeScript", "Python", "OpenAI API", "RAG architecture"],
+    "architecture": "Three-layer system: Iris (voice/chat interface) → Apollo (multi-LLM reasoning, pattern recognition) → Hermes (autonomous task execution)",
+    "tags": ["AI", "Voice", "Philosophy", "Human Flourishing", "In Development"],
+    "links": {},
+    "dates": {
+      "start": "2025-10"
+    },
+    "status": "in_development"
+  },
+  {
     "id": "proj_hilite",
     "title": "HiLiTe",
     "summary": "A machine learning pipeline that turns full-length soccer matches into highlight reels with AI-generated commentary in minutes.",
@@ -29,18 +53,18 @@
   },
   {
     "id": "proj_portfolio",
-    "title": "Portfolio & Iris",
-    "summary": "This site. Built to show who I am, with Iris as a conversational way to learn exactly what you want to know. Custom RAG pipeline under the hood.",
-    "aliases": ["Iris", "Iris assistant"],
+    "title": "Portfolio & Iris Assistant",
+    "summary": "This site. Built to show who I am through conversation, not just static pages. Iris (the assistant you're talking to right now) uses a custom RAG pipeline to answer questions about my work, projects, and philosophy.",
+    "aliases": ["Iris", "Iris assistant", "portfolio Iris", "this site"],
     "specifics": [
-      "Named Iris after the Greek messenger goddess, part of a longer-term vision for personal AI assistants to help me work faster and smarter (Iris for digital, Hermes eventually for a physical robot)",
-      "Built a custom RAG pipeline with embeddings retrieval, semantic search, intent detection, and streaming LLM responses (like what ChatGPT does but for my own data)",
+      "Named Iris after the Greek messenger goddess—she carried messages between gods and mortals. This Iris carries context about me to visitors.",
+      "This is distinct from Project Olympus's Iris: the portfolio Iris is a focused assistant for this site; Olympus Iris is the voice-first interface for the full flourishing system",
+      "Built a custom RAG pipeline with embeddings retrieval, semantic search, intent detection, and streaming LLM responses",
+      "The knowledge base includes my projects, experiences, skills, values, interests, and personal philosophy",
       "Designed intelligent quick actions that suggest related items based on complexity, impact, and recency scores",
-      "Config-driven action system that tracks what you've already visited and adapts suggestions based on conversation depth",
       "Command palette (⌘K) for instant search and Iris chat integration",
-      "Structured knowledge base with filters, year-based queries, and personal context retrieval",
       "Production deployment with Redis caching, rate limiting, and Supabase for message storage",
-      "Cross type navigation connecting projects, skills, experiences, and classes with smart suggestions"
+      "This project was the testing ground for many ideas that evolved into Project Olympus"
     ],
     "skills": ["openai_api", "rag", "product_management", "typescript", "react", "nextjs", "tailwind_css", "framer_motion", "supabase", "api_integration", "redis", "nlp", "machine_learning", "writing", "data_structures"],
     "tech_stack": ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion", "OpenAI API"],

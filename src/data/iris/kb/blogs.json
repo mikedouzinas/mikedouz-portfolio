@@ -12,6 +12,11 @@
       "related_experiences": ["exp_veson_mobile_2021_2023", "exp_veson_2024"],
       "related_projects": []
     }
-  ]
+  ],
+  "writing_practice": {
+    "description": "Mike maintains an active writing practice beyond published blog posts. He's kept a running document of life lessons, patterns, and frameworks since high school. This includes philosophical frameworks, observations about human behavior, and principles for living well. Writing is how he processes and thinks through complex ideas.",
+    "topics": ["philosophy", "human flourishing", "pattern recognition", "personal development", "frameworks for living"],
+    "note": "Much of this writing informs his product thinking and the philosophy behind Project Olympus, even if not published publicly."
+  }
 }
 

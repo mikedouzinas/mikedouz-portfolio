@@ -595,5 +595,57 @@
         { "type": "experience", "id": "exp_veson_mobile_2021_2023" },
         { "type": "experience", "id": "proj_knight_life" }
       ]
+    },
+    {
+      "id": "philosophical_thinking",
+      "name": "Philosophical Thinking",
+      "type": "skill",
+      "aliases": ["philosophy", "eudaimonia", "human_flourishing", "aristotle"],
+      "description": "Applying philosophical frameworks (especially Aristotelian eudaimonia) to product design and life decisions. Connecting ancient wisdom to modern technology challenges.",
+      "evidence": [
+        { "type": "project", "id": "proj_olympus" }
+      ]
+    },
+    {
+      "id": "systems_thinking",
+      "name": "Systems Thinking",
+      "type": "skill",
+      "aliases": ["systems_design", "holistic_thinking", "integration"],
+      "description": "Understanding how components interact within complex systems. Designing solutions that address root causes rather than symptoms. Seeing patterns across domains.",
+      "evidence": [
+        { "type": "project", "id": "proj_olympus" },
+        { "type": "project", "id": "proj_portfolio" }
+      ]
+    },
+    {
+      "id": "framework_design",
+      "name": "Framework Design",
+      "type": "skill",
+      "aliases": ["mental_models", "conceptual_frameworks"],
+      "description": "Creating structured ways of thinking about complex problems. Building mental models that can be applied across contexts. Examples: Tree of Human Flourishing, Signal vs Noise framework.",
+      "evidence": [
+        { "type": "project", "id": "proj_olympus" }
+      ]
+    },
+    {
+      "id": "strategic_thinking",
+      "name": "Strategic Thinking",
+      "type": "skill",
+      "aliases": ["long_term_thinking", "vision"],
+      "description": "Thinking in decades, not days. Understanding how current decisions compound over time. Balancing immediate execution with long-term vision.",
+      "evidence": [
+        { "type": "project", "id": "proj_olympus" },
+        { "type": "class", "id": "class_busi_360_2024" }
+      ]
+    },
+    {
+      "id": "growth_orientation",
+      "name": "Growth Orientation",
+      "type": "skill",
+      "aliases": ["growth_mindset", "self_improvement", "personal_development"],
+      "description": "Actively becoming rather than defending who you've been. Willingness to revise beliefs when evidence contradicts them. Prioritizing getting better over looking good.",
+      "evidence": [
+        { "type": "project", "id": "proj_olympus" }
+      ]
     }
   ]
