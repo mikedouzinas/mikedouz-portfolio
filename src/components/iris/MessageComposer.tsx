@@ -274,11 +274,9 @@ export default function MessageComposer({
       
       // Check if it's a timeout error
       if (err instanceof Error && err.name === 'AbortError') {
-        setError('⏱️ Request timed out due to slow connection. Please check your WiFi and try again.');
-      } else if (err instanceof Error && err.message.includes('fetch')) {
-        setError('🌐 Network error: Unable to connect to the server. Please check your internet connection.');
+        setError('⏱️ Request timed out. Please check your connection and try again.');
       } else {
-        setError(err instanceof Error ? err.message : 'Failed to send message. Please try again.');
+        setError('Something went wrong sending your message. Please try again in a moment.');
       }
     } finally {
       setIsSubmitting(false);

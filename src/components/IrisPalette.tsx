@@ -125,7 +125,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const router = useRouter();
   // View mode state machine: 'suggestions' = show suggestions, 'answer' = show answer only
   const [viewMode, setViewMode] = useState<'suggestions' | 'answer'>('suggestions');
-  
+
+  // API version: 'custom' = RAG pipeline (default), 'claude' = simple Claude fallback
+  const [version] = useState<'claude' | 'custom'>('custom');
+
   // State management
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -1085,8 +1088,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         params.set('visitedNodes', JSON.stringify(visitedNodes));
       }
 
+      // Use different endpoint based on version toggle
+      const endpoint = version === 'claude' ? '/api/iris/answer-claude' : '/api/iris/answer';
       const response = await fetch(
-        `/api/iris/answer?${params.toString()}`,
+        `${endpoint}?${params.toString()}`,
         { signal: controller.signal }
       );
 
@@ -1579,7 +1584,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         <div className="flex-none relative flex items-center pl-4 pr-[52px] min-h-[56px]">
           {/* Left search icon */}
           <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-black/50 dark:text-white/50 pointer-events-none" />
-          
+
           {/* Search input - always editable with character limit */}
           <input
             ref={inputRef}
@@ -1591,17 +1596,20 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             onBlur={() => setIsInputFocused(false)}
             placeholder="Ask Iris anything…"
             maxLength={500}
-            className="
-              h-14 w-full bg-transparent 
-              pl-10 pr-16 
-              text-base text-black/90 dark:text-white/90 
-              placeholder-black/40 dark:placeholder-white/40 
+            className={`
+              h-14 w-full bg-transparent
+              pl-10
+              ${viewMode === 'suggestions' ? 'pr-32' : 'pr-16'}
+              text-base text-black/90 dark:text-white/90
+              placeholder-black/40 dark:placeholder-white/40
               outline-none border-0
-            "
+            `}
             aria-autocomplete="list"
             aria-controls="iris-suggestions"
             aria-activedescendant={`suggestion-${selectedIndex}`}
           />
+
+          {/* Version toggle hidden — using custom RAG pipeline only */}
           
           {/* Right button - "Clear" in answer view, "Ask Iris" in suggestions view */}
           {viewMode === 'answer' ? (

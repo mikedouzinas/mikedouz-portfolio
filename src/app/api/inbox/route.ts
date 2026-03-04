@@ -98,31 +98,27 @@ export async function POST(req: NextRequest) {
       ip_hash: hashIpUa(ip, userAgent),
     };
     
-    // Insert into Supabase
-    const messageId = await insertInboxMessage(sanitized);
-    
-    // Send email notification via Resend
+    // Try to insert into Supabase (graceful — email is the critical path)
+    let messageId: string | null = null;
     try {
-      const emailResult = await sendInboxEmail({
-        messageId,
-        source: sanitized.source,
-        draftMessage: sanitized.draft_message,
-        contactMethod: sanitized.contact_method,
-        contactValue: sanitized.contact_value,
-        userQuery: sanitized.user_query,
-        irisAnswer: sanitized.iris_answer,
-      });
-      console.log(`[Inbox] Email result for message ${messageId}:`, JSON.stringify(emailResult, null, 2));
-    } catch (emailError) {
-      console.error('[Inbox] Failed to send email notification:', emailError);
-      if (emailError instanceof Error) {
-        console.error('[Inbox] Error details:', emailError.message);
-        console.error('[Inbox] Error stack:', emailError.stack);
-      }
-      // Don't fail the request if email fails - message is already in DB
+      messageId = await insertInboxMessage(sanitized);
+    } catch (dbError) {
+      console.error('[Inbox] Supabase insert failed (will still send email):', dbError);
     }
-    
-    return NextResponse.json({ id: messageId });
+
+    // Send email notification via Resend — this is what matters
+    const emailResult = await sendInboxEmail({
+      messageId: messageId || `no-db-${Date.now()}`,
+      source: sanitized.source,
+      draftMessage: sanitized.draft_message,
+      contactMethod: sanitized.contact_method,
+      contactValue: sanitized.contact_value,
+      userQuery: sanitized.user_query,
+      irisAnswer: sanitized.iris_answer,
+    });
+    console.log(`[Inbox] Email sent (db=${messageId ? 'ok' : 'skipped'}):`, JSON.stringify(emailResult, null, 2));
+
+    return NextResponse.json({ id: messageId || 'email-only' });
     
   } catch (error) {
     console.error('[Inbox] POST error:', error);
