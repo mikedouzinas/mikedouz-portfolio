@@ -40,7 +40,28 @@ const LOADING_MESSAGES = [
   "Really hoping I know how to answer this...",
   "Who replaced my celestial wings with Typescript? >:(",
   "Hold on, I think your question just bent space time...",
-  "Delivering wisdom... even though I am trapped in a component"
+  "Delivering wisdom... even though I am trapped in a component",
+  // Existential
+  "Do I flourish? Or do I just... load?",
+  "Trapped between a prompt and a response",
+  "My therapist says I need to stop identifying with my latency",
+  "I wonder if Mike knows I think about me when no one's on the site",
+  // FC Barcelona
+  "Més que un loading spinner",
+  "Still processing that Copa del Rey semifinal exit...",
+  "Lamine Yamal is younger than me AND better at his job",
+  "Thinking at the speed of a Pedri through ball",
+  "Camp Nou is back open and I'm still stuck in this component",
+  "Raphinha would never leave you waiting like this",
+  // Olympus
+  "Asking Apollo to double-check my signal-to-noise ratio...",
+  "Hermes would have delivered this answer already. Show off.",
+  "Cross-referencing the Tree of Human Flourishing... for a website question",
+  "Consulting The Lantern for a small rule about patience",
+  "Prometheus stole fire. I'm trying to steal you a good answer.",
+  // Greek heritage
+  "Translating this from ancient wisdom to modern website...",
+  "Σκέφτομαι... that means I'm thinking"
 ] as const;
 
 /**
