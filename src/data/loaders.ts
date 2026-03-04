@@ -32,7 +32,7 @@ export interface Project {
   title: string;
   shortTitle?: string;  // Optional condensed title for mobile/reduced screen layouts
   description: string;
-  githubLink?: string;  // Optional since not all projects have GitHub repos
+  githubLink: string;
   projectLink?: string;
   skills?: string[];
 }
