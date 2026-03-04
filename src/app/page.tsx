@@ -109,12 +109,12 @@ export default function Home() {
             </div>
           </section>
           
-          {/* Blogs Section - expandable on mobile, full list on desktop */}
-          <section id="blogs" className="md:mt-32">
+          {/* Media Section (formerly Blogs) - expandable on mobile, full list on desktop */}
+          <section id="media" className="md:mt-32">
             {/* Mobile: ExpandableSection wrapper with collapsible behavior */}
             <div className="md:hidden">
-              <ExpandableSection 
-                title="Blogs" 
+              <ExpandableSection
+                title="Media"
                 items={blogCards}
                 initialCount={2}
               />

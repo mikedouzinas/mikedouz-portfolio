@@ -46,6 +46,7 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
         { id: 'about', label: 'About' },
         { id: 'experience', label: 'Experience' },
         { id: 'projects', label: 'Projects' },
+        { id: 'media', label: 'Media' },
     ];
 
     const activeSection = useActiveSection(navItems.map((item) => item.id));
