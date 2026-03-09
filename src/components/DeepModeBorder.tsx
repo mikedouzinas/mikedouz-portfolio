@@ -15,17 +15,20 @@ export default function DeepModeBorder() {
   const [dims, setDims] = useState({ w: 0, h: 0 });
 
   useEffect(() => {
-    const update = () => {
-      if (containerRef.current) {
-        setDims({
-          w: containerRef.current.clientWidth,
-          h: containerRef.current.clientHeight,
-        });
-      }
-    };
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setDims((prev) =>
+        prev.w === Math.round(width) && prev.h === Math.round(height)
+          ? prev
+          : { w: Math.round(width), h: Math.round(height) }
+      );
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   const { w, h } = dims;
