@@ -7,6 +7,8 @@ import blogsData from "./iris/kb/blogs.json";
 import projectsData from "./iris/kb/projects.json";
 import experienceData from "./iris/kb/experience.json";
 import skillsData from "./iris/kb/skills.json";
+import songsData from "./spotify/songs.json";
+import type { SpotifySong } from "@/types/spotify";
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -241,4 +243,10 @@ export const workExperiences: WorkExperience[] = experienceData.map((exp) => ({
   // Automatically detect incoming status from future start date
   isIncoming: isDateInFuture(exp.dates.start),
 }));
+
+/**
+ * Loads song data for the Spotify sidebar
+ * Static JSON for now; future iterations can pull from Spotify API
+ */
+export const songs: SpotifySong[] = songsData;
 

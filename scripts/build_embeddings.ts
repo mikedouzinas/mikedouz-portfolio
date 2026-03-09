@@ -5,7 +5,7 @@ import path from "path"
 dotenv.config({ path: path.join(process.cwd(), ".env.local") })
 
 import fs from "fs/promises"
-import { loadKBItems } from "@/lib/iris/load"
+import { loadKBItems, loadInProgress } from "@/lib/iris/load"
 import { embed } from "@/lib/iris/embedding"
 
 // Write to src/data/iris/derived to match where retrieval.ts reads from
@@ -26,9 +26,20 @@ function docText(d: any) {
 
 ;(async () => {
   const items = await loadKBItems()
+
+  // Also embed in-progress items so deep mode can find them via vector search
+  let inProgressItems: any[] = []
+  try {
+    inProgressItems = await loadInProgress()
+    console.log(`Loaded ${inProgressItems.length} in-progress items`)
+  } catch (err) {
+    console.warn("No in-progress items found, skipping:", err)
+  }
+
+  const allItems = [...items, ...inProgressItems]
   const out: { id: string; kind?: string; vector: number[] }[] = []
 
-  for (const it of items) {
+  for (const it of allItems) {
     const text = docText(it)
     const vector = await embed(text)
     out.push({ id: it.id, kind: it.kind, vector })

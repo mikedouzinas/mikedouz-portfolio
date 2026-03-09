@@ -1,0 +1,79 @@
+[
+  {
+    "id": "song_1",
+    "title": "Vienna",
+    "artist": "Billy Joel",
+    "album": "The Stranger",
+    "albumArt": "/images/spotify/the-stranger.jpg",
+    "spotifyUrl": "https://open.spotify.com/track/4U45aEWtQhrm8A5mxPaFZ7",
+    "period": "Boston Childhood",
+    "year": 2018,
+    "significance": "The song that taught me slow down is okay"
+  },
+  {
+    "id": "song_2",
+    "title": "Pursuit of Happiness",
+    "artist": "Kid Cudi",
+    "album": "Man on the Moon",
+    "albumArt": "/images/spotify/man-on-the-moon.jpg",
+    "spotifyUrl": "https://open.spotify.com/track/3yfqSUWxFvZELEM4PmlwIR",
+    "period": "Boston Childhood",
+    "year": 2019,
+    "significance": "Late night drives, windows down"
+  },
+  {
+    "id": "song_3",
+    "title": "Electric Feel",
+    "artist": "MGMT",
+    "album": "Oracular Spectacular",
+    "albumArt": "/images/spotify/oracular-spectacular.jpg",
+    "spotifyUrl": "https://open.spotify.com/track/3FtYbEfBqAlGO46NUDQSAt",
+    "period": "Rice Freshman Year",
+    "year": 2023,
+    "significance": "First week at Rice energy"
+  },
+  {
+    "id": "song_4",
+    "title": "505",
+    "artist": "Arctic Monkeys",
+    "album": "Favourite Worst Nightmare",
+    "albumArt": "/images/spotify/favourite-worst-nightmare.jpg",
+    "spotifyUrl": "https://open.spotify.com/track/0BxE4FqsDD1Ot4YuBXwAPp",
+    "period": "Rice Freshman Year",
+    "year": 2023,
+    "significance": "Sophomore year late nights"
+  },
+  {
+    "id": "song_5",
+    "title": "La Vida Es Un Carnaval",
+    "artist": "Celia Cruz",
+    "album": "Mi Vida Es Cantar",
+    "albumArt": "/images/spotify/mi-vida-es-cantar.jpg",
+    "spotifyUrl": "https://open.spotify.com/track/4wNLTcYqSe4Hf0bYCYkh4P",
+    "period": "Barcelona Fall 2025",
+    "year": 2025,
+    "significance": "Walking Las Ramblas at sunset"
+  },
+  {
+    "id": "song_6",
+    "title": "Nights",
+    "artist": "Frank Ocean",
+    "album": "Blonde",
+    "albumArt": "/images/spotify/blonde.jpg",
+    "spotifyUrl": "https://open.spotify.com/track/7eqoqGkKwgOaEMfikWsi8y",
+    "period": "Barcelona Fall 2025",
+    "year": 2025,
+    "significance": "The switch, every time"
+  },
+  {
+    "id": "song_7",
+    "title": "Runaway",
+    "artist": "Kanye West",
+    "album": "My Beautiful Dark Twisted Fantasy",
+    "albumArt": "/images/spotify/mbdtf.jpg",
+    "spotifyUrl": "https://open.spotify.com/track/3DK6m7It6Pw857FcQftMds",
+    "period": "Building Olympus",
+    "year": 2026,
+    "significance": "Building something from nothing"
+  }
+]
