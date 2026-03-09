@@ -164,8 +164,8 @@ export function deriveFilterDefaults(
     // Professional comment: Also check for "what is" patterns (including contractions) for specific item queries
     const isWhatIsQuery = /\b(what is|whats|what s|what.*is|what.*was)\b/.test(normalized);
     const specificMatch = aliasMatches.find(match => {
-      // Only match projects or experiences that aren't already in company filters
-      if (match.type !== 'project' && match.type !== 'experience') return false;
+      // Only match projects, experiences, or in-progress items that aren't already in company filters
+      if (match.type !== 'project' && match.type !== 'experience' && match.type !== 'in-progress') return false;
       // Don't set title_match if this name is already in company filters
       if (next.company && next.company.includes(match.name)) return false;
       // For list queries, prefer company filters over title_match (unless it's a "what is" query)
