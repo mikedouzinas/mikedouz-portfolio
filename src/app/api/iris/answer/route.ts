@@ -1290,7 +1290,7 @@ Keep your response to 2-3 short paragraphs max.`;
         console.log(`[General Intent] Pre-filtered ${allItems.length} items to ${preFilteredItems.length} items using year filter:`, filters.year);
       }
 
-      const retrievalOptions: { topK: number; fields: string[]; types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'>; preFilteredItemIds?: Set<string> } = {
+      const retrievalOptions: { topK: number; fields: string[]; types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill' | 'in-progress'>; preFilteredItemIds?: Set<string>; items?: KBItem[] } = {
         topK: config.features?.generalTopK ?? 5,
         fields: isEvaluative ? ['title', 'summary', 'specifics', 'dates', 'skills'] : fields
       };
@@ -1305,34 +1305,13 @@ Keep your response to 2-3 short paragraphs max.`;
         retrievalOptions.preFilteredItemIds = new Set(preFilteredItems.map(item => item.id));
       }
 
+      // Deep mode: pass all items (including in-progress) so vector search can find them
+      if (deepMode) {
+        retrievalOptions.items = await getAllItems();
+      }
+
       const retrievalResults = await retrieve(query, retrievalOptions);
       results = retrievalResults.results;
-
-      // Deep mode: in-progress items have no embeddings, so match them via keyword
-      // search and merge into results so they're treated identically to standard items
-      if (deepMode) {
-        const inProgressItems = await loadInProgress();
-        const queryLower = query.toLowerCase();
-        const queryWords = queryLower.split(/\s+/).filter(w => w.length > 3);
-        const matchingInProgress = inProgressItems.filter(item => {
-          if (item.title.toLowerCase().includes(queryLower)) return true;
-          if (item.aliases?.some(a => a.toLowerCase().includes(queryLower))) return true;
-          return queryWords.some(word =>
-            item.title.toLowerCase().includes(word) ||
-            item.aliases?.some(a => a.toLowerCase().includes(word))
-          );
-        });
-        if (matchingInProgress.length > 0) {
-          const existingIds = new Set(results.map(r => r.doc.id));
-          const newResults = matchingInProgress
-            .filter(item => !existingIds.has(item.id))
-            .map((doc, idx) => ({
-              score: 0.95 - (idx * 0.01),
-              doc: doc as Partial<KBItem>
-            }));
-          results = [...newResults, ...results];
-        }
-      }
 
       // Boost results with importance rankings
       results = boostWithImportance(results, rankings, query, isEvaluative);

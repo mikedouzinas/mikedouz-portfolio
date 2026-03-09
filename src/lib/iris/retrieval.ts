@@ -20,12 +20,13 @@ const EMB_PATH = path.join(process.cwd(), "src/data/iris/derived/embeddings.json
 
 type EmbRow = { id: string; vector: number[] };
 type Retrieved = { score: number; doc: Partial<KBItem> };
-type Options = { 
-  topK?: number; 
-  fields?: string[]; 
+type Options = {
+  topK?: number;
+  fields?: string[];
   types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill' | 'in-progress'>;
   debug?: boolean;
   preFilteredItemIds?: Set<string>; // Optional set of item IDs to restrict retrieval to (for pre-filtered queries)
+  items?: KBItem[]; // Optional pre-loaded items (e.g., with in-progress items for deep mode)
 };
 
 function cosine(a: number[], b: number[]) {
@@ -81,11 +82,15 @@ export async function retrieve(query: string, options: Options = {}): Promise<{ 
     setTimeout(() => reject(new Error('Request timed out.')), config.retrievalTimeoutMs);
   });
 
+  // If caller provided pre-loaded items (e.g., with in-progress for deep mode), use those
+  // Otherwise load standard KB items
+  const loadItems = options.items ? Promise.resolve(options.items) : loadKBItems();
+
   const [{ data: qEmb }, vecRaw, kb] = await Promise.race([
     Promise.all([
       getClient().embeddings.create({ model: "text-embedding-3-small", input: query }),
       fs.readFile(EMB_PATH, "utf8"),
-      loadKBItems()
+      loadItems
     ]),
     timeoutPromise
   ]);
