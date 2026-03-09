@@ -8,38 +8,41 @@ import BlogCard from './blogs/blog_card';
 import MouseGlow from '@/components/mouse_glow';
 import HeaderMobile from '@/components/HeaderMobile';
 import AboutSheet from '@/components/AboutSheet';
+import { DeepModeProvider, useDeepMode } from '@/components/DeepModeContext';
+import DeepModeBorder from '@/components/DeepModeBorder';
 import ExpandableSection from '@/components/ExpandableSection';
+import InProgressSection from '@/components/InProgressSection';
 import { workExperiences, projects, blogs } from '@/data/loaders';
 
-export default function Home() {
+/**
+ * Inner component that consumes DeepModeContext.
+ * Separated from Home so useDeepMode() is called inside DeepModeProvider.
+ */
+function HomeContent() {
   const mainRef = useRef<HTMLDivElement>(null);
-  // State for controlling the About & Links sheet on mobile
   const [aboutSheetOpen, setAboutSheetOpen] = useState(false);
+  const { deepMode } = useDeepMode();
 
-  // When scrolling over the sidebar, scroll the main container
   const handleSidebarWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (mainRef.current) {
       mainRef.current.scrollBy({ top: e.deltaY, behavior: 'auto' });
     }
   };
 
-  // Add this function to pass to SidebarHome
   const scrollToTop = () => {
     if (mainRef.current) {
       mainRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  // Create card arrays for expandable sections on mobile
-  // These maintain the existing card designs without modification
   const experienceCards = workExperiences.map((exp) => (
     <ExperienceCard key={exp.id} item={exp} />
   ));
-  
+
   const projectCards = projects.map((proj) => (
     <ProjectCard key={proj.id} project={proj} />
   ));
-  
+
   const blogCards = blogs.map((blog) => (
     <BlogCard key={blog.id} blog={blog} />
   ));
@@ -47,88 +50,156 @@ export default function Home() {
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
       <MouseGlow />
-      
-      {/* Mobile sticky header - only visible below md breakpoint */}
+      <DeepModeBorder />
+
       <HeaderMobile onOpenAbout={() => setAboutSheetOpen(true)} />
-      
-      {/* About & Links sheet modal for mobile */}
-      <AboutSheet 
-        open={aboutSheetOpen} 
-        onClose={() => setAboutSheetOpen(false)} 
+
+      <AboutSheet
+        open={aboutSheetOpen}
+        onClose={() => setAboutSheetOpen(false)}
       />
-      
+
       <div className="flex">
-        {/* Desktop Sidebar - only visible at md breakpoint and above */}
         <aside onWheel={handleSidebarWheel} className="hidden md:block fixed inset-y-0 left-0 w-1/3">
           <SidebarHome scrollToTop={scrollToTop} />
         </aside>
-        
-        {/* Main Content */}
-        {/* Mobile: minimal spacing (pt-1, space-y-6) | Desktop: generous spacing (pt-8, space-y-32) */}
+
         <main ref={mainRef} className="ml-0 md:ml-[33.3333%] w-full px-4 md:px-8 pt-1 md:pt-8 pb-20 overflow-y-auto md:h-screen space-y-6 md:space-y-32">
-          {/* About Section - Hidden on mobile (available via AboutSheet), visible on desktop */}
+          {/* About Section */}
           <section id="about" className="hidden md:block md:mt-16">
             <About />
           </section>
-          
-          {/* Experience Section - expandable on mobile, full list on desktop */}
+
+          {/* Experience Section */}
           <section id="experience" className="md:mt-32">
-            {/* Mobile: ExpandableSection wrapper with collapsible behavior */}
-            <div className="md:hidden">
-              <ExpandableSection 
-                title="Experience" 
-                items={experienceCards}
-                initialCount={2}
-              />
+            {/* Deep mode: in-progress experience items */}
+            <div
+              style={{
+                height: deepMode ? 'auto' : '0',
+                overflow: deepMode ? 'visible' : 'hidden',
+                margin: deepMode ? undefined : '0',
+              }}
+            >
+              <InProgressSection section="experience" visible={deepMode} />
             </div>
-            
-            {/* Desktop: Full list without collapsing */}
-            <div className="hidden md:block">
-              <div className="max-w-3xl mx-auto space-y-6">
-                {experienceCards}
+
+            {/* Regular: standard experience cards */}
+            <div
+              style={{
+                height: deepMode ? '0' : 'auto',
+                overflow: deepMode ? 'hidden' : 'visible',
+                margin: deepMode ? '0' : undefined,
+              }}
+            >
+              <div className="md:hidden">
+                <ExpandableSection
+                  title="Experience"
+                  items={experienceCards}
+                  initialCount={2}
+                />
+              </div>
+              <div className="hidden md:block">
+                <div className="max-w-3xl mx-auto space-y-6">
+                  {experienceCards}
+                </div>
               </div>
             </div>
           </section>
-          
-          {/* Projects Section - expandable on mobile, full list on desktop */}
+
+          {/* Projects Section */}
           <section id="projects" className="md:mt-32">
-            {/* Mobile: ExpandableSection wrapper with collapsible behavior */}
-            <div className="md:hidden">
-              <ExpandableSection 
-                title="Projects" 
-                items={projectCards}
-                initialCount={2}
-              />
+            {/* Deep mode: in-progress project items */}
+            <div
+              style={{
+                height: deepMode ? 'auto' : '0',
+                overflow: deepMode ? 'visible' : 'hidden',
+                margin: deepMode ? undefined : '0',
+              }}
+            >
+              <InProgressSection section="projects" visible={deepMode} />
             </div>
-            
-            {/* Desktop: Full list without collapsing */}
-            <div className="hidden md:block">
-              <div className="max-w-3xl mx-auto space-y-6">
-                {projectCards}
+
+            {/* Regular: standard project cards */}
+            <div
+              style={{
+                height: deepMode ? '0' : 'auto',
+                overflow: deepMode ? 'hidden' : 'visible',
+                margin: deepMode ? '0' : undefined,
+              }}
+            >
+              <div className="md:hidden">
+                <ExpandableSection
+                  title="Projects"
+                  items={projectCards}
+                  initialCount={2}
+                />
+              </div>
+              <div className="hidden md:block">
+                <div className="max-w-3xl mx-auto space-y-6">
+                  {projectCards}
+                </div>
               </div>
             </div>
           </section>
-          
-          {/* Media Section (formerly Blogs) - expandable on mobile, full list on desktop */}
+
+          {/* Media Section */}
           <section id="media" className="md:mt-32">
-            {/* Mobile: ExpandableSection wrapper with collapsible behavior */}
-            <div className="md:hidden">
-              <ExpandableSection
-                title="Media"
-                items={blogCards}
-                initialCount={2}
-              />
+            {/* Deep mode: in-progress media items */}
+            <div
+              style={{
+                height: deepMode ? 'auto' : '0',
+                overflow: deepMode ? 'visible' : 'hidden',
+                margin: deepMode ? undefined : '0',
+              }}
+            >
+              <InProgressSection section="media" visible={deepMode} />
             </div>
-            
-            {/* Desktop: Full list without collapsing */}
-            <div className="hidden md:block">
-              <div className="max-w-3xl mx-auto space-y-6">
-                {blogCards}
+
+            {/* Regular: standard blog/media cards */}
+            <div
+              style={{
+                height: deepMode ? '0' : 'auto',
+                overflow: deepMode ? 'hidden' : 'visible',
+                margin: deepMode ? '0' : undefined,
+              }}
+            >
+              <div className="md:hidden">
+                <ExpandableSection
+                  title="Media"
+                  items={blogCards}
+                  initialCount={2}
+                />
+              </div>
+              <div className="hidden md:block">
+                <div className="max-w-3xl mx-auto space-y-6">
+                  {blogCards}
+                </div>
               </div>
             </div>
+          </section>
+
+          {/* Blueprints Section — only visible in deep mode */}
+          <section
+            id="blueprints"
+            className="md:mt-32"
+            style={{
+              height: deepMode ? 'auto' : '0',
+              overflow: deepMode ? 'visible' : 'hidden',
+              margin: deepMode ? undefined : '0',
+            }}
+          >
+            <InProgressSection section="blueprints" visible={deepMode} />
           </section>
         </main>
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <DeepModeProvider>
+      <HomeContent />
+    </DeepModeProvider>
   );
 }

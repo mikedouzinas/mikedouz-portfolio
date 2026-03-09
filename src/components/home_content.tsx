@@ -1,7 +1,8 @@
 "use client";
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import Image from "next/image";
 import IrisButton from './IrisButton';
+import { useDeepMode } from './DeepModeContext';
 
 type HomeContentProps = {
   imageContainerSize: string;
@@ -20,11 +21,27 @@ export default function HomeContent({
   textWrapperClass = ""
 }: Omit<HomeContentProps, 'subTextSize'>) {
   const [fadeOut] = useState(false);
+  const [ringExiting, setRingExiting] = useState(false);
+  const { deepMode, toggleDeepMode } = useDeepMode();
   const containerRef = useRef<HTMLDivElement>(null);
   const glareRef = useRef<HTMLDivElement>(null);
   const isFirstHover = useRef(true);
   const maxTilt = 10;
   const scaleFactor = 1.03;
+
+  const handleProfileClick = useCallback(() => {
+    if (deepMode) {
+      // Exiting: play reverse animation before toggling off
+      setRingExiting(true);
+      // Toggle deep mode immediately so border bars start fading at the same time
+      toggleDeepMode();
+      setTimeout(() => {
+        setRingExiting(false);
+      }, 300);
+    } else {
+      toggleDeepMode();
+    }
+  }, [deepMode, toggleDeepMode]);
 
   const handleMouseEnter = () => {
     if (containerRef.current) {
@@ -83,15 +100,20 @@ export default function HomeContent({
       <div className="hidden md:inline-block relative">
         <div
           ref={containerRef}
+          onClick={handleProfileClick}
           onMouseEnter={handleMouseEnter}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          // Data attribute signals to MouseGlow component to hide global glow when hovering
-          // Profile picture has its own custom glare effect
           data-has-custom-glow="true"
-          className="rounded-full p-1 bg-gradient-to-br from-orange-500 to-gray-100 dark:from-gray-800 dark:to-gray-700 inline-flex items-center justify-center shadow-xl overflow-hidden"
+          className={`rounded-full p-1 inline-flex items-center justify-center shadow-xl overflow-hidden cursor-pointer transition-all duration-500 ease-in-out ${
+            ringExiting
+              ? 'deep-ring-wrapper deep-ring-exiting'
+              : deepMode
+                ? 'deep-ring-wrapper'
+                : 'bg-gradient-to-br from-orange-500 to-gray-100 dark:from-gray-800 dark:to-gray-700'
+          }`}
         >
-          <div className={`${imageContainerSize} rounded-full border-4 border-transparent relative inline-flex items-center justify-center overflow-hidden`}>
+          <div className={`${imageContainerSize} rounded-full border-4 border-transparent relative inline-flex items-center justify-center overflow-hidden z-10`}>
             <Image
               src="/profile.png"
               alt="Mike Veson"

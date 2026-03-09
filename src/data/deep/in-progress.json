@@ -1,0 +1,207 @@
+[
+  {
+    "id": "project-olympus",
+    "title": "Founder",
+    "section": "experience",
+    "status": "building",
+    "role": "Founder",
+    "company": "The Olympus Project",
+    "period": "Est. OCT 2025",
+    "summary": "I started the Olympus Project to help people flourish by reaching them through whatever means is most effective. Right now that's Iris Mobile, Apollo Terminal, The Lantern, a movie, The Tree of Human Flourishing, and the List of Important Things. Part of the work is figuring out which channels actually make a difference in people's lives.",
+    "specifics": [
+      "The core idea is indirect transmission: show people their patterns so clearly they recognize themselves and change from conviction, not instruction. Same mechanism Greek myths used for millennia.",
+      "Current channels: Iris Mobile (universal assistant), Apollo Terminal (AI that helps you know yourself), The Lantern (book for 16-35 year olds), The Pursuit of Well-Being (movie), The Tree of Human Flourishing (philosophy book), List of Important Things (running life lessons since 5th grade).",
+      "I prefer to work privately and in small groups rather than publicly on the internet. Aristotle worked in small groups too.",
+      "Part of the project is discovering what are the most effective ways to reach people and incorporate real benefits into their lives."
+    ],
+    "aliases": ["olympus", "project olympus", "founder", "the olympus project"],
+    "connections": ["iris-mobile", "apollo", "calliope-screenplay", "tree", "lantern", "important-things"],
+    "tags": ["ai", "philosophy", "eudaimonia"]
+  },
+  {
+    "id": "iris-mobile",
+    "title": "Iris Mobile",
+    "section": "projects",
+    "status": "building",
+    "parent": "The Olympus Project",
+    "summary": "I made Iris as my universal assistant accessible anywhere. Iris Mobile lets me access Apollo on my phone for vault stuff and AI help. If I have an idea on the go or just want to check my grocery list, it's all there. It replaces keeping things in fifty places like Apple Notes, Google Drive, and Word.",
+    "specifics": [
+      "SwiftUI mobile app connected to the same structure as Apollo Terminal. Everything in my Obsidian vault accessible on the go.",
+      "I use it with Wispr Flow because voice-first has been the best way to get my thoughts out as fast as possible no matter where I am. That's the whole purpose of Iris.",
+      "Named after the Greek messenger goddess who's universally accessible to message. Fitting because Iris is meant to be everywhere.",
+      "The system on mikeveson.com is also Iris. It's another form of the same universal assistant, this time to help others know about me. The vault in Apollo is what keeps the site updated.",
+      "Not a chatbot, not a companion. A thinking partner that knows your patterns and challenges your assumptions.",
+      "Always-on backend via NanoClaw: Docker containers accessible through Telegram and terminal even when the app isn't open."
+    ],
+    "aliases": ["iris", "thinking partner", "iris app"],
+    "connections": ["apollo", "tree", "project-olympus"],
+    "skills": ["swift", "swiftui", "typescript", "claude-sdk"],
+    "tags": ["ai", "mobile", "voice"]
+  },
+  {
+    "id": "apollo",
+    "title": "Apollo Terminal",
+    "section": "projects",
+    "status": "building",
+    "parent": "The Olympus Project",
+    "summary": "Apollo is the AI that helps me know myself. I use an Obsidian vault synced across my devices for everything from classwork to writing my philosophy book, and Apollo searches for the relevant context when I bring something up. The advantage is I can bring up things I might not even be comfortable discussing with a friend or therapist, and get unbiased, understanding advice within the context of my life.",
+    "specifics": [
+      "Solves the AI context problem: using Claude Code, Apollo searches my vault for relevant context so every conversation has the full picture of my life, not just what I said in the last five minutes.",
+      "I use markdown files for everything. Classes, philosophy, relationships, self-observations. It's crucial to understand my classwork within the context of my life and it helps me ideate so much more.",
+      "Built-in features: dialectic engine (multi-agent philosophical reasoning), weekly synthesis, self-updating prompting to help the user the most.",
+      "Available on GitHub for anyone to use. I'm very cautious about how much autonomy to give AI systems, which is why it's completely opt-in. I prefer it over systems like OpenClaw.",
+      "Secure, never buggy, and consistent at helping me know myself and my patterns better.",
+      "Not meant to replace friends or therapists. It acts as a beneficiary to promote your life with those real people, which no AI system can replace.",
+      "The dialectic engine runs four agents in sequence: Proposer, Challenger, Arbiter, Axiom Checker. Builds a persistent Truth Store of verified beliefs.",
+      "Background processing: daily vault scans, weekly pattern analysis. Apollo doesn't just wait for questions."
+    ],
+    "aliases": ["apollo", "apollo terminal", "dialectic engine"],
+    "connections": ["iris-mobile", "tree", "project-olympus"],
+    "skills": ["typescript", "claude-sdk", "multi-agent"],
+    "tags": ["ai", "philosophy", "infrastructure"],
+    "links": {
+      "github": "https://github.com/mikedouzinas/apollo-vault"
+    }
+  },
+  {
+    "id": "rankd",
+    "title": "Rankd",
+    "section": "projects",
+    "status": "paused",
+    "summary": "I hate that on Beli I have to rank a steakhouse against my favorite pizza place. It's not about how good the restaurant is, it's about what my favorite foods are and how they rank against other items in their category. Rankd lets you rate individual restaurants and foods within their categories so we get more contextual rankings that actually help you find places.",
+    "specifics": [
+      "Rate foods within their category, not across categories. Comparing pizza to sushi is meaningless. Rankings emerge from food ratings.",
+      "I'm planning on expanding this beyond food eventually.",
+      "Built an MVP in SwiftUI. iOS app with SwiftData, 20+ categories with 50+ subcategories, category leaderboards, multi-dimensional value scoring (taste per calorie, per dollar, or pure taste).",
+      "Currently paused while I work on Olympus."
+    ],
+    "aliases": ["rankd", "food ranking", "food app"],
+    "skills": ["swift", "swiftui", "swiftdata", "ios"],
+    "tags": ["app", "food", "ios", "paused"]
+  },
+  {
+    "id": "caliber",
+    "title": "Caliber",
+    "section": "projects",
+    "status": "paused",
+    "summary": "I'm a massive FC Barcelona fan and a software guy, so I'm always complaining about how current stats are used to compare players. A dribble past the best defender in the league is different from one past the worst, and a dribble into five players versus open space is completely different. I've designed a full architecture for a more contextual ranking system so I can actually tell people why Lamine Yamal is better than Michael Olise.",
+    "specifics": [
+      "The idea: PageRank-style weighting where every action is measured against the opponent's tier, not just counted raw. Context is everything.",
+      "Cross-league calibration via Champions League match overlaps so you can compare players across leagues fairly.",
+      "10 core mechanics designed: difficulty weighting, performance vs. opportunity separation, press resistance, off-ball movement, matchup predictions, player chemistry.",
+      "Data from FBRef, StatsBomb Open Data, Understat. Stack: Python, Jupyter, Pandas.",
+      "Originally targeted FC Barcelona hackathon. Got rejected. Same day, recognized Iris was closer to core mission and pivoted.",
+      "The insight is still valid. Might revisit independently."
+    ],
+    "aliases": ["caliber", "soccer analytics", "opposition-adjusted"],
+    "skills": ["python", "pandas", "data-science"],
+    "tags": ["sports", "analytics", "soccer", "paused"]
+  },
+  {
+    "id": "calliope-screenplay",
+    "title": "The Pursuit of Well-Being",
+    "section": "media",
+    "status": "writing",
+    "parent": "The Olympus Project",
+    "summary": "I'm working on a movie (name pending) meant to show the human experience of pursuing happiness by living through every wrong approach until the right one emerges. It's a visual proof of my own philosophy to help people understand it themselves and draw their own conclusions from it.",
+    "specifics": [
+      "The audience never hears 'eudaimonia' or any philosophy term. They watch someone stumble through every wrong approach until the right one emerges, and the recognition is what changes them.",
+      "Trilogy mapping to my life: Film 1 (Before the Break, pre-2025), Film 2 (The Catharsis, 2025), Film 3 (Living It, 2026+). Each stands alone.",
+      "10-act character journey: soccer -> more inputs -> maximal intensity -> control -> family -> avoidance -> COLLAPSE ('What do I really want?') -> return to basics -> helping others see -> continued learning.",
+      "Music as emotional architecture: Tame Impala's 'Elephant' (immersion), 'Apocalypse Dreams' (catharsis), Fred Again's 'Lights Burn Dimmer' (upswing).",
+      "Building via emotional seeds: songs and feelings inspire scenes, not outline-first.",
+      "No voiceover, no narration. Soccer motif threads through every life as a barometer for well-being."
+    ],
+    "aliases": ["calliope", "screenplay", "movie script", "pursuit", "the pursuit of well-being"],
+    "connections": ["iris-mobile", "tree", "project-olympus"],
+    "tags": ["creative", "writing", "philosophy", "film"]
+  },
+  {
+    "id": "tree",
+    "title": "The Tree of Human Flourishing",
+    "section": "media",
+    "status": "writing",
+    "summary": "I'm writing a practical philosophical framework building off Aristotle, Rawls, Socrates, and others. I believe there's a lot of gold in the high-level commonalities across these different philosophers, and this book weaves them together into a new concept around the importance of knowing thyself and how it impacts our lives across relationships, work, leisure, and well-being.",
+    "specifics": [
+      "I'm six chapters in and I'm taking philosophy courses, engaging in lots of conversations, and living to make this as solid as possible.",
+      "The framework: four branches (autonomy, competence, connection, meaning), four success criteria (genuinely yours, coherent, sustainable, revisable), a root system, and coherence as the sap.",
+      "Chapters: The Cage Is Almost Never Absolute, Know Thyself, Coherence, The Conditions, Love/Relationships/What You're Actually Pursuing, Communication/Society/The World Beyond Yourself.",
+      "I'm very careful not to claim anything that can be misinterpreted, which is why I prefer to work privately rather than publicly on the internet.",
+      "Active structural question: investigating whether 'Know Thyself' should be the trunk of the Tree, with the branches as emergent outputs rather than prescribed categories.",
+      "40+ research documents, 9 exploration pieces. The framework provides a structure to evaluate any path, including religious ones."
+    ],
+    "aliases": ["tree", "flourishing framework", "eudaimonia framework", "the tree"],
+    "connections": ["iris-mobile", "calliope-screenplay", "lantern", "project-olympus"],
+    "tags": ["philosophy", "writing", "framework"]
+  },
+  {
+    "id": "lantern",
+    "title": "The Lantern",
+    "section": "media",
+    "status": "writing",
+    "parent": "The Olympus Project",
+    "summary": "I started writing The Lantern in August 2025, inspired by How I Met Your Mother and all the unspoken rules that exist in our lives from the bro code to the front porch test. It's 39 rules and 79 theories covering everything from relationship patterns to ways to escape traps that lead to unhappiness, aimed at the young person experience roughly 16 to 35. I've printed over 30 copies that I give to friends across the world and update with their feedback.",
+    "specifics": [
+      "It's the first project of the Olympus Project collection, written informally to help people who've gone through similar experiences in high school and college.",
+      "A more formalized version of my List of Important Things except more applicable to the young person experience.",
+      "39 rules (things to do or not do) and 79 theories (names for situations and patterns worth being aware of).",
+      "I've printed over 30 copies to date, given them to friends across the world, and update the book throughout the year with their feedback.",
+      "Rules include: Nothing Good Happens After 2 AM, The Front Porch Test, Never Drag it Out, The Platinum Rule, Proportional Celebration.",
+      "Theories include: Marshall Syndrome, The Proximity Effect, Dobler/Dahmer Theory, Relationship Gut, The Sparkling Water Theory.",
+      "One published deep article: The Skiing Rule (pushing your edge vs. going against your grain)."
+    ],
+    "aliases": ["lantern", "principles", "life rules", "handbook", "mike veson handbook"],
+    "connections": ["tree", "important-things", "project-olympus"],
+    "tags": ["philosophy", "writing", "personal"]
+  },
+  {
+    "id": "important-things",
+    "title": "List of Important Things",
+    "section": "media",
+    "status": "ongoing",
+    "summary": "I've kept a running list of important things since 5th grade. Any time I learn a lesson or hear something that sticks with me, I add it. It's been a great showing of how I've grown because I can see how my thinking has changed from 5th grade to now. I want my future kids to have it to help them on their journey too.",
+    "specifics": [
+      "Started in 5th grade in a Notes document. Still going.",
+      "Not a book, not a formal project. Just a running list of things I've learned that mattered.",
+      "The growth is visible: entries from 5th grade versus entries from now show how much my thinking has evolved.",
+      "I want my future kids to have this to help them on their journey.",
+      "The Lantern is a more formalized, publishable version of this for a wider audience."
+    ],
+    "aliases": ["important things", "life lessons list"],
+    "connections": ["lantern"],
+    "tags": ["personal", "ongoing"]
+  },
+  {
+    "id": "tavern",
+    "title": "The Tavern",
+    "section": "blueprints",
+    "status": "vision",
+    "summary": "I love the vibes of taverns. Inspired by McLaren's from How I Met Your Mother, Greek kafeneia, and European pubs, I'm designing the tavern I want to have someday. Custom drinks named after my friends, my favorite foods, a spot to hang out with your friends and have a good time.",
+    "specifics": [
+      "This is the physical version of what Olympus is digitally: a place where people can actually connect.",
+      "Menu I've designed: tavern burger, Emmy burger (pretzel bun), Chicago-style tavern pizza (NOT deep dish), sweet potato waffle fries, cheese fondue, late night Nutella pizza.",
+      "20+ signature drinks named after my friends: The Fotis, The MV, The Tasha (Fernet con coca), The Maggie Shot, The Jackson (espresso martini), The Voldemort (Aperol spritz). Each drink is a story.",
+      "Pool table, one bookable hibachi table, secret menu, European hot chocolate in winter.",
+      "Part of a bigger Douzinas Empire vision: The Tavern, Mike's Diner, Mike's Cafe.",
+      "Inspired by the kafeneio tradition in Greece where coffee houses are social institutions, the pubs I visited across Europe, and McLaren's from HIMYM."
+    ],
+    "aliases": ["tavern", "pub", "third place", "cornerstone tavern", "douzinas empire"],
+    "tags": ["vision", "community", "hospitality", "greek"]
+  },
+  {
+    "id": "green-room",
+    "title": "The Green Room",
+    "section": "blueprints",
+    "status": "vision",
+    "summary": "My environment is super important for being creative and having ideas, so I'm designing the Green Room: a space of things that help me be creative. Since I move around a lot, I try to create a Green Room wherever I'm staying with specific things that remind me of myself and help me think. Even having a couch matters because I tend to have more creative ideas lying down, which there's actually research on.",
+    "specifics": [
+      "The purpose is creativity and depth. I spend time in shallow social modes that drain my thinking frequency, and the Green Room is where that gets restored.",
+      "I try to create a version of it wherever I'm staying. Specific items that remind me of myself, that put me in a creative headspace.",
+      "Two functional zones: a couch for reflective processing (I genuinely have more creative ideas lying down, there's research on supine cognition) and a desk for execution.",
+      "Part of a bigger Vermont compound vision: hosting, family, personal retreat. Speakeasy in the basement, hibachi grill.",
+      "Color palette: silver with gold, green and blue. Every detail curated to be unmistakably mine."
+    ],
+    "aliases": ["green room", "creative space", "man cave", "vermont compound"],
+    "tags": ["vision", "creative", "identity", "personal"]
+  }
+]

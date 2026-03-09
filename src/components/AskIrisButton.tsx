@@ -9,7 +9,7 @@ interface AskIrisButtonProps {
     id: string;
     title: string;
   };
-  type: 'project' | 'blog' | 'experience';
+  type: 'project' | 'blog' | 'experience' | 'in-progress';
   className?: string;
 }
 
@@ -39,7 +39,8 @@ export default function AskIrisButton({ item, type, className = '' }: AskIrisBut
       detail: {
         query,
         filters,
-        intent
+        intent,
+        ...(type === 'in-progress' && { deepMode: true }),
       }
     }));
   };

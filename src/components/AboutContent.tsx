@@ -26,9 +26,9 @@ interface AboutContentProps {
  * Shared About content component
  * Used in both AboutSheet (mobile) and about_section (desktop)
  */
-export default function AboutContent({ 
-  expanded = false, 
-  textClassName = "text-sm font-light text-gray-600 dark:text-gray-400", 
+export default function AboutContent({
+  expanded = false,
+  textClassName = "text-sm font-light text-gray-600 dark:text-gray-400",
   containerClassName = "",
   onIrisClick
 }: AboutContentProps) {
@@ -43,45 +43,24 @@ export default function AboutContent({
   return (
     <div className={containerClassName}>
       <p className={`mb-3 ${textClassName} leading-relaxed`}>
-        I&apos;m <strong className="font-semibold">Mike Veson</strong>, a junior at{" "}
+        I spent most of college doing what I believed I <em>should</em> be doing as opposed to what I <em>wanted</em> to do. Obsessing over grades, filling my life with noise, thinking I needed a good job to be happy. Then I let go of that. I went to{" "}
         <a
-          href="https://www.rice.edu"
+          href="https://www.salleurl.edu/en"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:opacity-80 transition-opacity"
         >
-          <span className="font-semibold bg-gradient-to-r from-blue-600 to-gray-600 dark:from-blue-400 dark:to-gray-400 text-transparent bg-clip-text">
-            Rice University
+          <span className="font-semibold bg-gradient-to-r from-red-600 to-yellow-500 dark:from-red-500 dark:to-yellow-400 text-transparent bg-clip-text">
+            Barcelona
           </span>
         </a>{" "}
-        studying computer science, probably graduating May 2027. Grew up in Boston watching my parents build{" "}
-        <a
-          href="https://veson.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:opacity-80 transition-opacity"
-        >
-          <span className="font-semibold bg-gradient-to-r from-blue-700 to-orange-600 dark:from-blue-400 dark:to-orange-400 text-transparent bg-clip-text">
-            Veson Nautical
-          </span>
-        </a>; learned early that you can make something meaningful if you care about the problem and the people.
+        and somewhere along the way my perception of success changed and how I felt before no longer made any sense.
       </p>
 
       {expanded && (
         <>
           <p className={`mb-3 ${textClassName} leading-relaxed`}>
-            Spent Fall 2025 studying abroad in{" "}
-            <a
-              href="https://www.salleurl.edu/en"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:opacity-80 transition-opacity"
-            >
-              <span className="font-semibold bg-gradient-to-r from-red-600 to-yellow-500 dark:from-red-500 dark:to-yellow-400 text-transparent bg-clip-text">
-                Barcelona
-              </span>
-            </a>
-            . Traveled around Europe, got to see my lifelong club{" "}
+            I got to see my lifelong club{" "}
             <a
               href="https://youtu.be/9V2guLT3S14?si=I8x2_s2vhjppaj-d"
               target="_blank"
@@ -92,13 +71,35 @@ export default function AboutContent({
                 Barça
               </span>
             </a>{" "}
-            play week in week out at the new Camp Nou, and spent the semester getting better at Spanish and Greek. Had a lot of conversations about what people should want out of life. I learned the hard way that it doesn&apos;t matter how hard you work if you&apos;re working hard for the wrong reasons. So I started spending more time figuring out what&apos;s worth doing in the first place, and now I&apos;m building products to help with that.
+            play at the Camp Nou, speak with amazing new people in Greek, Spanish, English, and very poorly in Catalan, and more unexpectedly but most importantly, I spent so much time alone. I was forced into looking at my life and understanding not only what I want from it, but what it means to live a good one, and I came back to{" "}
+            <a
+              href="https://www.rice.edu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity"
+            >
+              <span className="font-semibold bg-gradient-to-r from-blue-600 to-gray-600 dark:from-blue-400 dark:to-gray-400 text-transparent bg-clip-text">
+                Rice
+              </span>
+            </a>{" "}
+            with a completely different idea of how I want to live.
           </p>
           <p className={`mb-3 ${textClassName} leading-relaxed`}>
-            I love talking to people about what success means to them. Not success in the typical sense, but a life that fulfills you every day for reasons true to who you are. Learning more every day through writing books, blogs, movie scripts, and having conversations with people who push me forward.
+            I&apos;m a junior computer science major at Rice from Boston, but what I study is not what I care about. I&apos;m writing movies, books, and philosophy, and building technology as a means to help people know themselves and live well. I grew up watching my parents build{" "}
+            <a
+              href="https://veson.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity"
+            >
+              <span className="font-semibold bg-gradient-to-r from-blue-700 to-orange-600 dark:from-blue-400 dark:to-orange-400 text-transparent bg-clip-text">
+                Veson Nautical
+              </span>
+            </a>{" "}
+            from the ground up and I learned young how to build software, talk with people, and understand problems. I don&apos;t want that to be my entire life, but I&apos;m grateful to have those skills to help me live the life I want to and to help others do so too.
           </p>
           <p className={`${textClassName} leading-relaxed`}>
-            I always want to meet and talk to more people, so if you&apos;ve made it this far, say hi through{" "}
+            I hope this website gives you a window into my life, and if anything interests you, ask{" "}
             <button
               onClick={handleIrisClick}
               className="hover:opacity-80 transition-opacity inline-block focus:outline-none"
@@ -106,7 +107,8 @@ export default function AboutContent({
               <span className="font-semibold bg-gradient-to-r from-blue-500 via-emerald-500 to-blue-500 dark:from-blue-400 dark:via-emerald-400 dark:to-blue-400 text-transparent bg-clip-text">
                 Iris
               </span>
-            </button>.
+            </button>{" "}
+            about it or reach out if you want to talk more. Iron sharpens iron.
           </p>
         </>
       )}

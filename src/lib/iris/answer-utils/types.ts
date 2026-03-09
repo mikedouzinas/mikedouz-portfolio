@@ -19,7 +19,7 @@ export type Intent =
  * Enables queries like "all Python projects" or "experiences from 2024"
  */
 export interface QueryFilter {
-  type?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'>;
+  type?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill' | 'in-progress'>;
   // Field-based filters
   skills?: string[];          // For any item with skills field
   company?: string[];         // For experiences

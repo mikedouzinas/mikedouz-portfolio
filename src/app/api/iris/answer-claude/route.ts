@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { loadKBItems, loadContact } from '@/lib/iris/load';
 import { logQuery } from '@/lib/iris/analytics';
 import { generateQuickActions } from '@/lib/iris/quickActions_v2';
@@ -62,6 +64,9 @@ export async function POST(request: NextRequest) {
     console.log(`Query: "${query}"`);
     console.log('Method: Full KB context with prompt caching');
 
+    // Check if deep mode is active (includes in-progress items)
+    const isDeepMode = searchParams.get('deepMode') === 'true';
+
     // Load entire knowledge base and rankings for quick actions
     const [kbItems, contactInfo, rankings] = await Promise.all([
       loadKBItems(),
@@ -69,12 +74,28 @@ export async function POST(request: NextRequest) {
       loadRankings(),
     ]);
 
-    console.log(`KB Size: ${kbItems.length} items loaded`);
+    // Conditionally load in-progress items for deep mode
+    let allItems = kbItems;
+    if (isDeepMode) {
+      try {
+        const inProgressPath = path.join(process.cwd(), 'src/data/deep/in-progress.json');
+        const raw = await fs.readFile(inProgressPath, 'utf8');
+        const inProgressItems = JSON.parse(raw).map((item: Record<string, unknown>) => ({
+          ...item,
+          kind: 'in-progress' as const,
+        }));
+        allItems = [...kbItems, ...inProgressItems];
+      } catch (err) {
+        console.warn('Failed to load in-progress items:', err);
+      }
+    }
 
-    // Format KB for Claude
+    console.log(`KB Size: ${allItems.length} items loaded${isDeepMode ? ' (deep mode)' : ''}`);
+
+    // Format KB for Claude (uses allItems which includes in-progress when deep mode is active)
     const kbContext = {
       contact: contactInfo,
-      items: kbItems.map(item => ({
+      items: allItems.map(item => ({
         ...item,
       })),
     };
@@ -124,7 +145,7 @@ ${JSON.stringify(kbContext, null, 2)}
       query,
       intent: 'claude_direct', // Special intent for analytics
       filters: undefined,
-      results_count: kbItems.length,
+      results_count: allItems.length,
       answer_length: 0,
       latency_ms: 0,
       cached: false,
@@ -167,7 +188,7 @@ ${JSON.stringify(kbContext, null, 2)}
             encoder.encode(`data: ${JSON.stringify({
               debug: {
                 intent: 'claude_direct',
-                resultsCount: kbItems.length,
+                resultsCount: allItems.length,
                 detailLevel: 'full',
               }
             })}\n\n`)
@@ -190,12 +211,12 @@ ${JSON.stringify(kbContext, null, 2)}
           const quickActions = generateQuickActions({
             query,
             intent: 'claude_direct',
-            results: kbItems.map((item, idx) => ({
+            results: allItems.map((item, idx) => ({
               score: 1 - (idx * 0.01), // Descending scores
               doc: item,
             })),
             fullAnswer: accumulatedText,
-            allItems: kbItems,
+            allItems: allItems,
             rankings,
             depth,
             visitedNodes,

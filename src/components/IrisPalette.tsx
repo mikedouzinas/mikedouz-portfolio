@@ -18,6 +18,7 @@ import {
   Lightbulb
 } from 'lucide-react';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
+import { useDeepMode } from './DeepModeContext';
 import { SiCalendly } from 'react-icons/si';
 import { getSignalSummary } from '@/lib/iris/signals';
 import { useRouter } from 'next/navigation';
@@ -123,6 +124,7 @@ function autoLinkText(input: string): string {
 
 export default function IrisPalette({ open: controlledOpen, onOpenChange }: IrisPaletteProps) {
   const router = useRouter();
+  const { deepMode } = useDeepMode();
   // View mode state machine: 'suggestions' = show suggestions, 'answer' = show answer only
   const [viewMode, setViewMode] = useState<'suggestions' | 'answer'>('suggestions');
 
@@ -1086,6 +1088,11 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       // Pass visited nodes to prevent suggesting already-visited items
       if (visitedNodes.length > 0) {
         params.set('visitedNodes', JSON.stringify(visitedNodes));
+      }
+
+      // Pass deep mode flag so the API can include in-progress items
+      if (deepMode) {
+        params.set('deepMode', 'true');
       }
 
       // Use different endpoint based on version toggle
