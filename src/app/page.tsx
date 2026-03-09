@@ -8,7 +8,7 @@ import BlogCard from './blogs/blog_card';
 import MouseGlow from '@/components/mouse_glow';
 import HeaderMobile from '@/components/HeaderMobile';
 import AboutSheet from '@/components/AboutSheet';
-import { DeepModeProvider, useDeepMode } from '@/components/DeepModeContext';
+import { useDeepMode } from '@/components/DeepModeContext';
 import DeepModeBorder from '@/components/DeepModeBorder';
 import ExpandableSection from '@/components/ExpandableSection';
 import InProgressSection from '@/components/InProgressSection';
@@ -197,9 +197,5 @@ function HomeContent() {
 }
 
 export default function Home() {
-  return (
-    <DeepModeProvider>
-      <HomeContent />
-    </DeepModeProvider>
-  );
+  return <HomeContent />;
 }

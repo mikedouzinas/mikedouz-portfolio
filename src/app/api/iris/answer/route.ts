@@ -304,6 +304,7 @@ export async function POST(req: NextRequest) {
     const deepMode = body.deepMode === true;
 
     // Debug: Log intent routing details
+    console.log(`[Answer API] deepMode=${deepMode}, body.deepMode=${body.deepMode}`);
     if (skipClassification) {
       console.log(`[Answer API] Fast-path routing: intent=${presetIntent}, skipClassification=${skipClassification}`);
     } else if (body.intent) {
@@ -326,8 +327,10 @@ export async function POST(req: NextRequest) {
     const getAllItems = async () => {
       if (!allItemsCache) {
         allItemsCache = await loadKBItems();
+        console.log(`[Answer API] Loaded ${allItemsCache.length} standard KB items`);
         if (deepMode) {
           const inProgress = await loadInProgress();
+          console.log(`[Answer API] Deep mode ON: loaded ${inProgress.length} in-progress items, IDs: ${inProgress.map(i => i.id).join(', ')}`);
           allItemsCache = [...allItemsCache, ...inProgress];
         }
       }

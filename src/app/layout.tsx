@@ -3,6 +3,7 @@ import { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "next-themes";
+import { DeepModeProvider } from "@/components/DeepModeContext";
 import IrisPalette from "@/components/IrisPalette";
 import "../styles/globals.css";
 
@@ -70,8 +71,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark">
-          {children}
-          <IrisPalette />
+          <DeepModeProvider>
+            {children}
+            <IrisPalette />
+          </DeepModeProvider>
         </ThemeProvider>
         <Analytics />
         {/* Professional comment: GoogleAnalytics component handles script loading and deduplication.
