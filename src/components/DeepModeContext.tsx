@@ -37,10 +37,10 @@ export function DeepModeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [deepMode]);
 
-  // Keyboard shortcut: Cmd+Shift+. to toggle deep mode
+  // Keyboard shortcut: Cmd+Shift+. (Mac) / Ctrl+Shift+. (Windows) to toggle deep mode
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.metaKey && e.shiftKey && (e.code === 'Period' || e.key === '>' || e.key === '.')) {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.code === 'Period' || e.key === '>' || e.key === '.')) {
         e.preventDefault();
         setDeepMode(prev => !prev);
       }
@@ -48,6 +48,13 @@ export function DeepModeProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Listen for toggle events from other components (e.g. Iris palette commands)
+  useEffect(() => {
+    const handleToggleEvent = () => setDeepMode(prev => !prev);
+    window.addEventListener('mv-toggle-deep-mode', handleToggleEvent);
+    return () => window.removeEventListener('mv-toggle-deep-mode', handleToggleEvent);
   }, []);
 
   const toggleDeepMode = useCallback(() => {

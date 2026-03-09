@@ -2,8 +2,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useDeepMode } from './DeepModeContext';
 
-const INSET = 5;
-const CORNER_RADIUS = 0;
 const PATH_LENGTH = 1000;
 
 // 8 bars + 8 gaps, summing to exactly PATH_LENGTH for seamless looping
@@ -41,12 +39,8 @@ export default function DeepModeBorder() {
   return (
     <div
       ref={containerRef}
-      className="fixed z-40 pointer-events-none"
+      className="fixed z-40 pointer-events-none top-[68px] md:top-[5px] right-[5px] bottom-[5px] left-[5px]"
       style={{
-        top: INSET,
-        right: INSET,
-        bottom: INSET,
-        left: INSET,
         opacity: deepMode ? 0.8 : 0,
         transition: deepMode
           ? 'opacity 600ms ease-out 200ms'

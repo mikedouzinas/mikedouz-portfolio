@@ -33,7 +33,10 @@ Rewrite the About section in Mike's actual voice. The current version is polishe
 ## Phase 2: Spotify Sidebar Section
 
 ### What
-Collapsible Spotify bar in the sidebar, below nav items, above social icons.
+Collapsible Spotify bar in the sidebar, below nav items, above social icons. A listening heatmap that shows songs I was obsessed with at specific points in time.
+
+### The Concept (YouTube "Most Replayed" for Spotify)
+Like how YouTube shows the most frequently watched parts of a video, this shows the most frequently listened-to songs across time. Only songs that hit a high replay frequency in a compressed timeframe appear. It's not a curated playlist. It's a listening intensity timeline.
 
 ### Design
 - **Collapsed state:** Horizontal bar similar to the Iris button style
@@ -45,21 +48,30 @@ Collapsible Spotify bar in the sidebar, below nav items, above social icons.
   - Shows a small timeline/table view of songs (like a Swift table view)
   - Same corner radius as collapsed bar, just grows taller
   - Maintains the bar header throughout
-- **Content:** Timeline of songs mapped to periods
-  - Song name, artist, time period label
+- **Content:** Timeline of songs by time period
+  - Song name, artist, time period
   - Small album art if available
   - Clicking opens Spotify link
+  - **Optional hover tooltip:** A sentence of context for why the song mattered (manual, optional field)
 
-### Data (MVP — hardcoded)
-- Store songs in a JSON data file (`src/data/spotify/songs.json` or similar)
-- Include songs that have come up recently in vault conversations
-- Easy to update by editing the JSON file
-- Future: Spotify API integration for automatic population
+### Data
+- **MVP:** Static JSON file (`src/data/spotify/songs.json`), manually editable
+- **Future:** Spotify API integration to auto-populate based on listening history
+  - Track replay frequency over time windows (days/weeks)
+  - Songs that exceed a threshold in a compressed timeframe auto-surface
+  - Manual entries coexist alongside auto-populated ones
+  - Manual override: can always add/edit/annotate entries directly
 
 ### Files to create/modify
 - `src/components/SpotifySidebar.tsx` — new component
 - `src/app/sidebar_content.tsx` — integrate below nav, above social icons
 - `src/data/spotify/songs.json` — song data
+
+### Mobile Deep Mode Access
+The profile photo trigger only works on desktop. Mobile needs alternative entry points:
+- **Long press on "Mike Veson" text** in the mobile header (physical discovery)
+- **Iris command**: typing "deep mode" or "/deep" into the Iris palette (verbal discovery)
+- Both approaches maintain the hidden/discoverable feel
 
 ---
 
@@ -96,7 +108,7 @@ When entering deep mode, the page gets a distinctive visual treatment:
 
 ## Phase 4: Future Ideas (Not Now)
 
-- Spotify API auto-population based on listen patterns
+- Spotify API listening heatmap (auto-populate from replay frequency data)
 - Music-time association tool (separate product?)
 - Passcode-protected edit mode for updating songs without git push
 - Olympus card/page (currently shelved, may revisit)

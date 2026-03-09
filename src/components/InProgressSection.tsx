@@ -2,6 +2,7 @@
 import React from "react";
 import InProgressCard from "./InProgressCard";
 import type { InProgressItem } from "./InProgressCard";
+import ExpandableSection from "./ExpandableSection";
 import inProgressData from "@/data/deep/in-progress.json";
 
 // Status sort order: building/writing first, then ongoing, vision, paused
@@ -27,22 +28,35 @@ export const inProgressBySection = {
 
 /**
  * Renders a list of in-progress cards for a given section.
- * Used inside each section's deep-mode branch in page.tsx.
+ * On mobile: wraps cards in ExpandableSection for consistent headers,
+ * "Show all" toggle, and spacing — matching normal mode exactly.
+ * On desktop: renders cards directly in a spaced column.
  */
 export default function InProgressSection({
   section,
+  title,
   visible,
 }: {
   section: keyof typeof inProgressBySection;
+  title: string;
   visible: boolean;
 }) {
   const items = inProgressBySection[section];
 
+  const cards = items.map((item, i) => (
+    <InProgressCard key={item.id} item={item} index={i} visible={visible} />
+  ));
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {items.map((item, i) => (
-        <InProgressCard key={item.id} item={item} index={i} visible={visible} />
-      ))}
-    </div>
+    <>
+      <div className="md:hidden">
+        <ExpandableSection title={title} items={cards} initialCount={2} />
+      </div>
+      <div className="hidden md:block">
+        <div className="max-w-3xl mx-auto space-y-6">
+          {cards}
+        </div>
+      </div>
+    </>
   );
 }

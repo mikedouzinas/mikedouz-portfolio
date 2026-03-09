@@ -21,7 +21,7 @@ import { workExperiences, projects, blogs } from '@/data/loaders';
 function HomeContent() {
   const mainRef = useRef<HTMLDivElement>(null);
   const [aboutSheetOpen, setAboutSheetOpen] = useState(false);
-  const { deepMode } = useDeepMode();
+  const { deepMode, toggleDeepMode } = useDeepMode();
 
   const handleSidebarWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (mainRef.current) {
@@ -52,7 +52,7 @@ function HomeContent() {
       <MouseGlow />
       <DeepModeBorder />
 
-      <HeaderMobile onOpenAbout={() => setAboutSheetOpen(true)} />
+      <HeaderMobile onOpenAbout={() => setAboutSheetOpen(true)} onToggleDeepMode={toggleDeepMode} />
 
       <AboutSheet
         open={aboutSheetOpen}
@@ -80,7 +80,7 @@ function HomeContent() {
                 margin: deepMode ? undefined : '0',
               }}
             >
-              <InProgressSection section="experience" visible={deepMode} />
+              <InProgressSection section="experience" title="Experience" visible={deepMode} />
             </div>
 
             {/* Regular: standard experience cards */}
@@ -116,7 +116,7 @@ function HomeContent() {
                 margin: deepMode ? undefined : '0',
               }}
             >
-              <InProgressSection section="projects" visible={deepMode} />
+              <InProgressSection section="projects" title="Projects" visible={deepMode} />
             </div>
 
             {/* Regular: standard project cards */}
@@ -152,7 +152,7 @@ function HomeContent() {
                 margin: deepMode ? undefined : '0',
               }}
             >
-              <InProgressSection section="media" visible={deepMode} />
+              <InProgressSection section="media" title="Media" visible={deepMode} />
             </div>
 
             {/* Regular: standard blog/media cards */}
@@ -188,7 +188,7 @@ function HomeContent() {
               margin: deepMode ? undefined : '0',
             }}
           >
-            <InProgressSection section="blueprints" visible={deepMode} />
+            <InProgressSection section="blueprints" title="Blueprints" visible={deepMode} />
           </section>
         </main>
       </div>

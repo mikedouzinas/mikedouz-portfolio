@@ -124,7 +124,7 @@ function autoLinkText(input: string): string {
 
 export default function IrisPalette({ open: controlledOpen, onOpenChange }: IrisPaletteProps) {
   const router = useRouter();
-  const { deepMode } = useDeepMode();
+  const { deepMode, toggleDeepMode } = useDeepMode();
   // View mode state machine: 'suggestions' = show suggestions, 'answer' = show answer only
   const [viewMode, setViewMode] = useState<'suggestions' | 'answer'>('suggestions');
 
@@ -1005,6 +1005,18 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     preIntent?: string,
     continueConversation = false // New param: true for quick actions, false for fresh queries
   ) => {
+    // Intercept deep mode commands — toggle and close, don't send to API
+    const normalized = q.trim().toLowerCase();
+    if (normalized === 'deep mode' || normalized === 'in progress mode') {
+      handleOpenChange(false);
+      setQuery('');
+      // Dispatch event after close to decouple from palette state reset
+      requestAnimationFrame(() => {
+        window.dispatchEvent(new CustomEvent('mv-toggle-deep-mode'));
+      });
+      return;
+    }
+
     // Input validation - max 500 characters
     if (!q.trim() || isProcessingQuery) return;
     if (q.length > 500) {

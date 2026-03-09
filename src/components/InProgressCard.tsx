@@ -20,6 +20,7 @@ import {
 export interface InProgressItem {
   id: string;
   title: string;
+  shortTitle?: string;
   section: "experience" | "projects" | "media" | "blueprints";
   status: "building" | "writing" | "ongoing" | "vision" | "paused";
   summary: string;
@@ -103,7 +104,7 @@ export default function InProgressCard({ item, index, visible }: InProgressCardP
 
   const statusTag = (
     <span
-      className={`px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full whitespace-nowrap ${config.tagClasses}`}
+      className={`hidden md:inline px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full whitespace-nowrap ${config.tagClasses}`}
     >
       {config.label}
     </span>
@@ -200,7 +201,12 @@ export default function InProgressCard({ item, index, visible }: InProgressCardP
 
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <h3 className="text-xl text-gray-900 dark:text-gray-200 group-hover:text-blue-800 dark:group-hover:text-blue-300">
-                  {item.title}
+                  {item.shortTitle ? (
+                    <>
+                      <span className="md:hidden">{item.shortTitle}</span>
+                      <span className="hidden md:inline">{item.title}</span>
+                    </>
+                  ) : item.title}
                 </h3>
                 {statusTag}
                 <div className="ml-auto flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-[50ms]">

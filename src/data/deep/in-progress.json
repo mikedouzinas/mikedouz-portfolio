@@ -7,10 +7,10 @@
     "role": "Founder",
     "company": "The Olympus Project",
     "period": "Est. OCT 2025",
-    "summary": "I started the Olympus Project to help people flourish by reaching them through whatever means is most effective. Right now that's Iris Mobile, Apollo Terminal, The Lantern, a movie, The Tree of Human Flourishing, and the List of Important Things. Part of the work is figuring out which channels actually make a difference in people's lives.",
+    "summary": "The Olympus Project is a company I made to help people flourish by reaching them through whatever means is most effective. Right now that's Iris Mobile, Apollo Terminal, The Lantern, a movie trilogy, The Tree of Human Flourishing, and the List of Important Things. Part of the work is figuring out which channels actually make a difference in people's lives.",
     "specifics": [
       "The core idea is indirect transmission: show people their patterns so clearly they recognize themselves and change from conviction, not instruction. Same mechanism Greek myths used for millennia.",
-      "Current channels: Iris Mobile (universal assistant), Apollo Terminal (AI that helps you know yourself), The Lantern (book for 16-35 year olds), The Pursuit of Well-Being (movie), The Tree of Human Flourishing (philosophy book), List of Important Things (running life lessons since 5th grade).",
+      "Current channels: Iris Mobile (universal assistant), Apollo Terminal (AI that helps you know yourself), The Lantern (book for 16-35 year olds), a movie trilogy (name pending), The Tree of Human Flourishing (philosophy book), List of Important Things (running life lessons since 5th grade).",
       "I prefer to work privately and in small groups rather than publicly on the internet. Aristotle worked in small groups too.",
       "Part of the project is discovering what are the most effective ways to reach people and incorporate real benefits into their lives."
     ],
@@ -44,7 +44,7 @@
     "section": "projects",
     "status": "building",
     "parent": "The Olympus Project",
-    "summary": "Apollo is the AI that helps me know myself. I use an Obsidian vault synced across my devices for everything from classwork to writing my philosophy book, and Apollo searches for the relevant context when I bring something up. The advantage is I can bring up things I might not even be comfortable discussing with a friend or therapist, and get unbiased, understanding advice within the context of my life.",
+    "summary": "Apollo is the AI that helps me know myself. I use an Obsidian vault synced across my devices for everything from classwork to writing my philosophy book, and Apollo searches for the relevant context when I bring something up. The advantage is I can bring up things I might not even be comfortable discussing with anyone in my life and get unbiased, understanding advice within the full context of my life.",
     "specifics": [
       "Solves the AI context problem: using Claude Code, Apollo searches my vault for relevant context so every conversation has the full picture of my life, not just what I said in the last five minutes.",
       "I use markdown files for everything. Classes, philosophy, relationships, self-observations. It's crucial to understand my classwork within the context of my life and it helps me ideate so much more.",
@@ -99,11 +99,11 @@
   },
   {
     "id": "calliope-screenplay",
-    "title": "The Pursuit of Well-Being",
+    "title": "Movie Trilogy",
     "section": "media",
     "status": "writing",
     "parent": "The Olympus Project",
-    "summary": "I'm working on a movie (name pending) meant to show the human experience of pursuing happiness by living through every wrong approach until the right one emerges. It's a visual proof of my own philosophy to help people understand it themselves and draw their own conclusions from it.",
+    "summary": "I'm working on a movie trilogy (name pending) meant to show the human experience of pursuing happiness by living through every wrong approach until the right one emerges. It's a visual proof of my own philosophy to help people understand it themselves and draw their own conclusions from it.",
     "specifics": [
       "The audience never hears 'eudaimonia' or any philosophy term. They watch someone stumble through every wrong approach until the right one emerges, and the recognition is what changes them.",
       "Trilogy mapping to my life: Film 1 (Before the Break, pre-2025), Film 2 (The Catharsis, 2025), Film 3 (Living It, 2026+). Each stands alone.",
@@ -112,15 +112,17 @@
       "Building via emotional seeds: songs and feelings inspire scenes, not outline-first.",
       "No voiceover, no narration. Soccer motif threads through every life as a barometer for well-being."
     ],
-    "aliases": ["calliope", "screenplay", "movie script", "pursuit", "the pursuit of well-being"],
+    "aliases": ["calliope", "movie trilogy", "screenplay", "movie script", "pursuit"],
     "connections": ["iris-mobile", "tree", "project-olympus"],
     "tags": ["creative", "writing", "philosophy", "film"]
   },
   {
     "id": "tree",
     "title": "The Tree of Human Flourishing",
+    "shortTitle": "Tree of Flourishing",
     "section": "media",
     "status": "writing",
+    "parent": "The Olympus Project",
     "summary": "I'm writing a practical philosophical framework building off Aristotle, Rawls, Socrates, and others. I believe there's a lot of gold in the high-level commonalities across these different philosophers, and this book weaves them together into a new concept around the importance of knowing thyself and how it impacts our lives across relationships, work, leisure, and well-being.",
     "specifics": [
       "I'm six chapters in and I'm taking philosophy courses, engaging in lots of conversations, and living to make this as solid as possible.",
