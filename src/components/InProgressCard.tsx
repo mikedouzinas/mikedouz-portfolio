@@ -104,7 +104,7 @@ export default function InProgressCard({ item, index, visible }: InProgressCardP
 
   const statusTag = (
     <span
-      className={`hidden md:inline px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full whitespace-nowrap ${config.tagClasses}`}
+      className={`inline px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full whitespace-nowrap ${config.tagClasses}`}
     >
       {config.label}
     </span>
@@ -154,7 +154,7 @@ export default function InProgressCard({ item, index, visible }: InProgressCardP
                   {item.role || item.title}
                 </h3>
                 {statusTag}
-                <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-[50ms]">
+                <div className="ml-auto opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-[50ms]">
                   <AskIrisButton item={{ id: item.id, title: item.company || item.title }} type="in-progress" />
                 </div>
               </div>
@@ -209,7 +209,7 @@ export default function InProgressCard({ item, index, visible }: InProgressCardP
                   ) : item.title}
                 </h3>
                 {statusTag}
-                <div className="ml-auto flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-[50ms]">
+                <div className="ml-auto flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-[50ms]">
                   <AskIrisButton item={{ id: item.id, title: item.title }} type="in-progress" />
                   {githubLink && (
                     <a
