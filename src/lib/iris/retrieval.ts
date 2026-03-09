@@ -23,7 +23,7 @@ type Retrieved = { score: number; doc: Partial<KBItem> };
 type Options = { 
   topK?: number; 
   fields?: string[]; 
-  types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill'>;
+  types?: Array<'project' | 'experience' | 'class' | 'blog' | 'story' | 'value' | 'interest' | 'education' | 'bio' | 'skill' | 'in-progress'>;
   debug?: boolean;
   preFilteredItemIds?: Set<string>; // Optional set of item IDs to restrict retrieval to (for pre-filtered queries)
 };

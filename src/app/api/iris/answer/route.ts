@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { retrieve, diversifyByType, buildEvidencePacks, buildEvidenceSignals } from '@/lib/iris/retrieval';
-import { loadContact, loadKBItems, buildAliasIndex, AliasEntry, loadBio } from '@/lib/iris/load';
+import { loadContact, loadKBItems, loadInProgress, buildAliasIndex, AliasEntry, loadBio } from '@/lib/iris/load';
 // SignalSummary type reserved for future RAG personalization
 import { irisCache } from '@/lib/iris/cache';
 import { type KBItem, type PlannerResult, type EvidenceSignals } from '@/lib/iris/schema';
@@ -301,6 +301,7 @@ export async function POST(req: NextRequest) {
     const skipClassification = body.skipClassification === true;
     const presetIntent = body.intent;
     const presetFilters = body.filters;
+    const deepMode = body.deepMode === true;
 
     // Debug: Log intent routing details
     if (skipClassification) {
@@ -325,6 +326,10 @@ export async function POST(req: NextRequest) {
     const getAllItems = async () => {
       if (!allItemsCache) {
         allItemsCache = await loadKBItems();
+        if (deepMode) {
+          const inProgress = await loadInProgress();
+          allItemsCache = [...allItemsCache, ...inProgress];
+        }
       }
       return allItemsCache;
     };
@@ -1927,6 +1932,7 @@ export async function GET(request: Request) {
     const filters = filtersParam ? JSON.parse(filtersParam) : undefined;
     const visitedNodesParam = searchParams.get('visitedNodes');
     const visitedNodes = visitedNodesParam ? JSON.parse(visitedNodesParam) : undefined;
+    const deepMode = searchParams.get('deepMode') === 'true';
 
     // Create a new Request object with POST method and JSON body
     const postRequest = new NextRequest(request.url, {
@@ -1942,7 +1948,8 @@ export async function GET(request: Request) {
         skipClassification,
         intent,
         filters,
-        visitedNodes
+        visitedNodes,
+        deepMode
       })
     });
 

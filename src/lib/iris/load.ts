@@ -14,11 +14,13 @@ import {
   type InterestT,
   type EducationT,
   type BioT,
+  type InProgressT,
   type KBItem
 } from "./schema"
 
 /** Root data dirs */
 const KB_DIR = path.join(process.cwd(), "src/data/iris/kb")
+const DEEP_DIR = path.join(process.cwd(), "src/data/deep")
 
 /** Helpers */
 async function readJSON<T>(p: string): Promise<T> {
@@ -139,6 +141,12 @@ export async function loadBio(): Promise<BioT[]> {
     language_proficiency: profile.language_proficiency,
     kind: "bio" as const
   }]
+}
+
+/** ---- In-progress items (deep mode only) ---- */
+export async function loadInProgress(): Promise<InProgressT[]> {
+  const data = await readJSON<unknown[]>(path.join(DEEP_DIR, "in-progress.json"))
+  return (data as InProgressT[]).map(item => ({ ...item, kind: "in-progress" as const }))
 }
 
 /** ---- Combined content for retrieval (all KB items) ---- */

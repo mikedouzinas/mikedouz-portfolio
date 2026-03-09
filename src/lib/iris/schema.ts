@@ -256,6 +256,27 @@ export const InterestsArray = z.array(InterestBase)
 export const EducationArray = z.array(EducationBase)
 export const BioArray = z.array(BioBase)
 
+/** In-progress items (deep mode) */
+export type InProgressT = {
+  kind: "in-progress";
+  id: string;
+  title: string;
+  shortTitle?: string;
+  section: string;
+  status: string;
+  summary: string;
+  specifics: string[];
+  parent?: string;
+  role?: string;
+  company?: string;
+  period?: string;
+  aliases?: string[];
+  connections?: string[];
+  skills?: string[];
+  tags?: string[];
+  links?: Record<string, string>;
+}
+
 export type KBItem =
   | ProjectT
   | ExperienceT
@@ -266,9 +287,10 @@ export type KBItem =
   | InterestT
   | EducationT
   | BioT
-  | SkillT  // Adding SkillT so skills can be retrieved as standalone documents
+  | SkillT
+  | InProgressT
 
-export const KBItemKinds = ["project","experience","class","blog","story","value","interest","education","bio","skill"] as const
+export const KBItemKinds = ["project","experience","class","blog","story","value","interest","education","bio","skill","in-progress"] as const
 
 /** ---------- Synthesis Upgrade Types ---------- */
 
