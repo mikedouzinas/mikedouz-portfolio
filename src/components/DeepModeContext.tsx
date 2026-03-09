@@ -37,29 +37,18 @@ export function DeepModeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [deepMode]);
 
-  // Keyboard shortcut: Cmd+1+2 to toggle deep mode
+  // Keyboard shortcut: Cmd+Shift+. to toggle deep mode
+  // Mirrors macOS "show hidden files" — fitting for revealing the hidden layer
   useEffect(() => {
-    const pressed = new Set<string>();
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      pressed.add(e.key);
-      if (e.metaKey && pressed.has('1') && pressed.has('2')) {
+      if (e.metaKey && e.shiftKey && e.key === '>') {
         e.preventDefault();
         setDeepMode(prev => !prev);
-        pressed.clear();
       }
     };
 
-    const handleKeyUp = (e: KeyboardEvent) => {
-      pressed.delete(e.key);
-    };
-
     window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const toggleDeepMode = useCallback(() => {
