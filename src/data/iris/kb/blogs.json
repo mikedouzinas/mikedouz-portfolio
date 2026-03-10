@@ -1,12 +1,13 @@
 {
   "blog_posts": [
     {
-      "title": "The Web",
-      "short_name": "The Web Blog",
+      "title": "the web",
+      "short_name": "the web",
       "url": "/blog",
       "published_date": "March 10, 2026",
-      "context": "A living collection of Mike's research, philosophical analysis, and thinking — all connected like a web. Covers topics from the Tree of Human Flourishing to computer ethics to relationship philosophy.",
-      "summary": "The Web is Mike's public thinking space on mikeveson.com. It's a stream of research documents, philosophical analysis, personal reactions, and ideas. Posts cover ethics and technology, the Tree of Human Flourishing, relationship philosophy, and whatever Mike is currently processing. Each post can have its own visual identity through custom theming. Think of it as a raw, informal window into how Mike actually thinks — sophisticated in substance, casual in presentation.",
+      "description": "research, reactions, and thinking. all connected.",
+      "context": "A living collection of Mike's research, philosophical analysis, and thinking, all connected like a web. Covers topics from the Tree of Human Flourishing to computer ethics to relationship philosophy. Established in 2026 as a public window into how Mike actually thinks.",
+      "summary": "the web is Mike's public thinking space on mikeveson.com. It's a stream of research documents, philosophical analysis, personal reactions, and ideas. Posts cover ethics and technology, the Tree of Human Flourishing, relationship philosophy, and whatever Mike is currently processing. Each post can have its own visual identity through custom theming. Think of it as a raw, informal window into how Mike actually thinks: sophisticated in substance, casual in presentation. Not polished for the sake of it. Everything is connected because that's how his brain works.",
       "class": null,
       "related_class": null,
       "related_experiences": [],

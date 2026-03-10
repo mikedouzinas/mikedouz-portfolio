@@ -38,13 +38,18 @@ export default function BlogCard({ blog }: BlogCardProps) {
           </div>
           <a
             href={blog.link}
-            target="_blank"
-            rel="noopener noreferrer"
+            target={blog.link.startsWith("/") ? undefined : "_blank"}
+            rel={blog.link.startsWith("/") ? undefined : "noopener noreferrer"}
             onClick={(e) => e.stopPropagation()}
             className="text-lg font-semibold text-gray-900 dark:text-gray-200 group-hover:text-blue-800 dark:group-hover:text-blue-300 hover:underline block"
           >
             {blog.title}
           </a>
+          {blog.description && (
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              {blog.description}
+            </p>
+          )}
         </div>
       </div>
     </BaseCard>

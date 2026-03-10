@@ -32,7 +32,11 @@ export default function BaseCard({
 }: BaseCardProps) {
   const handleClick = () => {
     if (href) {
-      window.open(href, "_blank");
+      if (href.startsWith("/")) {
+        window.location.href = href;
+      } else {
+        window.open(href, "_blank");
+      }
     }
     onClick?.();
   };

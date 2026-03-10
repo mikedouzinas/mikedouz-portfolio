@@ -18,6 +18,7 @@ import skillsData from "./iris/kb/skills.json";
 export interface Blog {
   id: string;
   title: string;
+  description: string;
   imageUrl: string;
   date: string;
   link: string;
@@ -197,8 +198,9 @@ function formatDateRange(dates: { start: string; end?: string }): string {
 export const blogs: Blog[] = blogsData.blog_posts.map((post, index) => ({
   id: `blog_${index}`, // Match backend ID generation (0-based index)
   title: post.title,
+  description: (post as any).description || post.context || "",
   imageUrl: "/blog1.png", // Default image - could be enhanced to use post-specific images
-  date: new Date(post.published_date).getFullYear().toString(), // Extract just the year
+  date: post.published_date.includes("2026") ? `est. ${new Date(post.published_date).getFullYear()}` : new Date(post.published_date).getFullYear().toString(),
   link: post.url,
 }));
 
