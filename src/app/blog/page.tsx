@@ -8,6 +8,7 @@ import { BlogPostPreview } from "@/lib/blog";
 import PostCard from "./components/PostCard";
 import TagFilter from "./components/TagFilter";
 import SearchBar from "./components/SearchBar";
+import WebPattern from "./components/WebPattern";
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPostPreview[]>([]);
@@ -55,10 +56,11 @@ export default function BlogPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100">
+    <div className="relative min-h-screen bg-gray-900 text-gray-100">
       <MouseGlow />
+      <WebPattern />
 
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+      <div className="relative max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -94,11 +96,24 @@ export default function BlogPage() {
           {loading ? (
             <p className="text-gray-500 text-sm">loading...</p>
           ) : posts.length === 0 ? (
-            <p className="text-gray-500 text-sm">
-              {activeTag || searchQuery
-                ? "no posts match that filter."
-                : "nothing here yet."}
-            </p>
+            activeTag || searchQuery ? (
+              <p className="text-gray-500 text-sm">no posts match that filter.</p>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="py-12 text-center space-y-4"
+              >
+                <p className="text-gray-400 text-base leading-relaxed max-w-md mx-auto">
+                  this is where my research, philosophical analysis, and reactions live.
+                  everything connected, nothing polished for the sake of it.
+                </p>
+                <p className="text-gray-500 text-sm">
+                  posts are coming. check back soon.
+                </p>
+              </motion.div>
+            )
           ) : (
             posts.map((post, index) => (
               <PostCard key={post.id} post={post} index={index} />

@@ -169,26 +169,10 @@ function HomeContent() {
                   items={blogCards}
                   initialCount={2}
                 />
-                <div className="text-center mt-4">
-                  <a
-                    href="/blog"
-                    className="text-sm text-gray-500 hover:text-purple-400 transition-colors"
-                  >
-                    explore the web &rarr;
-                  </a>
-                </div>
               </div>
               <div className="hidden md:block">
                 <div className="max-w-3xl mx-auto space-y-6">
                   {blogCards}
-                </div>
-                <div className="text-center mt-4">
-                  <a
-                    href="/blog"
-                    className="text-sm text-gray-500 hover:text-purple-400 transition-colors"
-                  >
-                    explore the web &rarr;
-                  </a>
                 </div>
               </div>
             </div>
