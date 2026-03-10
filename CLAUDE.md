@@ -1113,7 +1113,7 @@ npm run dev
 
 - **Database**: Supabase `blog_posts` table with full-text search (weighted tsvector), JSONB `theme` field for per-post visual customization
 - **API**: `src/app/api/blog/route.ts` (list/create), `src/app/api/blog/[slug]/route.ts` (read/update)
-- **Auth**: `ADMIN_API_KEY` env var in `Authorization: Bearer <key>` header for POST/PUT
+- **Auth**: `ADMIN_API_KEY` env var passed as `x-admin-key` header for POST/PUT
 - **Frontend**: `/blog` page (stream with search + tag filtering), `/blog/[slug]` (individual post)
 - **Visual**: Spider web pattern reveals on mouse hover (CSS mask-image flashlight effect)
 
@@ -1140,7 +1140,7 @@ Use the `/publish` Claude Code command from the Obsidian vault, OR manually via 
 ```bash
 curl -X POST http://localhost:3000/api/blog \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $ADMIN_API_KEY" \
+  -H "x-admin-key: $ADMIN_API_KEY" \
   -d '{
     "title": "Post Title",
     "slug": "post-slug",
@@ -1159,7 +1159,7 @@ curl -X POST http://localhost:3000/api/blog \
 ```bash
 curl -X PUT http://localhost:3000/api/blog/post-slug \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $ADMIN_API_KEY" \
+  -H "x-admin-key: $ADMIN_API_KEY" \
   -d '{
     "title": "Updated Title",
     "body": "Updated markdown...",
