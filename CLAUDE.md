@@ -1107,14 +1107,14 @@ npm run dev
 
 ### Overview
 
-"the web" is Mike's blog on mikeveson.com. Research, reactions, and thinking, all connected. Posts are stored in Supabase (not git), published via API, and rendered at `/blog`.
+"the web" is Mike's blog on mikeveson.com. Research, reactions, and thinking, all connected. Posts are stored in Supabase (not git), published via API, and rendered at `/the-web`.
 
 ### Architecture
 
 - **Database**: Supabase `blog_posts` table with full-text search (weighted tsvector), JSONB `theme` field for per-post visual customization
-- **API**: `src/app/api/blog/route.ts` (list/create), `src/app/api/blog/[slug]/route.ts` (read/update)
+- **API**: `src/app/api/the-web/route.ts` (list/create), `src/app/api/the-web/[slug]/route.ts` (read/update)
 - **Auth**: `ADMIN_API_KEY` env var passed as `x-admin-key` header for POST/PUT
-- **Frontend**: `/blog` page (stream with search + tag filtering), `/blog/[slug]` (individual post)
+- **Frontend**: `/the-web` page (stream with search + tag filtering), `/the-web/[slug]` (individual post)
 - **Visual**: Spider web pattern reveals on mouse hover (CSS mask-image flashlight effect)
 
 ### Key Files
@@ -1122,13 +1122,13 @@ npm run dev
 | File | Purpose |
 |------|---------|
 | `src/lib/blog.ts` | Types, Supabase queries, reading time calc |
-| `src/app/api/blog/route.ts` | GET (public list) + POST (admin create) |
-| `src/app/api/blog/[slug]/route.ts` | GET (single post) + PUT (admin update) |
-| `src/app/blog/page.tsx` | Main stream page (client component) |
-| `src/app/blog/[slug]/page.tsx` | Individual post page (server component, SEO) |
-| `src/app/blog/components/WebPattern.tsx` | Hover-reveal spider web background |
-| `src/app/blog/components/PostCard.tsx` | Blog post card with per-post glow color |
-| `src/app/blog/components/MarkdownRenderer.tsx` | Styled markdown rendering |
+| `src/app/api/the-web/route.ts` | GET (public list) + POST (admin create) |
+| `src/app/api/the-web/[slug]/route.ts` | GET (single post) + PUT (admin update) |
+| `src/app/the-web/page.tsx` | Main stream page (client component) |
+| `src/app/the-web/[slug]/page.tsx` | Individual post page (server component, SEO) |
+| `src/app/the-web/components/WebPattern.tsx` | Hover-reveal spider web background |
+| `src/app/the-web/components/PostCard.tsx` | Blog post card with per-post glow color |
+| `src/app/the-web/components/MarkdownRenderer.tsx` | Styled markdown rendering |
 | `src/app/blogs/blog_card.tsx` | Homepage blog card (in media section) |
 | `src/data/iris/kb/blogs.json` | KB entries for Iris + homepage display |
 | `supabase/migrations/20260310_blog_posts.sql` | Database schema |
@@ -1138,7 +1138,7 @@ npm run dev
 Use the `/publish` Claude Code command from the Obsidian vault, OR manually via API:
 
 ```bash
-curl -X POST http://localhost:3000/api/blog \
+curl -X POST http://localhost:3000/api/the-web \
   -H "Content-Type: application/json" \
   -H "x-admin-key: $ADMIN_API_KEY" \
   -d '{
@@ -1157,7 +1157,7 @@ curl -X POST http://localhost:3000/api/blog \
 ### Updating an Existing Post
 
 ```bash
-curl -X PUT http://localhost:3000/api/blog/post-slug \
+curl -X PUT http://localhost:3000/api/the-web/post-slug \
   -H "Content-Type: application/json" \
   -H "x-admin-key: $ADMIN_API_KEY" \
   -d '{

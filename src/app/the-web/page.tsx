@@ -19,7 +19,7 @@ export default function BlogPage() {
 
   // Fetch tags once on mount
   useEffect(() => {
-    fetch("/api/blog?tags_only=true")
+    fetch("/api/the-web?tags_only=true")
       .then((res) => res.json())
       .then((data) => setTags(data.tags || []))
       .catch(console.error);
@@ -33,7 +33,7 @@ export default function BlogPage() {
       if (activeTag) params.set("tag", activeTag);
       if (searchQuery) params.set("search", searchQuery);
 
-      const res = await fetch(`/api/blog?${params.toString()}`);
+      const res = await fetch(`/api/the-web?${params.toString()}`);
       const data = await res.json();
       setPosts(data.posts || []);
     } catch (err) {

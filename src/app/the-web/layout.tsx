@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'The Web | Mike Veson',
     description: 'Research, philosophy, and thinking — one stream.',
-    url: 'https://mikeveson.com/blog',
+    url: 'https://mikeveson.com/the-web',
     siteName: 'Mike Veson',
     type: 'website',
   },

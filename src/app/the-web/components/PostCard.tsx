@@ -25,7 +25,7 @@ export default function PostCard({ post, index }: PostCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
     >
-      <Link href={`/blog/${post.slug}`}>
+      <Link href={`/the-web/${post.slug}`}>
         <div
           data-has-contained-glow="true"
           className="relative overflow-hidden rounded-xl cursor-pointer group hover:shadow-lg transition-shadow duration-300 hover:bg-gradient-to-br hover:from-gray-800 hover:to-gray-700 p-5"

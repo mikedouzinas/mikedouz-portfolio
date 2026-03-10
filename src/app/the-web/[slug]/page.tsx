@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: post.title,
       description: post.subtitle || post.body.slice(0, 160),
-      url: `https://mikeveson.com/blog/${slug}`,
+      url: `https://mikeveson.com/the-web/${slug}`,
       type: 'article',
       publishedTime: post.published_at,
       ...(post.cover_image ? { images: [post.cover_image] } : {}),
@@ -46,7 +46,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       <article className="max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
         {/* Back link */}
         <Link
-          href="/blog"
+          href="/the-web"
           className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
         >
           &larr; the web
@@ -75,7 +75,7 @@ export default async function BlogPostPage({ params }: PageProps) {
               {post.tags.map((tag) => (
                 <Link
                   key={tag}
-                  href={`/blog?tag=${encodeURIComponent(tag)}`}
+                  href={`/the-web?tag=${encodeURIComponent(tag)}`}
                   className="px-2.5 py-0.5 text-xs rounded-full bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 transition-colors"
                 >
                   {tag}
@@ -93,7 +93,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           <nav className="mt-16 pt-8 border-t border-gray-800 flex justify-between">
             {prev ? (
               <Link
-                href={`/blog/${prev.slug}`}
+                href={`/the-web/${prev.slug}`}
                 className="text-sm text-gray-400 hover:text-purple-300 transition-colors"
               >
                 &larr; {prev.title}
@@ -103,7 +103,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             )}
             {next ? (
               <Link
-                href={`/blog/${next.slug}`}
+                href={`/the-web/${next.slug}`}
                 className="text-sm text-gray-400 hover:text-purple-300 transition-colors text-right"
               >
                 {next.title} &rarr;

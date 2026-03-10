@@ -570,7 +570,7 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
   blog: [
     {
       type: 'link',
-      label: 'Read Article',
+      label: (item) => (item as BlogT).url?.startsWith('/') ? 'Read Blog' : 'Read Article',
       priority: 10,
       condition: (item) => 'url' in item,
       getData: (item) => ({
