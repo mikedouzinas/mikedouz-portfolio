@@ -199,7 +199,7 @@ export const blogs: Blog[] = blogsData.blog_posts.map((post, index) => ({
   id: `blog_${index}`, // Match backend ID generation (0-based index)
   title: post.title,
   description: (post as any).description || post.context || "",
-  imageUrl: "/blog1.png", // Default image - could be enhanced to use post-specific images
+  imageUrl: (post as any).image || "/blog1.png",
   date: post.published_date.includes("2026") ? `est. ${new Date(post.published_date).getFullYear()}` : new Date(post.published_date).getFullYear().toString(),
   link: post.url,
 }));

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <rect width="400" height="300" fill="#111827"/>
+
+  <g opacity="0.15">
+    <!-- Radial lines from center -->
+    <line x1="200" y1="150" x2="200" y2="0" stroke="#7c6fad" stroke-width="0.5"/>
+    <line x1="200" y1="150" x2="305.7" y2="27.9" stroke="#7c6fad" stroke-width="0.5"/>
+    <line x1="200" y1="150" x2="370" y2="80.4" stroke="#7c6fad" stroke-width="0.5"/>
+    <line x1="200" y1="150" x2="390" y2="150" stroke="#7c6fad" stroke-width="0.5"/>
+    <line x1="200" y1="150" x2="370" y2="219.6" stroke="#7c6fad" stroke-width="0.5"/>
+    <line x1="200" y1="150" x2="305.7" y2="272.1" stroke="#7c6fad" stroke-width="0.5"/>
+    <line x1="200" y1="150" x2="200" y2="300" stroke="#7c6fad" stroke-width="0.5"/>
+    <line x1="200" y1="150" x2="94.3" y2="272.1" stroke="#7c6fad" stroke-width="0.5"/>
+    <line x1="200" y1="150" x2="30" y2="219.6" stroke="#7c6fad" stroke-width="0.5"/>
+    <line x1="200" y1="150" x2="10" y2="150" stroke="#7c6fad" stroke-width="0.5"/>
+    <line x1="200" y1="150" x2="30" y2="80.4" stroke="#7c6fad" stroke-width="0.5"/>
+    <line x1="200" y1="150" x2="94.3" y2="27.9" stroke="#7c6fad" stroke-width="0.5"/>
+
+    <!-- Concentric rings (arcs approximated as ellipses) -->
+    <ellipse cx="200" cy="150" rx="30" ry="24" fill="none" stroke="#6b7280" stroke-width="0.4"/>
+    <ellipse cx="200" cy="150" rx="60" ry="48" fill="none" stroke="#6b7280" stroke-width="0.4"/>
+    <ellipse cx="200" cy="150" rx="90" ry="72" fill="none" stroke="#6b7280" stroke-width="0.4"/>
+    <ellipse cx="200" cy="150" rx="120" ry="96" fill="none" stroke="#6b7280" stroke-width="0.4"/>
+    <ellipse cx="200" cy="150" rx="155" ry="124" fill="none" stroke="#6b7280" stroke-width="0.4"/>
+    <ellipse cx="200" cy="150" rx="190" ry="148" fill="none" stroke="#6b7280" stroke-width="0.4"/>
+
+    <!-- Intersection dots -->
+    <circle cx="200" cy="126" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="200" cy="102" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="200" cy="78" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="200" cy="54" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="200" cy="26" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="230" cy="150" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="260" cy="150" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="290" cy="150" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="320" cy="150" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="355" cy="150" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="170" cy="150" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="140" cy="150" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="110" cy="150" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="80" cy="150" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="45" cy="150" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="200" cy="174" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="200" cy="198" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="200" cy="222" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="200" cy="246" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <circle cx="200" cy="274" r="1.2" fill="#a78bfa" opacity="0.5"/>
+    <!-- Diagonal dots -->
+    <circle cx="221" cy="132.8" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="242" cy="115.6" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="263" cy="98.4" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="284" cy="81.2" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="179" cy="132.8" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="158" cy="115.6" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="137" cy="98.4" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="116" cy="81.2" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="221" cy="167.2" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="242" cy="184.4" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="263" cy="201.6" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="284" cy="218.8" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="179" cy="167.2" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="158" cy="184.4" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="137" cy="201.6" r="1.2" fill="#a78bfa" opacity="0.4"/>
+    <circle cx="116" cy="218.8" r="1.2" fill="#a78bfa" opacity="0.4"/>
+  </g>
+
+  <!-- "the web" text — outlined in purple, empty fill -->
+  <text
+    x="200"
+    y="158"
+    text-anchor="middle"
+    dominant-baseline="central"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    font-size="36"
+    font-weight="700"
+    letter-spacing="2"
+    fill="none"
+    stroke="#a78bfa"
+    stroke-width="0.8"
+  >the web</text>
+</svg>
