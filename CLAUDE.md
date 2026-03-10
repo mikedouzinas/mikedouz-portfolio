@@ -1103,8 +1103,105 @@ npm run dev
 
 ---
 
-**Last Updated**: 2026-02-04
-**Version**: 1.0
+## The Web Blog System
+
+### Overview
+
+"the web" is Mike's blog on mikeveson.com. Research, reactions, and thinking, all connected. Posts are stored in Supabase (not git), published via API, and rendered at `/blog`.
+
+### Architecture
+
+- **Database**: Supabase `blog_posts` table with full-text search (weighted tsvector), JSONB `theme` field for per-post visual customization
+- **API**: `src/app/api/blog/route.ts` (list/create), `src/app/api/blog/[slug]/route.ts` (read/update)
+- **Auth**: `ADMIN_API_KEY` env var in `Authorization: Bearer <key>` header for POST/PUT
+- **Frontend**: `/blog` page (stream with search + tag filtering), `/blog/[slug]` (individual post)
+- **Visual**: Spider web pattern reveals on mouse hover (CSS mask-image flashlight effect)
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/lib/blog.ts` | Types, Supabase queries, reading time calc |
+| `src/app/api/blog/route.ts` | GET (public list) + POST (admin create) |
+| `src/app/api/blog/[slug]/route.ts` | GET (single post) + PUT (admin update) |
+| `src/app/blog/page.tsx` | Main stream page (client component) |
+| `src/app/blog/[slug]/page.tsx` | Individual post page (server component, SEO) |
+| `src/app/blog/components/WebPattern.tsx` | Hover-reveal spider web background |
+| `src/app/blog/components/PostCard.tsx` | Blog post card with per-post glow color |
+| `src/app/blog/components/MarkdownRenderer.tsx` | Styled markdown rendering |
+| `src/app/blogs/blog_card.tsx` | Homepage blog card (in media section) |
+| `src/data/iris/kb/blogs.json` | KB entries for Iris + homepage display |
+| `supabase/migrations/20260310_blog_posts.sql` | Database schema |
+
+### Publishing a Post
+
+Use the `/publish` Claude Code command from the Obsidian vault, OR manually via API:
+
+```bash
+curl -X POST http://localhost:3000/api/blog \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ADMIN_API_KEY" \
+  -d '{
+    "title": "Post Title",
+    "slug": "post-slug",
+    "subtitle": "Optional subtitle",
+    "body": "Full markdown content...",
+    "tags": ["ethics", "technology"],
+    "status": "published",
+    "theme": {
+      "accent_color": "168, 85, 247"
+    }
+  }'
+```
+
+### Updating an Existing Post
+
+```bash
+curl -X PUT http://localhost:3000/api/blog/post-slug \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ADMIN_API_KEY" \
+  -d '{
+    "title": "Updated Title",
+    "body": "Updated markdown...",
+    "tags": ["updated", "tags"]
+  }'
+```
+
+### Per-Post Theming
+
+Each post can have a custom `theme` JSONB field:
+
+```json
+{
+  "accent_color": "168, 85, 247",
+  "header_style": "gradient",
+  "header_gradient_from": "#1a0a2e",
+  "header_gradient_to": "#2d1b69"
+}
+```
+
+The `accent_color` (RGB string) controls the glow color on the post card and can be used for per-post visual identity.
+
+### Available Tags
+
+Common tag categories: `ethics`, `technology`, `philosophy`, `flourishing`, `relationships`, `rice`, `research`, `reactions`, `tree-of-human-flourishing`
+
+### Homepage Display
+
+Blog entries on the homepage come from `src/data/iris/kb/blogs.json`. To add a new blog to the homepage media section, add an entry there. The loader (`src/data/loaders.ts`) maps the JSON to the `Blog` interface. External links get an external link icon on the card.
+
+### Database Schema (Supabase)
+
+Table: `blog_posts`
+- `id` (uuid), `title`, `slug` (unique), `subtitle`, `body` (markdown), `tags` (text[])
+- `status` (draft/published/archived), `published_at`, `theme` (jsonb)
+- `search_vector` (tsvector, auto-updated trigger, weighted: title A, subtitle B, body C)
+- RLS enabled, GIN indexes on search_vector and tags
+
+---
+
+**Last Updated**: 2026-03-10
+**Version**: 1.1
 **Maintainer**: Mike Veson (mike@douzinas.com)
 
 For questions about this guide or the codebase, press ⌘K on [mikeveson.com](https://mikeveson.com) and ask Iris!
