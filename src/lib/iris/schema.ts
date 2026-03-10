@@ -150,8 +150,8 @@ const BlogBase = z.object({
   published_date: z.string(),
   context: z.string().optional(),
   summary: z.string(),
-  class: z.string().optional(),
-  related_class: Id.optional(),              // Link to class if written for coursework
+  class: z.string().nullable().optional(),
+  related_class: Id.nullable().optional(),   // Link to class if written for coursework
   related_experiences: z.array(Id).default([]),  // Link to experiences discussed in blog
   related_projects: z.array(Id).default([]),     // Link to projects discussed in blog
   tags: z.array(z.string()).default([]),
