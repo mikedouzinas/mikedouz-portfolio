@@ -80,6 +80,7 @@ export function calculateReadingTime(body: string): number {
  */
 export function generatePreview(body: string, maxLength = 200): string {
   const plain = body
+    .replace(/::(.*?)\|[^:]*?::/g, '$1')    // hover definitions (keep visible text)
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')   // images
     .replace(/\[[^\]]*\]\([^)]*\)/g, (m) => {
       const text = m.match(/\[([^\]]*)\]/);
