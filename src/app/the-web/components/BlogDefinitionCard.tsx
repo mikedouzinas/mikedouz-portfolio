@@ -11,6 +11,7 @@ interface BlogDefinitionCardProps {
   greek?: string;
   link?: string;
   kind?: string;
+  notitle?: string;
   children: React.ReactNode;
 }
 
@@ -31,6 +32,7 @@ export default function BlogDefinitionCard({
   greek,
   link,
   kind = 'clarification',
+  notitle,
   children,
 }: BlogDefinitionCardProps) {
   const validKind = (['clarification', 'reference', 'aside'].includes(kind)
@@ -46,6 +48,7 @@ export default function BlogDefinitionCard({
     greek,
     link,
     kind: validKind,
+    notitle: notitle === 'true',
   };
 
   const triggerClass = TRIGGER_STYLES[validKind] || TRIGGER_STYLES.clarification;

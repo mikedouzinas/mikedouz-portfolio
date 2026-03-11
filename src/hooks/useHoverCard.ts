@@ -19,7 +19,7 @@ interface UseHoverCardReturn {
   isTouchDevice: boolean;
 }
 
-const CARD_WIDTH = 240;
+const CARD_WIDTH = 280;
 const CARD_HEIGHT = 200;
 const OFFSET_Y = 12;
 
@@ -36,19 +36,27 @@ export function useHoverCard(): UseHoverCardReturn {
 
   const calculatePosition = useCallback(() => {
     if (!triggerRef.current) return null;
-    const rect = triggerRef.current.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
+
+    // Use getClientRects to get per-line rects for wrapped text
+    const rects = triggerRef.current.getClientRects();
+    const fallbackRect = triggerRef.current.getBoundingClientRect();
+
+    // Use the first line rect for positioning (where the user is reading)
+    const anchorRect = rects.length > 0 ? rects[0] : fallbackRect;
     const viewportWidth = window.innerWidth;
 
-    const spaceAbove = rect.top;
+    const spaceAbove = anchorRect.top;
     const placement =
       spaceAbove > CARD_HEIGHT + OFFSET_Y ? "above" : "below";
 
-    let x = rect.left + rect.width / 2 - CARD_WIDTH / 2;
+    // Position horizontally centered on the anchor rect, clamped to viewport
+    let x = anchorRect.left + anchorRect.width / 2 - CARD_WIDTH / 2;
     x = Math.max(8, Math.min(x, viewportWidth - CARD_WIDTH - 8));
 
     const y =
-      placement === "above" ? rect.top - OFFSET_Y : rect.bottom + OFFSET_Y;
+      placement === "above"
+        ? anchorRect.top - OFFSET_Y
+        : anchorRect.bottom + OFFSET_Y;
 
     return { x, y, placement } as Position;
   }, []);

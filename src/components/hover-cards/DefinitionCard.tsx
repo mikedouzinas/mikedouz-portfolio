@@ -26,6 +26,7 @@ export default function DefinitionCard({
 }: DefinitionCardProps) {
   const isBlog = variant === "blog";
   const kind = data.kind || "clarification";
+  const showTitle = !data.notitle;
 
   // Kind-based accent colors (blog only; portfolio keeps blue-to-emerald)
   const accentGradient = isBlog
@@ -47,23 +48,27 @@ export default function DefinitionCard({
         border px-4 py-3
       `}
     >
-      <div className="flex items-baseline gap-2 mb-1.5">
-        <span
-          className={`
-            text-base font-serif font-semibold italic
-            ${isBlog ? "text-gray-100" : "text-gray-900 dark:text-gray-100"}
-          `}
-        >
-          {data.term}
-        </span>
-        {data.greek && (
-          <span className="text-xs text-gray-400 dark:text-gray-500 font-light">
-            {data.greek}
-          </span>
-        )}
-      </div>
+      {showTitle && (
+        <>
+          <div className="flex items-baseline gap-2 mb-1.5">
+            <span
+              className={`
+                text-base font-serif font-semibold italic
+                ${isBlog ? "text-gray-100" : "text-gray-900 dark:text-gray-100"}
+              `}
+            >
+              {data.term}
+            </span>
+            {data.greek && (
+              <span className="text-xs text-gray-400 dark:text-gray-500 font-light">
+                {data.greek}
+              </span>
+            )}
+          </div>
 
-      <div className={`w-8 h-px mb-2 ${accentGradient}`} />
+          <div className={`w-8 h-px mb-2 ${accentGradient}`} />
+        </>
+      )}
 
       <p
         className={`

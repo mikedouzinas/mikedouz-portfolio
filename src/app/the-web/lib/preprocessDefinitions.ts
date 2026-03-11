@@ -35,6 +35,7 @@ interface ParsedDefinition {
   greek?: string;
   link?: string;
   kind?: string;
+  notitle?: boolean;
 }
 
 function parseFields(text: string, rest: string): ParsedDefinition {
@@ -60,6 +61,9 @@ function parseFields(text: string, rest: string): ParsedDefinition {
       else if (key === 'greek') result.greek = value;
       else if (key === 'link') result.link = value;
       else if (key === 'kind') result.kind = value;
+      else if (key === 'notitle') result.notitle = value !== 'false';
+    } else if (part.toLowerCase() === 'notitle') {
+      result.notitle = true;
     } else {
       // Positional fallback: 2nd field = source, 3rd = greek
       if (!result.source) result.source = part;
@@ -90,6 +94,9 @@ export function preprocessDefinitions(markdown: string): string {
     }
     if (parsed.kind) {
       attrs.push(`kind="${escapeAttr(parsed.kind)}"`);
+    }
+    if (parsed.notitle) {
+      attrs.push(`notitle="true"`);
     }
 
     return `<hoverdef ${attrs.join(' ')}>${parsed.text}</hoverdef>`;

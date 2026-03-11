@@ -78,7 +78,7 @@ export default function AboutContent({
             </HoverTrigger>{" "}
             play at the Camp Nou, speak with amazing new people in{" "}
             <HoverTrigger cardId="greek">
-              <span className="hover:opacity-80 transition-opacity cursor-default">
+              <span className="font-semibold bg-gradient-to-r from-blue-600 to-white dark:from-blue-400 dark:to-white text-transparent bg-clip-text hover:opacity-80 transition-opacity cursor-default">
                 Greek
               </span>
             </HoverTrigger>

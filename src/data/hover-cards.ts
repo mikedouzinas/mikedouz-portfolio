@@ -23,6 +23,7 @@ export interface DefinitionCardData {
   greek?: string;
   link?: string;
   kind?: DefinitionKind;
+  notitle?: boolean;
 }
 
 export type HoverCardData = MemoryBubbleData | DefinitionCardData;

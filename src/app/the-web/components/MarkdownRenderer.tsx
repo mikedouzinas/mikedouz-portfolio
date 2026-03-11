@@ -109,6 +109,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             greek,
             link,
             kind,
+            notitle,
           }: {
             children?: React.ReactNode;
             term?: string;
@@ -117,6 +118,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             greek?: string;
             link?: string;
             kind?: string;
+            notitle?: string;
           }) => (
             <BlogDefinitionCard
               term={term || ''}
@@ -125,6 +127,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
               greek={greek}
               link={link}
               kind={kind}
+              notitle={notitle}
             >
               {children}
             </BlogDefinitionCard>
