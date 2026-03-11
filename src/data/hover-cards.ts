@@ -110,7 +110,7 @@ export const hoverCards: Record<string, HoverCardData> = {
     id: "veson-nautical-def",
     term: "Veson Nautical",
     definition:
-      "A maritime technology company founded by my parents in 2001. Veson builds software that helps the commercial shipping industry manage voyages, contracts, and operations. It grew from a small startup in our house to a global platform used across the industry.",
+      "My parents co-founded Veson Nautical in 2001, combining my grandfathers' shipping software legacies — Veson Inc. and Nautical Technology Corp. It grew from their small Boston apartment into a global maritime platform. I built the company's first mobile app, 20 years after they started it.",
     link: "https://veson.com",
     kind: "reference",
   },
