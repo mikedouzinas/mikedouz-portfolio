@@ -5,6 +5,7 @@ import { getPostBySlug, getAdjacentPosts } from '@/lib/blog';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 import ShareButton from '../components/ShareButton';
 import CommentSection from '../components/CommentSection';
+import SubscribeWidget from '../components/SubscribeWidget';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -55,9 +56,12 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         {/* Header */}
         <header className="mb-10 mt-8">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight">
-            {post.title}
-          </h1>
+          <div className="flex items-baseline justify-between gap-4 flex-wrap">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight">
+              {post.title}
+            </h1>
+            <SubscribeWidget />
+          </div>
 
           {post.subtitle && (
             <p className="mt-2 text-lg text-gray-400">{post.subtitle}</p>
@@ -89,30 +93,37 @@ export default async function BlogPostPage({ params }: PageProps) {
         {/* Body */}
         <MarkdownRenderer content={post.body} />
 
+        {/* Bottom subscribe */}
+        <div className="mt-12 pt-8 border-t border-gray-800 flex items-baseline justify-between gap-4 flex-wrap">
+          <p className="text-sm text-gray-400">enjoyed this? get notified when i publish.</p>
+          <SubscribeWidget />
+        </div>
+
         {/* Comments */}
-        <div className="mt-16 pt-8 border-t border-gray-800">
+        <div className="mt-12 pt-8 border-t border-gray-800">
           <CommentSection postSlug={slug} />
         </div>
 
         {/* Prev / Next navigation */}
+        {/* next = newer post (→), prev = older post (←) to match newest-first stream */}
         {(prev || next) && (
           <nav className="mt-16 pt-8 border-t border-gray-800 flex justify-between">
-            {prev ? (
+            {next ? (
               <Link
-                href={`/the-web/${prev.slug}`}
+                href={`/the-web/${next.slug}`}
                 className="text-sm text-gray-400 hover:text-purple-300 transition-colors"
               >
-                &larr; {prev.title}
+                &larr; {next.title}
               </Link>
             ) : (
               <span />
             )}
-            {next ? (
+            {prev ? (
               <Link
-                href={`/the-web/${next.slug}`}
+                href={`/the-web/${prev.slug}`}
                 className="text-sm text-gray-400 hover:text-purple-300 transition-colors text-right"
               >
-                {next.title} &rarr;
+                {prev.title} &rarr;
               </Link>
             ) : (
               <span />

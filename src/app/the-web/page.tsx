@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import MouseGlow from "@/components/mouse_glow";
 import { BlogPostPreview } from "@/lib/blog";
 import PostCard from "./components/PostCard";
@@ -10,6 +10,7 @@ import TagFilter from "./components/TagFilter";
 import SearchBar from "./components/SearchBar";
 import WebPattern from "./components/WebPattern";
 import WebLoader from "./components/WebLoader";
+import SubscribeWidget from "./components/SubscribeWidget";
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPostPreview[]>([]);
@@ -17,6 +18,25 @@ export default function BlogPage() {
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
+
+  // Handle subscribe confirmation/unsubscribe toasts from URL params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const subscribeStatus = params.get('subscribe');
+    if (subscribeStatus === 'confirmed') {
+      setToast({ message: "you're in. you'll hear from me when i publish.", type: 'success' });
+    } else if (subscribeStatus === 'removed') {
+      setToast({ message: "unsubscribed. no hard feelings.", type: 'info' });
+    } else if (subscribeStatus === 'invalid' || subscribeStatus === 'error') {
+      setToast({ message: "that link didn't work. try subscribing again.", type: 'error' });
+    }
+    if (subscribeStatus) {
+      window.history.replaceState({}, '', '/the-web');
+      const timer = setTimeout(() => setToast(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Fetch tags once on mount
   useEffect(() => {
@@ -58,6 +78,22 @@ export default function BlogPage() {
 
   return (
     <div className="relative min-h-screen bg-gray-900 text-gray-100">
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm ${
+              toast.type === 'success' ? 'bg-green-900/80 text-green-300 border border-green-700/50' :
+              toast.type === 'error' ? 'bg-red-900/80 text-red-300 border border-red-700/50' :
+              'bg-gray-800/80 text-gray-300 border border-gray-700/50'
+            } backdrop-blur-sm`}
+          >
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
       <MouseGlow />
       <WebPattern />
 
@@ -76,9 +112,12 @@ export default function BlogPage() {
         </motion.div>
 
         <div className="mt-8 mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight lowercase">
-            the web
-          </h1>
+          <div className="flex items-baseline justify-between gap-4 flex-wrap">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight lowercase">
+              the web
+            </h1>
+            <SubscribeWidget />
+          </div>
           <p className="mt-2 text-gray-400 text-sm sm:text-base">
             research, reactions, and thinking. all connected.
           </p>
@@ -121,6 +160,7 @@ export default function BlogPage() {
             ))
           )}
         </div>
+
       </div>
     </div>
   );

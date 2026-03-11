@@ -165,7 +165,16 @@ export default function CommentForm({
 
       {error && <p className="text-xs text-red-400">{error}</p>}
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        {onCancel && !parentAuthor && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="text-sm text-gray-500 hover:text-gray-300 transition-colors px-3 py-2"
+          >
+            cancel
+          </button>
+        )}
         <button
           type="submit"
           disabled={!canSubmit || submitting}

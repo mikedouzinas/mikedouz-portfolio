@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { BlogComment } from '@/lib/comments';
 import CommentForm from './CommentForm';
 import CommentThread from './CommentThread';
@@ -39,6 +40,7 @@ export default function CommentSection({
   const [comments, setComments] = useState<BlogComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   const fetchComments = useCallback(async () => {
     try {
@@ -65,41 +67,70 @@ export default function CommentSection({
   function handleCommentAdded(newComment: BlogComment) {
     setComments((prev) => [...prev, newComment]);
     setReplyingTo(null);
+    setShowForm(false);
   }
 
   const nested = useMemo(() => nestComments(comments), [comments]);
   const visibleCount = comments.filter((c) => !c.is_deleted).length;
+  const hasComments = visibleCount > 0;
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-gray-200 mb-6">
-        {visibleCount > 0
-          ? `${visibleCount} comment${visibleCount !== 1 ? 's' : ''}`
-          : 'join the discussion'}
-      </h3>
-
-      {/* New top-level comment form */}
-      <div className="mb-8">
-        <CommentForm postSlug={postSlug} onSubmit={handleCommentAdded} />
-      </div>
+      {/* Header */}
+      {hasComments && (
+        <h3 className="text-lg font-semibold text-gray-200 mb-6">
+          {visibleCount} comment{visibleCount !== 1 ? 's' : ''}
+        </h3>
+      )}
 
       {/* Comment threads */}
       {loading ? (
         <WebLoader />
       ) : (
-        <div className="space-y-1">
-          {nested.map((comment) => (
-            <CommentThread
-              key={comment.id}
-              comment={comment}
-              onReply={handleReply}
-              replyingTo={replyingTo}
-              postSlug={postSlug}
-              onCommentAdded={handleCommentAdded}
-            />
-          ))}
-        </div>
+        hasComments && (
+          <div className="space-y-1 mb-6">
+            {nested.map((comment) => (
+              <CommentThread
+                key={comment.id}
+                comment={comment}
+                onReply={handleReply}
+                replyingTo={replyingTo}
+                postSlug={postSlug}
+                onCommentAdded={handleCommentAdded}
+              />
+            ))}
+          </div>
+        )
       )}
+
+      {/* Add comment button / form at the bottom */}
+      <AnimatePresence mode="wait">
+        {showForm ? (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.15 }}
+          >
+            <CommentForm
+              postSlug={postSlug}
+              onSubmit={handleCommentAdded}
+              onCancel={() => setShowForm(false)}
+            />
+          </motion.div>
+        ) : (
+          <motion.button
+            key="button"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onClick={() => setShowForm(true)}
+            className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+          >
+            {hasComments ? 'add comment' : 'start the discussion'}
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

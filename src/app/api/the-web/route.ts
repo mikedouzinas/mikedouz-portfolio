@@ -6,6 +6,7 @@ import {
   getAllTags,
   createBlogPost,
 } from '@/lib/blog';
+import { notifySubscribers } from '@/lib/notifySubscribers';
 
 export const runtime = 'nodejs';
 
@@ -94,6 +95,19 @@ export async function POST(req: NextRequest) {
     }
 
     const post = await createBlogPost(validation.data);
+
+    // Send subscriber notifications (non-blocking)
+    if (post.status === 'published') {
+      notifySubscribers({
+        title: post.title,
+        subtitle: post.subtitle,
+        slug: post.slug,
+        body: post.body,
+        reading_time: post.reading_time,
+        tags: post.tags,
+      }).catch((err) => console.error('[Blog] Failed to notify subscribers:', err));
+    }
+
     return NextResponse.json({ post }, { status: 201 });
   } catch (error) {
     console.error('[Blog] POST error:', error);

@@ -38,6 +38,11 @@ export const env = {
   
   // Email recipient for inbox notifications
   inboxRecipientEmail: process.env.INBOX_RECIPIENT_EMAIL || 'mike@douzinas.com',
+
+  // Twilio configuration (for SMS subscriptions)
+  twilioAccountSid: process.env.TWILIO_ACCOUNT_SID || '',
+  twilioAuthToken: process.env.TWILIO_AUTH_TOKEN || '',
+  twilioPhoneNumber: process.env.TWILIO_PHONE_NUMBER || '',
 } as const;
 
 /**
