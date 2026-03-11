@@ -56,7 +56,9 @@ export const hoverCards: Record<string, HoverCardData> = {
     type: "memory",
     id: "greek",
     photos: [
-      "/images/memories/greece-1.jpg",
+      "/images/memories/greece-1.jpeg",
+      "/images/memories/greece-2.jpeg",
+      "/images/memories/greece-3.png",
     ],
     caption: "Greece",
     location: "Greece",

@@ -105,7 +105,7 @@ export default function AboutContent({
           </p>
           <p className={`mb-3 ${textClassName} leading-relaxed`}>
             I&apos;m a junior computer science major at Rice from Boston, but what I study is not what I care about. I&apos;m writing movies, books, and philosophy, and building technology as a means to help people know themselves and live well. I grew up watching my parents build{" "}
-            <HoverTrigger cardId="veson-nautical" href="https://veson.com">
+            <HoverTrigger cardId="veson-nautical" definitionId="veson-nautical-def" href="https://veson.com">
               <a
                 href="https://veson.com"
                 target="_blank"

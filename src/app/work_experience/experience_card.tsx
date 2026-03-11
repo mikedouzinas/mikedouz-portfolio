@@ -4,9 +4,55 @@ import Image from "next/image";
 import { WorkExperience } from "@/data/loaders";
 import BaseCard from "@/components/base_card";
 import AskIrisButton from "@/components/AskIrisButton";
+import { HoverTrigger } from "@/components/hover-cards";
 
 interface ExperienceCardProps {
   item: WorkExperience;
+}
+
+/**
+ * Renders description text with hover triggers injected for matching phrases.
+ * Splits the text around trigger phrases and wraps matches with HoverTrigger.
+ */
+function RichDescription({
+  text,
+  triggers,
+}: {
+  text: string;
+  triggers?: Record<string, string>;
+}) {
+  if (!triggers || Object.keys(triggers).length === 0) {
+    return <>{text}</>;
+  }
+
+  // Build a regex that matches any trigger phrase (case-insensitive)
+  const phrases = Object.keys(triggers).sort((a, b) => b.length - a.length);
+  const pattern = new RegExp(`(${phrases.map(escapeRegex).join("|")})`, "gi");
+  const parts = text.split(pattern);
+
+  return (
+    <>
+      {parts.map((part, i) => {
+        const matchKey = phrases.find(
+          (p) => p.toLowerCase() === part.toLowerCase(),
+        );
+        if (matchKey) {
+          return (
+            <HoverTrigger key={i} cardId={triggers[matchKey]}>
+              <span className="underline decoration-dotted decoration-gray-400 dark:decoration-gray-500 underline-offset-2 cursor-default hover:decoration-gray-600 dark:hover:decoration-gray-300 transition-colors duration-200">
+                {part}
+              </span>
+            </HoverTrigger>
+          );
+        }
+        return <React.Fragment key={i}>{part}</React.Fragment>;
+      })}
+    </>
+  );
+}
+
+function escapeRegex(str: string) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 export default function ExperienceCard({ item }: ExperienceCardProps) {
@@ -55,7 +101,10 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
             )}
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {item.description}
+            <RichDescription
+              text={item.description}
+              triggers={item.hoverTriggers}
+            />
           </p>
           <div className="flex flex-wrap gap-2 mt-4">
             {item.skills.map((skill) => (

@@ -51,6 +51,8 @@ export interface WorkExperience {
   companyUrl: string;
   skills: string[];
   isIncoming: boolean;  // True if start date is in the future
+  /** Map of text snippets to hover card IDs for inline hover triggers */
+  hoverTriggers?: Record<string, string>;
 }
 
 // ============================================================================
@@ -229,6 +231,13 @@ export const projects: Project[] = projectsData.map((proj) => ({
  * Generates short titles for reduced screen layouts (role only, no company)
  * Automatically detects "incoming" experiences based on future start dates
  */
+// Map experience IDs to hover trigger configurations
+const EXPERIENCE_HOVER_TRIGGERS: Record<string, Record<string, string>> = {
+  exp_veson_mobile_2021_2023: {
+    "three iOS devs": "veson-redwing",
+  },
+};
+
 export const workExperiences: WorkExperience[] = experienceData.map((exp) => ({
   id: exp.id,
   title: exp.role, // 'role' in JSON maps to 'title' in the UI
@@ -242,5 +251,6 @@ export const workExperiences: WorkExperience[] = experienceData.map((exp) => ({
   skills: mapSkillIdsToNames(exp.skills, 5),
   // Automatically detect incoming status from future start date
   isIncoming: isDateInFuture(exp.dates.start),
+  hoverTriggers: EXPERIENCE_HOVER_TRIGGERS[exp.id],
 }));
 
