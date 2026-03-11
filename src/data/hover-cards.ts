@@ -32,50 +32,58 @@ export const hoverCards: Record<string, HoverCardData> = {
     type: "memory",
     id: "barcelona",
     photos: [
-      "/images/memories/barcelona-1.jpg",
-      "/images/memories/barcelona-2.jpg",
-      "/images/memories/barcelona-3.jpg",
+      "/images/memories/barcelona-1.png",
+      "/images/memories/barcelona-2.png",
+      "/images/memories/barcelona-3.png",
     ],
     caption: "Barcelona, Fall 2025",
     location: "Barcelona",
     year: 2025,
-    song: {
-      title: "TBD",
-      artist: "TBD",
-      previewUrl: "",
-    },
   },
   barca: {
     type: "memory",
     id: "barca",
     photos: [
-      "/images/memories/barca-1.jpg",
-      "/images/memories/barca-2.jpg",
+      "/images/memories/barca-1.jpeg",
+      "/images/memories/barca-2.jpeg",
+      "/images/memories/barca-3.jpeg",
     ],
     caption: "Camp Nou",
     location: "Barcelona",
     year: 2025,
-    song: {
-      title: "TBD",
-      artist: "TBD",
-      previewUrl: "",
-    },
+  },
+  greek: {
+    type: "memory",
+    id: "greek",
+    photos: [
+      "/images/memories/greece-1.jpg",
+    ],
+    caption: "Greece",
+    location: "Greece",
   },
   rice: {
     type: "memory",
     id: "rice",
-    photos: ["/images/memories/rice-1.jpg"],
-    caption: "Rice University",
+    photos: ["/images/memories/rice-1.jpeg"],
+    caption: "Rice University, IM flag football",
     location: "Houston",
   },
   "veson-nautical": {
     type: "memory",
     id: "veson-nautical",
     photos: [
-      "/images/memories/veson-1.jpg",
-      "/images/memories/veson-2.jpg",
+      "/images/memories/veson-1.JPG",
+      "/images/memories/veson-2.png",
     ],
     caption: "Where it started",
+  },
+  "veson-redwing": {
+    type: "memory",
+    id: "veson-redwing",
+    photos: [
+      "/images/memories/veson-redwing.jpeg",
+    ],
+    caption: "Veson Nautical",
   },
   "good-life": {
     type: "definition",
@@ -93,5 +101,14 @@ export const hoverCards: Record<string, HoverCardData> = {
     definition:
       "As iron sharpens iron, so one person sharpens another.",
     source: "Proverbs 27:17",
+  },
+  "veson-nautical-def": {
+    type: "definition",
+    id: "veson-nautical-def",
+    term: "Veson Nautical",
+    definition:
+      "A maritime technology company founded by my parents in 2001. Veson builds software that helps the commercial shipping industry manage voyages, contracts, and operations. It grew from a small startup in our house to a global platform used across the industry.",
+    link: "https://veson.com",
+    kind: "reference",
   },
 };

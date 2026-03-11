@@ -76,7 +76,13 @@ export default function AboutContent({
                 </span>
               </a>
             </HoverTrigger>{" "}
-            play at the Camp Nou, speak with amazing new people in Greek, Spanish, English, and very poorly in Catalan, and more unexpectedly but most importantly, I spent so much time alone. I was forced into looking at my life and understanding not only what I want from it, but what it means to live{" "}
+            play at the Camp Nou, speak with amazing new people in{" "}
+            <HoverTrigger cardId="greek">
+              <span className="hover:opacity-80 transition-opacity cursor-default">
+                Greek
+              </span>
+            </HoverTrigger>
+            , Spanish, English, and very poorly in Catalan, and more unexpectedly but most importantly, I spent so much time alone. I was forced into looking at my life and understanding not only what I want from it, but what it means to live{" "}
             <HoverTrigger cardId="good-life">
               <span className="underline decoration-dotted decoration-gray-300 dark:decoration-gray-600 underline-offset-2 cursor-default">
                 a good one
