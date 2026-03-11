@@ -9,6 +9,7 @@ import PostCard from "./components/PostCard";
 import TagFilter from "./components/TagFilter";
 import SearchBar from "./components/SearchBar";
 import WebPattern from "./components/WebPattern";
+import WebLoader from "./components/WebLoader";
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPostPreview[]>([]);
@@ -94,7 +95,7 @@ export default function BlogPage() {
 
         <div className="space-y-4">
           {loading ? (
-            <p className="text-gray-500 text-sm">loading...</p>
+            <WebLoader />
           ) : posts.length === 0 ? (
             activeTag || searchQuery ? (
               <p className="text-gray-500 text-sm">no posts match that filter.</p>

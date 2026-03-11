@@ -46,6 +46,7 @@ export interface BlogPostPreview {
   cover_image: string | null;
   theme: BlogPostTheme;
   preview: string;
+  comment_count: number;
 }
 
 export interface CreateBlogPostInput {
@@ -107,7 +108,7 @@ export function generatePreview(body: string, maxLength = 200): string {
 
 // Preview columns (everything except body and search_vector)
 const PREVIEW_COLUMNS =
-  'id, slug, title, subtitle, tags, published_at, reading_time, cover_image, theme, body';
+  'id, slug, title, subtitle, tags, published_at, reading_time, cover_image, theme, body, comment_count';
 
 // ---------------------------------------------------------------------------
 // Query functions
@@ -167,6 +168,7 @@ export async function getPublishedPosts(options?: {
     cover_image: row.cover_image,
     theme: row.theme as BlogPostTheme,
     preview: generatePreview(row.body),
+    comment_count: row.comment_count ?? 0,
   }));
 }
 

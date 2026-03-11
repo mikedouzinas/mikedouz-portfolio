@@ -119,7 +119,7 @@ export default function WebPattern({ className }: WebPatternProps) {
             key={`r-${i}`}
             d={d}
             fill="none"
-            stroke="#7c6fad"
+            stroke="#a78bfa"
             strokeWidth="0.5"
             strokeLinecap="round"
           />
@@ -131,7 +131,7 @@ export default function WebPattern({ className }: WebPatternProps) {
             key={`a-${i}`}
             d={d}
             fill="none"
-            stroke="#6b7280"
+            stroke="#a78bfa"
             strokeWidth="0.4"
             strokeLinecap="round"
           />

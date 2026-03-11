@@ -36,6 +36,12 @@ export default function PostCard({ post, index }: PostCardProps) {
             <span>{formattedDate}</span>
             <span>&middot;</span>
             <span>{post.reading_time} min read</span>
+            {post.comment_count > 0 && (
+              <>
+                <span>&middot;</span>
+                <span>{post.comment_count} comment{post.comment_count !== 1 ? 's' : ''}</span>
+              </>
+            )}
           </div>
 
           <h2 className="text-lg font-semibold text-gray-100 group-hover:text-white transition-colors mb-1">

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getPostBySlug, getAdjacentPosts } from '@/lib/blog';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 import ShareButton from '../components/ShareButton';
+import CommentSection from '../components/CommentSection';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -87,6 +88,11 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         {/* Body */}
         <MarkdownRenderer content={post.body} />
+
+        {/* Comments */}
+        <div className="mt-16 pt-8 border-t border-gray-800">
+          <CommentSection postSlug={slug} />
+        </div>
 
         {/* Prev / Next navigation */}
         {(prev || next) && (
