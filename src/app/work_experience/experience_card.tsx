@@ -39,7 +39,7 @@ function RichDescription({
         if (matchKey) {
           return (
             <HoverTrigger key={i} cardId={triggers[matchKey]}>
-              <span className="underline decoration-dotted decoration-gray-400 dark:decoration-gray-500 underline-offset-2 cursor-default hover:decoration-gray-600 dark:hover:decoration-gray-300 transition-colors duration-200">
+              <span className="text-blue-600 dark:text-blue-400 underline decoration-dotted decoration-blue-400/40 dark:decoration-blue-400/40 underline-offset-2 cursor-help hover:text-blue-500 dark:hover:text-blue-300 hover:decoration-blue-500/60 dark:hover:decoration-blue-300/60 transition-colors duration-200">
                 {part}
               </span>
             </HoverTrigger>

@@ -20,6 +20,7 @@ export default function MemoryBubble({
 }: MemoryBubbleProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imgErrors, setImgErrors] = useState<Set<number>>(new Set());
+  const [autoAdvance, setAutoAdvance] = useState(true);
   const isFilmStrip = data.photos.length > 1;
 
   const goTo = useCallback(
@@ -31,14 +32,22 @@ export default function MemoryBubble({
     [data.photos.length],
   );
 
-  // Auto-advance every 2.5 seconds
+  const manualGoTo = useCallback(
+    (index: number) => {
+      setAutoAdvance(false);
+      goTo(index);
+    },
+    [goTo],
+  );
+
+  // Auto-advance every 2.5 seconds (disabled after manual interaction)
   useEffect(() => {
-    if (!isFilmStrip) return;
+    if (!isFilmStrip || !autoAdvance) return;
     const interval = setInterval(() => {
       goTo(currentIndex + 1);
     }, 2500);
     return () => clearInterval(interval);
-  }, [isFilmStrip, currentIndex, goTo]);
+  }, [isFilmStrip, autoAdvance, currentIndex, goTo]);
 
   const handleImageError = (index: number) => {
     setImgErrors((prev) => new Set(prev).add(index));
@@ -82,7 +91,7 @@ export default function MemoryBubble({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                goTo(currentIndex - 1);
+                manualGoTo(currentIndex - 1);
               }}
               className="absolute left-1.5 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center text-white/80 hover:text-white transition-all duration-150 backdrop-blur-sm"
               aria-label="Previous photo"
@@ -106,7 +115,7 @@ export default function MemoryBubble({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                goTo(currentIndex + 1);
+                manualGoTo(currentIndex + 1);
               }}
               className="absolute right-1.5 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center text-white/80 hover:text-white transition-all duration-150 backdrop-blur-sm"
               aria-label="Next photo"
@@ -138,7 +147,7 @@ export default function MemoryBubble({
                 key={i}
                 onClick={(e) => {
                   e.stopPropagation();
-                  goTo(i);
+                  manualGoTo(i);
                 }}
                 className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
                   i === currentIndex ? "bg-white" : "bg-white/40"
