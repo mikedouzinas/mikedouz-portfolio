@@ -31,6 +31,50 @@ function avatarColor(name: string): string {
 }
 
 /**
+ * Tiny spider web SVG for avatar background.
+ */
+function AvatarWeb({ size }: { size: number }) {
+  const c = size / 2;
+  const r = size / 2 - 1;
+  const spokes = 6;
+  const rings = 3;
+
+  const lines = Array.from({ length: spokes }, (_, i) => {
+    const angle = (i / spokes) * Math.PI * 2;
+    return `M${c},${c} L${c + Math.cos(angle) * r},${c + Math.sin(angle) * r}`;
+  });
+
+  const arcs: string[] = [];
+  for (let ri = 1; ri <= rings; ri++) {
+    const radius = (ri / rings) * r;
+    let d = '';
+    for (let i = 0; i <= spokes; i++) {
+      const angle = (i / spokes) * Math.PI * 2;
+      const x = c + Math.cos(angle) * radius;
+      const y = c + Math.sin(angle) * radius;
+      d += i === 0 ? `M${x},${y}` : ` L${x},${y}`;
+    }
+    arcs.push(d);
+  }
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      className="absolute inset-0 opacity-15"
+    >
+      {lines.map((d, i) => (
+        <path key={`s${i}`} d={d} stroke="white" strokeWidth="0.5" fill="none" />
+      ))}
+      {arcs.map((d, i) => (
+        <path key={`a${i}`} d={d} stroke="white" strokeWidth="0.4" fill="none" />
+      ))}
+    </svg>
+  );
+}
+
+/**
  * Simple relative time formatter.
  */
 function timeAgo(dateStr: string): string {
@@ -88,9 +132,10 @@ export default function CommentCard({
     >
       {/* Avatar */}
       <div
-        className={`${avatarSize} ${avatarColor(comment.author_name)} rounded-full flex items-center justify-center shrink-0 font-medium text-white`}
+        className={`${avatarSize} ${avatarColor(comment.author_name)} rounded-full flex items-center justify-center shrink-0 font-medium text-white relative overflow-hidden`}
       >
-        {comment.author_name[0].toUpperCase()}
+        <AvatarWeb size={isReply ? 28 : 32} />
+        <span className="relative z-10">{comment.author_name[0].toUpperCase()}</span>
       </div>
 
       {/* Content */}
