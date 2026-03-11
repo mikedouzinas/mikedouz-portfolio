@@ -8,11 +8,33 @@ interface DefinitionCardProps {
   variant?: "portfolio" | "blog";
 }
 
+function getLinkLabel(url: string): string {
+  try {
+    const hostname = new URL(url).hostname.replace("www.", "");
+    if (hostname.includes("youtube")) return "Watch";
+    if (hostname.includes("wiley") || hostname.includes("doi.org"))
+      return "Read paper";
+    return "View source";
+  } catch {
+    return "View source";
+  }
+}
+
 export default function DefinitionCard({
   data,
   variant = "portfolio",
 }: DefinitionCardProps) {
   const isBlog = variant === "blog";
+  const kind = data.kind || "clarification";
+
+  // Kind-based accent colors (blog only; portfolio keeps blue-to-emerald)
+  const accentGradient = isBlog
+    ? kind === "reference"
+      ? "bg-gradient-to-r from-blue-400 to-cyan-400"
+      : kind === "aside"
+        ? "bg-gradient-to-r from-amber-400 to-orange-400"
+        : "bg-gradient-to-r from-purple-400 to-purple-600"
+    : "bg-gradient-to-r from-blue-400 to-emerald-400";
 
   return (
     <div
@@ -41,16 +63,7 @@ export default function DefinitionCard({
         )}
       </div>
 
-      <div
-        className={`
-          w-8 h-px mb-2
-          ${
-            isBlog
-              ? "bg-gradient-to-r from-purple-400 to-purple-600"
-              : "bg-gradient-to-r from-blue-400 to-emerald-400"
-          }
-        `}
-      />
+      <div className={`w-8 h-px mb-2 ${accentGradient}`} />
 
       <p
         className={`
@@ -61,8 +74,32 @@ export default function DefinitionCard({
         {data.definition}
       </p>
 
-      {data.source && (
-        <p className="mt-2 text-[10px] text-gray-500 italic">{data.source}</p>
+      {(data.source || data.link) && (
+        <div className="mt-2 flex items-center justify-between gap-2">
+          {data.source && (
+            <p className="text-[10px] text-gray-500 italic truncate">
+              {data.source}
+            </p>
+          )}
+          {data.link && (
+            <a
+              href={data.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className={`
+                text-[10px] font-medium shrink-0
+                ${isBlog
+                  ? "text-purple-400 hover:text-purple-300"
+                  : "text-blue-500 hover:text-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
+                }
+                transition-colors duration-150
+              `}
+            >
+              {getLinkLabel(data.link)} &rarr;
+            </a>
+          )}
+        </div>
       )}
     </div>
   );

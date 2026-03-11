@@ -107,18 +107,24 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             definition,
             source,
             greek,
+            link,
+            kind,
           }: {
             children?: React.ReactNode;
             term?: string;
             definition?: string;
             source?: string;
             greek?: string;
+            link?: string;
+            kind?: string;
           }) => (
             <BlogDefinitionCard
               term={term || ''}
               definition={definition || ''}
               source={source}
               greek={greek}
+              link={link}
+              kind={kind}
             >
               {children}
             </BlogDefinitionCard>

@@ -5,5 +5,6 @@ export { default as MusicOverlay } from "./MusicOverlay";
 export type {
   HoverCardData,
   DefinitionCardData,
+  DefinitionKind,
   MemoryBubbleData,
 } from "@/data/hover-cards";

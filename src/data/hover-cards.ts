@@ -12,6 +12,8 @@ export interface MemoryBubbleData {
   };
 }
 
+export type DefinitionKind = "clarification" | "reference" | "aside";
+
 export interface DefinitionCardData {
   type: "definition";
   id: string;
@@ -19,6 +21,8 @@ export interface DefinitionCardData {
   definition: string;
   source?: string;
   greek?: string;
+  link?: string;
+  kind?: DefinitionKind;
 }
 
 export type HoverCardData = MemoryBubbleData | DefinitionCardData;
