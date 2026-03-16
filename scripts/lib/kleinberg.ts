@@ -236,12 +236,14 @@ export function splitIntoPeaks(
       ? (active[active.length / 2 - 1] + active[active.length / 2]) / 2
       : active[Math.floor(active.length / 2)];
 
-  // Identify valley weeks: count < medianActive (strict)
-  const isValley = regionCounts.map((c) => c < medianActive);
+  // Identify valley weeks: count <= 1 OR count < medianActive * 0.4
+  // This is more aggressive than just "below median" — it catches real dips
+  const valleyThreshold = Math.max(1, medianActive * 0.4);
+  const isValley = regionCounts.map((c) => c <= valleyThreshold);
 
-  // Find contiguous valley spans of length >= 2
-  // A split point sits between the last valley week and the next non-valley week.
-  const splitPoints: number[] = []; // indices where a new peak begins (relative to region)
+  // Find contiguous valley spans of length >= 1
+  // Even a single week of near-zero plays between two hot weeks is a real gap
+  const splitPoints: number[] = [];
 
   let valleyStart = -1;
   for (let i = 0; i < regionLen; i++) {
@@ -249,11 +251,8 @@ export function splitIntoPeaks(
       if (valleyStart === -1) valleyStart = i;
     } else {
       if (valleyStart !== -1) {
-        const valleyLen = i - valleyStart;
-        if (valleyLen >= 2) {
-          // Split: new peak starts at i
-          splitPoints.push(i);
-        }
+        // Split at any valley — even 1 week if the drop is significant
+        splitPoints.push(i);
         valleyStart = -1;
       }
     }
