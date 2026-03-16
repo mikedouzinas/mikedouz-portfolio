@@ -48,24 +48,48 @@ Single analysis pipeline that works on both historical export and incremental AP
 - Parse all streaming history files into unified format: `{ trackId, trackName, artist, album, trackUri, timestamp, msPlayed, reasonStart, reasonEnd, skipped }`
 - Filter out: plays under 30 seconds (skips/accidents), podcast episodes, null track names
 
-**Step 2: Burst Detection (Primary)**
-- For each unique track, collect all plays sorted by timestamp
-- Sliding window: find clusters where 3+ plays occur within a 10-day window, allowing up to 2-day gaps between plays
-- Score each burst: `playCount × dominanceRatio` where dominanceRatio = track plays / total plays in that window
-- Minimum threshold: score must exceed a tunable floor (calibrated against actual data)
-- Output per burst: track info, date range, play count, total listening context (unique tracks, total plays in window), listening share %, streak length
+**Step 2: Burst Detection — Kleinberg's Algorithm (Primary)**
+
+Uses [Kleinberg's hierarchical burst detection](https://www.cs.cornell.edu/home/kleinber/bhs.pdf) (2002) instead of fixed time windows. The algorithm models listening as a hidden Markov process with multiple intensity states, using the Viterbi algorithm to find the optimal state sequence. No arbitrary thresholds — the data's own statistical properties determine burst boundaries.
+
+**Layer 1 — Kleinberg at weekly granularity:**
+- Aggregate plays per track into weekly buckets
+- Run Kleinberg with 4 states (normal → elevated → burst → intense)
+- Parameters: `s=2.0` (each state requires 2x the rate of the previous), `gamma=2.0` (moderate transition cost)
+- State rates auto-calibrate per track: `rate_i = base_rate × s^i` where base_rate = track's average weekly plays
+- Cost function balances emission cost (how well state explains observed count) against transition cost (penalty for state changes, proportional to `gamma × log(T)`)
+- Output: state sequence per week, identifying broad burst regions (any week in state ≥ 1)
+
+**Layer 2 — Peak splitting within bursts:**
+- Within each Kleinberg burst region, detect distinct sub-peaks separated by valleys
+- A valley = 2+ consecutive weeks below the region's median active-week play count
+- This splits long elevated periods (e.g., 8 months of Tame Impala) into distinct moments separated by natural dips
+- Each sub-peak becomes a separate "music moment"
+
+**Layer 3 — Daily peak detection:**
+- Within each sub-peak, find the single hottest day (highest play count)
+- Record as the moment's "peak day" — the most intense point of the burst
+
+**Why this approach:**
+- No fixed windows (7-day, 10-day, etc.) — Kleinberg finds natural boundaries
+- Hierarchical: detects bursts within bursts (an intense week inside a broader elevated month)
+- Self-calibrating per track: a song you normally play once/month has different burst thresholds than one you play daily
+- Comeback detection: peak splitting naturally identifies when a song returns after a gap, creating multiple moments for the same track
+- Tested on full dataset (53K plays, 4 years): produces ~727 moments across ~394 songs, with 220 songs having 2+ distinct comeback moments
+
+**Output per moment:** track info, date range, play count, weeks duration, max Kleinberg state (1-3), intensity (plays/week), peak day + peak day plays
 
 **Step 3: Secondary Insights (Admin-Only)**
 
-These are computed for all tracks but only displayed in admin mode:
+These are computed for all tracks but only displayed in admin mode. The burst detection in Step 2 already captures comebacks (songs with multiple moments) — these insights add additional dimensions.
 
-- **Loyalty tracks**: Played 30+ times across 3+ distinct months. Scored by consistency (months with plays / total months in range)
-- **Rediscoveries**: A track with a dormancy gap of 60+ days followed by 3+ plays in 10 days. The gap length and comeback intensity are recorded
-- **Late night signatures**: Tracks where 50%+ of plays occur between midnight–4am. Minimum 5 total plays. Contrast ratio (night% vs day%) is the score
+- **Comebacks**: Automatically detected — songs with 2+ distinct moments from the Kleinberg peak-splitting. 220 songs in current dataset. The gap between moments and the change in intensity tells the story
+- **Loyalty tracks**: Played 50+ times across 4+ distinct months. Scored by consistency (months with plays / total months in range). ~150 tracks in current dataset
+- **Late night signatures**: Tracks where 50%+ of plays occur between midnight–4am (using `ts` timestamps). Minimum 10 total plays. Contrast ratio (night% vs day%) is the score
 - **Artist deep dives**: 7+ unique tracks by the same artist played within a 14-day window. Scored by catalog breadth (unique tracks / artist's total unique tracks in history)
 - **Session anchors**: Tracks that appear as `reason_start: "playbtn"` (manual play, session starter) in 30%+ of their plays, minimum 10 plays. Also detect frequent session-enders via `reason_end: "endplay"` patterns
-- **One-and-done obsessions**: 5+ plays within 7 days, then zero plays for 60+ days after. The abruptness of the drop-off is the insight
-- **Seasonal returns**: Tracks that spike in the same calendar month across 2+ years. Detected by month-over-month play distribution
+- **One-and-done obsessions**: A burst moment (from Step 2) followed by zero plays for 60+ days. The abruptness of the drop-off is the insight
+- **Seasonal returns**: Tracks with burst moments in the same calendar quarter across 2+ years. Detected from the moment date ranges
 
 **Step 4: Spotify API Enrichment**
 - For each unique track URI in the output, fetch from Spotify API:
@@ -281,6 +305,6 @@ src/components/
 
 ## Open Questions
 
-1. **Burst detection thresholds** — need to calibrate minimum score against real data. Plan: run analysis once, inspect results, tune
-2. **Exact deep mode integration point** — need to examine how deep mode currently works to find the right mount point for the bubble
-3. **Album art caching** — Spotify CDN URLs may change. Consider storing in Supabase or using a proxy if this becomes an issue
+1. **Exact deep mode integration point** — need to examine how deep mode currently works to find the right mount point for the bubble
+2. **Album art caching** — Spotify CDN URLs may change. Consider storing in Supabase or using a proxy if this becomes an issue
+3. **Moment filtering for public view** — 727 moments is a lot. May want to show only state 2+ (burst/intense) in the public widget (~268 moments) and reserve state 1 (elevated) for admin view. Or use a minimum plays-per-week threshold. To be calibrated during implementation
