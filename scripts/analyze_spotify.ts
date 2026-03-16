@@ -8,8 +8,11 @@
  * Usage:  npx tsx scripts/analyze_spotify.ts
  */
 
-import fs from "fs";
+import dotenv from "dotenv";
 import path from "path";
+dotenv.config({ path: path.join(process.cwd(), ".env.local") });
+
+import fs from "fs";
 import crypto from "crypto";
 
 import { loadAndNormalize } from "./lib/normalize";
@@ -18,6 +21,8 @@ import {
   extractBurstRegions,
   splitIntoPeaks,
 } from "./lib/kleinberg";
+import { enrichTracks } from "./lib/spotify-api";
+import { computeInsights } from "./lib/insights";
 import type { MusicMoment } from "../src/lib/spotify/types";
 
 // ---------------------------------------------------------------------------
@@ -25,10 +30,8 @@ import type { MusicMoment } from "../src/lib/spotify/types";
 // ---------------------------------------------------------------------------
 
 const RAW_DIR = path.resolve(__dirname, "../data/spotify/raw");
-const OUT_FILE = path.resolve(
-  __dirname,
-  "../src/data/spotify/music-moments.json"
-);
+const OUT_DIR = path.resolve(__dirname, "../src/data/spotify");
+const OUT_FILE = path.resolve(OUT_DIR, "music-moments.json");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -241,7 +244,31 @@ async function main(): Promise<void> {
     return b.intensity - a.intensity;
   });
 
-  // 5. Write output -----------------------------------------------------------
+  // 5. Enrich with Spotify API metadata (album art, preview URLs) ------------
+  try {
+    const uniqueUris = [...new Set(moments.map((m) => m.trackUri))];
+    const trackMeta = await enrichTracks(uniqueUris);
+
+    let enriched = 0;
+    for (const moment of moments) {
+      const meta = trackMeta.get(moment.trackUri);
+      if (meta) {
+        moment.albumArtUrl = meta.albumArtUrl;
+        moment.previewUrl = meta.previewUrl;
+        moment.spotifyUrl = meta.spotifyUrl;
+        enriched++;
+      }
+    }
+    console.log(`  Enriched ${enriched} moments with Spotify metadata`);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn(
+      `  Warning: Spotify enrichment skipped — ${message}`
+    );
+    console.warn("  Moments will be written without album art or preview URLs.");
+  }
+
+  // 6. Write output -----------------------------------------------------------
   const outDir = path.dirname(OUT_FILE);
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(OUT_FILE, JSON.stringify(moments, null, 2), "utf-8");
