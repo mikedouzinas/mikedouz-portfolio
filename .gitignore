@@ -42,3 +42,9 @@ next-env.d.ts
 
 # generated files
 /src/data/iris/derived/
+
+# spotify raw data (personal export - do not commit)
+/data/spotify/raw/
+
+# superpowers brainstorm sessions
+.superpowers/
