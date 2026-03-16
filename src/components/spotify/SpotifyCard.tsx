@@ -3,6 +3,9 @@
 import Image from 'next/image';
 import { ExternalLink, Play, Pause } from 'lucide-react';
 import type { MusicMoment } from '@/lib/spotify/types';
+import { useAdminMode } from '@/hooks/useAdminMode';
+import { musicInsights } from '@/data/spotify/loader';
+import SpotifyAdminDetail from '@/components/spotify/SpotifyAdminDetail';
 
 interface SpotifyCardProps {
   moment: MusicMoment;
@@ -38,6 +41,8 @@ export default function SpotifyCard({
   playProgress = 0,
   onPlayToggle,
 }: SpotifyCardProps) {
+  const adminMode = useAdminMode();
+  const insight = musicInsights.find((i) => i.id === moment.id);
   const dateLabel = formatDateRange(moment.dateRange);
   const playsPerWeek =
     moment.weeksCount > 0
@@ -171,6 +176,9 @@ export default function SpotifyCard({
           <p className="text-[10px] uppercase tracking-wide text-gray-500">Per week</p>
         </div>
       </div>
+
+      {/* Admin detail panel */}
+      {adminMode && insight && <SpotifyAdminDetail insight={insight} />}
     </div>
   );
 }
