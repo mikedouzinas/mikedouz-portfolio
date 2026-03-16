@@ -16,7 +16,8 @@
     "kb:rebuild": "npm run verify:kb && npm run build:embeddings && npm run build:typeahead && npm run build:rankings",
     "test:iris": "tsx scripts/test_iris.ts",
     "test:iris:automated": "tsx scripts/test_iris_comprehensive.ts",
-    "test:iris:help": "cat TESTING.md"
+    "test:iris:help": "cat TESTING.md",
+    "spotify:analyze": "tsx scripts/analyze_spotify.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
