@@ -86,7 +86,8 @@ interface SpotifySearchResponse {
 async function searchTrack(
   trackName: string,
   artist: string,
-  token: string
+  token: string,
+  retries = 2
 ): Promise<SpotifyTrackMeta | null> {
   const query = encodeURIComponent(`track:${trackName} artist:${artist}`);
   const url = `https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`;
@@ -94,6 +95,15 @@ async function searchTrack(
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+  // Handle rate limiting with retry
+  if (response.status === 429 && retries > 0) {
+    const rawRetry = response.headers.get('retry-after');
+    const retryAfter = Math.min(Math.max(parseInt(rawRetry || '3', 10), 1), 30);
+    console.log(`    Rate limited, waiting ${retryAfter}s...`);
+    await new Promise((r) => setTimeout(r, retryAfter * 1000));
+    return searchTrack(trackName, artist, token, retries - 1);
+  }
 
   if (!response.ok) return null;
 
@@ -163,9 +173,9 @@ export async function enrichTracks(
       console.log(`    ${i + 1}/${tracks.length} searched (${enriched} found, ${failed} missed)`);
     }
 
-    // Rate limit: 50ms between requests
+    // Rate limit: 350ms between requests (Spotify allows ~180 req/min)
     if (i < tracks.length - 1) {
-      await new Promise((r) => setTimeout(r, 50));
+      await new Promise((r) => setTimeout(r, 350));
     }
   }
 

@@ -16,10 +16,16 @@ export default function SpotifyBubble() {
   const { currentMomentId, isPlaying, progress, togglePlay, stop } = useAudioPreview();
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Public: show state 2+ OR any moment with high raw intensity (5+ plays/week)
+  // This catches tracks like Drakkar Noir (17 plays/1 week = state 1 but clearly significant)
+  // Admin: show everything
   const filteredMoments = useMemo(() => {
-    return adminMode
-      ? musicMoments
-      : musicMoments.filter((m) => m.maxState >= 2);
+    if (adminMode) return musicMoments;
+    return musicMoments.filter((m) => {
+      if (m.maxState >= 2) return true;
+      const playsPerWeek = m.weeksCount > 0 ? m.playCount / m.weeksCount : m.playCount;
+      return playsPerWeek >= 5;
+    });
   }, [adminMode]);
 
   const momentsByMonth = useMemo(
