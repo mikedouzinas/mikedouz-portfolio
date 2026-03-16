@@ -55,7 +55,7 @@ export default function SpotifyBubble() {
   };
 
   return (
-    <div className="hidden md:block mb-4 relative" style={{ marginLeft: 'calc(50% - 96px)' }}>
+    <div className="hidden md:block mb-4" style={{ marginLeft: 'calc(50% - 96px)', position: 'relative' }}>
       {/* Collapsed: inline in sidebar flow */}
       {!expanded && (
         <div
@@ -107,7 +107,7 @@ export default function SpotifyBubble() {
         </div>
       )}
 
-      {/* Expanded: same position, just wider and taller */}
+      {/* Expanded: anchored at bottom-left of collapsed, grows UP and RIGHT */}
       <AnimatePresence>
         {expanded && (
           <motion.div
@@ -115,11 +115,10 @@ export default function SpotifyBubble() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="rounded-2xl shadow-2xl shadow-black/40 overflow-hidden"
+            className="absolute left-0 bottom-0 z-50 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden"
             style={{
               backgroundColor: '#1a1a2e',
               width: 'min(420px, calc(100vw / 3 - 1rem))',
-              marginRight: '-2rem',
             }}
           >
             {/* Header */}
