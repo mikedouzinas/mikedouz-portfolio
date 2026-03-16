@@ -13,7 +13,7 @@ import DeepModeBorder from '@/components/DeepModeBorder';
 import ExpandableSection from '@/components/ExpandableSection';
 import InProgressSection from '@/components/InProgressSection';
 import { workExperiences, projects, blogs } from '@/data/loaders';
-import SpotifyBubble from '@/components/spotify/SpotifyBubble';
+
 
 /**
  * Inner component that consumes DeepModeContext.
@@ -194,7 +194,6 @@ function HomeContent() {
         </main>
       </div>
 
-      <SpotifyBubble />
     </div>
   );
 }

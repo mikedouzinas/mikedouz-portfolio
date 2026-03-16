@@ -46,14 +46,13 @@ export default function SpotifyBubble() {
   };
 
   return (
-    <div className="hidden md:block fixed bottom-6 left-6 z-40">
+    <div className="hidden md:block w-48 mx-auto mb-4">
       <motion.div
         layout
         style={{
-          width: expanded ? 420 : 260,
           backgroundColor: '#1a1a2e',
         }}
-        className="rounded-2xl shadow-2xl shadow-black/30 overflow-hidden"
+        className="rounded-2xl shadow-lg shadow-black/20 overflow-hidden w-full"
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
         {/* Header */}
@@ -127,7 +126,7 @@ export default function SpotifyBubble() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
             >
-              <div className="overflow-y-auto px-3 pb-3 space-y-4" style={{ maxHeight: 400 }}>
+              <div className="overflow-y-auto px-3 pb-3 space-y-4" style={{ maxHeight: 300 }}>
                 {momentsByMonth.map(({ month, moments }) => (
                   <div key={month}>
                     {/* Month label */}

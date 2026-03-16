@@ -4,6 +4,7 @@ import HomeContent from '../components/home_content';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { SiCalendly } from 'react-icons/si';
 import PlaygroundButton from '../components/PlaygroundButton';
+import SpotifyBubble from '@/components/spotify/SpotifyBubble';
 
 // Hook to detect the currently active section using Intersection Observer
 const useActiveSection = (sectionIds: string[]): string => {
@@ -103,6 +104,8 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                     </ul>
                 </nav>
             </div>
+            {/* Spotify music timeline (deep mode only) */}
+            <SpotifyBubble />
             {/* Social media icons aligned with the profile container */}
             <div className="w-48 mx-auto">
                 <PlaygroundButton />
