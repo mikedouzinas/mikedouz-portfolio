@@ -214,8 +214,17 @@ export default function SpotifyCard({
                   </span>
                 ))}
                 {hotDays.length > 3 && (
-                  <span className="text-[9px] text-gray-500 py-0.5">
+                  <span
+                    className="text-[9px] text-gray-500 py-0.5 cursor-help relative group/more"
+                  >
                     +{hotDays.length - 3} more
+                    <span className="absolute bottom-full left-0 mb-1.5 hidden group-hover/more:block bg-gray-900 border border-white/10 rounded-lg p-2 shadow-xl z-20 whitespace-nowrap">
+                      {hotDays.slice(3).map((d) => (
+                        <span key={d.date} className="block text-gray-300">
+                          {formatDay(d.date)} — <span className="font-bold" style={{ color: accentColor }}>{d.plays}x</span>
+                        </span>
+                      ))}
+                    </span>
                   </span>
                 )}
               </div>
