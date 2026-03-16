@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
     // Enable unoptimized mode if needed for development (can be removed in production)
     // Professional comment: Uncomment if images still don't load - this disables optimization but ensures images work
     // unoptimized: process.env.NODE_ENV === 'development',
+    remotePatterns: [
+      { protocol: 'https' as const, hostname: 'i.scdn.co' },
+    ],
   },
 };
 
