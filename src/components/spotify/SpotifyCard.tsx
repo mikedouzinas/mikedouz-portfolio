@@ -114,10 +114,10 @@ export default function SpotifyCard({
     );
   }
 
-  // Format peak day
-  const peakDate = moment.peakDay && moment.peakDayPlays > 1
-    ? new Date(moment.peakDay).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
-    : null;
+  // Format hot days for display
+  const hotDays = (moment.hotDays || []).filter(d => d.plays >= 2);
+  const topHotDay = hotDays[0];
+  const formatDay = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
   // Full card with intensity color bar on left
   return (
@@ -201,12 +201,25 @@ export default function SpotifyCard({
               <span className="text-gray-400">
                 <span className="font-bold text-gray-200">{moment.weeksCount}</span> {moment.weeksCount === 1 ? 'wk' : 'wks'}
               </span>
-              {peakDate && (
-                <span className="text-gray-400">
-                  peak <span className="font-bold text-gray-200">{peakDate}</span> ({moment.peakDayPlays}x)
-                </span>
-              )}
             </div>
+            {/* Hot days — top contributor days */}
+            {hotDays.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-1.5">
+                {hotDays.slice(0, 3).map((d) => (
+                  <span
+                    key={d.date}
+                    className="text-[9px] px-1.5 py-0.5 rounded-md bg-white/[0.06] text-gray-300"
+                  >
+                    {formatDay(d.date)} <span className="font-bold" style={{ color: accentColor }}>{d.plays}x</span>
+                  </span>
+                ))}
+                {hotDays.length > 3 && (
+                  <span className="text-[9px] text-gray-500 py-0.5">
+                    +{hotDays.length - 3} more
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

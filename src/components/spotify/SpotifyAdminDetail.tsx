@@ -77,30 +77,15 @@ function Tooltip({ text, children }: { text: string; children: React.ReactNode }
 }
 
 export default function SpotifyAdminDetail({ insight }: SpotifyAdminDetailProps) {
-  const { insightTypes, context, maxState, peakDay, peakDayPlays } = insight;
+  const { insightTypes, context, maxState } = insight;
   const stateInfo = STATE_LABELS[maxState];
 
-  // Format peak day nicely
-  const peakDate = peakDay
-    ? new Date(peakDay).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
-    : null;
-
-  // Listening share: this track's plays / total plays in window
   const listeningShare = context.totalPlaysInWindow > 0
     ? ((insight.playCount / context.totalPlaysInWindow) * 100).toFixed(1)
     : null;
 
   return (
     <div className="space-y-2.5 border-t border-white/[0.06] pt-2.5">
-      {/* Peak day highlight */}
-      {peakDate && peakDayPlays > 1 && (
-        <div className="flex items-center gap-2 text-[11px]">
-          <span className="text-gray-500">Peak day:</span>
-          <span className="font-bold text-gray-100">{peakDate}</span>
-          <span className="text-gray-400">({peakDayPlays} plays)</span>
-        </div>
-      )}
-
       {/* Insight tags with hover descriptions */}
       {insightTypes.length > 0 && (
         <div className="flex flex-wrap gap-1.5">

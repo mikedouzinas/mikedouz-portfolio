@@ -39,6 +39,7 @@ export interface MusicMoment {
   maxState: number;
   peakDay: string;
   peakDayPlays: number;
+  hotDays: Array<{ date: string; plays: number }>; // top days sorted by plays desc
 }
 
 export type InsightType =

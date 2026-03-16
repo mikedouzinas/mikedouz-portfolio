@@ -197,18 +197,18 @@ async function main(): Promise<void> {
 
         const dateRange = { start: startWeekIso, end: endIso };
 
-        // Find peak day within this date range
-        let peakDay = startWeekIso;
-        let peakDayPlays = 0;
-
+        // Find hot days within this date range (all days with 2+ plays, sorted desc)
+        const daysInRange: Array<{ date: string; plays: number }> = [];
         for (const [dayIso, count] of db.entries()) {
-          if (dayIso >= dateRange.start && dayIso <= dateRange.end) {
-            if (count > peakDayPlays) {
-              peakDayPlays = count;
-              peakDay = dayIso;
-            }
+          if (dayIso >= dateRange.start && dayIso <= dateRange.end && count >= 2) {
+            daysInRange.push({ date: dayIso, plays: count });
           }
         }
+        daysInRange.sort((a, b) => b.plays - a.plays);
+        const hotDays = daysInRange.slice(0, 5); // top 5 days max
+
+        const peakDay = hotDays[0]?.date || startWeekIso;
+        const peakDayPlays = hotDays[0]?.plays || 0;
 
         // Intensity: maxState of the burst region (already in region.maxState)
         const intensity = region.maxState;
@@ -232,6 +232,7 @@ async function main(): Promise<void> {
           maxState: region.maxState,
           peakDay,
           peakDayPlays,
+          hotDays,
         });
       }
     }
