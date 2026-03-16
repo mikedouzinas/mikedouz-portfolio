@@ -43,23 +43,26 @@ function formatDateRange(dateRange: { start: string; end: string }): string {
   return `${sMonth} ${sDay}, ${sYear} – ${eMonth} ${eDay}, ${eYear}`;
 }
 
-/** Intensity color — green gradient from muted to vivid based on play density */
+/**
+ * Intensity color scale — cool blue through green to hot orange/red.
+ * Like YouTube's viewership heatmap: cold → warm → hot.
+ */
 function intensityColor(moment: MusicMoment): string {
   const playsPerWeek = moment.weeksCount > 0 ? moment.playCount / moment.weeksCount : moment.playCount;
-  // Scale: 2/wk = subtle, 5/wk = medium, 10+/wk = hot
-  if (playsPerWeek >= 8) return 'rgb(29, 185, 84)';       // full Spotify green
-  if (playsPerWeek >= 5) return 'rgb(29, 185, 84, 0.8)';  // bright
-  if (playsPerWeek >= 3) return 'rgb(29, 185, 84, 0.6)';  // medium
-  return 'rgb(29, 185, 84, 0.4)';                          // subtle
+  if (playsPerWeek >= 10) return '#ef4444'; // red — on fire
+  if (playsPerWeek >= 7)  return '#f97316'; // orange — very hot
+  if (playsPerWeek >= 5)  return '#eab308'; // yellow — hot
+  if (playsPerWeek >= 3)  return '#22c55e'; // green — warm
+  return '#3b82f6';                          // blue — moderate
 }
 
-/** Left border accent thickness based on intensity */
-function intensityBorderWidth(moment: MusicMoment): number {
+function intensityLabel(moment: MusicMoment): string {
   const playsPerWeek = moment.weeksCount > 0 ? moment.playCount / moment.weeksCount : moment.playCount;
-  if (playsPerWeek >= 8) return 3;
-  if (playsPerWeek >= 5) return 2.5;
-  if (playsPerWeek >= 3) return 2;
-  return 1.5;
+  if (playsPerWeek >= 10) return 'on fire';
+  if (playsPerWeek >= 7) return 'very hot';
+  if (playsPerWeek >= 5) return 'hot';
+  if (playsPerWeek >= 3) return 'warm';
+  return '';
 }
 
 export default function SpotifyCard({
@@ -74,7 +77,7 @@ export default function SpotifyCard({
   const dateLabel = formatDateRange(moment.dateRange);
   const hasPreview = !!moment.previewUrl;
   const accentColor = intensityColor(moment);
-  const borderWidth = intensityBorderWidth(moment);
+  const heat = intensityLabel(moment);
 
   if (compact) {
     return (
@@ -111,94 +114,108 @@ export default function SpotifyCard({
     );
   }
 
-  // Full card with intensity accent border
-  return (
-    <div
-      className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3"
-      style={{ borderLeftColor: accentColor, borderLeftWidth: borderWidth }}
-    >
-      <div className="flex gap-3">
-        {/* Album art */}
-        <div
-          className={`relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-white/10 ${hasPreview ? 'group cursor-pointer' : ''}`}
-          onClick={() => hasPreview && onPlayToggle?.(moment)}
-        >
-          {moment.albumArtUrl ? (
-            <Image
-              src={moment.albumArtUrl}
-              alt={moment.album}
-              fill
-              sizes="56px"
-              className="object-cover"
-            />
-          ) : (
-            <div className="w-full h-full" />
-          )}
+  // Format peak day
+  const peakDate = moment.peakDay && moment.peakDayPlays > 1
+    ? new Date(moment.peakDay).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+    : null;
 
-          {hasPreview && (
-            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              {isPlaying ? (
-                <Pause className="w-5 h-5 text-white fill-white" />
-              ) : (
-                <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+  // Full card with intensity color bar on left
+  return (
+    <div className="rounded-xl bg-white/[0.04] border border-white/[0.06] overflow-hidden flex">
+      {/* Intensity color bar */}
+      <div className="w-1 flex-shrink-0" style={{ backgroundColor: accentColor }} />
+
+      <div className="flex-1 p-3">
+        <div className="flex gap-3">
+          {/* Album art */}
+          <div
+            className={`relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-white/10 ${hasPreview ? 'group cursor-pointer' : ''}`}
+            onClick={() => hasPreview && onPlayToggle?.(moment)}
+          >
+            {moment.albumArtUrl ? (
+              <Image
+                src={moment.albumArtUrl}
+                alt={moment.album}
+                fill
+                sizes="56px"
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full" />
+            )}
+
+            {hasPreview && (
+              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                {isPlaying ? (
+                  <Pause className="w-5 h-5 text-white fill-white" />
+                ) : (
+                  <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+                )}
+              </div>
+            )}
+
+            {isPlaying && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/20">
+                <div
+                  className="h-full bg-[#1DB954]"
+                  style={{ width: `${playProgress * 100}%` }}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-sm font-semibold text-gray-100 truncate leading-tight">
+                {moment.trackName}
+              </p>
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                {heat && (
+                  <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full" style={{ backgroundColor: accentColor + '20', color: accentColor }}>
+                    {heat}
+                  </span>
+                )}
+                {moment.spotifyUrl && (
+                  <a
+                    href={moment.spotifyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-500 hover:text-[#1DB954] transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 truncate leading-tight mt-0.5">
+              {moment.artist}
+            </p>
+            <p className="text-[11px] font-medium mt-1.5" style={{ color: accentColor }}>
+              {dateLabel}
+            </p>
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5 text-[10px]">
+              <span className="text-gray-400">
+                <span className="font-bold text-gray-200">{moment.playCount}</span> plays
+              </span>
+              <span className="text-gray-400">
+                <span className="font-bold text-gray-200">{moment.weeksCount}</span> {moment.weeksCount === 1 ? 'wk' : 'wks'}
+              </span>
+              {peakDate && (
+                <span className="text-gray-400">
+                  peak <span className="font-bold text-gray-200">{peakDate}</span> ({moment.peakDayPlays}x)
+                </span>
               )}
             </div>
-          )}
-
-          {isPlaying && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/20">
-              <div
-                className="h-full bg-[#1DB954]"
-                style={{ width: `${playProgress * 100}%` }}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <p className="text-sm font-semibold text-gray-100 truncate leading-tight">
-              {moment.trackName}
-            </p>
-            {moment.spotifyUrl && (
-              <a
-                href={moment.spotifyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-shrink-0 text-gray-500 hover:text-[#1DB954] transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            )}
-          </div>
-          <p className="text-xs text-gray-400 truncate leading-tight mt-0.5">
-            {moment.artist}
-          </p>
-          <p className="text-[11px] font-medium mt-1.5" style={{ color: accentColor }}>
-            {dateLabel}
-          </p>
-          <div className="flex gap-3 mt-1.5 text-[10px]">
-            <span className="text-gray-400">
-              <span className="font-bold text-gray-200">{moment.playCount}</span> plays
-            </span>
-            <span className="text-gray-400">
-              <span className="font-bold text-gray-200">{moment.weeksCount}</span> {moment.weeksCount === 1 ? 'wk' : 'wks'}
-            </span>
-            {moment.peakDayPlays > 1 && (
-              <span className="text-gray-400">
-                peak <span className="font-bold text-gray-200">{moment.peakDayPlays}x</span>/day
-              </span>
-            )}
           </div>
         </div>
+
+        {adminMode && insight && (
+          <div className="mt-3">
+            <SpotifyAdminDetail insight={insight} />
+          </div>
+        )}
       </div>
-
-      {adminMode && insight && (
-        <div className="mt-3">
-          <SpotifyAdminDetail insight={insight} />
-        </div>
-      )}
     </div>
   );
 }
