@@ -8,7 +8,11 @@
  * apps in development mode get 403 on /v1/tracks but Search works fine.
  */
 
+import fs from "fs";
+import path from "path";
 import type { SpotifyTrackMeta } from "../../src/lib/spotify/types";
+
+const CACHE_PATH = path.resolve(__dirname, "../../data/spotify/enrichment-cache.json");
 
 // ---------------------------------------------------------------------------
 // Auth
@@ -142,43 +146,75 @@ interface TrackInfo {
  * @param tracks - Array of { trackUri, trackName, artist }
  * @returns Map of trackUri → SpotifyTrackMeta
  */
+function loadCache(): Map<string, SpotifyTrackMeta> {
+  try {
+    if (fs.existsSync(CACHE_PATH)) {
+      const raw = JSON.parse(fs.readFileSync(CACHE_PATH, "utf-8")) as Record<string, SpotifyTrackMeta>;
+      return new Map(Object.entries(raw));
+    }
+  } catch { /* ignore corrupt cache */ }
+  return new Map();
+}
+
+function saveCache(cache: Map<string, SpotifyTrackMeta>): void {
+  const obj: Record<string, SpotifyTrackMeta> = {};
+  for (const [k, v] of cache) obj[k] = v;
+  fs.mkdirSync(path.dirname(CACHE_PATH), { recursive: true });
+  fs.writeFileSync(CACHE_PATH, JSON.stringify(obj, null, 2));
+}
+
 export async function enrichTracks(
   tracks: TrackInfo[]
 ): Promise<Map<string, SpotifyTrackMeta>> {
-  const token = await getAccessToken();
+  const cache = loadCache();
   const result = new Map<string, SpotifyTrackMeta>();
 
-  console.log(`  Enriching ${tracks.length} unique tracks via Search API...`);
+  // Separate cached vs uncached
+  const uncached: TrackInfo[] = [];
+  for (const t of tracks) {
+    const cached = cache.get(t.trackUri);
+    if (cached) {
+      result.set(t.trackUri, cached);
+    } else {
+      uncached.push(t);
+    }
+  }
 
-  let enriched = 0;
+  console.log(`  Enriching: ${result.size} cached, ${uncached.length} to fetch`);
+
+  if (uncached.length === 0) return result;
+
+  const token = await getAccessToken();
+  let fetched = 0;
   let failed = 0;
 
-  for (let i = 0; i < tracks.length; i++) {
-    const { trackUri, trackName, artist } = tracks[i];
+  for (let i = 0; i < uncached.length; i++) {
+    const { trackUri, trackName, artist } = uncached[i];
 
-    // Skip if already enriched (same URI from a previous search)
     if (result.has(trackUri)) continue;
 
     const meta = await searchTrack(trackName, artist, token);
     if (meta) {
-      // Use the original trackUri as key (not the search result URI, in case of slight mismatches)
       result.set(trackUri, meta);
-      enriched++;
+      cache.set(trackUri, meta);
+      fetched++;
     } else {
       failed++;
     }
 
-    // Progress every 50 tracks
-    if ((i + 1) % 50 === 0) {
-      console.log(`    ${i + 1}/${tracks.length} searched (${enriched} found, ${failed} missed)`);
+    if ((i + 1) % 25 === 0) {
+      console.log(`    ${i + 1}/${uncached.length} fetched (${fetched} found, ${failed} missed)`);
+      // Save cache periodically in case of interruption
+      saveCache(cache);
     }
 
-    // Rate limit: 350ms between requests (Spotify allows ~180 req/min)
-    if (i < tracks.length - 1) {
-      await new Promise((r) => setTimeout(r, 350));
+    // Rate limit: 400ms between requests
+    if (i < uncached.length - 1) {
+      await new Promise((r) => setTimeout(r, 400));
     }
   }
 
-  console.log(`  Enrichment complete: ${enriched} found, ${failed} missed out of ${tracks.length}`);
+  saveCache(cache);
+  console.log(`  Enrichment: ${result.size} total (${fetched} new, ${failed} missed)`);
   return result;
 }

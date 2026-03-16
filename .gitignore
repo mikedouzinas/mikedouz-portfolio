@@ -45,6 +45,7 @@ next-env.d.ts
 
 # spotify raw data (personal export - do not commit)
 /data/spotify/raw/
+/data/spotify/enrichment-cache.json
 
 # superpowers brainstorm sessions
 .superpowers/
