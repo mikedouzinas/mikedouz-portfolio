@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { ExternalLink, Play, Pause } from 'lucide-react';
 import type { MusicMoment } from '@/lib/spotify/types';
 import { useAdminMode } from '@/hooks/useAdminMode';
-import { musicInsights } from '@/data/spotify/loader';
+import { getMusicInsights } from '@/data/spotify/loader';
 import SpotifyAdminDetail from '@/components/spotify/SpotifyAdminDetail';
 
 interface SpotifyCardProps {
@@ -73,7 +73,8 @@ export default function SpotifyCard({
   onPlayToggle,
 }: SpotifyCardProps) {
   const adminMode = useAdminMode();
-  const insight = musicInsights.find((i) => i.id === moment.id);
+  // Only load insights data when admin mode is active (avoids 745KB bundle for public)
+  const insight = adminMode ? getMusicInsights().find((i) => i.id === moment.id) : undefined;
   const dateLabel = formatDateRange(moment.dateRange);
   const hasPreview = !!moment.previewUrl;
   const accentColor = intensityColor(moment);

@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Music, Maximize2, Minimize2 } from 'lucide-react';
-import { musicMoments, getMomentsByMonth, formatMonth } from '@/data/spotify/loader';
+import { getMusicMoments, getMomentsByMonth, formatMonth } from '@/data/spotify/loader';
 import { useAudioPreview } from '@/hooks/useAudioPreview';
 import { useAdminMode } from '@/hooks/useAdminMode';
 import { useDeepMode } from '@/components/DeepModeContext';
@@ -20,8 +20,9 @@ export default function SpotifyBubble() {
   // This catches tracks like Drakkar Noir (17 plays/1 week = state 1 but clearly significant)
   // Admin: show everything
   const filteredMoments = useMemo(() => {
-    if (adminMode) return musicMoments;
-    return musicMoments.filter((m) => {
+    const allMoments = getMusicMoments();
+    if (adminMode) return allMoments;
+    return allMoments.filter((m) => {
       if (m.maxState >= 2) return true;
       const playsPerWeek = m.weeksCount > 0 ? m.playCount / m.weeksCount : m.playCount;
       return playsPerWeek >= 5;
