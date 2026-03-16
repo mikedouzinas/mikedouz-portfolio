@@ -22,13 +22,23 @@ export default function SpotifyBubble() {
       : musicMoments.filter((m) => m.maxState >= 2);
   }, [adminMode]);
 
-  const recentMoments = useMemo(() => filteredMoments.slice(0, 3), [filteredMoments]);
-  const remainingCount = filteredMoments.length - 3;
-
   const momentsByMonth = useMemo(
     () => getMomentsByMonth(filteredMoments),
     [filteredMoments]
   );
+
+  // Collapsed shows top 3 in the same order as expanded (first month's top items, then next month)
+  const recentMoments = useMemo(() => {
+    const flat: typeof filteredMoments = [];
+    for (const { moments } of momentsByMonth) {
+      for (const m of moments) {
+        flat.push(m);
+        if (flat.length >= 3) return flat;
+      }
+    }
+    return flat;
+  }, [momentsByMonth]);
+  const remainingCount = filteredMoments.length - recentMoments.length;
 
   const uniqueSongsCount = useMemo(
     () => new Set(filteredMoments.map((m) => m.trackUri)).size,
@@ -148,7 +158,7 @@ export default function SpotifyBubble() {
               {momentsByMonth.map(({ month, moments }) => (
                 <div key={month}>
                   <p
-                    className="text-[10px] font-semibold tracking-widest uppercase mb-2 px-1 sticky top-0 py-1"
+                    className="text-[10px] font-semibold tracking-widest uppercase mb-2 px-1 sticky top-0 py-1 z-10"
                     style={{ color: '#1DB954', backgroundColor: '#1a1a2e' }}
                   >
                     {formatMonth(month)}
