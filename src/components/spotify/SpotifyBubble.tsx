@@ -107,18 +107,19 @@ export default function SpotifyBubble() {
         </div>
       )}
 
-      {/* Expanded: absolute positioned, grows up and to the right */}
+      {/* Expanded: same position, just wider and taller */}
       <AnimatePresence>
         {expanded && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-0 left-0 z-50 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden"
+            className="rounded-2xl shadow-2xl shadow-black/40 overflow-hidden"
             style={{
               backgroundColor: '#1a1a2e',
               width: 'min(420px, calc(100vw / 3 - 1rem))',
+              marginRight: '-2rem',
             }}
           >
             {/* Header */}
