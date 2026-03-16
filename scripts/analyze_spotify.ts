@@ -268,9 +268,8 @@ async function main(): Promise<void> {
     console.warn("  Moments will be written without album art or preview URLs.");
   }
 
-  // 6. Write output -----------------------------------------------------------
-  const outDir = path.dirname(OUT_FILE);
-  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+  // 6. Write moments output ---------------------------------------------------
+  if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
   fs.writeFileSync(OUT_FILE, JSON.stringify(moments, null, 2), "utf-8");
 
   // Summary stats
@@ -283,6 +282,21 @@ async function main(): Promise<void> {
   console.log(`  State 2 (burst):   ${state2}`);
   console.log(`  State 1 (elevated): ${state1}`);
   console.log(`Wrote ${moments.length} moments to ${OUT_FILE}`);
+
+  // 7. Compute secondary insights --------------------------------------------
+  console.log("\nComputing secondary insights...");
+  const insights = computeInsights(moments, plays);
+  const insightCounts: Record<string, number> = {};
+  for (const insight of insights) {
+    for (const type of insight.insightTypes) {
+      insightCounts[type] = (insightCounts[type] || 0) + 1;
+    }
+  }
+  console.log("  Insight distribution:", insightCounts);
+
+  const insightsPath = path.join(OUT_DIR, "music-insights.json");
+  fs.writeFileSync(insightsPath, JSON.stringify(insights, null, 2));
+  console.log(`Wrote ${insights.length} insights to ${insightsPath}`);
 }
 
 main().catch((err) => {
