@@ -4,9 +4,8 @@
  * Spotify Web API client for enriching track metadata (album art, preview URLs).
  * Uses client credentials flow — no user auth required.
  *
- * Usage:
- *   import { enrichTracks } from "./lib/spotify-api";
- *   const meta = await enrichTracks(trackUris);
+ * Uses the Search API instead of the Tracks batch endpoint because new Spotify
+ * apps in development mode get 403 on /v1/tracks but Search works fine.
  */
 
 import type { SpotifyTrackMeta } from "../../src/lib/spotify/types";
@@ -54,7 +53,7 @@ export async function getAccessToken(): Promise<string> {
 }
 
 // ---------------------------------------------------------------------------
-// Track metadata
+// Track metadata via Search API
 // ---------------------------------------------------------------------------
 
 interface SpotifyImage {
@@ -63,114 +62,113 @@ interface SpotifyImage {
   width: number | null;
 }
 
-interface SpotifyAlbum {
-  images: SpotifyImage[];
-}
-
-interface SpotifyApiTrack {
+interface SpotifySearchTrack {
   id: string;
   uri: string;
+  name: string;
   preview_url: string | null;
   external_urls: { spotify: string };
-  album?: SpotifyAlbum;
+  album?: {
+    images: SpotifyImage[];
+  };
+  artists: Array<{ name: string }>;
 }
 
-interface SpotifyTracksResponse {
-  tracks: (SpotifyApiTrack | null)[];
+interface SpotifySearchResponse {
+  tracks: {
+    items: SpotifySearchTrack[];
+  };
 }
 
 /**
- * Fetches metadata for up to 50 tracks in a single API call.
- * Returns a Map of trackUri → SpotifyTrackMeta.
+ * Search for a single track by name + artist and return its metadata.
  */
-export async function fetchTrackBatch(
-  trackIds: string[],
+async function searchTrack(
+  trackName: string,
+  artist: string,
   token: string
-): Promise<Map<string, SpotifyTrackMeta>> {
-  const ids = trackIds.join(",");
-  const url = `https://api.spotify.com/v1/tracks?ids=${encodeURIComponent(ids)}`;
+): Promise<SpotifyTrackMeta | null> {
+  const query = encodeURIComponent(`track:${trackName} artist:${artist}`);
+  const url = `https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`;
 
   const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(
-      `Spotify tracks API failed (${response.status}): ${text}`
-    );
-  }
+  if (!response.ok) return null;
 
-  const data = (await response.json()) as SpotifyTracksResponse;
-  const result = new Map<string, SpotifyTrackMeta>();
+  const data = (await response.json()) as SpotifySearchResponse;
+  const track = data.tracks?.items?.[0];
+  if (!track) return null;
 
-  for (const track of data.tracks) {
-    if (!track) continue;
+  const albumArtUrl =
+    track.album?.images?.[1]?.url ||
+    track.album?.images?.[0]?.url ||
+    "";
 
-    // Prefer 300x300 (index 1), fall back to first image
-    const albumArtUrl =
-      track.album?.images?.[1]?.url ||
-      track.album?.images?.[0]?.url ||
-      "";
-
-    result.set(track.uri, {
-      trackUri: track.uri,
-      albumArtUrl,
-      previewUrl: track.preview_url,
-      spotifyUrl: track.external_urls.spotify,
-      genres: [],
-    });
-  }
-
-  return result;
+  return {
+    trackUri: track.uri,
+    albumArtUrl,
+    previewUrl: track.preview_url,
+    spotifyUrl: track.external_urls.spotify,
+    genres: [],
+  };
 }
 
 // ---------------------------------------------------------------------------
 // Main export
 // ---------------------------------------------------------------------------
 
+interface TrackInfo {
+  trackUri: string;
+  trackName: string;
+  artist: string;
+}
+
 /**
- * Enriches a list of track URIs with Spotify metadata.
- * Batches requests in groups of 50 with a 100ms delay between batches.
+ * Enriches tracks with Spotify metadata using the Search API.
+ * Searches one track at a time with 50ms delay for rate limiting.
  *
- * @param trackUris - Array of Spotify track URIs (e.g. "spotify:track:abc123")
+ * @param tracks - Array of { trackUri, trackName, artist }
  * @returns Map of trackUri → SpotifyTrackMeta
  */
 export async function enrichTracks(
-  trackUris: string[]
+  tracks: TrackInfo[]
 ): Promise<Map<string, SpotifyTrackMeta>> {
   const token = await getAccessToken();
   const result = new Map<string, SpotifyTrackMeta>();
 
-  // Extract track IDs from URIs, keeping a URI→ID mapping
-  const uriToId = new Map<string, string>();
-  for (const uri of trackUris) {
-    const parts = uri.split(":");
-    const id = parts[2] ?? uri;
-    uriToId.set(uri, id);
-  }
+  console.log(`  Enriching ${tracks.length} unique tracks via Search API...`);
 
-  const uniqueIds = Array.from(uriToId.values());
+  let enriched = 0;
+  let failed = 0;
 
-  console.log(`  Enriching ${trackUris.length} unique tracks...`);
+  for (let i = 0; i < tracks.length; i++) {
+    const { trackUri, trackName, artist } = tracks[i];
 
-  // Batch in groups of 50
-  const BATCH_SIZE = 50;
-  for (let i = 0; i < uniqueIds.length; i += BATCH_SIZE) {
-    const batch = uniqueIds.slice(i, i + BATCH_SIZE);
-    const batchMeta = await fetchTrackBatch(batch, token);
+    // Skip if already enriched (same URI from a previous search)
+    if (result.has(trackUri)) continue;
 
-    for (const [uri, meta] of batchMeta) {
-      result.set(uri, meta);
+    const meta = await searchTrack(trackName, artist, token);
+    if (meta) {
+      // Use the original trackUri as key (not the search result URI, in case of slight mismatches)
+      result.set(trackUri, meta);
+      enriched++;
+    } else {
+      failed++;
     }
 
-    // Rate-limit delay between batches (skip after the last one)
-    if (i + BATCH_SIZE < uniqueIds.length) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+    // Progress every 50 tracks
+    if ((i + 1) % 50 === 0) {
+      console.log(`    ${i + 1}/${tracks.length} searched (${enriched} found, ${failed} missed)`);
+    }
+
+    // Rate limit: 50ms between requests
+    if (i < tracks.length - 1) {
+      await new Promise((r) => setTimeout(r, 50));
     }
   }
 
+  console.log(`  Enrichment complete: ${enriched} found, ${failed} missed out of ${tracks.length}`);
   return result;
 }

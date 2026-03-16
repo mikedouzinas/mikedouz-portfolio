@@ -246,12 +246,21 @@ async function main(): Promise<void> {
 
   // 5. Enrich with Spotify API metadata (album art, preview URLs) ------------
   try {
-    const uniqueUris = [...new Set(moments.map((m) => m.trackUri))];
-    const trackMeta = await enrichTracks(uniqueUris);
+    // Deduplicate by trackUri, keeping first occurrence's name/artist
+    const seen = new Set<string>();
+    const uniqueTracks: Array<{ trackUri: string; trackName: string; artist: string }> = [];
+    for (const m of moments) {
+      if (m.trackUri && !seen.has(m.trackUri)) {
+        seen.add(m.trackUri);
+        uniqueTracks.push({ trackUri: m.trackUri, trackName: m.trackName, artist: m.artist });
+      }
+    }
+
+    const enrichmentMeta = await enrichTracks(uniqueTracks);
 
     let enriched = 0;
     for (const moment of moments) {
-      const meta = trackMeta.get(moment.trackUri);
+      const meta = enrichmentMeta.get(moment.trackUri);
       if (meta) {
         moment.albumArtUrl = meta.albumArtUrl;
         moment.previewUrl = meta.previewUrl;
