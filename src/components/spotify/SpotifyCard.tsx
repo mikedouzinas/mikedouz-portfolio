@@ -11,7 +11,7 @@ interface SpotifyCardProps {
   moment: MusicMoment;
   compact?: boolean;
   isPlaying?: boolean;
-  playProgress?: number; // 0-1
+  playProgress?: number;
   onPlayToggle?: (moment: MusicMoment) => void;
 }
 
@@ -44,141 +44,122 @@ export default function SpotifyCard({
   const adminMode = useAdminMode();
   const insight = musicInsights.find((i) => i.id === moment.id);
   const dateLabel = formatDateRange(moment.dateRange);
-  const playsPerWeek =
-    moment.weeksCount > 0
-      ? Math.round(moment.playCount / moment.weeksCount)
-      : moment.playCount;
+  const hasPreview = !!moment.previewUrl;
 
   if (compact) {
     return (
-      <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06]">
-        {/* Album art */}
-        <div className="relative w-9 h-9 flex-shrink-0 rounded overflow-hidden">
+      <div className="flex items-center gap-2.5 py-1.5">
+        <div className="relative w-9 h-9 flex-shrink-0 rounded overflow-hidden bg-white/10">
           {moment.albumArtUrl ? (
             <Image
               src={moment.albumArtUrl}
-              alt={`${moment.album} album art`}
+              alt={moment.album}
               fill
               sizes="36px"
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-white/10 flex items-center justify-center">
+            <div className="w-full h-full flex items-center justify-center">
               <Play className="w-3 h-3 text-gray-500" />
             </div>
           )}
         </div>
-
-        {/* Track info */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-100 truncate leading-tight">
+          <p className="text-xs font-medium text-gray-100 truncate leading-tight">
             {moment.trackName}
           </p>
-          <p className="text-xs text-gray-400 truncate leading-tight">
-            {moment.artist}
+          <p className="text-[10px] text-gray-500 truncate leading-tight">
+            {moment.artist} · {dateLabel}
           </p>
         </div>
-
-        {/* Date */}
-        <span className="text-xs text-gray-500 flex-shrink-0">{dateLabel}</span>
       </div>
     );
   }
 
-  // Full variant
+  // Full card
   return (
-    <div className="rounded-xl bg-white/[0.04] border border-white/[0.06] overflow-hidden">
-      <div className="p-4 flex gap-4">
-        {/* Album art with play button overlay */}
+    <div className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3">
+      <div className="flex gap-3">
+        {/* Album art */}
         <div
-          className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden group cursor-pointer"
-          onClick={() => onPlayToggle?.(moment)}
+          className={`relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-white/10 ${hasPreview ? 'group cursor-pointer' : ''}`}
+          onClick={() => hasPreview && onPlayToggle?.(moment)}
         >
           {moment.albumArtUrl ? (
             <Image
               src={moment.albumArtUrl}
-              alt={`${moment.album} album art`}
+              alt={moment.album}
               fill
-              sizes="64px"
+              sizes="56px"
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-white/10" />
+            <div className="w-full h-full" />
           )}
 
-          {/* Play/pause overlay */}
-          {onPlayToggle && (
+          {/* Play overlay — only when preview available */}
+          {hasPreview && (
             <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               {isPlaying ? (
-                <Pause className="w-6 h-6 text-white" />
+                <Pause className="w-5 h-5 text-white fill-white" />
               ) : (
-                <Play className="w-6 h-6 text-white fill-white" />
+                <Play className="w-5 h-5 text-white fill-white ml-0.5" />
               )}
             </div>
           )}
 
-          {/* Progress bar */}
           {isPlaying && (
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/20">
               <div
-                className="h-full bg-[#1DB954] transition-all duration-300"
+                className="h-full bg-[#1DB954]"
                 style={{ width: `${playProgress * 100}%` }}
               />
             </div>
           )}
         </div>
 
-        {/* Track info */}
+        {/* Info — all left-aligned */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-base font-semibold text-gray-100 truncate leading-tight">
-                {moment.trackName}
-              </p>
-              <p className="text-sm text-gray-400 truncate leading-snug">
-                {moment.artist}
-              </p>
-            </div>
-
-            {/* Spotify external link */}
+            <p className="text-sm font-semibold text-gray-100 truncate leading-tight">
+              {moment.trackName}
+            </p>
             {moment.spotifyUrl && (
               <a
                 href={moment.spotifyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-shrink-0 text-gray-500 hover:text-[#1DB954] transition-colors mt-0.5"
-                aria-label={`Open ${moment.trackName} on Spotify`}
+                className="flex-shrink-0 text-gray-500 hover:text-[#1DB954] transition-colors"
               >
-                <ExternalLink className="w-4 h-4" />
+                <ExternalLink className="w-3.5 h-3.5" />
               </a>
             )}
           </div>
-
-          {/* Date range in Spotify green */}
-          <p className="text-xs font-medium mt-1" style={{ color: '#1DB954' }}>
+          <p className="text-xs text-gray-400 truncate leading-tight mt-0.5">
+            {moment.artist}
+          </p>
+          <p className="text-[11px] font-medium mt-1.5" style={{ color: '#1DB954' }}>
             {dateLabel}
           </p>
+
+          {/* Stats — left-aligned, inline */}
+          <div className="flex gap-3 mt-2 text-[10px]">
+            <span className="text-gray-400">
+              <span className="font-bold text-gray-200">{moment.playCount}</span> plays
+            </span>
+            <span className="text-gray-400">
+              <span className="font-bold text-gray-200">{moment.weeksCount}</span> {moment.weeksCount === 1 ? 'week' : 'weeks'}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="px-4 pb-4 flex gap-6">
-        <div className="text-center">
-          <p className="text-sm font-bold text-white">{moment.playCount}</p>
-          <p className="text-[10px] uppercase tracking-wide text-gray-500">Plays</p>
+      {/* Admin detail */}
+      {adminMode && insight && (
+        <div className="mt-3">
+          <SpotifyAdminDetail insight={insight} />
         </div>
-        <div className="text-center">
-          <p className="text-sm font-bold text-white">{moment.weeksCount}</p>
-          <p className="text-[10px] uppercase tracking-wide text-gray-500">Weeks</p>
-        </div>
-        <div className="text-center">
-          <p className="text-sm font-bold text-white">{playsPerWeek}</p>
-          <p className="text-[10px] uppercase tracking-wide text-gray-500">Per week</p>
-        </div>
-      </div>
-
-      {/* Admin detail panel */}
-      {adminMode && insight && <SpotifyAdminDetail insight={insight} />}
+      )}
     </div>
   );
 }
