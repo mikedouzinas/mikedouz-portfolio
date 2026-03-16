@@ -1,0 +1,302 @@
+/**
+ * Kleinberg Burst Detection Algorithm
+ *
+ * Implements Kleinberg's (2002) algorithm for detecting bursts in event streams
+ * using a hidden Markov model and the Viterbi algorithm.
+ *
+ * Reference: Kleinberg, J. (2002). Bursty and Hierarchical Structure in Streams.
+ */
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export interface KleinbergParams {
+  /** Scaling factor between adjacent state rates. Default: 2.0 */
+  s?: number;
+  /** Transition cost multiplier. Default: 2.0 */
+  gamma?: number;
+  /** Number of hidden states. Default: 4 */
+  numStates?: number;
+}
+
+export interface KleinbergResult {
+  /** Viterbi-decoded state sequence (0 = baseline, higher = more bursty) */
+  states: number[];
+  /** Event rate associated with each state */
+  stateRates: number[];
+}
+
+export interface BurstRegion {
+  /** Inclusive start index in the original event-count array */
+  start: number;
+  /** Inclusive end index in the original event-count array */
+  end: number;
+  /** Highest state reached during this region */
+  maxState: number;
+  /** Full state sub-sequence for this region */
+  stateSeq: number[];
+}
+
+export interface Peak {
+  /** Start offset relative to the burst region start */
+  relStart: number;
+  /** End offset relative to the burst region start (inclusive) */
+  relEnd: number;
+  /** Total play count inside this peak */
+  plays: number;
+  /** Number of weeks inside this peak */
+  weeks: number;
+}
+
+// ---------------------------------------------------------------------------
+// 1. Kleinberg Burst Detection (Viterbi on HMM)
+// ---------------------------------------------------------------------------
+
+/**
+ * Run Kleinberg burst detection on a time series of event counts.
+ *
+ * @param eventCounts - Array of non-negative integer counts per time bucket.
+ * @param params      - Algorithm hyper-parameters (all optional).
+ * @returns Viterbi state sequence and the rate for each state.
+ */
+export function kleinbergBurstDetection(
+  eventCounts: number[],
+  params: KleinbergParams = {}
+): KleinbergResult {
+  const s = params.s ?? 2.0;
+  const gamma = params.gamma ?? 2.0;
+  const numStates = params.numStates ?? 4;
+
+  const T = eventCounts.length;
+
+  // Degenerate case: empty input
+  if (T === 0) {
+    return { states: [], stateRates: [] };
+  }
+
+  // Base rate = mean of event counts (floor at a small positive value to avoid
+  // log(0) in the emission cost when baseRate == 0).
+  const sum = eventCounts.reduce((a, b) => a + b, 0);
+  const baseRate = Math.max(sum / T, 1e-9);
+
+  // State rates: rate_i = baseRate * s^i
+  const stateRates: number[] = new Array(numStates);
+  for (let i = 0; i < numStates; i++) {
+    stateRates[i] = baseRate * Math.pow(s, i);
+  }
+
+  // DP tables (row-major: [t * numStates + state])
+  // cost[t][j] = min cost of being in state j at time t
+  const cost = new Float64Array(T * numStates).fill(Infinity);
+  const back = new Int32Array(T * numStates).fill(-1);
+
+  // ---------------------------------------------------------------------------
+  // Initialisation (t = 0): only state 0 is free to enter; higher states cost
+  // a transition penalty from a hypothetical state-0 at time -1.
+  // ---------------------------------------------------------------------------
+  const logT = Math.log(T > 1 ? T : 2); // avoid log(1)=0 making transitions free
+
+  for (let j = 0; j < numStates; j++) {
+    const transCost = j > 0 ? gamma * j * logT : 0.0;
+    const emitCost = emissionCost(stateRates[j], eventCounts[0]);
+    cost[0 * numStates + j] = transCost + emitCost;
+    back[0 * numStates + j] = 0; // sentinel: came from state 0 at t=-1
+  }
+
+  // ---------------------------------------------------------------------------
+  // Viterbi forward pass (t = 1 … T-1)
+  // ---------------------------------------------------------------------------
+  for (let t = 1; t < T; t++) {
+    for (let j = 0; j < numStates; j++) {
+      const emit = emissionCost(stateRates[j], eventCounts[t]);
+      let bestCost = Infinity;
+      let bestPrev = 0;
+
+      for (let i = 0; i < numStates; i++) {
+        // Transition cost: moving up costs gamma*(j-i)*log(T), moving down is free
+        const trans = j > i ? gamma * (j - i) * logT : 0.0;
+        const candidate = cost[(t - 1) * numStates + i] + trans;
+        if (candidate < bestCost) {
+          bestCost = candidate;
+          bestPrev = i;
+        }
+      }
+
+      cost[t * numStates + j] = bestCost + emit;
+      back[t * numStates + j] = bestPrev;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Backtrack: find minimum cost state at t = T-1, then follow pointers
+  // ---------------------------------------------------------------------------
+  const states = new Array<number>(T);
+
+  // Find best final state
+  let bestFinal = 0;
+  let bestFinalCost = cost[(T - 1) * numStates + 0];
+  for (let j = 1; j < numStates; j++) {
+    const c = cost[(T - 1) * numStates + j];
+    if (c < bestFinalCost) {
+      bestFinalCost = c;
+      bestFinal = j;
+    }
+  }
+
+  states[T - 1] = bestFinal;
+  for (let t = T - 2; t >= 0; t--) {
+    states[t] = back[(t + 1) * numStates + states[t + 1]];
+  }
+
+  return { states, stateRates };
+}
+
+/**
+ * Poisson emission cost: -log P(count | rate) ∝ rate - count*log(rate)
+ * (constant terms dropped).
+ */
+function emissionCost(rate: number, count: number): number {
+  if (count === 0) return rate;
+  return rate - count * Math.log(rate);
+}
+
+// ---------------------------------------------------------------------------
+// 2. Extract Burst Regions
+// ---------------------------------------------------------------------------
+
+/**
+ * Extract contiguous regions where `state >= minState`.
+ *
+ * @param states   - State sequence returned by `kleinbergBurstDetection`.
+ * @param minState - Minimum state to be considered a burst (default: 1).
+ * @returns Array of burst regions sorted by start index.
+ */
+export function extractBurstRegions(
+  states: number[],
+  minState = 1
+): BurstRegion[] {
+  const regions: BurstRegion[] = [];
+  let inBurst = false;
+  let start = 0;
+
+  for (let t = 0; t <= states.length; t++) {
+    const active = t < states.length && states[t] >= minState;
+
+    if (active && !inBurst) {
+      // Burst begins
+      start = t;
+      inBurst = true;
+    } else if (!active && inBurst) {
+      // Burst ends (exclusive at t, inclusive at t-1)
+      const end = t - 1;
+      const stateSeq = states.slice(start, end + 1);
+      const maxState = stateSeq.reduce((m, v) => Math.max(m, v), 0);
+      regions.push({ start, end, maxState, stateSeq });
+      inBurst = false;
+    }
+  }
+
+  return regions;
+}
+
+// ---------------------------------------------------------------------------
+// 3. Split Into Peaks
+// ---------------------------------------------------------------------------
+
+/**
+ * Split a burst region into sub-peaks separated by valleys.
+ *
+ * A valley is defined as 2 or more consecutive weeks whose play count is
+ * strictly below the median of non-zero weeks within the region.
+ *
+ * Rules:
+ * - Minimum 5 plays per peak.
+ * - If no valid split point exists, return the whole region as a single peak.
+ *
+ * @param weeklyCounts  - Full weekly count array (same length as `states`).
+ * @param regionStart   - Inclusive start index of the burst region.
+ * @param regionEnd     - Inclusive end index of the burst region.
+ * @returns Array of peaks with relative offsets inside the region.
+ */
+export function splitIntoPeaks(
+  weeklyCounts: number[],
+  regionStart: number,
+  regionEnd: number
+): Peak[] {
+  const regionCounts = weeklyCounts.slice(regionStart, regionEnd + 1);
+  const regionLen = regionCounts.length;
+
+  // Compute median of non-zero weeks in the region
+  const active = regionCounts.filter((c) => c > 0).sort((a, b) => a - b);
+  const medianActive =
+    active.length === 0
+      ? 0
+      : active.length % 2 === 0
+      ? (active[active.length / 2 - 1] + active[active.length / 2]) / 2
+      : active[Math.floor(active.length / 2)];
+
+  // Identify valley weeks: count < medianActive (strict)
+  const isValley = regionCounts.map((c) => c < medianActive);
+
+  // Find contiguous valley spans of length >= 2
+  // A split point sits between the last valley week and the next non-valley week.
+  const splitPoints: number[] = []; // indices where a new peak begins (relative to region)
+
+  let valleyStart = -1;
+  for (let i = 0; i < regionLen; i++) {
+    if (isValley[i]) {
+      if (valleyStart === -1) valleyStart = i;
+    } else {
+      if (valleyStart !== -1) {
+        const valleyLen = i - valleyStart;
+        if (valleyLen >= 2) {
+          // Split: new peak starts at i
+          splitPoints.push(i);
+        }
+        valleyStart = -1;
+      }
+    }
+  }
+  // Handle trailing valley (ignore — it just means the burst ends early)
+
+  if (splitPoints.length === 0) {
+    // No split: whole region is one peak
+    const totalPlays = regionCounts.reduce((a, b) => a + b, 0);
+    if (totalPlays < 5) return [];
+    return [{ relStart: 0, relEnd: regionLen - 1, plays: totalPlays, weeks: regionLen }];
+  }
+
+  // Build candidate peak ranges from split points.
+  // Each split point marks the index where a new peak begins (the valley sits
+  // just before it). We trim leading/trailing valley weeks from each sub-peak
+  // so that valley weeks never appear inside a peak.
+  const boundaries = [0, ...splitPoints, regionLen]; // start indices + sentinel end
+  const peaks: Peak[] = [];
+
+  for (let p = 0; p < boundaries.length - 1; p++) {
+    let relStart = boundaries[p];
+    let relEnd = boundaries[p + 1] - 1;
+
+    // Trim leading valley weeks
+    while (relStart <= relEnd && isValley[relStart]) relStart++;
+    // Trim trailing valley weeks
+    while (relEnd >= relStart && isValley[relEnd]) relEnd--;
+
+    if (relStart > relEnd) continue; // entirely valley — skip
+
+    const slice = regionCounts.slice(relStart, relEnd + 1);
+    const plays = slice.reduce((a, b) => a + b, 0);
+    if (plays < 5) continue; // skip undersized peaks
+    peaks.push({ relStart, relEnd, plays, weeks: relEnd - relStart + 1 });
+  }
+
+  // If filtering removed all sub-peaks, fall back to whole region
+  if (peaks.length === 0) {
+    const totalPlays = regionCounts.reduce((a, b) => a + b, 0);
+    if (totalPlays < 5) return [];
+    return [{ relStart: 0, relEnd: regionLen - 1, plays: totalPlays, weeks: regionLen }];
+  }
+
+  return peaks;
+}
