@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "next-themes";
 import { DeepModeProvider } from "@/components/DeepModeContext";
+import { AdminModeProvider } from "@/components/AdminModeProvider";
 import IrisPalette from "@/components/IrisPalette";
 import "../styles/globals.css";
 
@@ -72,8 +73,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <DeepModeProvider>
-            {children}
-            <IrisPalette />
+            <AdminModeProvider>
+              {children}
+              <IrisPalette />
+            </AdminModeProvider>
           </DeepModeProvider>
         </ThemeProvider>
         <Analytics />
