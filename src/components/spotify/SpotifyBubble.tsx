@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Music, ChevronDown } from 'lucide-react';
+import { Music, Maximize2, Minimize2 } from 'lucide-react';
 import { musicMoments, getMomentsByMonth, formatMonth } from '@/data/spotify/loader';
 import { useAudioPreview } from '@/hooks/useAudioPreview';
 import { useAdminMode } from '@/hooks/useAdminMode';
@@ -14,8 +14,8 @@ export default function SpotifyBubble() {
   const adminMode = useAdminMode();
   const [expanded, setExpanded] = useState(false);
   const { currentMomentId, isPlaying, progress, togglePlay, stop } = useAudioPreview();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Filter moments: public shows maxState >= 2, admin shows all
   const filteredMoments = useMemo(() => {
     return adminMode
       ? musicMoments
@@ -35,33 +35,36 @@ export default function SpotifyBubble() {
     [filteredMoments]
   );
 
-  // Don't render if deep mode is off
+  // Isolate scroll: prevent wheel events from propagating to parent/main content
+  const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    const atTop = scrollTop <= 0 && e.deltaY < 0;
+    const atBottom = scrollTop + clientHeight >= scrollHeight - 1 && e.deltaY > 0;
+
+    // Only stop propagation if we're not at the scroll boundary
+    if (!atTop && !atBottom) {
+      e.stopPropagation();
+    }
+  }, []);
+
   if (!deepMode) return null;
 
   const handleToggleExpand = () => {
-    if (expanded) {
-      stop();
-    }
+    if (expanded) stop();
     setExpanded((prev) => !prev);
   };
 
   return (
-    <div className="hidden md:block w-48 mx-auto mb-4">
-      <motion.div
-        layout
-        style={{
-          backgroundColor: '#1a1a2e',
-        }}
-        className="rounded-2xl shadow-lg shadow-black/20 overflow-hidden w-full"
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    <div className="hidden md:block px-6 mb-4">
+      <div
+        className="rounded-2xl shadow-lg shadow-black/20 overflow-hidden"
+        style={{ backgroundColor: '#1a1a2e' }}
       >
         {/* Header */}
-        <button
-          onClick={handleToggleExpand}
-          className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors"
-          aria-expanded={expanded}
-          aria-label={expanded ? 'Collapse music moments' : 'Expand music moments'}
-        >
+        <div className="flex items-center justify-between px-3 py-2.5">
           <div className="flex items-center gap-2">
             <Music className="w-3.5 h-3.5" style={{ color: '#1DB954' }} />
             <span
@@ -71,13 +74,25 @@ export default function SpotifyBubble() {
               Mike&apos;s Music
             </span>
           </div>
-          <motion.div
-            animate={{ rotate: expanded ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
+          <button
+            onClick={handleToggleExpand}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/10 transition-colors"
+            aria-expanded={expanded}
+            aria-label={expanded ? 'Collapse music moments' : 'Expand music moments'}
           >
-            <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
-          </motion.div>
-        </button>
+            {expanded ? (
+              <>
+                <Minimize2 className="w-3 h-3 text-gray-400" />
+                <span className="text-[10px] text-gray-400">close</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-3 h-3 text-gray-400" />
+                <span className="text-[10px] text-gray-400">expand</span>
+              </>
+            )}
+          </button>
+        </div>
 
         <AnimatePresence mode="wait">
           {!expanded ? (
@@ -88,33 +103,30 @@ export default function SpotifyBubble() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="px-3 pb-3 space-y-1.5"
+              className="px-3 pb-3 space-y-1"
             >
               {recentMoments.map((moment) => (
                 <SpotifyCard key={moment.id} moment={moment} compact />
               ))}
 
-              {filteredMoments.length > 0 && (
-                <div className="flex items-center gap-2 pt-1 px-1">
-                  {/* Dot indicators */}
+              {remainingCount > 0 && (
+                <button
+                  onClick={handleToggleExpand}
+                  className="flex items-center gap-2 pt-1 px-1 hover:opacity-80 transition-opacity"
+                >
                   <div className="flex gap-1">
-                    {recentMoments.map((_, i) => (
+                    {[1, 0.6, 0.3].map((opacity, i) => (
                       <div
                         key={i}
                         className="w-1 h-1 rounded-full"
-                        style={{ backgroundColor: '#1DB954' }}
+                        style={{ backgroundColor: '#1DB954', opacity }}
                       />
                     ))}
-                    {remainingCount > 0 && (
-                      <div className="w-1 h-1 rounded-full bg-white/20" />
-                    )}
                   </div>
-                  {remainingCount > 0 && (
-                    <span className="text-[10px] text-gray-500">
-                      {remainingCount} more moment{remainingCount !== 1 ? 's' : ''}
-                    </span>
-                  )}
-                </div>
+                  <span className="text-[10px] text-gray-500">
+                    {remainingCount} more moment{remainingCount !== 1 ? 's' : ''}
+                  </span>
+                </button>
               )}
             </motion.div>
           ) : (
@@ -126,13 +138,17 @@ export default function SpotifyBubble() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
             >
-              <div className="overflow-y-auto px-3 pb-3 space-y-4" style={{ maxHeight: 300 }}>
+              <div
+                ref={scrollRef}
+                onWheel={handleWheel}
+                className="overflow-y-auto px-3 pb-3 space-y-4"
+                style={{ maxHeight: 350 }}
+              >
                 {momentsByMonth.map(({ month, moments }) => (
                   <div key={month}>
-                    {/* Month label */}
                     <p
-                      className="text-[10px] font-semibold tracking-widest uppercase mb-2 px-1"
-                      style={{ color: '#1DB954' }}
+                      className="text-[10px] font-semibold tracking-widest uppercase mb-2 px-1 sticky top-0 py-1"
+                      style={{ color: '#1DB954', backgroundColor: '#1a1a2e' }}
                     >
                       {formatMonth(month)}
                     </p>
@@ -153,7 +169,7 @@ export default function SpotifyBubble() {
               </div>
 
               {/* Footer stats */}
-              <div className="px-4 py-2.5 border-t border-white/[0.06] flex items-center gap-3">
+              <div className="px-3 py-2 border-t border-white/[0.06] flex items-center gap-3">
                 <span className="text-[10px] text-gray-500">
                   {filteredMoments.length} moment{filteredMoments.length !== 1 ? 's' : ''}
                 </span>
@@ -165,7 +181,7 @@ export default function SpotifyBubble() {
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </div>
   );
 }
