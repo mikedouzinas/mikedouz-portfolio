@@ -280,8 +280,8 @@ src/components/
 
 ```json
 {
-  "spotify:analyze": "ts-node scripts/analyze_spotify.ts",
-  "spotify:refresh": "ts-node scripts/refresh_spotify.ts",
+  "spotify:analyze": "tsx scripts/analyze_spotify.ts",
+  "spotify:refresh": "tsx scripts/refresh_spotify.ts",
   "spotify:rebuild": "npm run spotify:analyze && npm run spotify:refresh"
 }
 ```
@@ -292,7 +292,7 @@ src/components/
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| Analysis language | TypeScript (ts-node) | Consistency with codebase, shared types |
+| Analysis language | TypeScript (tsx runner) | Consistency with codebase, shared types |
 | Primary data store | Static JSON files | Simple, no runtime DB dependency for reads |
 | Refresh mechanism | Script (cron-compatible) | Can run via Vercel cron or manually |
 | Album art source | Spotify CDN URLs | Stored in JSON, no local image storage |
