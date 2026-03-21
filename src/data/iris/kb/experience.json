@@ -13,8 +13,10 @@
       "start": "2026-05",
       "end": "2026-08"
     },
-    "summary": "Incoming Software Engineering Intern on the Gmail iOS team in San Francisco.",
-    "specifics": [],
+    "summary": "Incoming Software Engineering Intern on the Gmail iOS team in the Bay Area.",
+    "specifics": [
+      "Living near San Francisco, working out of the Sunnyvale office"
+    ],
     "skills": [
       "swift"
     ],
