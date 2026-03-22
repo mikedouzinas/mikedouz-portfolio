@@ -505,36 +505,6 @@
     "hotDays": []
   },
   {
-    "id": "692a7550c668de26937203a474f21f71",
-    "trackName": "Hula Girl",
-    "artist": "The Neighbourhood",
-    "album": "(((((ultraSOUND)))))",
-    "trackUri": "spotify:track:2Q12wBicdnoLI6F343qcHk",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02ba9dd3d335c249d54e04ca1d",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/2Q12wBicdnoLI6F343qcHk",
-    "dateRange": {
-      "start": "2026-01-12",
-      "end": "2026-01-25"
-    },
-    "playCount": 12,
-    "weeksCount": 2,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2026-01-13",
-    "peakDayPlays": 4,
-    "hotDays": [
-      {
-        "date": "2026-01-13",
-        "plays": 4
-      },
-      {
-        "date": "2026-01-14",
-        "plays": 4
-      }
-    ]
-  },
-  {
     "id": "e88667c60f2c21cb63756750165f1f2f",
     "trackName": "Staring At The Sun (feat. SZA)",
     "artist": "Post Malone",
@@ -8139,6 +8109,36 @@
     "hotDays": []
   },
   {
+    "id": "00cd4ed349a2bdde3607c2e0a814374d",
+    "trackName": "Heartbeat",
+    "artist": "Childish Gambino",
+    "album": "Camp",
+    "trackUri": "spotify:track:0zo4aX57COch7Wh3NRImTM",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e026182cfe2e2a090d125c81dc0",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/5AGQSF0ytihJyt96K5vW9d",
+    "dateRange": {
+      "start": "2023-08-21",
+      "end": "2023-09-03"
+    },
+    "playCount": 7,
+    "weeksCount": 2,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-08-30",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-08-30",
+        "plays": 2
+      },
+      {
+        "date": "2023-09-02",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "ed0fa5788933957501508984c10cc355",
     "trackName": "Love Me",
     "artist": "Lil Wayne",
@@ -8638,6 +8638,36 @@
       },
       {
         "date": "2023-08-20",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "5cdfd76a963c3d28e01cd2242688a43f",
+    "trackName": "Heartbeat",
+    "artist": "Childish Gambino",
+    "album": "Camp",
+    "trackUri": "spotify:track:0zo4aX57COch7Wh3NRImTM",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e026182cfe2e2a090d125c81dc0",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/5AGQSF0ytihJyt96K5vW9d",
+    "dateRange": {
+      "start": "2023-07-31",
+      "end": "2023-08-13"
+    },
+    "playCount": 8,
+    "weeksCount": 2,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-08-02",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-08-02",
+        "plays": 2
+      },
+      {
+        "date": "2023-08-04",
         "plays": 2
       }
     ]
@@ -9360,6 +9390,27 @@
         "plays": 2
       }
     ]
+  },
+  {
+    "id": "749fb6ef2b9348192add9c4b4ae57b39",
+    "trackName": "Heartbeat",
+    "artist": "Childish Gambino",
+    "album": "Camp",
+    "trackUri": "spotify:track:0zo4aX57COch7Wh3NRImTM",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e026182cfe2e2a090d125c81dc0",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/5AGQSF0ytihJyt96K5vW9d",
+    "dateRange": {
+      "start": "2023-06-26",
+      "end": "2023-07-16"
+    },
+    "playCount": 6,
+    "weeksCount": 3,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-06-26",
+    "peakDayPlays": 0,
+    "hotDays": []
   },
   {
     "id": "b500a5611a281759b0a45e7cc9df3656",
@@ -10522,7 +10573,7 @@
     "hotDays": []
   },
   {
-    "id": "0a7ae5dbb1ab3d3fa8b0a99382ef9261",
+    "id": "93f75d6fb79046a3defb53f1a0e24df2",
     "trackName": "Heartbeat",
     "artist": "Childish Gambino",
     "album": "Camp",
@@ -10532,10 +10583,10 @@
     "spotifyUrl": "https://open.spotify.com/track/5AGQSF0ytihJyt96K5vW9d",
     "dateRange": {
       "start": "2023-05-08",
-      "end": "2023-05-28"
+      "end": "2023-06-04"
     },
-    "playCount": 15,
-    "weeksCount": 3,
+    "playCount": 17,
+    "weeksCount": 4,
     "intensity": 2,
     "maxState": 2,
     "peakDay": "2023-05-09",

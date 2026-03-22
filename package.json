@@ -19,7 +19,10 @@
     "test:iris:help": "cat TESTING.md",
     "spotify:analyze": "tsx scripts/analyze_spotify.ts",
     "spotify:refresh": "tsx scripts/refresh_spotify.ts",
-    "spotify:rebuild": "npm run spotify:refresh && npm run spotify:analyze"
+    "spotify:pull": "tsx scripts/pull_spotify.ts",
+    "spotify:rebuild": "npm run spotify:refresh && npm run spotify:analyze",
+    "spotify:sync": "npm run spotify:pull && npm run spotify:analyze",
+    "spotify:auth": "tsx scripts/spotify_auth.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
