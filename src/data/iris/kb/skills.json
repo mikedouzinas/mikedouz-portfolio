@@ -462,11 +462,11 @@
       ]
     },
     {
-      "id": "openai_api",
-      "name": "OpenAI API",
+      "id": "ai_integration",
+      "name": "AI Integration",
       "type": "service",
-      "aliases": ["gpt_4", "gpt_4_turbo", "openai", "chatgpt"],
-      "description": "Embeddings and LLM orchestration for apps.",
+      "aliases": ["gpt_4", "gpt_4_turbo", "openai", "chatgpt", "claude", "anthropic", "llm_orchestration", "ai_api"],
+      "description": "LLM orchestration, prompt engineering, tool use, and AI system integration across OpenAI and Anthropic platforms.",
       "evidence": [
         { "type": "class", "id": "class_busi_220_2024" },
         { "type": "class", "id": "class_comp_646_2025" },

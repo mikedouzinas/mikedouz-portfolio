@@ -166,7 +166,7 @@ function formatSkillId(skillId: string): string {
     'opencv': 'OpenCV',
     'pytorch': 'PyTorch',
     'scikit_learn': 'Scikit-Learn',
-    'openai_api': 'OpenAI API',
+    'ai_integration': 'OpenAI API',
     'google_document_ai': 'Google Document AI',
     'tailwind_css': 'Tailwind CSS',
     'framer_motion': 'Framer Motion',
@@ -189,7 +189,7 @@ function formatSkillId(skillId: string): string {
   if (skillId.includes('_')) {
     const parts = skillId.split('_');
     
-    // Check if last part is an acronym (e.g., "openai_api")
+    // Check if last part is an acronym (e.g., "ai_integration")
     if (acronyms.has(parts[parts.length - 1])) {
       return parts.map((part, idx) => {
         if (idx === parts.length - 1 && acronyms.has(part)) {

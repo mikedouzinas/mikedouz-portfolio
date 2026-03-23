@@ -117,7 +117,7 @@
         "Realtime transcription (<1s) and adaptive TTS feedback",
         "Agile sprints, TestFlight feedback, user-centered iteration"
       ],
-      "skills": ["swift", "nlp", "openai_api", "product_management"],
+      "skills": ["swift", "nlp", "ai_integration", "product_management"],
       "related_projects": ["proj_momentum"]
     },
     {

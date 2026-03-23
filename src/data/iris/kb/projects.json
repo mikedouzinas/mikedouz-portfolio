@@ -35,7 +35,7 @@
     "specifics": [
       "Iris AI Assistant: Named after the Greek messenger goddess. Powered by Claude Sonnet 4.6 (claude-sonnet-4-6) with the full knowledge base passed in a prompt-cached system prompt — no embeddings or semantic search. Intent classification happens via a Claude tool call in a single API request. Config-driven quick actions suggest related items based on complexity, impact, and recency scores. Structured knowledge base with 851 skills, filters, and personal context.",
       "The Web (Blog): Full blog system at /the-web with Supabase backend, full-text search, tag filtering, markdown rendering, spider-web hover reveal pattern, commenting with threaded replies, and a subscribe system (email + SMS via Twilio). Per-post theming with custom accent colors.",
-      "Blog Iris Interactions: Readers can highlight any text on a blog post and open an Iris-powered conversation bubble. Iris responds using the post content and optional author context documents. Readers can then have Iris draft a comment or a direct message to Mike.",
+      "Blog Iris Interactions: Readers can highlight any text on a blog post and open an Iris-powered conversation bubble. The goal is to make the blog a more collaborative space where readers can engage deeply with the ideas, ask questions, and have productive discussions that help them learn more. Iris responds using the post content and optional author context documents. Readers can then have Iris draft a comment or a direct message to Mike, making the writing feel like a conversation rather than a broadcast.",
       "Spotify Music Timeline: Kleinberg burst detection algorithm on 4 years of Spotify listening data (53K+ plays). Identifies songs with abnormal replay frequency in compressed timeframes. Glassmorphic sidebar panel with progressive collapse (drops songs one by one on short viewports), hover glow effect, and an expandable full timeline with month grouping and audio previews.",
       "Deep Mode: Hidden layer triggered by clicking the profile photo. Reveals in-progress projects, blueprints, and the Spotify timeline. Animated green-blue border bars on viewport edges, profile ring gradient animation. Content sections fade in with staggered delays.",
       "Ask Mike Inbox: Contact system where Iris can draft messages on behalf of visitors. Smart contact field auto-detects email vs phone. Honeypot spam detection, rate limiting, rich HTML email notifications via Resend.",
@@ -94,7 +94,7 @@
       "Built entirely in SwiftUI with AVFoundation for audio capture",
       "Ran TestFlight feedback cycles and iterated based on what users actually needed"
     ],
-    "skills": ["nlp", "openai_api", "product_management", "swift", "api_integration"],
+    "skills": ["nlp", "ai_integration", "product_management", "swift", "api_integration"],
     "tech_stack": ["SwiftUI", "AVFoundation", "OpenAI API"],
     "architecture": "Audio capture → ASR → intent (LLM) → action execution → TTS playback; reactive state with SwiftUI",
     "tags": ["iOS", "Voice", "Assistant"],

@@ -77,7 +77,7 @@ export const SKILL_COMPLEXITY: Record<string, number> = {
   'nlp': 8,                 // Advanced (text processing)
   'diffusion_models': 10,   // Expert (cutting-edge generative)
   'rag': 9,                 // Expert (retrieval-augmented generation, complex pipeline)
-  'openai_api': 5,          // Intermediate (API usage)
+  'ai_integration': 7,      // Advanced (LLM orchestration, prompt engineering, tool use, streaming)
 
   // ========================================
   // DATA SCIENCE & ANALYTICS
@@ -98,7 +98,10 @@ export const SKILL_COMPLEXITY: Record<string, number> = {
   // ========================================
   // SPECIALIZED DOMAINS
   // ========================================
-  'api_integration': 4,     // Intermediate-low (REST, GraphQL)
+  'api_integration': 5,     // Intermediate (REST, GraphQL, webhook design)
+  'sse': 7,                 // Advanced (Server-Sent Events, streaming protocols)
+  'signal_processing': 7,   // Advanced (burst detection, time-series analysis)
+  'redis': 6,               // Intermediate (caching, rate limiting)
 
   // ========================================
   // DEFAULT FALLBACK
@@ -115,12 +118,18 @@ export function getSkillComplexity(skillId: string): number {
 }
 
 /**
- * Get average complexity of a list of skills
- * Useful for computing project/experience complexity
+ * Get weighted complexity of a list of skills
+ * Uses top-N skills (sorted by complexity) to avoid penalizing breadth.
+ * A project with 15 skills including 5 high-complexity ones should score
+ * similarly to a project with only those 5 high-complexity skills.
  */
 export function getAverageComplexity(skillIds: string[]): number {
   if (skillIds.length === 0) return 5;
 
-  const sum = skillIds.reduce((acc, id) => acc + getSkillComplexity(id), 0);
-  return sum / skillIds.length;
+  const scores = skillIds.map(id => getSkillComplexity(id)).sort((a, b) => b - a);
+
+  // Use top 5 skills (or all if fewer than 5) for the complexity score
+  const topN = Math.min(5, scores.length);
+  const topSum = scores.slice(0, topN).reduce((acc, s) => acc + s, 0);
+  return topSum / topN;
 }

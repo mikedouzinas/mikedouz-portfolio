@@ -155,21 +155,26 @@ export function computeExperienceImportance(exp: ExperienceT): number {
   const skillComplexity = getAverageComplexity(exp.skills);
   const recency = computeRecency(exp.dates);
 
-  const hasImpact = (exp.specifics || []).some(s =>
-    /return offer|partnership|strategic|production|\d+[+%]|recognized|award|shipped|delivered|enabled/i.test(s)
-  );
+  const allSpecifics = (exp.specifics || []).join(' ');
 
-  // Weighted scoring (duration removed, recency reduced, impact increased)
+  // Concrete professional outcomes (return offers, production work, measurable business results)
+  const hasConcreteOutcome = /return offer|partnership|strategic|production|shipped to|deployed|launched|revenue|clients served/i.test(allSpecifics);
+
+  // Quantified results (percentages, user counts, time savings — not just interview counts)
+  const hasQuantifiedResult = /\d+\s*%|\d+x\s+(faster|improvement|reduction)|cut.*\d+|reduced.*\d+|saved.*\d+|\d+\+?\s*(users|clients|customers)/i.test(allSpecifics);
+
+  // Weighted scoring
   const complexityScore = skillComplexity * 5;                        // Complexity is most important
-  const recencyScore = recency * 1.5;                                 // Recency reduced from 3x to 1.5x
-  const impactScore = hasImpact ? 30 : 0;                             // Impact increased from 20 to 30
+  const recencyScore = recency * 1.5;                                 // Recency matters but less than impact
+  const outcomeScore = hasConcreteOutcome ? 25 : 0;                   // Return offers, production deployment
+  const quantifiedScore = hasQuantifiedResult ? 15 : 0;               // Measurable business results
   const roleScore = exp.skills.length * 2.5;                          // Skill breadth
 
-  const rawScore = complexityScore + recencyScore + impactScore + roleScore;
+  const rawScore = complexityScore + recencyScore + outcomeScore + quantifiedScore + roleScore;
 
   // Normalize to 0-100
-  // Max possible: 50 + 15 + 30 + 30 = 125
-  return Math.min(Math.round((rawScore / 125) * 100), 100);
+  // Max possible: 50 + 15 + 25 + 15 + 30 = 135
+  return Math.min(Math.round((rawScore / 135) * 100), 100);
 }
 
 /**
