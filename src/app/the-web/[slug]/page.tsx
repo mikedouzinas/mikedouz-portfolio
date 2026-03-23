@@ -7,6 +7,7 @@ import PostBodyWithIris from '../components/PostBodyWithIris';
 import ShareButton from '../components/ShareButton';
 import CommentSection from '../components/CommentSection';
 import SubscribeWidget from '../components/SubscribeWidget';
+import IrisHighlightHint from '../components/IrisHighlightHint';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -90,6 +91,9 @@ export default async function BlogPostPage({ params }: PageProps) {
             </div>
           )}
         </header>
+
+        {/* Iris highlight hint */}
+        <IrisHighlightHint />
 
         {/* Body */}
         <PostBodyWithIris slug={slug}>

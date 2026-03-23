@@ -98,10 +98,10 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
   const showActions = phase === 'conversation' && messages.length > 0 && messages[messages.length - 1].role === 'assistant';
   const showDraft = phase === 'drafting' || phase === 'draft_ready' || phase === 'submitting' || phase === 'submitted';
 
-  // Compute position
+  // Compute position relative to viewport (use fixed positioning)
   const getDesktopStyle = (): React.CSSProperties => {
     const rect = selection.rect;
-    const top = rect.top + window.scrollY;
+    let top = rect.top;
     let left = rect.right + BUBBLE_GAP;
 
     // Flip to left if overflowing viewport
@@ -112,8 +112,11 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
     // Clamp left to at least 16px
     if (left < 16) left = 16;
 
+    // Clamp top to stay within viewport
+    if (top < 16) top = 16;
+
     return {
-      position: 'absolute',
+      position: 'fixed',
       top,
       left,
       width: BUBBLE_WIDTH,
