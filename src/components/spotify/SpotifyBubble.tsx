@@ -114,7 +114,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
   };
 
   return (
-    <div ref={containerRef} className="hidden md:block text-left" style={{ marginLeft: 'calc(50% - 96px)', position: 'relative' }}>
+    <div ref={containerRef} className="hidden md:block text-left max-h-full overflow-hidden" style={{ marginLeft: 'calc(50% - 96px)' }}>
       {/* Collapsed view — always in DOM to hold position */}
       <div
         className="rounded-2xl overflow-hidden relative transition-transform duration-200 hover:scale-[1.02] cursor-pointer"
