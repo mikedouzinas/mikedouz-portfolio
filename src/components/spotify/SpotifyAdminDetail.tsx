@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Info } from "lucide-react";
+import { Info, ChevronRight } from "lucide-react";
 import type { MusicInsight, InsightType } from "@/lib/spotify/types";
 
 const INSIGHT_LABELS: Record<InsightType, { label: string; color: string; description: string }> = {
@@ -77,6 +77,7 @@ function Tooltip({ text, children }: { text: string; children: React.ReactNode }
 }
 
 export default function SpotifyAdminDetail({ insight }: SpotifyAdminDetailProps) {
+  const [expanded, setExpanded] = useState(false);
   const { insightTypes, context, maxState } = insight;
   const stateInfo = STATE_LABELS[maxState];
 
@@ -84,71 +85,100 @@ export default function SpotifyAdminDetail({ insight }: SpotifyAdminDetailProps)
     ? ((insight.playCount / context.totalPlaysInWindow) * 100).toFixed(1)
     : null;
 
+  // Summary line for collapsed state
+  const tagCount = insightTypes.length;
+  const summaryParts: string[] = [];
+  if (stateInfo) summaryParts.push(stateInfo.label);
+  if (tagCount > 0) summaryParts.push(`${tagCount} tag${tagCount > 1 ? 's' : ''}`);
+  if (listeningShare) summaryParts.push(`${listeningShare}%`);
+
   return (
-    <div className="space-y-2.5 border-t border-white/[0.06] pt-2.5">
-      {/* Insight tags with hover descriptions */}
-      {insightTypes.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {insightTypes.map((type) => {
-            const { label, color, description } = INSIGHT_LABELS[type];
-            return (
-              <Tooltip key={type} text={description}>
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium cursor-help ${color}`}>
-                  {label}
-                  <Info className="w-2.5 h-2.5 opacity-50" />
+    <div className="border-t border-white/[0.06] pt-2">
+      {/* Collapsed toggle */}
+      <button
+        onClick={() => setExpanded((p) => !p)}
+        className="flex items-center gap-1.5 w-full text-left group/admin hover:bg-white/[0.03] rounded-md px-1 -mx-1 py-0.5"
+      >
+        <ChevronRight
+          className="w-3 h-3 text-gray-500 transition-transform duration-150"
+          style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+        />
+        <span className="text-[10px] text-gray-500 font-medium">insights</span>
+        {!expanded && (
+          <span className="text-[10px] text-gray-600 ml-1">
+            {summaryParts.join(' · ')}
+          </span>
+        )}
+      </button>
+
+      {/* Expanded content */}
+      {expanded && (
+        <div className="space-y-2.5 pt-2 pl-4">
+          {/* Insight tags with hover descriptions */}
+          {insightTypes.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {insightTypes.map((type) => {
+                const { label, color, description } = INSIGHT_LABELS[type];
+                return (
+                  <Tooltip key={type} text={description}>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium cursor-help ${color}`}>
+                      {label}
+                      <Info className="w-2.5 h-2.5 opacity-50" />
+                    </span>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Context with readable labels */}
+          <div className="space-y-1 text-[11px]">
+            {stateInfo && (
+              <div className="flex items-center gap-2">
+                <Tooltip text={stateInfo.description}>
+                  <span className="text-gray-500 cursor-help flex items-center gap-1">
+                    Detection level <Info className="w-2.5 h-2.5 opacity-40" />
+                  </span>
+                </Tooltip>
+                <span className="text-gray-200 font-medium">{stateInfo.label}</span>
+              </div>
+            )}
+
+            {listeningShare && (
+              <div className="flex items-center gap-2">
+                <Tooltip text="What percentage of all your listening during this period was this song">
+                  <span className="text-gray-500 cursor-help flex items-center gap-1">
+                    Listening share <Info className="w-2.5 h-2.5 opacity-40" />
+                  </span>
+                </Tooltip>
+                <span className="text-gray-200 font-medium">{listeningShare}%</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              <Tooltip text="How many other songs you were also playing during this same period">
+                <span className="text-gray-500 cursor-help flex items-center gap-1">
+                  Also playing <Info className="w-2.5 h-2.5 opacity-40" />
                 </span>
               </Tooltip>
-            );
-          })}
+              <span className="text-gray-200 font-medium">
+                {context.uniqueTracksInWindow} other songs
+              </span>
+            </div>
+
+            {context.monthsActive != null && context.monthsActive > 1 && (
+              <div className="flex items-center gap-2">
+                <Tooltip text="Total months across your listening history where this song appears">
+                  <span className="text-gray-500 cursor-help flex items-center gap-1">
+                    In your library <Info className="w-2.5 h-2.5 opacity-40" />
+                  </span>
+                </Tooltip>
+                <span className="text-gray-200 font-medium">{context.monthsActive} months</span>
+              </div>
+            )}
+          </div>
         </div>
       )}
-
-      {/* Context with readable labels */}
-      <div className="space-y-1 text-[11px]">
-        {stateInfo && (
-          <div className="flex items-center gap-2">
-            <Tooltip text={stateInfo.description}>
-              <span className="text-gray-500 cursor-help flex items-center gap-1">
-                Detection level <Info className="w-2.5 h-2.5 opacity-40" />
-              </span>
-            </Tooltip>
-            <span className="text-gray-200 font-medium">{stateInfo.label}</span>
-          </div>
-        )}
-
-        {listeningShare && (
-          <div className="flex items-center gap-2">
-            <Tooltip text="What percentage of all your listening during this period was this song">
-              <span className="text-gray-500 cursor-help flex items-center gap-1">
-                Listening share <Info className="w-2.5 h-2.5 opacity-40" />
-              </span>
-            </Tooltip>
-            <span className="text-gray-200 font-medium">{listeningShare}%</span>
-          </div>
-        )}
-
-        <div className="flex items-center gap-2">
-          <Tooltip text="How many other songs you were also playing during this same period">
-            <span className="text-gray-500 cursor-help flex items-center gap-1">
-              Also playing <Info className="w-2.5 h-2.5 opacity-40" />
-            </span>
-          </Tooltip>
-          <span className="text-gray-200 font-medium">
-            {context.uniqueTracksInWindow} other songs
-          </span>
-        </div>
-
-        {context.monthsActive != null && context.monthsActive > 1 && (
-          <div className="flex items-center gap-2">
-            <Tooltip text="Total months across your listening history where this song appears">
-              <span className="text-gray-500 cursor-help flex items-center gap-1">
-                In your library <Info className="w-2.5 h-2.5 opacity-40" />
-              </span>
-            </Tooltip>
-            <span className="text-gray-200 font-medium">{context.monthsActive} months</span>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

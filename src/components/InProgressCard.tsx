@@ -181,15 +181,15 @@ export default function InProgressCard({ item, index, visible }: InProgressCardP
         ) : (
           /* Standard layout: [icon] | bar | [content] */
           <div className="flex flex-row gap-4">
-            {/* Icon column — vertically centered */}
+            {/* Icon column — vertically centered, hidden on mobile in deep mode */}
             {Icon && (
-              <div className="flex-shrink-0 flex items-center">
+              <div className="hidden md:flex flex-shrink-0 items-center">
                 <Icon className="w-8 h-8 text-gray-400 dark:text-gray-500" strokeWidth={1.5} />
               </div>
             )}
 
-            {/* Gradient divider */}
-            {dividerBar}
+            {/* Gradient divider — hidden on mobile */}
+            <div className="hidden md:block">{dividerBar}</div>
 
             {/* Content */}
             <div className="flex flex-col flex-1 min-w-0">

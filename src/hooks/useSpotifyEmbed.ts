@@ -16,7 +16,7 @@ interface EmbedController {
   removeListener: (event: string, callback: (data: unknown) => void) => void;
 }
 
-interface PlaybackUpdate {
+interface PlaybackData {
   isPaused: boolean;
   isBuffering: boolean;
   duration: number; // ms
@@ -78,9 +78,10 @@ function loadIFrameAPI(): Promise<SpotifyIFrameAPI> {
 export interface UseSpotifyEmbedReturn {
   currentMomentId: string | null;
   isPlaying: boolean;
+  isLoading: boolean;
   progress: number; // 0–1
   position: number; // seconds
-  duration: number; // seconds
+  duration: number; // seconds (effective preview duration, not full song)
   togglePlay: (moment: MusicMoment) => void;
   stop: () => void;
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -89,6 +90,7 @@ export interface UseSpotifyEmbedReturn {
 export function useSpotifyEmbed(): UseSpotifyEmbedReturn {
   const [currentMomentId, setCurrentMomentId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -98,8 +100,30 @@ export function useSpotifyEmbed(): UseSpotifyEmbedReturn {
   const pendingTrackRef = useRef<string | null>(null);
   const momentIdRef = useRef<string | null>(null);
 
+  // Track effective preview duration (Spotify reports full song length,
+  // but only plays ~30s for non-Premium users)
+  const wasPlayingRef = useRef(false);
+  const effectiveDurationRef = useRef<number>(0); // ms
+  const userToggledRef = useRef(false);
+
+  // Preload the API script on mount so first play is faster
+  useEffect(() => {
+    loadIFrameAPI();
+  }, []);
+
   const clearContainer = useCallback(() => {
     if (containerRef.current) containerRef.current.innerHTML = '';
+  }, []);
+
+  const resetState = useCallback(() => {
+    setCurrentMomentId(null);
+    setIsPlaying(false);
+    setIsLoading(false);
+    setProgress(0);
+    setPosition(0);
+    setDuration(0);
+    wasPlayingRef.current = false;
+    effectiveDurationRef.current = 0;
   }, []);
 
   const stop = useCallback(() => {
@@ -110,12 +134,8 @@ export function useSpotifyEmbed(): UseSpotifyEmbedReturn {
     pendingTrackRef.current = null;
     momentIdRef.current = null;
     clearContainer();
-    setCurrentMomentId(null);
-    setIsPlaying(false);
-    setProgress(0);
-    setPosition(0);
-    setDuration(0);
-  }, [clearContainer]);
+    resetState();
+  }, [clearContainer, resetState]);
 
   const createEmbed = useCallback(
     (trackId: string, momentId: string) => {
@@ -125,12 +145,15 @@ export function useSpotifyEmbed(): UseSpotifyEmbedReturn {
 
       setCurrentMomentId(momentId);
       setIsPlaying(false);
+      setIsLoading(true);
       setProgress(0);
       setPosition(0);
       setDuration(0);
+      wasPlayingRef.current = false;
+      effectiveDurationRef.current = 0;
+      userToggledRef.current = false;
 
       loadIFrameAPI().then((IFrameAPI) => {
-        // Bail if user switched tracks while API was loading
         if (pendingTrackRef.current !== trackId) return;
         if (!containerRef.current) return;
 
@@ -141,7 +164,6 @@ export function useSpotifyEmbed(): UseSpotifyEmbedReturn {
           el,
           { uri: `spotify:track:${trackId}`, width: 1, height: 1 },
           (controller) => {
-            // Bail if track changed during controller creation
             if (pendingTrackRef.current !== trackId) {
               try { controller.destroy(); } catch { /* ignore */ }
               return;
@@ -149,17 +171,41 @@ export function useSpotifyEmbed(): UseSpotifyEmbedReturn {
 
             controllerRef.current = controller;
 
-            controller.addListener('playback_update', (raw: unknown) => {
-              const d = raw as PlaybackUpdate;
-              setIsPlaying(!d.isPaused);
-              if (d.duration > 0) {
-                setProgress(d.position / d.duration);
-                setPosition(Math.floor(d.position / 1000));
-                setDuration(Math.floor(d.duration / 1000));
+            controller.addListener('playback_update', (e: unknown) => {
+              const d = (e as { data: PlaybackData }).data;
+              const playing = !d.isPaused;
+
+              // Detect preview end: was playing → now paused, and we didn't trigger it
+              if (wasPlayingRef.current && d.isPaused && !userToggledRef.current) {
+                // Preview ended — capture effective duration
+                if (effectiveDurationRef.current === 0 && d.position > 0) {
+                  effectiveDurationRef.current = d.position;
+                }
+                // Show as complete
+                setIsPlaying(false);
+                setProgress(1);
+                setPosition(Math.floor((effectiveDurationRef.current || d.position) / 1000));
+                setDuration(Math.floor((effectiveDurationRef.current || d.position) / 1000));
+                wasPlayingRef.current = false;
+                return;
+              }
+
+              userToggledRef.current = false;
+              wasPlayingRef.current = playing;
+              setIsLoading(false);
+              setIsPlaying(playing);
+
+              if (d.position > 0) {
+                // Use effective duration if known, otherwise use reported duration
+                const effDur = effectiveDurationRef.current || d.duration;
+                if (effDur > 0) {
+                  setProgress(Math.min(d.position / effDur, 1));
+                  setPosition(Math.floor(d.position / 1000));
+                  setDuration(Math.floor(effDur / 1000));
+                }
               }
             });
 
-            // Auto-play when the embed is ready
             controller.addListener('ready', () => {
               controller.play();
             });
@@ -177,6 +223,7 @@ export function useSpotifyEmbed(): UseSpotifyEmbedReturn {
 
       // Same track → toggle
       if (momentIdRef.current === moment.id && controllerRef.current) {
+        userToggledRef.current = true;
         controllerRef.current.togglePlay();
         return;
       }
@@ -204,6 +251,7 @@ export function useSpotifyEmbed(): UseSpotifyEmbedReturn {
   return {
     currentMomentId,
     isPlaying,
+    isLoading,
     progress,
     position,
     duration,

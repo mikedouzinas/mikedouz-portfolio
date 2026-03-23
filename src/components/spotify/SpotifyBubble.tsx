@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+// framer-motion removed — expanded panel uses CSS transitions for instant open
 import { Music, Maximize2, Minimize2 } from 'lucide-react';
 import { getMusicMoments, getMomentsByMonth, formatMonth } from '@/data/spotify/loader';
 import { useSpotifyEmbed } from '@/hooks/useSpotifyEmbed';
@@ -28,6 +28,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
     progress,
     position,
     duration,
+    isLoading,
     togglePlay,
     stop,
     containerRef: embedContainerRef,
@@ -83,7 +84,6 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
     }
     return flat;
   }, [momentsByMonth]);
-  const remainingCount = filteredMoments.length - recentMoments.length;
 
   const uniqueSongsCount = useMemo(
     () => new Set(filteredMoments.map((m) => m.trackUri)).size,
@@ -116,14 +116,14 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
 
   if (!deepMode) return null;
 
+  // Toggle expand without stopping playback
   const handleToggleExpand = () => {
-    if (expanded) stop();
     setExpanded((prev) => !prev);
   };
 
   return (
     <div ref={containerRef} className="hidden md:block text-left" style={{ marginLeft: 'calc(50% - 96px)' }}>
-      {/* Hidden Spotify embed container — 1x1 off-screen iframe lives here */}
+      {/* Hidden Spotify embed container */}
       <div
         ref={embedContainerRef}
         aria-hidden="true"
@@ -137,7 +137,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
         }}
       />
 
-      {/* Collapsed view — always in DOM to hold position */}
+      {/* Collapsed view */}
       <div
         className="rounded-2xl overflow-hidden relative transition-transform duration-200 hover:scale-[1.02] cursor-pointer"
         data-has-contained-glow="true"
@@ -152,6 +152,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
         }}
       >
         <ContainedMouseGlow color="52, 211, 153" intensity={0.25} />
+
         <div className="flex items-center justify-between px-3 py-2.5">
           <div className="flex items-center gap-2">
             <Music className="w-3.5 h-3.5" style={{ color: '#1DB954' }} />
@@ -177,6 +178,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
                 moment={moment}
                 compact
                 isPlaying={currentMomentId === moment.id && isPlaying}
+                isLoading={currentMomentId === moment.id && isLoading}
                 playProgress={currentMomentId === moment.id ? progress : 0}
                 playPosition={currentMomentId === moment.id ? position : 0}
                 playDuration={currentMomentId === moment.id ? duration : 0}
@@ -206,26 +208,24 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
         )}
       </div>
 
-      {/* Expanded view */}
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.12 }}
-            className="fixed z-50 rounded-2xl overflow-hidden"
-            style={{
-              background: 'rgba(16,42,46,0.92)',
-              backdropFilter: 'blur(30px)',
-              WebkitBackdropFilter: 'blur(30px)',
-              border: '1px solid rgba(52,211,153,0.25)',
-              boxShadow: '0 12px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)',
-              width: 'min(420px, calc(100vw / 3 - 1rem))',
-              bottom: '80px',
-              left: '32px',
-            }}
-          >
+      {/* Expanded view — always in DOM, toggled via opacity/pointer-events for instant open */}
+      <div
+        className="fixed z-50 rounded-2xl overflow-hidden transition-all duration-[120ms]"
+        style={{
+          background: 'rgba(16,42,46,0.95)',
+          border: '1px solid rgba(52,211,153,0.25)',
+          boxShadow: expanded
+            ? '0 12px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)'
+            : 'none',
+          width: 'min(420px, calc(100vw / 3 - 1rem))',
+          bottom: '80px',
+          left: '32px',
+          opacity: expanded ? 1 : 0,
+          pointerEvents: expanded ? 'auto' : 'none',
+          transform: expanded ? 'scale(1) translateY(0)' : 'scale(0.93) translateY(6px)',
+          willChange: 'transform, opacity',
+        }}
+      >
             <div className="flex items-center justify-between px-3 py-2.5">
               <div className="flex items-center gap-2">
                 <Music className="w-3.5 h-3.5" style={{ color: '#1DB954' }} />
@@ -265,6 +265,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
                         moment={moment}
                         compact={false}
                         isPlaying={currentMomentId === moment.id && isPlaying}
+                        isLoading={currentMomentId === moment.id && isLoading}
                         playProgress={currentMomentId === moment.id ? progress : 0}
                         playPosition={currentMomentId === moment.id ? position : 0}
                         playDuration={currentMomentId === moment.id ? duration : 0}
@@ -291,9 +292,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
                 {uniqueSongsCount} songs
               </span>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }

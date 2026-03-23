@@ -6,29 +6,56 @@ import type { MusicMoment } from '@/lib/spotify/types';
 import { useAdminMode } from '@/hooks/useAdminMode';
 import { getMusicInsights } from '@/data/spotify/loader';
 import SpotifyAdminDetail from '@/components/spotify/SpotifyAdminDetail';
+import FloatingNotes from './FloatingNotes';
 
 interface SpotifyCardProps {
   moment: MusicMoment;
   compact?: boolean;
   isPlaying?: boolean;
+  isLoading?: boolean;
   playProgress?: number;
-  playPosition?: number;  // seconds
-  playDuration?: number;  // seconds
+  playPosition?: number;
+  playDuration?: number;
   onPlayToggle?: (moment: MusicMoment) => void;
 }
 
-/** Format seconds as m:ss */
+/** Tiny bouncing equalizer bars — shows while the embed is loading */
+function LoadingBars({ size = 'sm' }: { size?: 'sm' | 'md' }) {
+  const h = size === 'sm' ? 10 : 16;
+  const barW = size === 'sm' ? 2 : 2.5;
+  const gap = size === 'sm' ? 1.5 : 2;
+  return (
+    <div className="flex items-end justify-center" style={{ height: h, gap }}>
+      {[0, 1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="rounded-full"
+          style={{
+            width: barW,
+            backgroundColor: '#1DB954',
+            animation: `eqBounce 0.8s ease-in-out ${i * 0.15}s infinite alternate`,
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes eqBounce {
+          0% { height: 20%; opacity: 0.4; }
+          100% { height: 100%; opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 function formatTime(s: number): string {
   const m = Math.floor(s / 60);
   const sec = s % 60;
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
-/** Show specific date range: "Jan 8 – 12, 2026" or "Dec 29 – Jan 25" */
 function formatDateRange(dateRange: { start: string; end: string }): string {
   const s = new Date(dateRange.start);
   const e = new Date(dateRange.end);
-
   const sMonth = s.toLocaleString('default', { month: 'short' });
   const eMonth = e.toLocaleString('default', { month: 'short' });
   const sDay = s.getUTCDate();
@@ -64,6 +91,7 @@ export default function SpotifyCard({
   moment,
   compact = false,
   isPlaying = false,
+  isLoading = false,
   playProgress = 0,
   playPosition = 0,
   playDuration = 0,
@@ -83,56 +111,49 @@ export default function SpotifyCard({
         className={`flex items-center gap-2.5 py-1.5 group/compact rounded-md px-1 -mx-1 transition-colors ${canPlay ? 'cursor-pointer hover:bg-white/[0.04]' : ''}`}
         onClick={() => canPlay && onPlayToggle?.(moment)}
       >
-        {/* Intensity dot — pulses green when playing */}
+        {/* Flashing green light when playing, otherwise intensity dot */}
         <div
-          className="w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors"
+          className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isPlaying ? 'animate-pulse' : ''}`}
           style={{
             backgroundColor: isPlaying ? '#1DB954' : accentColor,
-            boxShadow: isPlaying ? '0 0 6px #1DB954' : 'none',
+            boxShadow: isPlaying ? '0 0 8px 2px rgba(29,185,52,0.6)' : 'none',
           }}
         />
 
-        {/* Album art with play overlay */}
-        <div className="relative w-8 h-8 flex-shrink-0 rounded overflow-hidden bg-white/10">
-          {moment.albumArtUrl ? (
-            <Image
-              src={moment.albumArtUrl}
-              alt={moment.album}
-              fill
-              sizes="32px"
-              className={`object-cover transition-opacity ${isPlaying ? 'opacity-80' : ''}`}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Play className="w-3 h-3 text-gray-500" />
-            </div>
-          )}
-
-          {/* Hover overlay with play/pause */}
-          {canPlay && (
-            <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${isPlaying ? 'opacity-100' : 'opacity-0 group-hover/compact:opacity-100'}`}>
-              {isPlaying ? (
-                <Pause className="w-3 h-3 text-white fill-white" />
-              ) : (
-                <Play className="w-3 h-3 text-white fill-white ml-px" />
-              )}
-            </div>
-          )}
-
-          {/* Progress bar */}
-          {isPlaying && (
-            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/20">
-              <div
-                className="h-full bg-[#1DB954] transition-[width] duration-200"
-                style={{ width: `${playProgress * 100}%` }}
+        {/* Album art with notes + play overlay */}
+        <div className="relative w-8 h-8 flex-shrink-0" style={{ overflow: 'visible' }}>
+          <div className="relative w-full h-full rounded overflow-hidden bg-white/10">
+            {moment.albumArtUrl ? (
+              <Image
+                src={moment.albumArtUrl}
+                alt={moment.album}
+                fill
+                sizes="32px"
+                className="object-cover"
               />
-            </div>
-          )}
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Play className="w-3 h-3 text-gray-500" />
+              </div>
+            )}
 
-          {/* Playing ring */}
-          {isPlaying && (
-            <div className="absolute inset-0 rounded border border-[#1DB954]/60" />
-          )}
+            {/* Play/pause/loading overlay */}
+            {canPlay && (
+              <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${isPlaying || isLoading ? 'opacity-100' : 'opacity-0 group-hover/compact:opacity-100'}`}>
+                {isLoading ? (
+                  <LoadingBars size="sm" />
+                ) : isPlaying ? (
+                  <Pause className="w-3 h-3 text-white fill-white" />
+                ) : (
+                  <Play className="w-3 h-3 text-white fill-white ml-px" />
+                )}
+              </div>
+            )}
+
+          </div>
+
+          {/* Floating notes around the art */}
+          {isPlaying && <FloatingNotes size="sm" />}
         </div>
 
         {/* Track info */}
@@ -145,9 +166,9 @@ export default function SpotifyCard({
           </p>
         </div>
 
-        {/* Time indicator */}
-        {isPlaying && playDuration > 0 && (
-          <span className="text-[9px] text-gray-500 tabular-nums flex-shrink-0">
+        {/* Elapsed time */}
+        {isPlaying && playPosition > 0 && (
+          <span className="text-[9px] text-[#1DB954]/70 tabular-nums flex-shrink-0">
             {formatTime(playPosition)}
           </span>
         )}
@@ -161,6 +182,10 @@ export default function SpotifyCard({
   const formatDay = (d: string) =>
     new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
+  const barStyle: React.CSSProperties = isPlaying
+    ? { backgroundColor: '#1DB954' }
+    : { backgroundColor: accentColor };
+
   return (
     <div
       className="rounded-xl bg-white/[0.04] border overflow-hidden flex transition-colors"
@@ -168,55 +193,46 @@ export default function SpotifyCard({
         borderColor: isPlaying ? 'rgba(29,185,52,0.35)' : 'rgba(255,255,255,0.06)',
       }}
     >
-      {/* Intensity color bar */}
-      <div
-        className="w-1 flex-shrink-0 transition-colors"
-        style={{ backgroundColor: isPlaying ? '#1DB954' : accentColor }}
-      />
+      {/* Intensity color bar — doubles as progress indicator when playing */}
+      <div className="w-1 flex-shrink-0 rounded-l-xl" style={barStyle} />
 
-      <div className="flex-1 p-3">
+      <div className="flex-1 p-3 overflow-hidden">
         <div className="flex gap-3">
-          {/* Album art */}
-          <div
-            className={`relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-white/10 group cursor-pointer`}
-            onClick={() => canPlay && onPlayToggle?.(moment)}
-          >
-            {moment.albumArtUrl ? (
-              <Image
-                src={moment.albumArtUrl}
-                alt={moment.album}
-                fill
-                sizes="56px"
-                className={`object-cover transition-opacity ${isPlaying ? 'opacity-80' : ''}`}
-              />
-            ) : (
-              <div className="w-full h-full" />
-            )}
-
-            {canPlay && (
-              <div className={`absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity ${isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                {isPlaying ? (
-                  <Pause className="w-5 h-5 text-white fill-white" />
-                ) : (
-                  <Play className="w-5 h-5 text-white fill-white ml-0.5" />
-                )}
-              </div>
-            )}
-
-            {/* Progress bar on album art */}
-            {isPlaying && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/20">
-                <div
-                  className="h-full bg-[#1DB954] transition-[width] duration-200"
-                  style={{ width: `${playProgress * 100}%` }}
+          {/* Album art wrapper — allows notes to overflow */}
+          <div className="relative flex-shrink-0" style={{ width: 56, height: 56, overflow: 'visible' }}>
+            <div
+              className="relative w-full h-full rounded-lg overflow-hidden bg-white/10 group cursor-pointer"
+              onClick={() => canPlay && onPlayToggle?.(moment)}
+            >
+              {moment.albumArtUrl ? (
+                <Image
+                  src={moment.albumArtUrl}
+                  alt={moment.album}
+                  fill
+                  sizes="56px"
+                  className="object-cover"
                 />
-              </div>
-            )}
+              ) : (
+                <div className="w-full h-full" />
+              )}
 
-            {/* Playing ring */}
-            {isPlaying && (
-              <div className="absolute inset-0 rounded-lg border border-[#1DB954]/60" />
-            )}
+              {/* Play/pause/loading — always visible when playing or loading */}
+              {canPlay && (
+                <div className={`absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity ${isPlaying || isLoading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                  {isLoading ? (
+                    <LoadingBars size="md" />
+                  ) : isPlaying ? (
+                    <Pause className="w-5 h-5 text-white fill-white" />
+                  ) : (
+                    <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+                  )}
+                </div>
+              )}
+
+            </div>
+
+            {/* Floating notes around art */}
+            {isPlaying && <FloatingNotes size="md" />}
           </div>
 
           {/* Info */}
@@ -226,10 +242,10 @@ export default function SpotifyCard({
                 {moment.trackName}
               </p>
               <div className="flex items-center gap-1.5 flex-shrink-0">
-                {/* Time indicator */}
-                {isPlaying && playDuration > 0 && (
-                  <span className="text-[9px] text-gray-400 tabular-nums">
-                    {formatTime(playPosition)} / {formatTime(playDuration)}
+                {/* Elapsed time */}
+                {isPlaying && playPosition > 0 && (
+                  <span className="text-[9px] text-[#1DB954]/70 tabular-nums">
+                    {formatTime(playPosition)}{playDuration > 0 ? ` / ${formatTime(playDuration)}` : ''}
                   </span>
                 )}
                 {heat && (

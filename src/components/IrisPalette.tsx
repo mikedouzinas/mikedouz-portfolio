@@ -1511,31 +1511,27 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             role="dialog"
             aria-label="Iris command palette"
             aria-modal="false"
-            initial={{ 
-              opacity: 0, 
-              x: isMobile ? 0 : "-50%", 
-              scale: isMobile ? 1 : 0.95,
-              y: isMobile ? 20 : 0
+            initial={{
+              opacity: 0,
+              x: isMobile ? 0 : "-50%",
+              scale: 0.97,
+              y: 0
             }}
-            animate={{ 
-              opacity: 1, 
-              x: isMobile ? 0 : "-50%", 
+            animate={{
+              opacity: 1,
+              x: isMobile ? 0 : "-50%",
               scale: 1,
               y: 0
             }}
-            exit={{ 
-              opacity: 0, 
-              x: isMobile ? 0 : "-50%", 
-              scale: isMobile ? 1 : 0.95,
-              y: isMobile ? 20 : 0
+            exit={{
+              opacity: 0,
+              x: isMobile ? 0 : "-50%",
+              scale: 0.97,
+              y: 0
             }}
-            transition={{ 
-              duration: 0.35, 
-              ease: [0.16, 1, 0.3, 1], // Spring-like easing for liquid feel
-              scale: {
-                duration: 0.4,
-                ease: [0.16, 1, 0.3, 1]
-              }
+            transition={{
+              duration: 0.15,
+              ease: 'easeOut',
             }}
             onAnimationComplete={() => {
               // Unlock animation state when animation finishes (both open and close)
