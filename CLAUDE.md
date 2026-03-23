@@ -2,7 +2,7 @@
 
 **Last Updated**: 2026-03-23
 **Project**: mikeveson.com — Portfolio, Iris AI Assistant & The Web
-**Stack**: Next.js 15, React 19, TypeScript, OpenAI, Redis, Supabase, Twilio, Resend
+**Stack**: Next.js 15, React 19, TypeScript, Anthropic Claude, Redis, Supabase, Twilio, Resend
 
 ---
 
@@ -26,8 +26,8 @@ This is a **modern full-stack personal portfolio** featuring **Iris** - an intel
 
 ### Core Features
 
-- **Iris AI Assistant**: Command palette (⌘K) with semantic search and structured filtering
-- **RAG System**: OpenAI embeddings + GPT-4o-mini for context-aware responses
+- **Iris AI Assistant**: Command palette (⌘K) powered by Claude Sonnet 4.6 with the full KB in context
+- **Full-Context AI**: Entire knowledge base passed in a prompt-cached system prompt — no embeddings or semantic search
 - **Smart Inbox**: "Ask Mike" contact system with email notifications
 - **Interactive UI**: Mouse glow effects, animations, dark mode
 - **Knowledge Base**: 10 document types (projects, experience, classes, skills, etc.)
@@ -36,9 +36,10 @@ This is a **modern full-stack personal portfolio** featuring **Iris** - an intel
 ### Tech Stack
 
 - **Frontend**: Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes, OpenAI API, Upstash Redis, Supabase PostgreSQL
+- **Backend**: Next.js API Routes, Anthropic Claude API, Upstash Redis, Supabase PostgreSQL
 - **UI**: shadcn/ui, Framer Motion, cmdk (command palette)
 - **Email**: Resend API for inbox notifications
+- **Note**: OpenAI API is still used for blog Iris draft generation (not the main Iris assistant)
 
 ---
 
@@ -73,15 +74,12 @@ mikedouz-portfolio/
 │   │   └── ContainedMouseGlow.tsx  # Card glow effect
 │   │
 │   ├── lib/                    # Business logic & utilities
-│   │   ├── iris/               # Iris AI system (34 files)
-│   │   │   ├── answer-utils/   # Modular answer pipeline (14 files)
+│   │   ├── iris/               # Iris AI system
+│   │   │   ├── answer-utils/   # Modular answer utilities
 │   │   │   ├── config.ts       # Feature toggles, model config
 │   │   │   ├── schema.ts       # Zod schemas & TypeScript types
-│   │   │   ├── load.ts         # KB data loaders
-│   │   │   ├── retrieval.ts    # Semantic search & filtering
-│   │   │   ├── embedding.ts    # OpenAI embeddings
+│   │   │   ├── load.ts         # KB data loaders (full KB serialized into Claude context)
 │   │   │   ├── cache.ts        # Redis caching
-│   │   │   ├── intents.ts      # Intent classification
 │   │   │   ├── quickActions.ts # Smart follow-up suggestions
 │   │   │   └── analytics.ts    # Query logging
 │   │   ├── supabaseAdmin.ts    # Supabase client & queries
@@ -100,13 +98,12 @@ mikedouz-portfolio/
 │           │   ├── blogs.json        # Blog posts
 │           │   └── contact.json      # Contact info
 │           └── derived/        # Pre-computed data
-│               ├── embeddings.json   # Pre-computed vectors
 │               └── typeahead.json    # Search suggestions
 │
 ├── scripts/                    # Build & test utilities
-│   ├── build_embeddings.ts     # Pre-compute embeddings
 │   ├── build_typeahead.ts      # Generate suggestions (v1)
 │   ├── build_typeahead_v2.ts   # Enhanced suggestions (v2)
+│   ├── build_rankings.ts       # Pre-compute importance rankings
 │   ├── verify_kb.ts            # Validate KB structure
 │   ├── test_iris.ts            # Interactive test suite (80+ cases)
 │   └── clear_cache.ts          # Redis cache clearing
@@ -128,45 +125,38 @@ mikedouz-portfolio/
 
 **Location**: `src/app/api/iris/answer/route.ts` (main endpoint), `src/lib/iris/` (core logic)
 
-#### Intent System (5 Types)
+#### Intent System (via Claude Tool Call)
 
-Iris classifies queries into 5 intent types using GPT-4o-mini with function calling:
+Iris classifies queries into intent types using Claude Sonnet 4.6 with a tool call — no separate intent classification step. Claude receives the full KB in context and uses a `classify_query` tool to determine intent and any structured parameters in a single pass.
 
 | Intent | Purpose | Routing Logic |
 |--------|---------|---------------|
-| **`contact`** | Fast-path for contact info | Skips LLM, returns static contact data |
+| **`contact`** | Fast-path for contact info | Returns static contact data directly |
 | **`filter_query`** | Structured filtering | Uses `applyFilters()` with exact skill/year/type matching |
-| **`specific_item`** | Details about a specific item | Semantic search + reranking for specificity |
-| **`personal`** | Family/values/interests | Searches `stories`, `values`, `interests`, `bio` |
-| **`general`** | Semantic search | Cosine similarity on embeddings across all types |
+| **`specific_item`** | Details about a specific item | Claude searches its full-context KB |
+| **`personal`** | Family/values/interests | Claude draws from stories, values, interests, bio |
+| **`general`** | Open-ended query | Claude answers from full KB context |
 
-**File**: `src/lib/iris/answer-utils/intent.ts`
+Intent detection happens inside the same Claude call that generates the answer — there is no separate GPT step.
 
-#### RAG Pipeline
+#### Claude Full-Context Pipeline
 
 ```
 User Query (⌘K)
     ↓
-Intent Detection (GPT-4o-mini function calling)
+Full KB serialized into prompt-cached system prompt
     ↓
-┌─────────────┬─────────────┬─────────────┐
-│  Structured │   Semantic  │  Personal   │
-│  Filtering  │   Search    │  Context    │
-│  (exact)    │  (cosine)   │  (stories)  │
-└─────────────┴─────────────┴─────────────┘
-    ↓
-Context Builder (format docs, add metadata)
-    ↓
-LLM Generation (gpt-4o-mini, streaming)
+Claude Sonnet 4.6 (single API call, streaming)
+  ├─ Tool call: classify_query → intent + filters
+  └─ Streaming answer (uses full KB in context)
     ↓
 SSE Response (to frontend)
 ```
 
 **Key Files**:
-- `src/lib/iris/retrieval.ts` - Semantic search with cosine similarity
-- `src/lib/iris/answer-utils/filters.ts` - Structured filtering logic
-- `src/lib/iris/answer-utils/formatting.ts` - Context formatting (minimal/standard/full)
-- `src/lib/iris/answer-utils/planning.ts` - Pre-routing, contact planning
+- `src/app/api/iris/answer/route.ts` - Main endpoint (~820 lines); contains KB serialization, Claude call, and streaming logic
+- `src/lib/iris/answer-utils/filters.ts` - Structured filtering for `filter_query` intent
+- `src/lib/iris/load.ts` - KB data loaders (full KB loaded and serialized per request, cached by Claude prompt caching)
 
 #### Knowledge Base Structure
 
@@ -369,11 +359,13 @@ Iris emits structured directives during streaming:
 
    **Required for Iris**:
    ```bash
-   OPENAI_API_KEY=sk-...
+   ANTHROPIC_API_KEY=sk-ant-...
    ```
 
    **Optional (production features)**:
    ```bash
+   OPENAI_API_KEY=sk-...                   # Blog Iris draft generation only (not main Iris)
+
    UPSTASH_REDIS_REST_URL=https://...      # Caching
    UPSTASH_REDIS_REST_TOKEN=...
 
@@ -389,7 +381,8 @@ Iris emits structured directives during streaming:
 3. **Build Knowledge Base**
    ```bash
    npm run kb:rebuild
-   # Runs: verify:kb + build:embeddings + build:typeahead
+   # Runs: verify:kb + build:typeahead + build:rankings
+   # No embeddings step needed — Claude uses full KB in context
    ```
 
 4. **Run Development Server**
@@ -408,10 +401,10 @@ npm run build            # Production build
 npm start                # Start production server
 
 # Knowledge Base
-npm run kb:rebuild       # Full rebuild (verify + embeddings + typeahead)
+npm run kb:rebuild       # Full rebuild (verify + typeahead + rankings)
 npm run verify:kb        # Validate KB structure with Zod schemas
-npm run build:embeddings # Pre-compute embeddings (required after KB changes)
 npm run build:typeahead  # Generate suggestions (v1 + v2)
+npm run build:rankings   # Pre-compute importance rankings
 
 # Testing
 npm run test:iris        # Interactive test suite (80+ cases)
@@ -435,9 +428,11 @@ npm run clear:cache      # Clear Redis cache (if script exists)
 **After changes**:
 ```bash
 npm run verify:kb        # Check for errors
-npm run build:embeddings # Rebuild embeddings (REQUIRED)
+npm run kb:rebuild       # Rebuild typeahead + rankings
 npm run test:iris        # Test queries
 ```
+
+**Note**: No embeddings rebuild required — Iris is powered by Claude Sonnet 4.6 with the full KB passed in context. The KB is serialized and included directly in the prompt-cached system prompt.
 
 **Important**: Always use skill IDs (`react`, `python`) not display names ("React", "Python") in KB files.
 
@@ -447,8 +442,7 @@ npm run test:iris        # Test queries
 ```typescript
 export const config = {
   models: {
-    chat: 'gpt-4o-mini',  // or gpt-4-turbo, gpt-3.5-turbo
-    embeddings: 'text-embedding-3-small'  // or text-embedding-3-large
+    chat: 'claude-sonnet-4-6',  // Anthropic Claude Sonnet 4.6
   },
   chatSettings: {
     temperature: 1,
@@ -457,12 +451,9 @@ export const config = {
 };
 ```
 
-**Adjust Intent Detection** (`src/lib/iris/answer-utils/intent.ts`):
-- Modify function calling schema
-- Add new intent types
-- Change routing logic
+**Adjust Intent Detection** — intent is detected by Claude via tool call inside `route.ts`. To add or modify intent types, update the `classify_query` tool schema in `src/app/api/iris/answer/route.ts`.
 
-**Update System Prompt** (`src/app/api/iris/answer/route.ts` ~line 845):
+**Update System Prompt** (`src/app/api/iris/answer/route.ts` ~line 100):
 - Anti-hallucination instructions
 - Response style guidelines
 - Context formatting rules
@@ -652,8 +643,8 @@ This runs 11 test suites with 80+ cases covering:
 # 1. Verify KB structure
 npm run verify:kb
 
-# 2. Rebuild embeddings if KB changed
-npm run build:embeddings
+# 2. Rebuild KB artifacts if KB changed
+npm run kb:rebuild
 
 # 3. Run tests
 npm run test:iris
@@ -667,14 +658,11 @@ npm run build
 
 ### Common Issues
 
-**Issue**: Empty results fallback triggering too often
-**Solution**: Rebuild embeddings
-```bash
-npm run build:embeddings
-```
+**Issue**: Iris returns wrong or incomplete information after KB update
+**Solution**: KB is serialized into the prompt at runtime — no embeddings rebuild needed. Just ensure `npm run verify:kb` passes and restart the dev server.
 
 **Issue**: Hallucinated information
-**Fix**: Review system prompt anti-hallucination rules in `src/app/api/iris/answer/route.ts` ~line 845
+**Fix**: Review system prompt anti-hallucination rules in `src/app/api/iris/answer/route.ts` (top of file near system prompt constant)
 
 **Issue**: Filter queries not working
 **Check**: `applyFilters()` function in `answer/route.ts`, verify skills in KB match query terms (case-insensitive)
@@ -715,9 +703,10 @@ npm run clear:cache
 }
 ```
 
-2. **Rebuild embeddings**:
+2. **Rebuild KB artifacts**:
 ```bash
-npm run build:embeddings
+npm run verify:kb
+npm run kb:rebuild
 ```
 
 3. **Test**:
@@ -744,7 +733,7 @@ npm run test:iris
 3. **Rebuild**:
 ```bash
 npm run verify:kb
-npm run build:embeddings
+npm run kb:rebuild
 ```
 
 ### Task 3: Modify Iris Response Style
@@ -769,28 +758,26 @@ npm run dev
 
 ### Task 4: Add New Intent Type
 
-1. **Edit** `src/lib/iris/answer-utils/intent.ts`:
+1. **Edit** the `classify_query` tool schema in `src/app/api/iris/answer/route.ts`:
 ```typescript
-// Add to function calling schema
-const functions = [
-  {
-    name: 'new_intent',
-    description: 'When user asks about...',
-    parameters: {
-      type: 'object',
-      properties: {
-        // ... parameters
+// Add new value to the intent enum in the tool input_schema
+{
+  name: 'classify_query',
+  input_schema: {
+    properties: {
+      intent: {
+        enum: [...existingIntents, 'new_intent'],
+        description: 'When user asks about...'
       }
     }
   }
-];
+}
 ```
 
-2. **Update routing** in `src/app/api/iris/answer/route.ts`:
+2. **Add routing logic** in the same file after the tool call result:
 ```typescript
 if (intent === 'new_intent') {
   // Handle new intent
-  const results = await handleNewIntent(query);
 }
 ```
 
@@ -835,12 +822,14 @@ if (intent === 'new_intent') {
 
 | File | Purpose | Lines |
 |------|---------|-------|
-| `src/app/api/iris/answer/route.ts` | Main Iris endpoint (POST/GET) | ~1000 |
+| `src/app/api/iris/answer/route.ts` | Main Iris endpoint — KB serialization, Claude call, streaming, intent routing | ~820 |
 | `src/lib/iris/schema.ts` | Zod schemas & TypeScript types | 1600+ |
-| `src/lib/iris/load.ts` | KB data loaders | 200+ |
-| `src/lib/iris/retrieval.ts` | Semantic search & filtering | 150+ |
+| `src/lib/iris/load.ts` | KB data loaders (full KB passed to Claude in context) | 200+ |
 | `src/lib/iris/quickActions.ts` | Smart follow-up generation | 400+ |
-| `src/lib/iris/answer-utils/` | Modular answer pipeline | 14 files |
+| `src/lib/iris/answer-utils/filters.ts` | Structured filtering for `filter_query` intent | — |
+| `src/lib/iris/rankings.ts` | Importance scoring for quick actions | — |
+
+Note: `retrieval.ts`, `embedding.ts`, `intents.ts`, `planning.ts`, and `aliases.ts` were removed in the Claude migration — intent detection and retrieval are now handled by Claude with the full KB in context.
 
 ### Knowledge Base
 
@@ -871,7 +860,7 @@ if (intent === 'new_intent') {
 
 #### DO:
 - ✅ **Update the KB when shipping new features** — When a significant feature is added to mikeveson.com (new system, new page, new capability), update the `proj_portfolio` entry in `src/data/iris/kb/projects.json` to include it in the specifics. This site has many subsystems (Iris, The Web, Spotify timeline, deep mode, Olympus game, inbox, blog Iris interactions) and the KB entry should reflect the current state so Iris can answer questions about what the site includes. Also update skill IDs and tech stack if new technologies are introduced.
-- ✅ **Always rebuild embeddings** after changing KB files: `npm run build:embeddings`
+- ✅ **Run `npm run kb:rebuild`** after changing KB files (no embeddings step needed — Claude uses full KB in context)
 - ✅ **Use skill IDs** (e.g., `react`, `python`) not display names in KB files
 - ✅ **Test with `npm run test:iris`** after significant changes
 - ✅ **Run `npm run verify:kb`** to catch schema errors early
@@ -887,7 +876,7 @@ if (intent === 'new_intent') {
 #### DON'T:
 - ❌ **Never commit `.env.local`** - contains secrets
 - ❌ **Don't modify `node_modules/`** - use package.json
-- ❌ **Don't skip embeddings rebuild** after KB changes
+- ❌ **Don't skip `npm run verify:kb`** after KB changes — catches schema errors before they affect Iris
 - ❌ **Don't use display names for skills** - use IDs
 - ❌ **Don't weaken anti-hallucination prompts** - accuracy is critical
 - ❌ **Don't break backward compatibility** without good reason
@@ -900,20 +889,20 @@ if (intent === 'new_intent') {
 
 **When a user reports an issue**:
 
-1. **Check the intent classification** - Did Iris detect the right intent?
-   - File: `src/lib/iris/answer-utils/intent.ts`
-   - Test: Run query through `/api/iris/answer` and check logs
+1. **Check the intent classification** - Did Claude detect the right intent?
+   - Intent is determined via a `classify_query` tool call inside `src/app/api/iris/answer/route.ts`
+   - Test: Run query through `/api/iris/answer` and check server logs for the tool call result
 
-2. **Check retrieval results** - Are the right KB items being found?
-   - Semantic search: `src/lib/iris/retrieval.ts`
-   - Structured filtering: `src/lib/iris/answer-utils/filters.ts`
+2. **Check KB content** - Does the KB contain the relevant information?
+   - Claude has the full KB in context — if the answer is wrong or missing, check the KB JSON files
+   - Run `npm run verify:kb` to confirm KB passes schema validation
 
-3. **Check formatting** - Is context being formatted correctly?
-   - File: `src/lib/iris/answer-utils/formatting.ts`
-   - Detail levels: minimal, standard, full
+3. **Check structured filtering** - For `filter_query` intent, is filtering working?
+   - File: `src/lib/iris/answer-utils/filters.ts`
+   - Verify skills in KB match query terms (case-insensitive)
 
 4. **Check system prompt** - Are instructions clear and complete?
-   - File: `src/app/api/iris/answer/route.ts` ~line 845
+   - File: `src/app/api/iris/answer/route.ts` (system prompt near top of file)
 
 5. **Check cache** - Is a stale response being returned?
    - Clear cache or modify query to bypass
@@ -989,10 +978,10 @@ npm run build               # Production build
 npm start                   # Start production server
 
 # Knowledge Base Management
-npm run kb:rebuild          # Full rebuild (verify + embeddings + typeahead)
+npm run kb:rebuild          # Full rebuild (verify + typeahead + rankings; no embeddings needed)
 npm run verify:kb           # Validate KB structure
-npm run build:embeddings    # Pre-compute embeddings (REQUIRED after KB changes)
 npm run build:typeahead     # Generate search suggestions
+npm run build:rankings      # Pre-compute importance rankings for quick actions
 
 # Testing
 npm run test:iris           # Interactive test suite (80+ cases)
