@@ -111,24 +111,7 @@ export default function CommentCard({
   const [deleteError, setDeleteError] = useState(false);
   const avatarSize = isReply ? 'w-7 h-7 text-xs' : 'w-8 h-8 text-sm';
 
-  if (comment.is_deleted) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-start gap-3 py-3"
-      >
-        <div
-          className={`${avatarSize} rounded-full bg-gray-800 flex items-center justify-center shrink-0`}
-        >
-          <span className="text-gray-600">?</span>
-        </div>
-        <p className="text-sm text-gray-600 italic">
-          this comment was removed
-        </p>
-      </motion.div>
-    );
-  }
+  if (comment.is_deleted) return null;
 
   return (
     <motion.div
