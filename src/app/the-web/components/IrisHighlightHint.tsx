@@ -17,7 +17,7 @@ export default function IrisHighlightHint() {
       <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-blue-400 to-emerald-400 flex-shrink-0" />
       <p className="text-xs text-white/50 flex-1">
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 font-medium">Highlight any text</span>
-        {' '}to ask Iris about it or leave a comment
+        {' '}to question it, push back, or get behind-the-scenes context — or send anonymous feedback
       </p>
       <button
         onClick={() => setDismissed(true)}
