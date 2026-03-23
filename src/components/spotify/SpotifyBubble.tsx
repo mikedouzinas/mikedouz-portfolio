@@ -35,7 +35,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
     if (!el) return;
     const observer = new ResizeObserver((entries) => {
       const height = entries[0]?.contentRect.height ?? Infinity;
-      setCompact(height < 140);
+      setCompact(height < 200);
     });
     observer.observe(el);
     return () => observer.disconnect();
@@ -118,11 +118,11 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
       <div
         className="rounded-2xl overflow-hidden"
         style={{
-          background: 'rgba(15,31,26,0.85)',
+          background: 'rgba(20,45,35,0.8)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(29,185,84,0.2)',
-          boxShadow: '0 8px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)',
+          border: '1px solid rgba(74,222,128,0.2)',
+          boxShadow: '0 8px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08)',
           marginRight: '1rem',
           visibility: expanded ? 'hidden' : 'visible',
         }}
@@ -182,11 +182,11 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
             transition={{ duration: 0.12 }}
             className="absolute left-0 bottom-0 z-50 rounded-2xl overflow-hidden"
             style={{
-              background: 'rgba(15,31,26,0.92)',
+              background: 'rgba(20,45,35,0.9)',
               backdropFilter: 'blur(30px)',
               WebkitBackdropFilter: 'blur(30px)',
-              border: '1px solid rgba(29,185,84,0.2)',
-              boxShadow: '0 8px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)',
+              border: '1px solid rgba(74,222,128,0.2)',
+              boxShadow: '0 8px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08)',
               width: 'min(420px, calc(100vw / 3 - 1rem))',
             }}
           >
@@ -218,7 +218,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
                 <div key={month}>
                   <p
                     className="text-[10px] font-semibold tracking-widest uppercase mb-2 px-1 sticky top-0 py-1 z-10"
-                    style={{ color: '#1DB954', backgroundColor: 'rgba(15,31,26,0.95)' }}
+                    style={{ color: '#1DB954', backgroundColor: 'rgba(20,45,35,0.95)' }}
                   >
                     {formatMonth(month)}
                   </p>
