@@ -7,6 +7,7 @@ import { getMusicMoments, getMomentsByMonth, formatMonth } from '@/data/spotify/
 import { useAudioPreview } from '@/hooks/useAudioPreview';
 import { useAdminMode } from '@/hooks/useAdminMode';
 import { useDeepMode } from '@/components/DeepModeContext';
+import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import SpotifyCard from './SpotifyCard';
 
 const INITIAL_MONTHS = 3;
@@ -116,21 +117,23 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
     <div ref={containerRef} className="hidden md:block text-left" style={{ marginLeft: 'calc(50% - 96px)', position: 'relative' }}>
       {/* Collapsed view — always in DOM to hold position */}
       <div
-        className="rounded-2xl overflow-hidden"
+        className="rounded-2xl overflow-hidden relative transition-transform duration-200 hover:scale-[1.02] cursor-pointer"
+        data-has-contained-glow="true"
         style={{
-          background: 'rgba(20,45,35,0.8)',
+          background: 'rgba(16,42,46,0.75)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(74,222,128,0.2)',
+          border: '1px solid rgba(52,211,153,0.25)',
           boxShadow: '0 8px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08)',
           marginRight: '1rem',
           visibility: expanded ? 'hidden' : 'visible',
         }}
       >
+        <ContainedMouseGlow color="52, 211, 153" intensity={0.25} />
         <div className="flex items-center justify-between px-3 py-2.5">
           <div className="flex items-center gap-2">
             <Music className="w-3.5 h-3.5" style={{ color: '#1DB954' }} />
-            <span className="text-[11px] font-semibold tracking-widest uppercase" style={{ color: '#86efac' }}>
+            <span className="text-[11px] font-semibold tracking-widest uppercase" style={{ color: '#6ee7b7' }}>
               Mike&apos;s Music
             </span>
           </div>
@@ -180,20 +183,22 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.12 }}
-            className="absolute left-0 bottom-0 z-50 rounded-2xl overflow-hidden"
+            className="fixed z-50 rounded-2xl overflow-hidden"
             style={{
-              background: 'rgba(20,45,35,0.9)',
+              background: 'rgba(16,42,46,0.92)',
               backdropFilter: 'blur(30px)',
               WebkitBackdropFilter: 'blur(30px)',
-              border: '1px solid rgba(74,222,128,0.2)',
-              boxShadow: '0 8px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08)',
+              border: '1px solid rgba(52,211,153,0.25)',
+              boxShadow: '0 12px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)',
               width: 'min(420px, calc(100vw / 3 - 1rem))',
+              bottom: '80px',
+              left: '32px',
             }}
           >
             <div className="flex items-center justify-between px-3 py-2.5">
               <div className="flex items-center gap-2">
                 <Music className="w-3.5 h-3.5" style={{ color: '#1DB954' }} />
-                <span className="text-[11px] font-semibold tracking-widest uppercase" style={{ color: '#86efac' }}>
+                <span className="text-[11px] font-semibold tracking-widest uppercase" style={{ color: '#6ee7b7' }}>
                   Mike&apos;s Music
                 </span>
               </div>
@@ -218,7 +223,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
                 <div key={month}>
                   <p
                     className="text-[10px] font-semibold tracking-widest uppercase mb-2 px-1 sticky top-0 py-1 z-10"
-                    style={{ color: '#1DB954', backgroundColor: 'rgba(20,45,35,0.95)' }}
+                    style={{ color: '#34d399', backgroundColor: 'rgba(16,42,46,0.95)' }}
                   >
                     {formatMonth(month)}
                   </p>
