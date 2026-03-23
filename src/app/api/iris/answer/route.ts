@@ -558,6 +558,68 @@ export async function POST(req: NextRequest) {
 
           // ── Post-stream processing ──────────────────────────
 
+          // Handle GitHub activity two-pass flow
+          if (_githubActivityRequest) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: '\n\nChecking recent activity...\n\n' })}\n\n`));
+
+            const project = allItems.find(item => item.id === _githubActivityRequest!.project_id);
+            const githubLink = project && 'links' in project ? (project.links as Record<string, string>)?.github : null;
+
+            if (githubLink) {
+              // Extract "owner/repo" from GitHub URL
+              const repoMatch = githubLink.match(/github\.com\/([^/]+\/[^/]+)/);
+              const repoPath = repoMatch?.[1];
+
+              if (repoPath) {
+                try {
+                  const { getRepoCommits } = await import('@/lib/iris/github');
+                  const commits = await getRepoCommits(repoPath);
+
+                  if (commits) {
+                    // Second Claude call with commit data
+                    const activityStream = anthropic.messages.stream({
+                      model: config.models.chat,
+                      max_tokens: config.chatSettings.maxTokens,
+                      system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+                      messages: [
+                        ...messages,
+                        {
+                          role: 'assistant' as const,
+                          content: [
+                            { type: 'tool_use' as const, id: 'toolu_github_fetch_001', name: 'fetch_github_activity', input: _githubActivityRequest },
+                          ],
+                        },
+                        {
+                          role: 'user' as const,
+                          content: [
+                            { type: 'tool_result' as const, tool_use_id: 'toolu_github_fetch_001', content: commits },
+                          ],
+                        },
+                      ],
+                      tools: [CLASSIFY_RESPONSE_TOOL, SHOW_CONTACT_FORM_TOOL, FETCH_GITHUB_ACTIVITY_TOOL],
+                    });
+
+                    for await (const event of activityStream) {
+                      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+                        fullAnswer += event.delta.text;
+                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`));
+                      }
+                    }
+
+                    // Hardcode metadata for GitHub activity
+                    classifyResult = {
+                      intent: 'github_activity' as Intent,
+                      matched_item_ids: [_githubActivityRequest.project_id],
+                      about_mike: true,
+                    };
+                  }
+                } catch (ghError) {
+                  console.warn('[Answer API] GitHub activity fetch failed:', ghError);
+                }
+              }
+            }
+          }
+
           // Extract intent and matched items from classify_response
           const intent: Intent = classifyResult?.intent || (presetIntent as Intent) || 'general';
           let matchedItemIds: string[] = classifyResult?.matched_item_ids || [];
