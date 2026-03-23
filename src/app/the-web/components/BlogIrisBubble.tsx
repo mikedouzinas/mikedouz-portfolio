@@ -36,10 +36,71 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
 
   const [isMobile, setIsMobile] = useState(false);
   const [showDiscard, setShowDiscard] = useState(false);
-  // Lock passage to the INITIAL selection text — never update after mount
+  // Track whether conversation has started (first message sent) — locks position + passage
+  const lockedRef = useRef(false);
   const passageRef = useRef(selection?.text || '');
-  const initialRectRef = useRef(selection?.rect || null);
+  const lockedRectRef = useRef<DOMRect | null>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
+
+  // Update passage and rect while user is still selecting (before first message)
+  if (selection && !lockedRef.current) {
+    passageRef.current = selection.text;
+  }
+
+  // Visually highlight the selected passage in the post body using CSS highlight API or mark overlay
+  // This persists the highlight even after browser selection clears (when user clicks input)
+  useEffect(() => {
+    if (!passageRef.current) return;
+
+    const postBody = document.querySelector('[data-post-body]');
+    if (!postBody) return;
+
+    // Find and wrap the passage text with a highlight mark
+    const walker = document.createTreeWalker(postBody, NodeFilter.SHOW_TEXT);
+    const passageText = passageRef.current;
+    let found = false;
+    const marks: HTMLElement[] = [];
+
+    while (walker.nextNode()) {
+      const node = walker.currentNode as Text;
+      const idx = node.textContent?.indexOf(passageText.slice(0, 40)) ?? -1;
+      if (idx !== -1 && !found) {
+        found = true;
+        // Wrap the matching portion in a highlight span
+        const range = document.createRange();
+        range.setStart(node, idx);
+        range.setEnd(node, Math.min(idx + passageText.length, node.textContent?.length || 0));
+
+        const mark = document.createElement('mark');
+        mark.setAttribute('data-iris-highlight', 'true');
+        mark.style.backgroundColor = 'rgba(16, 185, 129, 0.12)';
+        mark.style.borderBottom = '2px solid rgba(16, 185, 129, 0.4)';
+        mark.style.borderRadius = '2px';
+        mark.style.padding = '1px 0';
+
+        try {
+          range.surroundContents(mark);
+          marks.push(mark);
+        } catch {
+          // surroundContents fails if selection spans multiple elements — skip
+        }
+        break;
+      }
+    }
+
+    return () => {
+      // Clean up: unwrap marks
+      marks.forEach((mark) => {
+        const parent = mark.parentNode;
+        if (parent) {
+          while (mark.firstChild) {
+            parent.insertBefore(mark.firstChild, mark);
+          }
+          parent.removeChild(mark);
+        }
+      });
+    };
+  }, []); // Run once on mount
 
   // Detect mobile
   useEffect(() => {
@@ -92,9 +153,14 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
 
   const handleSend = useCallback(
     (message: string) => {
+      // Lock position and passage on first send
+      if (!lockedRef.current) {
+        lockedRef.current = true;
+        lockedRectRef.current = selection?.rect || null;
+      }
       sendMessage(message, passageRef.current);
     },
-    [sendMessage]
+    [sendMessage, selection?.rect]
   );
 
   const handleComment = useCallback(() => {
@@ -127,9 +193,10 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
   // Use initial rect for positioning (locked)
   // Always position to the right of the article content area, vertically centered on selection
   const getDesktopStyle = (): React.CSSProperties => {
-    const rect = initialRectRef.current || selection.rect;
+    // Use locked rect after first message, live selection rect while still selecting
+    const rect = lockedRectRef.current || selection.rect;
     // Center vertically between top and bottom of selection
-    let top = rect.top + (rect.height / 2) - 80; // offset ~80px to roughly center the bubble
+    let top = rect.top + (rect.height / 2) - 80;
 
     // Find the post body container to get its right edge
     const postBody = document.querySelector('[data-post-body]');
