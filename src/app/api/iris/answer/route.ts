@@ -356,7 +356,11 @@ export async function POST(req: NextRequest) {
 
     // ── Check cache ─────────────────────────────────────────
     const cacheKey = `answer:${query.toLowerCase().trim()}`;
-    const cached = await irisCache.get(cacheKey);
+
+    // Time-sensitive bypass: skip cache for queries about current/recent state
+    const timeSensitiveTerms = ['today', 'now', 'recent', 'latest', 'current', 'currently'];
+    const isTimeSensitive = timeSensitiveTerms.some(t => query.toLowerCase().includes(t));
+    const cached = isTimeSensitive ? null : await irisCache.get(cacheKey);
 
     if (cached) {
       console.log(`[Cache] HIT for key: ${cacheKey}`);
@@ -511,6 +515,10 @@ export async function POST(req: NextRequest) {
             tools: [CLASSIFY_RESPONSE_TOOL, SHOW_CONTACT_FORM_TOOL, FETCH_GITHUB_ACTIVITY_TOOL],
           });
 
+          // Generate queryId early for client session tracking
+          const earlyQueryId = `claude_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ queryId: earlyQueryId })}\n\n`));
+
           // Consume the stream using async iteration over raw events
           for await (const event of stream) {
             if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
@@ -552,7 +560,18 @@ export async function POST(req: NextRequest) {
 
           // Extract intent and matched items from classify_response
           const intent: Intent = classifyResult?.intent || (presetIntent as Intent) || 'general';
-          const matchedItemIds: string[] = classifyResult?.matched_item_ids || [];
+          let matchedItemIds: string[] = classifyResult?.matched_item_ids || [];
+
+          // Fallback: if classify_response missing, extract matched IDs by title matching
+          if (!classifyResult && matchedItemIds.length === 0 && fullAnswer.length > 0) {
+            const lowerAnswer = fullAnswer.toLowerCase();
+            matchedItemIds = allItems
+              .filter(item => {
+                const title = ('title' in item && item.title) || ('name' in item && item.name) || ('role' in item && item.role);
+                return title && lowerAnswer.includes(String(title).toLowerCase());
+              })
+              .map(item => item.id);
+          }
           const aboutMike = classifyResult?.about_mike ?? true;
 
           // Off-topic check using Claude's classification (first query only)
@@ -667,8 +686,6 @@ export async function POST(req: NextRequest) {
                 console.warn('[Analytics] Failed to log quick action:', error);
               });
             }
-
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ queryId })}\n\n`));
           }
 
           // Send debug info
