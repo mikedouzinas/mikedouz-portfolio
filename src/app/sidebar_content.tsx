@@ -105,7 +105,7 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                 </nav>
             </div>
             {/* Spotify music timeline (deep mode only) */}
-            <div className="flex-1 min-h-0 flex items-start py-6" id="spotify-sidebar-wrapper">
+            <div className="flex-1 min-h-0 flex items-center py-6" id="spotify-sidebar-wrapper">
                 <SpotifyBubble parentSelector="#spotify-sidebar-wrapper" />
             </div>
             {/* Social media icons aligned with the profile container */}
