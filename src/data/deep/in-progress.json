@@ -7,12 +7,13 @@
     "role": "Founder",
     "company": "The Olympus Project",
     "period": "Est. OCT 2025",
-    "summary": "The Olympus Project is a company I made to help people flourish by reaching them through whatever means is most effective. Right now that's Iris Mobile, Apollo Terminal, The Lantern, a movie trilogy, The Tree of Human Flourishing, and the List of Important Things. Part of the work is figuring out which channels actually make a difference in people's lives.",
+    "summary": "A project dedicated to helping people flourish by translating the pursuit of self-knowledge across every medium that can reach them. Technology in the service of human flourishing, not human attention in the service of technology.",
     "specifics": [
-      "The core idea is indirect transmission: show people their patterns so clearly they recognize themselves and change from conviction, not instruction. Same mechanism Greek myths used for millennia.",
-      "Current channels: Iris Mobile (universal assistant), Apollo Terminal (AI that helps you know yourself), The Lantern (book for 16-35 year olds), a movie trilogy (name pending), The Tree of Human Flourishing (philosophy book), List of Important Things (running life lessons since 5th grade).",
-      "I prefer to work privately and in small groups rather than publicly on the internet. Aristotle worked in small groups too.",
-      "Part of the project is discovering what are the most effective ways to reach people and incorporate real benefits into their lives."
+      "Core belief: flourishing comes from knowing yourself. Not from a checklist, not from prescribed categories, but from the ongoing work of self-examination. Olympus exists to help people do that work and translate what it reveals across mediums that reach different people.",
+      "Method: indirect transmission. Show patterns so vividly that people recognize themselves, discover the insight, and change from internal conviction. Not lectures. Not prescriptions. Recognition. Same mechanism Greek myths used for millennia.",
+      "Current channels: Apollo (AI for self-knowledge, core product), Iris (universal access layer), The Web (blog/public writing), The Lantern (life principles for 16-35 year olds), Calliope (movie trilogy), The Tree of Human Flourishing (philosophy book), List of Important Things.",
+      "Collaboration model: Mike is the researcher, thinker, connector, producer. Each channel is best executed through collaboration with people and companies best positioned to make it excellent. The goal is to work WITH Anthropic for AI, WITH a studio for film, not to build everything in-house.",
+      "Business structure intention: B Corp or Public Benefit Corporation. Mission-protected. 'I never want to have to choose between my mission and profit.'"
     ],
     "aliases": ["olympus", "project olympus", "founder", "the olympus project"],
     "connections": ["iris-mobile", "apollo", "calliope-screenplay", "tree", "lantern", "important-things"],
@@ -123,14 +124,14 @@
     "section": "media",
     "status": "writing",
     "parent": "The Olympus Project",
-    "summary": "I'm writing a practical philosophical framework building off Aristotle, Rawls, Socrates, and others. I believe there's a lot of gold in the high-level commonalities across these different philosophers, and this book weaves them together into a new concept around the importance of knowing thyself and how it impacts our lives across relationships, work, leisure, and well-being.",
+    "summary": "A book exploring why self-knowledge is the foundation of flourishing, tracing how that insight connects across relationships, career, philosophy, religion, and daily life. Part autobiography, part philosophical investigation, part proof-by-lived-experience. Rooted in Aristotelian eudaimonia: living well and doing well, not just feeling good.",
     "specifics": [
-      "I'm six chapters in and I'm taking philosophy courses, engaging in lots of conversations, and living to make this as solid as possible.",
-      "The framework: four branches (autonomy, competence, connection, meaning), four success criteria (genuinely yours, coherent, sustainable, revisable), a root system, and coherence as the sap.",
+      "The core hypothesis: knowing yourself is the most important thing you can do, and when you genuinely do the work of self-examination, what you need from life becomes clear without being prescribed.",
+      "Structural evolution: early versions proposed four branches (Autonomy, Competence, Connection, Meaning) as universal requirements. Now views these as descriptive vocabulary, not the starting point. The real insight is simpler: know yourself, and the rest follows.",
+      "Four success criteria (Genuinely Yours, Coherent, Sustainable, Revisable) are better understood as qualities of self-knowledge itself, not a separate diagnostic tool.",
       "Chapters: The Cage Is Almost Never Absolute, Know Thyself, Coherence, The Conditions, Love/Relationships/What You're Actually Pursuing, Communication/Society/The World Beyond Yourself.",
-      "I'm very careful not to claim anything that can be misinterpreted, which is why I prefer to work privately rather than publicly on the internet.",
-      "Active structural question: investigating whether 'Know Thyself' should be the trunk of the Tree, with the branches as emergent outputs rather than prescribed categories.",
-      "40+ research documents, 9 exploration pieces. The framework provides a structure to evaluate any path, including religious ones."
+      "Traces how self-knowledge connects across relationships (patterns, self-deception, choosing well), career (examined interests vs. performed ones), philosophy (arriving at morals through examination, not inheritance), and daily life (the Lantern principles as artifacts of self-knowledge).",
+      "40+ research documents, 9 exploration pieces. The accumulated evidence IS the proof."
     ],
     "aliases": ["tree", "flourishing framework", "eudaimonia framework", "the tree"],
     "connections": ["iris-mobile", "calliope-screenplay", "lantern", "project-olympus"],
