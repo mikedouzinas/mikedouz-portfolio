@@ -96,7 +96,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         <IrisHighlightHint />
 
         {/* Body */}
-        <PostBodyWithIris slug={slug}>
+        <PostBodyWithIris slug={slug} postTitle={post.title}>
           <MarkdownRenderer content={post.body} />
         </PostBodyWithIris>
 

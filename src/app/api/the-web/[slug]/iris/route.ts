@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
+import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import { getPostBySlug } from '@/lib/blog';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
@@ -11,14 +12,18 @@ import {
 } from '@/app/the-web/lib/blogIrisPrompt';
 
 const RequestSchema = z.object({
-  message: z.string().min(1).max(500),
-  passage: z.string().min(1).max(500),
+  message: z.string().min(1).max(2000),
+  passage: z.string().min(1).max(1000),
   mode: z.enum(['conversation', 'draft_comment', 'draft_message']),
   history: z.array(z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string(),
   })).max(20).optional().default([]),
 });
+
+// Claude for conversation (quality matters), GPT-4o-mini for drafts (just formatting)
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 export async function POST(
   request: NextRequest,
@@ -49,7 +54,6 @@ export async function POST(
   }
 
   const { message, passage, mode, history } = body;
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
   // Build context with token budgets
   const postBody = truncateToTokens(post.body, 3000);
@@ -58,19 +62,21 @@ export async function POST(
     : null;
 
   if (mode === 'conversation') {
-    // SSE streaming response
+    // Claude for conversation — quality and nuance matter here
     const systemPrompt = getConversationPrompt(post.title, postBody, irisContext, passage);
-    const messages: OpenAI.ChatCompletionMessageParam[] = [
-      { role: 'system', content: systemPrompt },
-      ...history.map((h) => ({ role: h.role as 'user' | 'assistant', content: h.content })),
+    const messages: Anthropic.MessageParam[] = [
+      ...history.map((h) => ({
+        role: h.role as 'user' | 'assistant',
+        content: h.content,
+      })),
       { role: 'user', content: message },
     ];
 
-    const stream = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+    const stream = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 600,
+      system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
       messages,
-      temperature: 0.7,
-      max_tokens: 400,
       stream: true,
     });
 
@@ -79,9 +85,8 @@ export async function POST(
       async start(controller) {
         try {
           for await (const chunk of stream) {
-            const content = chunk.choices[0]?.delta?.content;
-            if (content) {
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+            if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: chunk.delta.text })}\n\n`));
             }
           }
           controller.enqueue(encoder.encode('data: [DONE]\n\n'));
@@ -102,7 +107,7 @@ export async function POST(
     });
   }
 
-  // Draft modes — return JSON
+  // Draft modes — GPT-4o-mini is fine here (just formatting, not thinking)
   const draftPrompt = mode === 'draft_comment'
     ? getDraftCommentPrompt()
     : getDraftMessagePrompt(post.title);

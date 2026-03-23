@@ -105,7 +105,9 @@ export function useBlogIris(slug: string) {
       });
 
       const data = await res.json();
-      setState((s) => ({ ...s, phase: 'draft_ready', draft: data.draft || lastUserMsg }));
+      // Fallback to user's message if draft is too short (<10 chars)
+      const finalDraft = data.draft && data.draft.length >= 10 ? data.draft : lastUserMsg;
+      setState((s) => ({ ...s, phase: 'draft_ready', draft: finalDraft }));
     } catch {
       setState((s) => ({
         ...s,
@@ -120,6 +122,14 @@ export function useBlogIris(slug: string) {
     setState((s) => ({ ...s, draft }));
   }, []);
 
+  const setPhase = useCallback((phase: Phase) => {
+    setState((s) => ({ ...s, phase }));
+  }, []);
+
+  const setError = useCallback((error: string | null) => {
+    setState((s) => ({ ...s, error }));
+  }, []);
+
   const backToChat = useCallback(() => {
     setState((s) => ({ ...s, phase: 'conversation', draft: '', draftType: null, error: null }));
   }, []);
@@ -129,5 +139,5 @@ export function useBlogIris(slug: string) {
     setState({ messages: [], phase: 'idle', draft: '', draftType: null, error: null });
   }, []);
 
-  return { ...state, sendMessage, requestDraft, setDraft, backToChat, reset };
+  return { ...state, sendMessage, requestDraft, setDraft, setPhase, setError, backToChat, reset };
 }

@@ -31,6 +31,7 @@ const CreatePostSchema = z.object({
     })
     .optional(),
   status: z.enum(['draft', 'published']).optional(),
+  iris_context: z.string().optional(),
 });
 
 /**

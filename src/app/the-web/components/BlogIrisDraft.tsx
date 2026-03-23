@@ -8,6 +8,7 @@ interface BlogIrisDraftProps {
   draft: string;
   passageRef: string;
   isLoading: boolean;
+  isSubmitting?: boolean;
   error: string | null;
   onDraftChange: (draft: string) => void;
   onSubmit: (data: {
@@ -37,6 +38,7 @@ export default function BlogIrisDraft({
   draft,
   passageRef,
   isLoading,
+  isSubmitting,
   error,
   onDraftChange,
   onSubmit,
@@ -65,8 +67,8 @@ export default function BlogIrisDraft({
 
   const isComment = draftType === 'comment';
   const minChars = isComment ? 10 : 3;
-  const maxChars = isComment ? 1000 : 500;
-  const canSubmit = draft.trim().length >= minChars && draft.trim().length <= maxChars;
+  const maxChars = isComment ? 5000 : 2000;
+  const canSubmit = !isSubmitting && draft.trim().length >= minChars && draft.trim().length <= maxChars;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -202,7 +204,7 @@ export default function BlogIrisDraft({
               : undefined
           }
         >
-          {isComment ? 'Post' : 'Send to Mike'}
+          {isSubmitting ? 'Sending...' : isComment ? 'Post' : 'Send to Mike'}
         </button>
       </div>
     </form>

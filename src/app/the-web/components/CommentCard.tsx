@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { BlogComment } from '@/lib/comments';
 
@@ -7,6 +8,8 @@ interface CommentCardProps {
   comment: BlogComment;
   isReply?: boolean;
   onReply?: (commentId: string, authorName: string) => void;
+  isAdmin?: boolean;
+  onDelete?: (commentId: string) => Promise<boolean>;
 }
 
 /**
@@ -101,7 +104,11 @@ export default function CommentCard({
   comment,
   isReply,
   onReply,
+  isAdmin,
+  onDelete,
 }: CommentCardProps) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
   const avatarSize = isReply ? 'w-7 h-7 text-xs' : 'w-8 h-8 text-sm';
 
   if (comment.is_deleted) {
@@ -164,14 +171,46 @@ export default function CommentCard({
           {comment.body}
         </p>
 
-        {onReply && (
-          <button
-            onClick={() => onReply(comment.id, comment.author_name)}
-            className="mt-1.5 text-xs text-gray-500 hover:text-purple-400 transition-colors"
-          >
-            reply
-          </button>
-        )}
+        <div className="flex items-center gap-3 mt-1.5">
+          {onReply && (
+            <button
+              onClick={() => onReply(comment.id, comment.author_name)}
+              className="text-xs text-gray-500 hover:text-purple-400 transition-colors"
+            >
+              reply
+            </button>
+          )}
+          {isAdmin && onDelete && !confirmDelete && (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="text-xs text-gray-600 hover:text-red-400 transition-colors"
+            >
+              delete
+            </button>
+          )}
+          {isAdmin && onDelete && confirmDelete && (
+            <span className="flex items-center gap-2 text-xs">
+              <span className="text-gray-500">{deleteError ? 'failed — ' : 'delete?'}</span>
+              <button
+                onClick={async () => {
+                  setDeleteError(false);
+                  const ok = await onDelete(comment.id);
+                  if (!ok) setDeleteError(true);
+                  else setConfirmDelete(false);
+                }}
+                className="text-red-400 hover:text-red-300 transition-colors font-medium"
+              >
+                {deleteError ? 'retry' : 'yes'}
+              </button>
+              <button
+                onClick={() => { setConfirmDelete(false); setDeleteError(false); }}
+                className="text-gray-500 hover:text-gray-300 transition-colors"
+              >
+                {deleteError ? 'cancel' : 'no'}
+              </button>
+            </span>
+          )}
+        </div>
       </div>
     </motion.div>
   );

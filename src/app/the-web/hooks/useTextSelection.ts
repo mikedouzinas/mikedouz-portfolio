@@ -5,6 +5,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 export interface TextSelection {
   text: string;
   rect: DOMRect;
+  /** Top and height of the full selection range, relative to the container element */
+  containerRelative: { top: number; height: number } | null;
 }
 
 /**
@@ -35,36 +37,61 @@ export function useTextSelection(
   }, []);
 
   useEffect(() => {
-    const handleSelectionChange = () => {
-      // Phase 2: locked — ignore everything
+    // Capture the finalized selection. Used by both mouseup (desktop)
+    // and touchend (mobile — touch selection doesn't fire mouseup).
+    const captureSelection = () => {
       if (locked.current) return;
 
       const sel = document.getSelection();
-      if (!sel || sel.isCollapsed || !sel.rangeCount) {
-        // Selection was cleared. Don't close if focus is inside the bubble
-        // (user clicked the textbox, which clears browser selection)
-        if (bubbleRef.current && bubbleRef.current.contains(document.activeElement)) {
-          return;
-        }
-        setSelection(null);
-        return;
-      }
+      if (!sel || sel.isCollapsed || !sel.rangeCount) return;
 
       const anchor = sel.anchorNode;
-      if (!anchor || !containerRef.current?.contains(anchor)) {
-        return;
-      }
+      if (!anchor || !containerRef.current?.contains(anchor)) return;
 
       const range = sel.getRangeAt(0);
       const text = sel.toString().trim();
       if (text.length < 3) return;
 
       const rect = range.getBoundingClientRect();
-      setSelection({ text, rect });
+      const container = containerRef.current;
+      let containerRelative: { top: number; height: number } | null = null;
+      if (container) {
+        const containerRect = container.getBoundingClientRect();
+        containerRelative = {
+          top: rect.top - containerRect.top + container.scrollTop,
+          height: rect.height,
+        };
+      }
+      setSelection({ text, rect, containerRelative });
     };
 
+    // Small delay on touchend so the browser finalizes the selection first
+    const handleTouchEnd = () => {
+      setTimeout(captureSelection, 80);
+    };
+
+    // selectionchange only used to detect when selection is cleared
+    const handleSelectionChange = () => {
+      if (locked.current) return;
+
+      const sel = document.getSelection();
+      if (!sel || sel.isCollapsed || !sel.rangeCount) {
+        // Don't close if focus is inside the bubble (user clicked textbox)
+        if (bubbleRef.current && bubbleRef.current.contains(document.activeElement)) {
+          return;
+        }
+        setSelection(null);
+      }
+    };
+
+    document.addEventListener('mouseup', captureSelection);
+    document.addEventListener('touchend', handleTouchEnd);
     document.addEventListener('selectionchange', handleSelectionChange);
-    return () => document.removeEventListener('selectionchange', handleSelectionChange);
+    return () => {
+      document.removeEventListener('mouseup', captureSelection);
+      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
   }, [containerRef, bubbleRef]);
 
   return { selection, clearSelection, lock, unlock };

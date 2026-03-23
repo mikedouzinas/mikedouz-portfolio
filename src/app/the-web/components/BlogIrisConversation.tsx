@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { getRandomBlogLoadingMessage } from '../lib/loadingMessages';
 
 interface Message {
@@ -13,6 +14,7 @@ interface BlogIrisConversationProps {
   isStreaming: boolean;
   onSend: (message: string) => void;
   disabled?: boolean;
+  expanded?: boolean;
 }
 
 export default function BlogIrisConversation({
@@ -20,6 +22,7 @@ export default function BlogIrisConversation({
   isStreaming,
   onSend,
   disabled,
+  expanded,
 }: BlogIrisConversationProps) {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -77,7 +80,7 @@ export default function BlogIrisConversation({
       {messages.length > 0 && (
         <div
           ref={scrollRef}
-          className="flex flex-col gap-2 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10"
+          className={`flex flex-col gap-2 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10 ${expanded ? 'max-h-[360px]' : 'max-h-[200px]'}`}
         >
           {messages.map((msg, i) => (
             <div
@@ -85,12 +88,25 @@ export default function BlogIrisConversation({
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {msg.role === 'user' ? (
-                <div className="bg-white/[0.07] text-[11px] text-white/90 px-2.5 py-1.5 rounded-[12px_12px_4px_12px] max-w-[85%] leading-relaxed">
+                <div className={`bg-white/[0.07] text-white/90 px-2.5 py-1.5 rounded-[12px_12px_4px_12px] max-w-[85%] leading-relaxed ${expanded ? 'text-[13px]' : 'text-[11px]'}`}>
                   {msg.content}
                 </div>
               ) : (
-                <div className="text-[11px] text-[#ccc] leading-relaxed max-w-[90%]">
-                  {msg.content}
+                <div className={`text-[#ccc] leading-relaxed max-w-[90%] iris-markdown ${expanded ? 'text-[13px]' : 'text-[11px]'}`}>
+                  <ReactMarkdown
+                    components={{
+                      p: ({ children }) => <p className="mb-1.5 last:mb-0">{children}</p>,
+                      strong: ({ children }) => <strong className="text-white/95 font-medium">{children}</strong>,
+                      em: ({ children }) => <em className="text-white/70">{children}</em>,
+                      ul: ({ children }) => <ul className="list-disc ml-3.5 mb-1.5 space-y-0.5">{children}</ul>,
+                      ol: ({ children }) => <ol className="list-decimal ml-3.5 mb-1.5 space-y-0.5">{children}</ol>,
+                      li: ({ children }) => <li>{children}</li>,
+                      a: ({ href, children }) => <a href={href} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">{children}</a>,
+                      code: ({ children }) => <code className="bg-white/[0.06] px-1 py-0.5 rounded text-[0.9em]">{children}</code>,
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
                   {isStreaming && i === messages.length - 1 && (
                     <span className="inline-flex ml-0.5">
                       <span className="animate-pulse">...</span>
@@ -122,11 +138,12 @@ export default function BlogIrisConversation({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          maxLength={2000}
           placeholder={messages.length === 0 ? 'Questions or comments...' : 'Reply...'}
           disabled={disabled || isStreaming}
           rows={1}
-          className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-2 text-[11px] text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors disabled:opacity-50 resize-none leading-relaxed"
-          style={{ minHeight: '34px', maxHeight: '80px' }}
+          className={`flex-1 bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-2 text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors disabled:opacity-50 resize-none leading-relaxed ${expanded ? 'text-[13px]' : 'text-[11px]'}`}
+          style={{ minHeight: expanded ? '40px' : '34px', maxHeight: expanded ? '120px' : '80px' }}
         />
         <button
           type="submit"

@@ -41,6 +41,26 @@ export default function CommentSection({
   const [loading, setLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [adminKey, setAdminKey] = useState<string | null>(null);
+
+  // Admin key: check URL param (?admin=key) then localStorage
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlKey = params.get('admin');
+      if (urlKey) {
+        localStorage.setItem('admin_key', urlKey);
+        setAdminKey(urlKey);
+        // Clean the URL so the key isn't visible/bookmarkable
+        const url = new URL(window.location.href);
+        url.searchParams.delete('admin');
+        window.history.replaceState({}, '', url.toString());
+      } else {
+        const stored = localStorage.getItem('admin_key');
+        if (stored) setAdminKey(stored);
+      }
+    } catch { /* SSR or no access */ }
+  }, []);
 
   const fetchComments = useCallback(async () => {
     try {
@@ -60,6 +80,13 @@ export default function CommentSection({
     fetchComments();
   }, [fetchComments]);
 
+  // Refresh comments when a new one is posted via Blog Iris
+  useEffect(() => {
+    const handler = () => fetchComments();
+    window.addEventListener('iris-comment-posted', handler);
+    return () => window.removeEventListener('iris-comment-posted', handler);
+  }, [fetchComments]);
+
   function handleReply(commentId: string, _authorName: string) {
     setReplyingTo(commentId === replyingTo ? null : commentId);
   }
@@ -68,6 +95,32 @@ export default function CommentSection({
     setComments((prev) => [...prev, newComment]);
     setReplyingTo(null);
     setShowForm(false);
+  }
+
+  async function handleDelete(commentId: string): Promise<boolean> {
+    if (!adminKey) return false;
+    try {
+      const res = await fetch(`/api/the-web/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-key': adminKey },
+      });
+      if (res.ok) {
+        setComments((prev) =>
+          prev.map((c) => (c.id === commentId ? { ...c, is_deleted: true } : c))
+        );
+        return true;
+      }
+      console.error('[Comments] Delete returned', res.status);
+      if (res.status === 401) {
+        // Bad admin key — clear it
+        localStorage.removeItem('admin_key');
+        setAdminKey(null);
+      }
+      return false;
+    } catch (err) {
+      console.error('[Comments] Delete failed:', err);
+      return false;
+    }
   }
 
   const nested = useMemo(() => nestComments(comments), [comments]);
@@ -97,6 +150,8 @@ export default function CommentSection({
                 replyingTo={replyingTo}
                 postSlug={postSlug}
                 onCommentAdded={handleCommentAdded}
+                isAdmin={!!adminKey}
+                onDelete={handleDelete}
               />
             ))}
           </div>
