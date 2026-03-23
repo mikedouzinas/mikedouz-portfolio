@@ -48,9 +48,14 @@ User query arrives at /api/iris/answer
 [PRESERVED] After stream completes:
   - Parse buffered classify_response → intent, matched_item_ids, filters
   - If classify_response missing, fall back to intent='general', extract
-    matched IDs by matching response text against KB item titles
-  - Run autoContactPlan() check: if query matches auto-contact pattern
-    AND Claude did not call show_contact_form, emit contactForm event anyway
+    matched IDs via case-insensitive substring match of KB item titles
+    against the full response text (simple heuristic, doesn't need to be perfect)
+  - Run autoContactPlan() safety net: if query matches auto-contact pattern
+    AND Claude did not call show_contact_form, emit contactForm event anyway.
+    Note: autoContactPlan(query, intent) also guards on intent — in the
+    fallback case where intent defaults to 'general', pass both the fallback
+    intent AND a flag indicating whether show_contact_form was called, so the
+    function checks the tool call state rather than relying solely on intent.
   - Feed into existing generateQuickActions() (quickActions_v2)
   - Send quick actions via SSE
   - Cache the full response (text + intent + matched_item_ids + quick actions)
@@ -293,6 +298,8 @@ When Claude calls `fetch_github_activity`, this becomes a **two-pass interaction
 
 **Client experience during the gap**: Send an initial SSE event with a loading indicator (e.g., `data: {"text": "Checking recent activity..."}`) while fetching commits, so the user sees immediate feedback.
 
+**Second pass classification**: The second Claude call does NOT need to call `classify_response` again. The intent is known (`github_activity`) and the project ID is known from the `fetch_github_activity` tool call. The pipeline hardcodes `intent: 'github_activity'` and `matched_item_ids: [project_id]` for quick action generation on GitHub activity responses.
+
 This replaces the current `github_activity` intent routing in the OpenAI route.
 
 ### Contact Intent Handling
@@ -341,14 +348,14 @@ This is a small cleanup but must be handled to avoid broken imports.
 - `src/lib/iris/embedding.ts` — no more embeddings
 - `src/lib/iris/retrieval.ts` — no more semantic search
 - `src/lib/iris/answer-utils/intent.ts` — Claude handles intent in single pass
-- `src/lib/iris/answer-utils/planning.ts` — pre-routing/micro-planner not needed
+- `src/lib/iris/answer-utils/planning.ts` — pre-routing/micro-planner removed; `planAutoContact()` and `buildContactDraft()` extracted to `responses.ts` before deletion
 - `src/lib/iris/answer-utils/aliases.ts` — Claude understands aliases from full KB context
 - `src/data/iris/derived/embeddings.json` — no longer generated
 - `scripts/build_embeddings.ts` — replaced by rankings build
 
 ### Code removed
 - Version toggle (`'claude' | 'custom'`) in `IrisPalette.tsx`
-- `openai` npm dependency (verify not used elsewhere first)
+- `openai` npm dependency (verify not used elsewhere first — note: `build_typeahead` scripts may use OpenAI for suggestion generation; if so, the dependency stays)
 - Embedding-related imports and references throughout `answer-utils/`
 
 ### Files modified
