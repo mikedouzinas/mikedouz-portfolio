@@ -34,6 +34,7 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
       sendMessage,
       requestDraft,
       setDraft,
+      backToChat,
       reset,
     } = useBlogIris(slug);
 
@@ -128,8 +129,8 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
     }, [requestDraft]);
 
     const handleBackToChat = useCallback(() => {
-      reset();
-    }, [reset]);
+      backToChat();
+    }, [backToChat]);
 
     const handleDraftSubmit = useCallback(
       (data: { draft: string; authorName: string; contact: string; passageRef: string }) => {

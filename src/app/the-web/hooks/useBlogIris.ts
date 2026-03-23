@@ -120,10 +120,14 @@ export function useBlogIris(slug: string) {
     setState((s) => ({ ...s, draft }));
   }, []);
 
+  const backToChat = useCallback(() => {
+    setState((s) => ({ ...s, phase: 'conversation', draft: '', draftType: null, error: null }));
+  }, []);
+
   const reset = useCallback(() => {
     abortRef.current?.abort();
     setState({ messages: [], phase: 'idle', draft: '', draftType: null, error: null });
   }, []);
 
-  return { ...state, sendMessage, requestDraft, setDraft, reset };
+  return { ...state, sendMessage, requestDraft, setDraft, backToChat, reset };
 }

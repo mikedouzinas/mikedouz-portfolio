@@ -105,7 +105,7 @@ export default function SpotifyBubble() {
   };
 
   return (
-    <div ref={containerRef} className="hidden md:block text-left" style={{ marginLeft: 'calc(50% - 96px)', position: 'relative' }}>
+    <div ref={containerRef} className="hidden md:block text-left max-h-full" style={{ marginLeft: 'calc(50% - 96px)', position: 'relative' }}>
       {/* Collapsed view — always in DOM to hold position */}
       <div
         className="rounded-2xl overflow-hidden"
