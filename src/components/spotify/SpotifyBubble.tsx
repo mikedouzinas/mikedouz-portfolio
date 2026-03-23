@@ -12,7 +12,11 @@ import SpotifyCard from './SpotifyCard';
 const INITIAL_MONTHS = 3;
 const LOAD_MORE_MONTHS = 3;
 
-export default function SpotifyBubble() {
+interface SpotifyBubbleProps {
+  parentSelector?: string;
+}
+
+export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
   const { deepMode } = useDeepMode();
   const adminMode = useAdminMode();
   const [expanded, setExpanded] = useState(false);
@@ -22,8 +26,12 @@ export default function SpotifyBubble() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [compact, setCompact] = useState(false);
 
+  // Observe the PARENT wrapper's height to determine compact mode
+  // The parent is the flex container that constrains our available space
   useEffect(() => {
-    const el = containerRef.current;
+    const el = parentSelector
+      ? document.querySelector(parentSelector)
+      : containerRef.current;
     if (!el) return;
     const observer = new ResizeObserver((entries) => {
       const height = entries[0]?.contentRect.height ?? Infinity;
@@ -31,7 +39,7 @@ export default function SpotifyBubble() {
     });
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [parentSelector]);
 
   const filteredMoments = useMemo(() => {
     const allMoments = getMusicMoments();
@@ -105,7 +113,7 @@ export default function SpotifyBubble() {
   };
 
   return (
-    <div ref={containerRef} className="hidden md:block text-left max-h-full" style={{ marginLeft: 'calc(50% - 96px)', position: 'relative' }}>
+    <div ref={containerRef} className="hidden md:block text-left" style={{ marginLeft: 'calc(50% - 96px)', position: 'relative' }}>
       {/* Collapsed view — always in DOM to hold position */}
       <div
         className="rounded-2xl overflow-hidden"
