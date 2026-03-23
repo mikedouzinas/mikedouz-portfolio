@@ -16,7 +16,7 @@ export const InboxPayload = z.object({
   ]),
   nonce: z.string().min(8),
   honeypot: z.string().optional(),
-  passage_ref: z.string().max(500).optional(),
+  passage_ref: z.string().max(1000).optional(),
   post_slug: z.string().max(200).optional(),
   post_title: z.string().max(300).optional(),
   iris_conversation: z.array(z.object({

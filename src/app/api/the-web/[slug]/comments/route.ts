@@ -48,7 +48,7 @@ const CreateCommentSchema = z.object({
     .max(5000)
     .trim(),
   parent_id: z.string().uuid().optional(),
-  passage_ref: z.string().max(500).optional(),
+  passage_ref: z.string().max(1000).optional(),
   honeypot: z.string().max(0).optional(),
 });
 
