@@ -25,43 +25,56 @@ User query arrives at /api/iris/answer
     ↓
 [PRESERVED] Security checks, input validation, rate limiting
     ↓
+[PRESERVED] Pattern-based off-topic pre-filter (isClearlyOffTopic)
+  → If clearly off-topic, return canned decline without calling Claude
+    ↓
 [PRESERVED] Load KB items, contact info, rankings
     ↓
 [PRESERVED] Check response cache (Redis/in-memory)
+  → Cache now stores: response text + intent + matched_item_ids + quick actions
     ↓
 [NEW] Single Claude API call:
   - System prompt: Iris personality + full KB JSON (prompt cached)
   - Three tool definitions (see below)
   - User message + conversation history
+  - If quick action drill-down (skipClassification=true): include preset
+    intent/filters in user message so Claude focuses on the right item
     ↓
 [NEW] Stream processing:
-  - Buffer tool_use content blocks (classify_response, show_contact_form)
-  - Stream text content blocks to client via SSE
+  - Stream text content blocks to client via SSE immediately as they arrive
+  - Buffer ALL tool_use content blocks (classify_response, show_contact_form)
+  - Tool calls and text can arrive in any order — handle both interleaved
     ↓
 [PRESERVED] After stream completes:
-  - Parse classify_response → intent, matched_item_ids, filters
+  - Parse buffered classify_response → intent, matched_item_ids, filters
+  - If classify_response missing, fall back to intent='general', extract
+    matched IDs by matching response text against KB item titles
+  - Run autoContactPlan() check: if query matches auto-contact pattern
+    AND Claude did not call show_contact_form, emit contactForm event anyway
   - Feed into existing generateQuickActions() (quickActions_v2)
   - Send quick actions via SSE
-  - Cache the response
+  - Cache the full response (text + intent + matched_item_ids + quick actions)
   - Log analytics
   - Send [DONE]
 ```
 
 ### Tool Definitions
 
-Claude gets three tools. It must always call `classify_response` first.
+Claude gets three tools. It must always call `classify_response` alongside its text response.
 
-#### 1. `classify_response` (required, always called first)
+#### 1. `classify_response` (required, always called)
 
 Replaces the separate GPT-4o-mini intent classification call. Since Claude has the full KB in context, classification is more accurate — it knows what data exists to answer the question.
+
+**Note on ordering**: Claude's API does not guarantee tool call ordering — tool_use and text content blocks can arrive interleaved in any order. The stream handler must handle this gracefully: stream text immediately, buffer all tool_use blocks, process metadata after the stream ends.
 
 ```typescript
 {
   name: 'classify_response',
-  description: 'Classify the query intent and identify which KB items you will reference in your response. You MUST call this tool before responding.',
+  description: 'Classify the query intent and identify which KB items you reference in your response. You MUST call this tool alongside every response.',
   input_schema: {
     type: 'object',
-    required: ['intent', 'matched_item_ids'],
+    required: ['intent', 'matched_item_ids', 'about_mike'],
     properties: {
       intent: {
         type: 'string',
@@ -73,6 +86,10 @@ Replaces the separate GPT-4o-mini intent classification call. Since Claude has t
         items: { type: 'string' },
         description: 'IDs of KB items you reference or rely on in your response.'
       },
+      about_mike: {
+        type: 'boolean',
+        description: 'True if the query is about Mike, his work, skills, or background. False if completely unrelated (weather, math, general trivia).'
+      },
       filters: {
         type: 'object',
         properties: {
@@ -80,7 +97,8 @@ Replaces the separate GPT-4o-mini intent classification call. Since Claude has t
           skills: { type: 'array', items: { type: 'string' }, description: 'Skill IDs mentioned or implied' },
           year: { type: 'number', description: 'Year filter if specified' },
           company: { type: 'string', description: 'Company name if specified' },
-          show_all: { type: 'boolean', description: 'True if user wants a comprehensive list' }
+          show_all: { type: 'boolean', description: 'True if user wants a comprehensive list' },
+          title_match: { type: 'string', description: 'Specific item title/name being asked about' }
         }
       }
     }
@@ -252,24 +270,69 @@ This means:
 
 ### Caching Strategy
 
-Preserved. The existing Redis + in-memory two-tier cache continues to work:
+Preserved and improved. The existing Redis + in-memory two-tier cache continues to work:
 
 - **Cache key**: `answer:{normalizedQuery}:{intent}` (intent now comes from Claude's tool call)
 - **TTL**: 1 hour
 - **Time-sensitive bypass**: Queries with "today", "now", "recent" skip cache
-- **Cache includes**: Full response text + quick actions + metadata
+- **Cache includes** (expanded): Full response text + intent + matched_item_ids + quick actions + metadata
+
+**Improvement over current system**: Currently, cached responses regenerate quick actions with empty results, producing lower-quality follow-ups. By caching the `classify_response` output (intent + matched_item_ids) alongside the response text, cached responses serve the same quality quick actions as fresh responses.
 
 ### GitHub Activity Flow
 
-When Claude calls `fetch_github_activity`:
+When Claude calls `fetch_github_activity`, this becomes a **two-pass interaction** — the only case where the single-pass architecture requires a second Claude call:
 
-1. Pipeline intercepts the tool call
-2. Fetches recent commits via GitHub API (existing `github.ts`)
-3. Re-prompts Claude with the commit data as a follow-up message
-4. Claude summarizes the activity conversationally
-5. Response streams to client as normal
+1. Claude's first response includes the `fetch_github_activity` tool call
+2. Pipeline intercepts the tool call, does NOT stream any text to client yet
+3. Fetches recent commits via GitHub API (existing `github.ts`)
+4. Sends a second Claude request with the tool result containing commit data
+5. Claude's second response streams to client as normal (summarizing the activity)
+
+**Latency implications**: This doubles the Claude roundtrip for GitHub activity queries. The second call benefits from prompt caching (same system prompt), but the tool result message is not cached. Expected total latency: ~4-6 seconds vs ~2-3 seconds for standard queries.
+
+**Client experience during the gap**: Send an initial SSE event with a loading indicator (e.g., `data: {"text": "Checking recent activity..."}`) while fetching commits, so the user sees immediate feedback.
 
 This replaces the current `github_activity` intent routing in the OpenAI route.
+
+### Contact Intent Handling
+
+The current route has a 190-line contact fast-path (lines 660-849) that handles three sub-types without calling the LLM:
+- "How to contact Mike" → show contact link buttons
+- "Is Mike available?" → load availability from bio, respond with availability info
+- "Write a message to Mike" → open message composer
+
+In the new architecture, **all contact queries go through Claude**. Claude handles all three sub-types naturally:
+- General contact → responds conversationally ("Mike is happy to connect!"), quick actions show contact buttons
+- Availability → reads availability from the KB (it has full context), responds with availability info
+- Message request → calls `show_contact_form` tool with a draft message
+
+The cost of sending contact queries through Claude is minimal with prompt caching (~$0.03). The benefit is better, more natural responses compared to hardcoded templates. The `autoContactPlan()` safety net (see flow diagram above) ensures the contact form is shown even if Claude forgets to call the tool.
+
+### Quick Action Drill-Down Queries (skipClassification)
+
+The current route supports `skipClassification=true` with preset `intent` and `filters` from quick action buttons. When a user clicks "Get details about HiLiTe", the client sends:
+```typescript
+{ skipClassification: true, intent: 'specific_item', filters: { title_match: 'HiLiTe' } }
+```
+
+In the new architecture, **all queries go through Claude** (no skip). However, when preset intent/filters are provided, they are included in the user message to focus Claude:
+
+```
+User message (augmented by pipeline):
+"Tell me about HiLiTe
+[System note: This is a drill-down query for specific item 'HiLiTe'. Focus your response on this item.]"
+```
+
+Claude still calls `classify_response` (providing matched_item_ids for quick actions), but the preset hint ensures it focuses on the right item. This is slightly more expensive than the current fast-path but produces better responses since Claude has full context to draw connections (e.g., mentioning related experiences or skills).
+
+### QueryFilter Re-export
+
+The current `route.ts` re-exports `QueryFilter` from `answer-utils/types.ts`, and both `IrisPalette.tsx` and `quickActions_v2.ts` import it from the route. During the rewrite, either:
+- Preserve the re-export in the new route, OR
+- (Preferred) Update imports in `IrisPalette.tsx` and `quickActions_v2.ts` to import directly from `@/lib/iris/answer-utils/types.ts`
+
+This is a small cleanup but must be handled to avoid broken imports.
 
 ## What Gets Removed
 
@@ -326,6 +389,8 @@ npm run kb:rebuild  →  verify:kb + build:rankings + build:typeahead
 ```
 
 `build:rankings` runs `rankings.ts` to compute importance scores for all KB items and writes `derived/rankings.json`. This replaces the OpenAI API call needed by `build:embeddings` — no external API key required at build time.
+
+**Note**: Rankings computation already exists in `rankings.ts` and `derived/rankings.json` is already generated as part of the current pipeline. The `build:rankings` script may already exist or need a trivial entry point that calls `computeRankings()` and writes the output. Check `package.json` scripts during implementation.
 
 ## Environment Variables
 
@@ -406,6 +471,7 @@ export const config = {
   },
   chatSettings: {
     maxTokens: 1024,
+    temperature: 1,             // Matches current OpenAI setting
   },
   // Performance budgets (unchanged)
   typeaheadMaxMs: 16,
@@ -419,9 +485,13 @@ export const config = {
 
 | Risk | Mitigation |
 |------|-----------|
-| Claude occasionally doesn't call `classify_response` | Include firm instruction in system prompt + validate in stream handler, fall back to intent='general' |
+| Claude occasionally doesn't call `classify_response` | Include firm instruction in system prompt + validate in stream handler. Fall back to intent='general' and extract matched IDs by matching response text against KB item titles. |
 | KB size exceeds context window | Currently ~50-80K tokens, well within 200K limit. Monitor as KB grows. |
 | Prompt caching misses increase cost | System prompt is stable across requests — cache hits should be >90% in production |
 | Response quality regression on specific query types | Run full test suite before deploying. Keep OpenAI route in git history for rollback reference. |
 | `show_contact_form` tool call not recognized by client | Graceful degradation — if client doesn't see `contactForm` event, contact buttons still available via quick actions |
 | Latency increase vs GPT-4o-mini | Claude Sonnet 4.6 TTFB may be slightly higher. Redis caching mitigates for repeated queries. Streaming masks perceived latency. |
+| Claude forgets `show_contact_form` when it should show contact | `autoContactPlan()` safety net runs post-stream: if query matches contact patterns and Claude didn't call the tool, emit `contactForm` event anyway |
+| Tool call ordering unpredictable | Stream handler buffers all tool_use blocks regardless of arrival order. Text is streamed immediately. Metadata processed only after stream ends. |
+| GitHub activity queries are slower (two Claude roundtrips) | Send "Checking recent activity..." indicator during commit fetch. Second call still benefits from prompt caching. |
+| Off-topic queries burn a Claude call | Pattern-based `isClearlyOffTopic` pre-filter catches obvious cases before calling Claude. `about_mike` field in `classify_response` provides LLM-level detection for borderline cases. |
