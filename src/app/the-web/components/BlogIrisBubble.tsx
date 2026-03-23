@@ -125,10 +125,11 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
   const showDraftView = phase === 'drafting' || phase === 'draft_ready' || phase === 'submitting' || phase === 'submitted';
 
   // Use initial rect for positioning (locked)
-  // Always position to the right of the article content area, not inline with selection
+  // Always position to the right of the article content area, vertically centered on selection
   const getDesktopStyle = (): React.CSSProperties => {
     const rect = initialRectRef.current || selection.rect;
-    let top = rect.top;
+    // Center vertically between top and bottom of selection
+    let top = rect.top + (rect.height / 2) - 80; // offset ~80px to roughly center the bubble
 
     // Find the post body container to get its right edge
     const postBody = document.querySelector('[data-post-body]');
@@ -180,11 +181,11 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex-1 min-w-0 text-[10px] text-white/35 italic truncate pr-2">
-          &ldquo;{passageRef.current.slice(0, 60)}
-          {passageRef.current.length > 60 ? '...' : ''}&rdquo;
+      {/* Header with passage reference */}
+      <div className="flex items-start justify-between gap-1.5 mb-2 pb-2 border-b border-white/[0.06]">
+        <div className="flex-1 min-w-0 text-[10px] text-white/50 italic leading-snug line-clamp-2">
+          &ldquo;{passageRef.current.slice(0, 120)}
+          {passageRef.current.length > 120 ? '...' : ''}&rdquo;
         </div>
         <button
           onClick={attemptClose}
