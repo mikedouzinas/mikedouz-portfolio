@@ -19,6 +19,19 @@ export default function SpotifyBubble() {
   const [visibleMonths, setVisibleMonths] = useState(INITIAL_MONTHS);
   const { currentMomentId, isPlaying, progress, togglePlay, stop } = useAudioPreview();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const height = entries[0]?.contentRect.height ?? Infinity;
+      setCompact(height < 140);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const filteredMoments = useMemo(() => {
     const allMoments = getMusicMoments();
@@ -92,7 +105,7 @@ export default function SpotifyBubble() {
   };
 
   return (
-    <div className="hidden md:block mb-4 text-left" style={{ marginLeft: 'calc(50% - 96px)', position: 'relative' }}>
+    <div ref={containerRef} className="hidden md:block mb-4 text-left" style={{ marginLeft: 'calc(50% - 96px)', position: 'relative' }}>
       {/* Collapsed view — always in DOM to hold position */}
       <div
         className="rounded-2xl shadow-lg shadow-black/20 overflow-hidden"
@@ -119,30 +132,32 @@ export default function SpotifyBubble() {
           </button>
         </div>
 
-        <div className="px-3 pb-3 space-y-1">
-          {recentMoments.map((moment) => (
-            <SpotifyCard key={moment.id} moment={moment} compact />
-          ))}
-          {remainingCount > 0 && (
-            <button
-              onClick={handleToggleExpand}
-              className="flex items-center gap-2 pt-1 px-1 hover:opacity-80 transition-opacity"
-            >
-              <div className="flex gap-1">
-                {[1, 0.6, 0.3].map((opacity, i) => (
-                  <div
-                    key={i}
-                    className="w-1 h-1 rounded-full"
-                    style={{ backgroundColor: '#1DB954', opacity }}
-                  />
-                ))}
-              </div>
-              <span className="text-[10px] text-gray-500">
-                {remainingCount} more
-              </span>
-            </button>
-          )}
-        </div>
+        {!compact && (
+          <div className="px-3 pb-3 space-y-1">
+            {recentMoments.map((moment) => (
+              <SpotifyCard key={moment.id} moment={moment} compact />
+            ))}
+            {remainingCount > 0 && (
+              <button
+                onClick={handleToggleExpand}
+                className="flex items-center gap-2 pt-1 px-1 hover:opacity-80 transition-opacity"
+              >
+                <div className="flex gap-1">
+                  {[1, 0.6, 0.3].map((opacity, i) => (
+                    <div
+                      key={i}
+                      className="w-1 h-1 rounded-full"
+                      style={{ backgroundColor: '#1DB954', opacity }}
+                    />
+                  ))}
+                </div>
+                <span className="text-[10px] text-gray-500">
+                  {remainingCount} more
+                </span>
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Expanded view */}

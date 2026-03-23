@@ -66,8 +66,8 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
     };
 
     return (
-        <div className="flex flex-col h-full justify-between p-8 text-center md:text-center">
-            <div>
+        <div className="flex flex-col h-full p-8 text-center md:text-center">
+            <div className="flex-shrink-0">
                 {/* Profile container: fixed width and centered */}
                 <div className="w-48 mx-auto">
                     <HomeContent
@@ -105,9 +105,11 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                 </nav>
             </div>
             {/* Spotify music timeline (deep mode only) */}
-            <SpotifyBubble />
+            <div className="flex-1 min-h-0 overflow-hidden flex items-center">
+                <SpotifyBubble />
+            </div>
             {/* Social media icons aligned with the profile container */}
-            <div className="w-48 mx-auto">
+            <div className="flex-shrink-0 mt-auto w-48 mx-auto">
                 <PlaygroundButton />
                 <div className="flex space-x-4 justify-center md:justify-start">
                     <a
