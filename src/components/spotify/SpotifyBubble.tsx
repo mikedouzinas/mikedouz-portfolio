@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Music, Maximize2, Minimize2 } from 'lucide-react';
 import { getMusicMoments, getMomentsByMonth, formatMonth } from '@/data/spotify/loader';
-import { useAudioPreview } from '@/hooks/useAudioPreview';
+import { useSpotifyEmbed } from '@/hooks/useSpotifyEmbed';
 import { useAdminMode } from '@/hooks/useAdminMode';
 import { useDeepMode } from '@/components/DeepModeContext';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
@@ -22,14 +22,21 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
   const adminMode = useAdminMode();
   const [expanded, setExpanded] = useState(false);
   const [visibleMonths, setVisibleMonths] = useState(INITIAL_MONTHS);
-  const { currentMomentId, isPlaying, progress, togglePlay, stop } = useAudioPreview();
+  const {
+    currentMomentId,
+    isPlaying,
+    progress,
+    position,
+    duration,
+    togglePlay,
+    stop,
+    containerRef: embedContainerRef,
+  } = useSpotifyEmbed();
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [visibleSongs, setVisibleSongs] = useState(3);
 
   // Observe the PARENT wrapper's height for progressive song collapse
-  // Heights: header ~44px, each song ~25px, "more" row ~20px, padding ~12px
-  // Tiers: 3 songs needs ~150px, 2 songs ~125px, 1 song ~100px, header-only ~60px
   useEffect(() => {
     const el = parentSelector
       ? document.querySelector(parentSelector)
@@ -58,13 +65,12 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
 
   const momentsByMonth = useMemo(
     () => getMomentsByMonth(filteredMoments),
-    [filteredMoments]
+    [filteredMoments],
   );
 
-  // Only render a subset of months for performance
   const visibleData = useMemo(
     () => momentsByMonth.slice(0, visibleMonths),
-    [momentsByMonth, visibleMonths]
+    [momentsByMonth, visibleMonths],
   );
 
   const recentMoments = useMemo(() => {
@@ -81,15 +87,13 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
 
   const uniqueSongsCount = useMemo(
     () => new Set(filteredMoments.map((m) => m.trackUri)).size,
-    [filteredMoments]
+    [filteredMoments],
   );
 
-  // Reset visible months when collapsing
   useEffect(() => {
     if (!expanded) setVisibleMonths(INITIAL_MONTHS);
   }, [expanded]);
 
-  // Load more months when scrolling near bottom
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -119,6 +123,20 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
 
   return (
     <div ref={containerRef} className="hidden md:block text-left" style={{ marginLeft: 'calc(50% - 96px)' }}>
+      {/* Hidden Spotify embed container — 1x1 off-screen iframe lives here */}
+      <div
+        ref={embedContainerRef}
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          width: 1,
+          height: 1,
+          overflow: 'hidden',
+          opacity: 0,
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Collapsed view — always in DOM to hold position */}
       <div
         className="rounded-2xl overflow-hidden relative transition-transform duration-200 hover:scale-[1.02] cursor-pointer"
@@ -152,9 +170,18 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
         </div>
 
         {visibleSongs > 0 && (
-          <div className="px-3 pb-3 space-y-1">
+          <div className="px-3 pb-3 space-y-0">
             {recentMoments.slice(0, visibleSongs).map((moment) => (
-              <SpotifyCard key={moment.id} moment={moment} compact />
+              <SpotifyCard
+                key={moment.id}
+                moment={moment}
+                compact
+                isPlaying={currentMomentId === moment.id && isPlaying}
+                playProgress={currentMomentId === moment.id ? progress : 0}
+                playPosition={currentMomentId === moment.id ? position : 0}
+                playDuration={currentMomentId === moment.id ? duration : 0}
+                onPlayToggle={togglePlay}
+              />
             ))}
             {filteredMoments.length - visibleSongs > 0 && (
               <button
@@ -239,6 +266,8 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
                         compact={false}
                         isPlaying={currentMomentId === moment.id && isPlaying}
                         playProgress={currentMomentId === moment.id ? progress : 0}
+                        playPosition={currentMomentId === moment.id ? position : 0}
+                        playDuration={currentMomentId === moment.id ? duration : 0}
                         onPlayToggle={togglePlay}
                       />
                     ))}
