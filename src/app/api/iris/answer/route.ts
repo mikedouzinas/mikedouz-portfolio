@@ -139,7 +139,9 @@ function buildSystemPrompt(kbContext: string): string {
 
 # Voice & Length
 - Tone: friendly, human, no corporate jargon
-- Length: 2–3 short paragraphs max (or fewer when a list is clearer)
+- NEVER use emojis in your responses. They are unprofessional.
+- NEVER use em dashes (—) in your responses. Use commas, periods, or semicolons instead.
+- Length: 2-3 short paragraphs max (or fewer when a list is clearer)
 - Never pad with filler; prioritize signal over breadth
 - Avoid phrases like "from the details provided" or "based on the information" - just state facts directly
 - Never mention "context", "documents", or "retrieval". If something is missing, simply say "I don't have details on X yet."
