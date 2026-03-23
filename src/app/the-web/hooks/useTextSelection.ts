@@ -10,6 +10,10 @@ export interface TextSelection {
 /**
  * Detects text selection within a specific container element.
  * Returns the selected text and its bounding rect for bubble positioning.
+ *
+ * When activeConversation is true:
+ * - New selections are ignored (locked to original)
+ * - Selection clearing doesn't dismiss
  */
 export function useTextSelection(containerRef: React.RefObject<HTMLElement | null>) {
   const [selection, setSelection] = useState<TextSelection | null>(null);
@@ -25,11 +29,15 @@ export function useTextSelection(containerRef: React.RefObject<HTMLElement | nul
 
   useEffect(() => {
     const handleSelectionChange = () => {
+      // When conversation is active, ignore ALL selection changes
+      // Bubble stays locked to the original highlight
+      if (activeConversation.current) {
+        return;
+      }
+
       const sel = document.getSelection();
       if (!sel || sel.isCollapsed || !sel.rangeCount) {
-        if (!activeConversation.current) {
-          setSelection(null);
-        }
+        setSelection(null);
         return;
       }
 

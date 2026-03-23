@@ -35,15 +35,11 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
   } = useBlogIris(slug);
 
   const [isMobile, setIsMobile] = useState(false);
+  const [showDiscard, setShowDiscard] = useState(false);
+  // Lock passage to the INITIAL selection text — never update after mount
   const passageRef = useRef(selection?.text || '');
+  const initialRectRef = useRef(selection?.rect || null);
   const bubbleRef = useRef<HTMLDivElement>(null);
-
-  // Track passage from initial selection
-  useEffect(() => {
-    if (selection?.text) {
-      passageRef.current = selection.text;
-    }
-  }, [selection?.text]);
 
   // Detect mobile
   useEffect(() => {
@@ -53,18 +49,43 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  // Click outside detection
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (bubbleRef.current && !bubbleRef.current.contains(e.target as Node)) {
+        attemptClose();
+      }
+    };
+    // Delay listener to avoid the initial highlight click triggering it
+    const timer = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 100);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [messages.length]);
+
   // Close on Escape
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        handleClose();
+        attemptClose();
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, []);
+  }, [messages.length]);
 
-  const handleClose = useCallback(() => {
+  const attemptClose = useCallback(() => {
+    if (messages.length > 0) {
+      setShowDiscard(true);
+    } else {
+      doClose();
+    }
+  }, [messages.length]);
+
+  const doClose = useCallback(() => {
     reset();
     onClose();
   }, [reset, onClose]);
@@ -84,6 +105,11 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
     requestDraft('message', passageRef.current);
   }, [requestDraft]);
 
+  const handleBackToChat = useCallback(() => {
+    // Go back from draft to conversation view
+    reset();
+  }, [reset]);
+
   const handleDraftSubmit = useCallback(
     (data: { draft: string; authorName: string; contact: string; passageRef: string }) => {
       // TODO: Wire up to submit API
@@ -96,23 +122,18 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
 
   const isStreaming = phase === 'streaming';
   const showActions = phase === 'conversation' && messages.length > 0 && messages[messages.length - 1].role === 'assistant';
-  const showDraft = phase === 'drafting' || phase === 'draft_ready' || phase === 'submitting' || phase === 'submitted';
+  const showDraftView = phase === 'drafting' || phase === 'draft_ready' || phase === 'submitting' || phase === 'submitted';
 
-  // Compute position relative to viewport (use fixed positioning)
+  // Use initial rect for positioning (locked)
   const getDesktopStyle = (): React.CSSProperties => {
-    const rect = selection.rect;
+    const rect = initialRectRef.current || selection.rect;
     let top = rect.top;
     let left = rect.right + BUBBLE_GAP;
 
-    // Flip to left if overflowing viewport
     if (left + BUBBLE_WIDTH > window.innerWidth - 16) {
       left = rect.left - BUBBLE_WIDTH - BUBBLE_GAP;
     }
-
-    // Clamp left to at least 16px
     if (left < 16) left = 16;
-
-    // Clamp top to stay within viewport
     if (top < 16) top = 16;
 
     return {
@@ -125,16 +146,36 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
   };
 
   const bubbleContent = (
-    <>
+    <div className="select-none">
+      {/* Discard confirmation */}
+      {showDiscard && (
+        <div className="flex items-center justify-between bg-white/[0.06] rounded-lg px-2.5 py-2 mb-2">
+          <span className="text-[10px] text-white/50">Discard conversation?</span>
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => setShowDiscard(false)}
+              className="text-[10px] text-white/40 hover:text-white/70 transition-colors px-1.5 py-0.5"
+            >
+              Keep
+            </button>
+            <button
+              onClick={doClose}
+              className="text-[10px] text-red-400/80 hover:text-red-400 transition-colors px-1.5 py-0.5"
+            >
+              Discard
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        {/* Passage snippet */}
         <div className="flex-1 min-w-0 text-[10px] text-white/35 italic truncate pr-2">
           &ldquo;{passageRef.current.slice(0, 60)}
           {passageRef.current.length > 60 ? '...' : ''}&rdquo;
         </div>
         <button
-          onClick={handleClose}
+          onClick={attemptClose}
           className="flex-shrink-0 w-5 h-5 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
         >
           <X className="w-3 h-3 text-white/40" />
@@ -142,17 +183,25 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
       </div>
 
       {/* Conversation area */}
-      {!showDraft && (
-        <BlogIrisConversation
-          messages={messages}
-          isStreaming={isStreaming}
-          onSend={handleSend}
-          disabled={isStreaming}
-        />
+      {!showDraftView && (
+        <div className="select-text">
+          <BlogIrisConversation
+            messages={messages}
+            isStreaming={isStreaming}
+            onSend={handleSend}
+            disabled={isStreaming}
+          />
+          {/* Hint below input when no messages yet */}
+          {messages.length === 0 && (
+            <p className="text-[9px] text-white/25 mt-1.5 leading-snug">
+              share a thought and Iris will give you context — then add a comment or message Mike
+            </p>
+          )}
+        </div>
       )}
 
       {/* Action pills */}
-      {showActions && !showDraft && (
+      {showActions && !showDraftView && (
         <div className="mt-2">
           <BlogIrisActions
             onComment={handleComment}
@@ -162,33 +211,34 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
       )}
 
       {/* Draft area */}
-      {showDraft && draftType && (
-        <BlogIrisDraft
-          draftType={draftType}
-          draft={draft}
-          passageRef={passageRef.current}
-          isLoading={phase === 'drafting'}
-          error={error}
-          onDraftChange={setDraft}
-          onSubmit={handleDraftSubmit}
-        />
+      {showDraftView && draftType && (
+        <div>
+          <BlogIrisDraft
+            draftType={draftType}
+            draft={draft}
+            passageRef={passageRef.current}
+            isLoading={phase === 'drafting'}
+            error={error}
+            onDraftChange={setDraft}
+            onSubmit={handleDraftSubmit}
+            onCancel={handleBackToChat}
+          />
+        </div>
       )}
 
       {/* Error display */}
-      {phase === 'error' && error && !showDraft && (
+      {phase === 'error' && error && !showDraftView && (
         <div className="mt-2 text-[10px] text-red-400/80">{error}</div>
       )}
-    </>
+    </div>
   );
 
-  // Mobile: bottom sheet
   if (isMobile) {
     return (
       <div
         ref={bubbleRef}
         className="fixed bottom-0 left-0 right-0 max-h-[70vh] z-50 rounded-t-2xl bg-[rgba(15,23,42,0.95)] backdrop-blur-[40px] border-t border-white/[0.12] shadow-2xl p-4 overflow-y-auto"
       >
-        {/* Drag handle */}
         <div className="flex justify-center mb-3">
           <div className="w-8 h-1 rounded-full bg-white/20" />
         </div>
@@ -197,7 +247,6 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
     );
   }
 
-  // Desktop: absolute positioned bubble
   return (
     <div
       ref={bubbleRef}

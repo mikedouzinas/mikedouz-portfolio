@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef, FormEvent } from 'react';
-import { MessageSquare, Send } from 'lucide-react';
 import { getRandomBlogLoadingMessage } from '../lib/loadingMessages';
 
 interface BlogIrisDraftProps {
@@ -17,6 +16,7 @@ interface BlogIrisDraftProps {
     contact: string;
     passageRef: string;
   }) => void;
+  onCancel?: () => void;
 }
 
 function validateContact(value: string): { type: 'email' | 'phone' | 'anonymous'; valid: boolean } {
@@ -40,6 +40,7 @@ export default function BlogIrisDraft({
   error,
   onDraftChange,
   onSubmit,
+  onCancel,
 }: BlogIrisDraftProps) {
   const [authorName, setAuthorName] = useState('');
   const [contact, setContact] = useState('');
@@ -88,17 +89,11 @@ export default function BlogIrisDraft({
       <div className="flex flex-col gap-2.5">
         {/* Dimmed selected pill */}
         <div className="flex items-center gap-1.5 opacity-70">
-          {isComment ? (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-              <MessageSquare className="w-3.5 h-3.5" />
-              Leave a comment
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-gradient-to-r from-sky-500 to-indigo-600 text-white">
-              <Send className="w-3.5 h-3.5" />
-              Message Mike
-            </div>
-          )}
+          <div className={`flex items-center px-2.5 py-1 rounded-lg text-[10px] font-medium text-white ${
+            isComment ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-gradient-to-r from-sky-500 to-indigo-600'
+          }`}>
+            {isComment ? 'Add a comment' : 'Message Mike'}
+          </div>
         </div>
         {/* Loading message */}
         <div className="flex items-center gap-2 text-[11px] text-white/50">
@@ -182,8 +177,17 @@ export default function BlogIrisDraft({
         </div>
       )}
 
-      {/* Submit button */}
-      <div className="flex justify-end">
+      {/* Actions */}
+      <div className="flex justify-between items-center">
+        {onCancel ? (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="text-[10px] text-white/40 hover:text-white/70 transition-colors"
+          >
+            Back
+          </button>
+        ) : <span />}
         <button
           type="submit"
           disabled={!canSubmit}
