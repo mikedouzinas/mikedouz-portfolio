@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { useTextSelection } from '../hooks/useTextSelection';
 import BlogIrisBubble from './BlogIrisBubble';
 
@@ -11,27 +11,22 @@ interface PostBodyWithIrisProps {
 
 export default function PostBodyWithIris({ slug, children }: PostBodyWithIrisProps) {
   const bodyRef = useRef<HTMLDivElement>(null);
-  const { selection, clearSelection, setConversationActive } = useTextSelection(bodyRef);
-
-  // Once a selection triggers the bubble, mark conversation active
-  // so that clicking inside the bubble (which clears browser selection) doesn't dismiss it
-  useEffect(() => {
-    if (selection) {
-      setConversationActive(true);
-    }
-  }, [selection, setConversationActive]);
+  const bubbleRef = useRef<HTMLDivElement>(null);
+  const { selection, clearSelection, lock, unlock } = useTextSelection(bodyRef, bubbleRef);
 
   return (
     <div ref={bodyRef} className="relative" data-post-body>
       {children}
       {selection && (
         <BlogIrisBubble
+          ref={bubbleRef}
           slug={slug}
           selection={selection}
           onClose={() => {
-            setConversationActive(false);
+            unlock();
             clearSelection();
           }}
+          onLock={lock}
         />
       )}
     </div>

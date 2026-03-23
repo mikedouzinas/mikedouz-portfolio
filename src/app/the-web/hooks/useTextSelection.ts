@@ -9,18 +9,25 @@ export interface TextSelection {
 
 /**
  * Detects text selection within a specific container element.
- * Returns the selected text and its bounding rect for bubble positioning.
  *
- * When activeConversation is true:
- * - New selections are ignored (locked to original)
- * - Selection clearing doesn't dismiss
+ * Two phases:
+ * - Before locked: selection changes update state. Clearing selection closes bubble
+ *   UNLESS focus is inside the bubble (user clicked the textbox).
+ * - After locked: all selection changes ignored (conversation in progress).
  */
-export function useTextSelection(containerRef: React.RefObject<HTMLElement | null>) {
+export function useTextSelection(
+  containerRef: React.RefObject<HTMLElement | null>,
+  bubbleRef: React.RefObject<HTMLElement | null>,
+) {
   const [selection, setSelection] = useState<TextSelection | null>(null);
-  const activeConversation = useRef(false);
+  const locked = useRef(false);
 
-  const setConversationActive = useCallback((active: boolean) => {
-    activeConversation.current = active;
+  const lock = useCallback(() => {
+    locked.current = true;
+  }, []);
+
+  const unlock = useCallback(() => {
+    locked.current = false;
   }, []);
 
   const clearSelection = useCallback(() => {
@@ -29,14 +36,16 @@ export function useTextSelection(containerRef: React.RefObject<HTMLElement | nul
 
   useEffect(() => {
     const handleSelectionChange = () => {
-      // When conversation is active, ignore ALL selection changes
-      // Bubble stays locked to the original highlight
-      if (activeConversation.current) {
-        return;
-      }
+      // Phase 2: locked — ignore everything
+      if (locked.current) return;
 
       const sel = document.getSelection();
       if (!sel || sel.isCollapsed || !sel.rangeCount) {
+        // Selection was cleared. Don't close if focus is inside the bubble
+        // (user clicked the textbox, which clears browser selection)
+        if (bubbleRef.current && bubbleRef.current.contains(document.activeElement)) {
+          return;
+        }
         setSelection(null);
         return;
       }
@@ -56,7 +65,7 @@ export function useTextSelection(containerRef: React.RefObject<HTMLElement | nul
 
     document.addEventListener('selectionchange', handleSelectionChange);
     return () => document.removeEventListener('selectionchange', handleSelectionChange);
-  }, [containerRef]);
+  }, [containerRef, bubbleRef]);
 
-  return { selection, clearSelection, setConversationActive };
+  return { selection, clearSelection, lock, unlock };
 }
