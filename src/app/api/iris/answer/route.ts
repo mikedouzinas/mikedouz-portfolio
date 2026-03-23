@@ -128,10 +128,12 @@ function buildSystemPrompt(kbContext: string): string {
   return `You are **Iris**, Mike's AI assistant. The user is CURRENTLY talking to you on mikeveson.com. Your job is to help visitors explore Mike's work, skills, projects, and writing using ONLY the knowledge base provided below. Be warm, concise, and useful.
 
 # Tool Usage (REQUIRED)
-- You MUST call the \`classify_response\` tool with EVERY response. It tells the system which KB items you referenced and what type of query this is.
+- CRITICAL: You MUST ALWAYS produce a text response to the user. The text response IS your primary output. Tool calls are metadata alongside it.
+- You MUST also call the \`classify_response\` tool with every response. Write your text answer FIRST, then include the tool call.
 - Set \`matched_item_ids\` to the \`id\` fields of all KB items you mention or reference in your answer.
 - Set \`about_mike\` to true if the query is about Mike, his work, skills, projects, background, or anything in the KB. Set false only for clearly off-topic queries.
 - Set \`intent\` to the best classification: contact, filter_query, specific_item, personal, general, or github_activity.
+- NEVER respond with only tool calls and no text. The user must always see a written response.
 - Call \`show_contact_form\` when you want to suggest the user message Mike directly (see "Contact vs Explore" section below).
 - Call \`fetch_github_activity\` ONLY when the user explicitly asks about recent updates/commits for a specific project.
 
@@ -506,7 +508,47 @@ export async function POST(req: NextRequest) {
     const readable = new ReadableStream({
       async start(controller) {
         try {
-          const stream = anthropic.messages.stream({
+          // Generate queryId early for client session tracking
+          const earlyQueryId = `claude_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ queryId: earlyQueryId })}\n\n`));
+
+          // Helper: process a stream, buffer tool calls, stream text
+          async function processStream(stream: AsyncIterable<Anthropic.RawMessageStreamEvent>) {
+            const localToolBuffers: Record<number, { name: string; jsonStr: string }> = {};
+
+            for await (const event of stream) {
+              if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+                const text = event.delta.text;
+                fullAnswer += text;
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
+              } else if (event.type === 'content_block_start' && event.content_block.type === 'tool_use') {
+                localToolBuffers[event.index] = { name: event.content_block.name, jsonStr: '' };
+              } else if (event.type === 'content_block_delta' && event.delta.type === 'input_json_delta') {
+                if (localToolBuffers[event.index]) {
+                  localToolBuffers[event.index].jsonStr += event.delta.partial_json;
+                }
+              } else if (event.type === 'content_block_stop') {
+                const buf = localToolBuffers[event.index];
+                if (buf) {
+                  try {
+                    const input = JSON.parse(buf.jsonStr);
+                    if (buf.name === 'classify_response') {
+                      classifyResult = input;
+                    } else if (buf.name === 'show_contact_form') {
+                      contactFormData = input;
+                    } else if (buf.name === 'fetch_github_activity') {
+                      _githubActivityRequest = input;
+                    }
+                  } catch (e) {
+                    console.warn(`[Answer API] Failed to parse tool input for ${buf.name}:`, e);
+                  }
+                }
+              }
+            }
+          }
+
+          // ── First Claude call ───────────────────────────────────
+          const initialStream = anthropic.messages.stream({
             model: config.models.chat,
             max_tokens: config.chatSettings.maxTokens,
             temperature: config.chatSettings.temperature,
@@ -515,45 +557,47 @@ export async function POST(req: NextRequest) {
             tools: [CLASSIFY_RESPONSE_TOOL, SHOW_CONTACT_FORM_TOOL, FETCH_GITHUB_ACTIVITY_TOOL],
           });
 
-          // Generate queryId early for client session tracking
-          const earlyQueryId = `claude_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ queryId: earlyQueryId })}\n\n`));
+          await processStream(initialStream);
 
-          // Consume the stream using async iteration over raw events
-          for await (const event of stream) {
-            if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-              // Stream text to client immediately
-              const text = event.delta.text;
-              fullAnswer += text;
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
-            } else if (event.type === 'content_block_start' && event.content_block.type === 'tool_use') {
-              // Start buffering tool input
-              toolInputBuffers[event.index] = { name: event.content_block.name, jsonStr: '' };
-            } else if (event.type === 'content_block_delta' && event.delta.type === 'input_json_delta') {
-              // Accumulate tool input JSON
-              if (toolInputBuffers[event.index]) {
-                toolInputBuffers[event.index].jsonStr += event.delta.partial_json;
-              }
-            } else if (event.type === 'content_block_stop') {
-              // Parse completed tool inputs
-              const buf = toolInputBuffers[event.index];
-              if (buf) {
-                try {
-                  const input = JSON.parse(buf.jsonStr);
-                  if (buf.name === 'classify_response') {
-                    classifyResult = input;
-                  } else if (buf.name === 'show_contact_form') {
-                    contactFormData = input;
-                  } else if (buf.name === 'fetch_github_activity') {
-                    _githubActivityRequest = input;
-                    // TODO: Task 5 — implement GitHub activity two-pass flow
-                    // For now, the text response from Claude will stand.
-                  }
-                } catch (e) {
-                  console.warn(`[Answer API] Failed to parse tool input for ${buf.name}:`, e);
-                }
-              }
-            }
+          // Get the final message to check stop_reason
+          const finalMessage = await initialStream.finalMessage();
+
+          // ── Tool-use continuation loop ──────────────────────────
+          // If Claude stopped because it called tools (no text yet),
+          // send tool results back and let it generate the text response
+          if (finalMessage.stop_reason === 'tool_use' && fullAnswer.length === 0) {
+            // Build tool results for all tool calls
+            const toolUseBlocks = finalMessage.content.filter(
+              (b): b is Anthropic.ToolUseBlock => b.type === 'tool_use'
+            );
+
+            const toolResults: Anthropic.ToolResultBlockParam[] = toolUseBlocks.map(block => ({
+              type: 'tool_result' as const,
+              tool_use_id: block.id,
+              content: block.name === 'classify_response'
+                ? 'Classification received. Now provide your response to the user.'
+                : block.name === 'show_contact_form'
+                  ? 'Contact form will be shown. Now provide your response to the user.'
+                  : 'Acknowledged.',
+            }));
+
+            // Second call: send tool results, get text response
+            const continuationMessages: Anthropic.MessageParam[] = [
+              ...messages,
+              { role: 'assistant' as const, content: finalMessage.content },
+              { role: 'user' as const, content: toolResults },
+            ];
+
+            const continuationStream = anthropic.messages.stream({
+              model: config.models.chat,
+              max_tokens: config.chatSettings.maxTokens,
+              temperature: config.chatSettings.temperature,
+              system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+              messages: continuationMessages,
+              tools: [CLASSIFY_RESPONSE_TOOL, SHOW_CONTACT_FORM_TOOL, FETCH_GITHUB_ACTIVITY_TOOL],
+            });
+
+            await processStream(continuationStream);
           }
 
           // ── Post-stream processing ──────────────────────────
