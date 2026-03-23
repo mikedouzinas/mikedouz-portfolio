@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getPostBySlug, getAdjacentPosts } from '@/lib/blog';
 import MarkdownRenderer from '../components/MarkdownRenderer';
+import PostBodyWithIris from '../components/PostBodyWithIris';
 import ShareButton from '../components/ShareButton';
 import CommentSection from '../components/CommentSection';
 import SubscribeWidget from '../components/SubscribeWidget';
@@ -91,7 +92,9 @@ export default async function BlogPostPage({ params }: PageProps) {
         </header>
 
         {/* Body */}
-        <MarkdownRenderer content={post.body} />
+        <PostBodyWithIris slug={slug}>
+          <MarkdownRenderer content={post.body} />
+        </PostBodyWithIris>
 
         {/* Bottom subscribe */}
         <div className="mt-12 pt-8 border-t border-gray-800 flex items-baseline justify-between gap-4 flex-wrap">

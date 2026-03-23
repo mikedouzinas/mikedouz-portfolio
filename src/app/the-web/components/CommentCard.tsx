@@ -154,6 +154,12 @@ export default function CommentCard({
           </span>
         </div>
 
+        {comment.passage_ref && (
+          <div className="mt-1 text-xs text-gray-500 italic border-l-2 border-blue-500/30 pl-2 mb-1 line-clamp-2">
+            Re: &ldquo;{comment.passage_ref}&rdquo;
+          </div>
+        )}
+
         <p className="mt-1 text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
           {comment.body}
         </p>

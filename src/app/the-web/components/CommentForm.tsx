@@ -7,6 +7,7 @@ interface CommentFormProps {
   postSlug: string;
   parentId?: string;
   parentAuthor?: string;
+  passageRef?: string;
   onSubmit: (comment: BlogComment) => void;
   onCancel?: () => void;
 }
@@ -18,6 +19,7 @@ export default function CommentForm({
   postSlug,
   parentId,
   parentAuthor,
+  passageRef,
   onSubmit,
   onCancel,
 }: CommentFormProps) {
@@ -40,7 +42,7 @@ export default function CommentForm({
     }
   }, []);
 
-  const canSubmit = authorName.trim().length >= 1 && body.trim().length >= 10;
+  const canSubmit = body.trim().length >= 10;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -64,11 +66,12 @@ export default function CommentForm({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          author_name: authorName.trim(),
+          author_name: authorName.trim() || 'Anonymous',
           author_email: authorEmail.trim() || undefined,
           body: body.trim(),
           parent_id: parentId,
           honeypot,
+          ...(passageRef ? { passage_ref: passageRef } : {}),
         }),
       });
 
