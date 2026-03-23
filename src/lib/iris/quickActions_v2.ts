@@ -5,7 +5,7 @@
 
 import type { QuickAction } from '@/components/iris/QuickActions';
 import type { KBItem } from './schema';
-import type { QueryFilter } from '@/app/api/iris/answer/route';
+import type { QueryFilter } from '@/lib/iris/answer-utils/types';
 import { getActionsForItem, getActionsForList, type ActionData } from './actionConfig';
 import type { Rankings } from './rankings';
 

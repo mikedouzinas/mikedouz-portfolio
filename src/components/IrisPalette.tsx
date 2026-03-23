@@ -36,7 +36,7 @@ import ReactMarkdown from 'react-markdown';
 import { useUiDirectives, defaultOpenFor, stripUiDirectives, detectContactDirective } from './iris/useUiDirectives';
 import MessageComposer from './iris/MessageComposer';
 import QuickActions, { type QuickAction } from './iris/QuickActions';
-import type { QueryFilter } from '@/app/api/iris/answer/route';
+import type { QueryFilter } from '@/lib/iris/answer-utils/types';
 import { getRandomLoadingConfig, getAnimationConfig, getRandomLoadingMessage } from '@/lib/iris/loadingMessages';
 
 /**
@@ -127,9 +127,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const { deepMode, toggleDeepMode } = useDeepMode();
   // View mode state machine: 'suggestions' = show suggestions, 'answer' = show answer only
   const [viewMode, setViewMode] = useState<'suggestions' | 'answer'>('suggestions');
-
-  // API version: 'custom' = RAG pipeline (default), 'claude' = simple Claude fallback
-  const [version] = useState<'claude' | 'custom'>('custom');
 
   // State management
   const [isOpen, setIsOpen] = useState(false);
@@ -1107,8 +1104,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         params.set('deepMode', 'true');
       }
 
-      // Use different endpoint based on version toggle
-      const endpoint = version === 'claude' ? '/api/iris/answer-claude' : '/api/iris/answer';
+      const endpoint = '/api/iris/answer';
       const response = await fetch(
         `${endpoint}?${params.toString()}`,
         { signal: controller.signal }
@@ -1200,6 +1196,15 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   } else if (parsed.queryId) {
                     // Capture query ID for analytics tracking
                     setCurrentQueryId(parsed.queryId);
+                  } else if (parsed.contactForm) {
+                    // Structured contact form event from Claude tool call
+                    // This replaces the XML <ui:contact /> parsing for the primary path
+                    setPersistedDirective({
+                      type: 'contact',
+                      reason: parsed.contactForm.reason,
+                      draft: parsed.contactForm.draft,
+                      open: parsed.contactForm.open || (parsed.contactForm.reason === 'user_request' ? 'auto' : 'cta'),
+                    });
                   }
                 } catch {
                   // Skip invalid JSON - silently ignore parse errors
