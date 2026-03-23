@@ -125,13 +125,25 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
   const showDraftView = phase === 'drafting' || phase === 'draft_ready' || phase === 'submitting' || phase === 'submitted';
 
   // Use initial rect for positioning (locked)
+  // Always position to the right of the article content area, not inline with selection
   const getDesktopStyle = (): React.CSSProperties => {
     const rect = initialRectRef.current || selection.rect;
     let top = rect.top;
-    let left = rect.right + BUBBLE_GAP;
 
+    // Find the post body container to get its right edge
+    const postBody = document.querySelector('[data-post-body]');
+    const containerRight = postBody
+      ? postBody.getBoundingClientRect().right
+      : rect.right;
+
+    let left = containerRight + BUBBLE_GAP;
+
+    // If bubble would overflow viewport, flip to left of the container
     if (left + BUBBLE_WIDTH > window.innerWidth - 16) {
-      left = rect.left - BUBBLE_WIDTH - BUBBLE_GAP;
+      const containerLeft = postBody
+        ? postBody.getBoundingClientRect().left
+        : rect.left;
+      left = containerLeft - BUBBLE_WIDTH - BUBBLE_GAP;
     }
     if (left < 16) left = 16;
     if (top < 16) top = 16;
@@ -194,7 +206,7 @@ export default function BlogIrisBubble({ slug, selection, onClose }: BlogIrisBub
           {/* Hint below input when no messages yet */}
           {messages.length === 0 && (
             <p className="text-[9px] text-white/25 mt-1.5 leading-snug">
-              share a thought and Iris will give you context — then add a comment or message Mike
+              share a thought and receive feedback, then Iris can help you comment or message Mike
             </p>
           )}
         </div>
