@@ -19,6 +19,7 @@ export interface BlogComment {
   parent_id: string | null;
   author_name: string;
   body: string;
+  passage_ref?: string | null;
   created_at: string;
   is_admin: boolean;
   is_deleted: boolean;
@@ -31,6 +32,7 @@ export interface CreateCommentInput {
   author_name: string;
   author_email?: string;
   body: string;
+  passage_ref?: string;
   ip_hash?: string;
   is_admin?: boolean;
 }
@@ -55,7 +57,7 @@ export function hashIP(ip: string): string {
 // ---------------------------------------------------------------------------
 
 const COMMENT_COLUMNS =
-  'id, post_id, parent_id, author_name, body, created_at, is_admin, is_deleted';
+  'id, post_id, parent_id, author_name, body, passage_ref, created_at, is_admin, is_deleted';
 
 /**
  * Fetch all comments for a post, ordered by created_at ASC.
@@ -112,9 +114,10 @@ export async function createComment(
     .insert({
       post_id: input.post_id,
       parent_id: input.parent_id || null,
-      author_name: input.author_name,
+      author_name: input.author_name?.trim() || 'Anonymous',
       author_email: input.author_email || null,
       body: input.body,
+      passage_ref: input.passage_ref?.trim() || null,
       ip_hash: input.ip_hash || null,
       is_admin: input.is_admin || false,
     })

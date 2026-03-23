@@ -40,7 +40,7 @@ function getResendClient(): Resend {
 
 // Zod validation schema
 const CreateCommentSchema = z.object({
-  author_name: z.string().min(1).max(100).trim(),
+  author_name: z.string().max(100).trim().default('Anonymous'),
   author_email: z.string().email().optional().or(z.literal('')),
   body: z
     .string()
@@ -48,6 +48,7 @@ const CreateCommentSchema = z.object({
     .max(5000)
     .trim(),
   parent_id: z.string().uuid().optional(),
+  passage_ref: z.string().max(500).optional(),
   honeypot: z.string().max(0).optional(),
 });
 
@@ -145,6 +146,7 @@ export async function POST(
       author_name: authorName,
       author_email: payload.author_email || undefined,
       body,
+      passage_ref: payload.passage_ref,
       ip_hash: ipHash,
       is_admin: isAdmin,
     });

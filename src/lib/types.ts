@@ -5,7 +5,7 @@ import { z } from 'zod';
  * Ensures type safety across client and server
  */
 export const InboxPayload = z.object({
-  source: z.enum(['iris-explicit', 'iris-suggested', 'auto-insufficient']),
+  source: z.enum(['iris-explicit', 'iris-suggested', 'auto-insufficient', 'blog-iris']),
   userQuery: z.string().optional(),
   irisAnswer: z.string().max(20000).optional(),
   message: z.string().min(3).max(500),
@@ -16,6 +16,13 @@ export const InboxPayload = z.object({
   ]),
   nonce: z.string().min(8),
   honeypot: z.string().optional(),
+  passage_ref: z.string().max(500).optional(),
+  post_slug: z.string().max(200).optional(),
+  post_title: z.string().max(300).optional(),
+  iris_conversation: z.array(z.object({
+    role: z.string(),
+    content: z.string(),
+  })).optional(),
 });
 
 /**
@@ -30,7 +37,7 @@ export type InboxPayload = z.infer<typeof InboxPayload>;
 export interface InboxMessage {
   id: string;
   created_at: string;
-  source: 'iris-explicit' | 'iris-suggested' | 'auto-insufficient';
+  source: 'iris-explicit' | 'iris-suggested' | 'auto-insufficient' | 'blog-iris';
   user_query?: string;
   iris_answer?: string;
   draft_message: string;
@@ -39,6 +46,10 @@ export interface InboxMessage {
   user_agent?: string;
   ip_hash?: string;
   status: 'new' | 'read' | 'replied';
+  passage_ref?: string;
+  post_slug?: string;
+  post_title?: string;
+  iris_conversation?: Array<{ role: string; content: string }>;
 }
 
 /**

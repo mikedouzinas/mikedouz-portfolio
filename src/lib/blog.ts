@@ -33,6 +33,7 @@ export interface BlogPost {
   cover_image: string | null;
   images: { url: string; alt?: string }[];
   theme: BlogPostTheme;
+  iris_context?: string | null;
 }
 
 export interface BlogPostPreview {
@@ -59,6 +60,7 @@ export interface CreateBlogPostInput {
   images?: { url: string; alt?: string }[];
   theme?: BlogPostTheme;
   status?: 'draft' | 'published';
+  iris_context?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -181,7 +183,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
 
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme')
+    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context')
     .eq('slug', slug)
     .eq('status', 'published')
     .single();
@@ -251,8 +253,9 @@ export async function createBlogPost(
       theme: input.theme || {},
       status: input.status || 'published',
       reading_time: calculateReadingTime(input.body),
+      iris_context: input.iris_context || null,
     })
-    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme')
+    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context')
     .single();
 
   if (error) {
@@ -291,12 +294,13 @@ export async function updateBlogPost(
   if (updates.images !== undefined) payload.images = updates.images;
   if (updates.theme !== undefined) payload.theme = updates.theme;
   if (updates.status !== undefined) payload.status = updates.status;
+  if (updates.iris_context !== undefined) payload.iris_context = updates.iris_context || null;
 
   const { data, error } = await supabase
     .from('blog_posts')
     .update(payload)
     .eq('slug', slug)
-    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme')
+    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context')
     .single();
 
   if (error) {
