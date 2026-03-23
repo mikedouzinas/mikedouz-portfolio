@@ -25,20 +25,22 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
   const { currentMomentId, isPlaying, progress, togglePlay, stop } = useAudioPreview();
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [compact, setCompact] = useState(false);
+  const [visibleSongs, setVisibleSongs] = useState(3);
 
-  // Observe the PARENT wrapper's height to determine compact mode
-  // The parent is the flex container that constrains our available space
-  // Compact threshold: header(~44px) + 3 songs(~75px) + remaining(~20px) + padding(~48px) ≈ 190px
-  // Collapse well before overflow by using 220px threshold
+  // Observe the PARENT wrapper's height for progressive song collapse
+  // Heights: header ~44px, each song ~25px, "more" row ~20px, padding ~12px
+  // Tiers: 3 songs needs ~150px, 2 songs ~125px, 1 song ~100px, header-only ~60px
   useEffect(() => {
     const el = parentSelector
       ? document.querySelector(parentSelector)
       : containerRef.current;
     if (!el) return;
     const observer = new ResizeObserver((entries) => {
-      const height = entries[0]?.contentRect.height ?? Infinity;
-      setCompact(height < 220);
+      const h = entries[0]?.contentRect.height ?? Infinity;
+      if (h >= 200) setVisibleSongs(3);
+      else if (h >= 160) setVisibleSongs(2);
+      else if (h >= 120) setVisibleSongs(1);
+      else setVisibleSongs(0);
     });
     observer.observe(el);
     return () => observer.disconnect();
@@ -149,12 +151,12 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
           </button>
         </div>
 
-        {!compact && (
+        {visibleSongs > 0 && (
           <div className="px-3 pb-3 space-y-1">
-            {recentMoments.map((moment) => (
+            {recentMoments.slice(0, visibleSongs).map((moment) => (
               <SpotifyCard key={moment.id} moment={moment} compact />
             ))}
-            {remainingCount > 0 && (
+            {filteredMoments.length - visibleSongs > 0 && (
               <button
                 onClick={handleToggleExpand}
                 className="flex items-center gap-2 pt-1 px-1 hover:opacity-80 transition-opacity"
@@ -169,7 +171,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
                   ))}
                 </div>
                 <span className="text-[10px] text-gray-500">
-                  {remainingCount} more
+                  {filteredMoments.length - visibleSongs} more
                 </span>
               </button>
             )}
