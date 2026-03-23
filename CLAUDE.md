@@ -1,8 +1,8 @@
 # CLAUDE.md - AI Assistant Guide
 
-**Last Updated**: 2025-11-20
-**Project**: Mike Veson Portfolio with Iris AI Assistant
-**Stack**: Next.js 15, TypeScript, OpenAI, Redis, Supabase
+**Last Updated**: 2026-03-23
+**Project**: mikeveson.com — Portfolio, Iris AI Assistant & The Web
+**Stack**: Next.js 15, React 19, TypeScript, OpenAI, Redis, Supabase, Twilio, Resend
 
 ---
 
@@ -870,6 +870,7 @@ if (intent === 'new_intent') {
 ### When Working on This Codebase
 
 #### DO:
+- ✅ **Update the KB when shipping new features** — When a significant feature is added to mikeveson.com (new system, new page, new capability), update the `proj_portfolio` entry in `src/data/iris/kb/projects.json` to include it in the specifics. This site has many subsystems (Iris, The Web, Spotify timeline, deep mode, Olympus game, inbox, blog Iris interactions) and the KB entry should reflect the current state so Iris can answer questions about what the site includes. Also update skill IDs and tech stack if new technologies are introduced.
 - ✅ **Always rebuild embeddings** after changing KB files: `npm run build:embeddings`
 - ✅ **Use skill IDs** (e.g., `react`, `python`) not display names in KB files
 - ✅ **Test with `npm run test:iris`** after significant changes
