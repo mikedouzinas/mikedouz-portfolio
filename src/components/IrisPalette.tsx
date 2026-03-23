@@ -1072,8 +1072,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         signals: JSON.stringify(signals),
       });
 
-      // Pass conversation context if available
-      if (conversationHistory.length > 0) {
+      // Pass conversation context if this is a follow-up (not a fresh query)
+      // CRITICAL: Must check continueConversation flag, not conversationHistory.length,
+      // because setConversationHistory([]) is async and the old value persists here
+      if (continueConversation && conversationHistory.length > 0) {
         const lastTurn = conversationHistory[conversationHistory.length - 1];
         params.set('previousQuery', lastTurn.query);
         params.set('previousAnswer', lastTurn.answer);
