@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, User, Send, Loader2, Info } from 'lucide-react';
-import { isValidPhoneFormat, validateAndFormatPhone } from '@/lib/phone';
+import { Mail, Send, Loader2, Info } from 'lucide-react';
 import { generateNonce } from '@/lib/security';
 import ContainedMouseGlow from '../ContainedMouseGlow';
 
@@ -79,10 +78,15 @@ export default function MessageComposer({
 }: MessageComposerProps) {
   // Form state
   const [message, setMessage] = useState(() => getDraftForOrigin(origin, initialDraft, userQuery));
-  const [contactMethod, setContactMethod] = useState<'email' | 'phone' | 'anon'>('email');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [countryCode, setCountryCode] = useState('US');
+  const [contact, setContact] = useState('');
+
+  function detectContactType(value: string): 'email' | 'phone' | 'anon' {
+    const trimmed = value.trim();
+    if (!trimmed) return 'anon';
+    if (trimmed.includes('@')) return 'email';
+    if (/^[+\d\s\-()]+$/.test(trimmed) && trimmed.replace(/\D/g, '').length >= 7) return 'phone';
+    return 'email'; // default assumption for non-empty strings
+  }
   
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -92,23 +96,14 @@ export default function MessageComposer({
   
   /**
    * Load cached contact info from localStorage
-   * On mount, restore the last contact method and value
+   * On mount, restore the last contact value
    */
   useEffect(() => {
     try {
-      const cached = localStorage.getItem('iris_contact_cache');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        setContactMethod(parsed.method || 'email');
-        
-        if (parsed.method === 'email' && parsed.value) {
-          setEmail(parsed.value);
-        } else if (parsed.method === 'phone' && parsed.value) {
-          setPhone(parsed.value);
-        }
-      }
+      const cached = localStorage.getItem('iris_contact_value');
+      if (cached) setContact(cached);
     } catch {
-      // Ignore localStorage errors (e.g., incognito mode)
+      // localStorage unavailable
     }
   }, []);
   
@@ -117,12 +112,9 @@ export default function MessageComposer({
    */
   const cacheContactInfo = () => {
     try {
-      const cache = {
-        method: contactMethod,
-        value: contactMethod === 'email' ? email : contactMethod === 'phone' ? phone : undefined,
-        countryCode: contactMethod === 'phone' ? countryCode : undefined,
-      };
-      localStorage.setItem('iris_contact_cache', JSON.stringify(cache));
+      if (contact.trim()) {
+        localStorage.setItem('iris_contact_value', contact.trim());
+      }
     } catch {
       // Ignore localStorage errors
     }
@@ -130,82 +122,30 @@ export default function MessageComposer({
   
   /**
    * Validate form before submission
-   * Uses thorough validation to catch issues before API submission
    */
   const validateForm = async (): Promise<string | null> => {
-    // Message required
     if (!message.trim() || message.trim().length < 3) {
       return 'Please enter a message (at least 3 characters)';
     }
-    
     if (message.length > 500) {
       return 'Message must be under 500 characters';
     }
-    
-    // Contact method validation
-    if (contactMethod === 'email') {
-      if (!email.trim()) {
-        return 'Please enter your email address';
-      }
-      
-      const emailTrimmed = email.trim();
-      
-      // Length check
-      if (emailTrimmed.length > 254) { // RFC 5321 limit
-        return 'Email address is too long';
-      }
-      
-      // Basic format validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(emailTrimmed)) {
-        return 'Please enter a valid email address (e.g., name@example.com)';
-      }
-      
-      // Check for common issues
-      if (emailTrimmed.includes('..')) {
-        return 'Email address cannot contain consecutive dots';
-      }
-      
-      if (emailTrimmed.startsWith('.') || emailTrimmed.endsWith('.')) {
-        return 'Email address cannot start or end with a dot';
-      }
-      
-      if (emailTrimmed.includes('@.') || emailTrimmed.includes('.@')) {
-        return 'Email address has invalid format';
-      }
-      
-    } else if (contactMethod === 'phone') {
-      if (!phone.trim()) {
-        return 'Please enter your phone number';
-      }
-      
-      // Length check
-      const phoneTrimmed = phone.replace(/[^\d+]/g, '');
-      if (phoneTrimmed.length < 7) {
-        return 'Phone number is too short';
-      }
-      
-      if (phoneTrimmed.length > 15) { // E.164 max length
-        return 'Phone number is too long';
-      }
-      
-      // Basic format validation
-      if (!isValidPhoneFormat(phone)) {
-        return 'Please enter a valid phone number (e.g., +1 234 567 8900)';
-      }
-      
-      // Thorough validation using the same logic as the API
-      try {
-        const formatted = await validateAndFormatPhone(phone, countryCode);
-        if (!formatted) {
-          return 'Please enter a valid phone number (e.g., +1 234 567 8900)';
+
+    const trimmedContact = contact.trim();
+    if (trimmedContact) {
+      const type = detectContactType(trimmedContact);
+      if (type === 'email') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(trimmedContact)) {
+          return 'Please enter a valid email address';
         }
-      } catch (error) {
-        console.warn('[MessageComposer] Phone validation error:', error);
-        return 'Please enter a valid phone number (e.g., +1 234 567 8900)';
+      } else if (type === 'phone') {
+        if (trimmedContact.replace(/\D/g, '').length < 7) {
+          return 'Please enter a valid phone number';
+        }
       }
     }
-    
+
     return null;
   };
   
@@ -232,16 +172,18 @@ export default function MessageComposer({
       cacheContactInfo();
       
       // Prepare payload
+      const detectedType = detectContactType(contact.trim());
+      const contactPayload = detectedType === 'anon'
+        ? { method: 'anon' as const }
+        : detectedType === 'email'
+          ? { method: 'email' as const, value: contact.trim() }
+          : { method: 'phone' as const, value: contact.trim() };
+
       const payload = {
         source: origin,
         userQuery,
         message: message.trim(),
-        contact:
-          contactMethod === 'email'
-            ? { method: 'email' as const, value: email.trim() }
-            : contactMethod === 'phone'
-            ? { method: 'phone' as const, value: phone.trim() }
-            : { method: 'anon' as const },
+        contact: contactPayload,
         nonce: generateNonce(16),
       };
       
@@ -359,111 +301,22 @@ export default function MessageComposer({
         )}
       </div>
       
-      {/* Contact method selector */}
+      {/* Smart contact field — auto-detects email vs phone */}
       <div className="mb-2 sm:mb-3">
-        {/* Horizontal scrollable container for mobile */}
-        <div className="flex gap-2 overflow-x-auto py-2 -mx-1 px-1 scrollbar-none">
-          {/* Hide scrollbar completely while keeping scroll functionality */}
-          <style jsx>{`
-            div::-webkit-scrollbar {
-              display: none;
-            }
-            div {
-              -ms-overflow-style: none;
-              scrollbar-width: none;
-            }
-          `}</style>
-          <button
-            type="button"
-            onClick={() => setContactMethod('email')}
-            disabled={locked || isSubmitting}
-            className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 transform whitespace-nowrap ${
-              contactMethod === 'email'
-                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white scale-105'
-                : 'bg-gradient-to-r from-blue-800/30 to-blue-900/20 text-white/70 hover:from-blue-700/40 hover:to-blue-800/30 hover:text-white/90 hover:scale-105'
-            } disabled:opacity-50 disabled:scale-100`}
-          >
-            <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Email</span>
-            <span className="sm:hidden">Email</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setContactMethod('phone')}
-            disabled={locked || isSubmitting}
-            className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 transform whitespace-nowrap ${
-              contactMethod === 'phone'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white scale-105'
-                : 'bg-gradient-to-r from-blue-800/30 to-blue-900/20 text-white/70 hover:from-blue-700/40 hover:to-blue-800/30 hover:text-white/90 hover:scale-105'
-            } disabled:opacity-50 disabled:scale-100`}
-          >
-            <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Phone</span>
-            <span className="sm:hidden">Phone</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setContactMethod('anon')}
-            disabled={locked || isSubmitting}
-            className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 transform whitespace-nowrap ${
-              contactMethod === 'anon'
-                ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white scale-105'
-                : 'bg-gradient-to-r from-blue-800/30 to-blue-900/20 text-white/70 hover:from-blue-700/40 hover:to-blue-800/30 hover:text-white/90 hover:scale-105'
-            } disabled:opacity-50 disabled:scale-100`}
-          >
-            <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>Anonymous</span>
-          </button>
-        </div>
-        
-        {/* Contact input field */}
-        {contactMethod === 'email' && (
-          <>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (validationError) setValidationError(null);
-              }}
-              disabled={locked || isSubmitting}
-              placeholder="your.email@example.com"
-              className="w-full mt-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 text-sm sm:text-base break-all"
-            />
-            {validationError && (contactMethod === 'email' || validationError.includes('email')) && (
-              <div className="mt-1 text-xs text-red-400">{validationError}</div>
-            )}
-          </>
-        )}
-        {contactMethod === 'phone' && (
-          <>
-            <div className="mt-1 sm:mt-2 flex gap-2 min-w-0">
-              <select
-                value={countryCode}
-                onChange={(e) => setCountryCode(e.target.value)}
-                disabled={locked || isSubmitting}
-                className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-0 disabled:opacity-50"
-              >
-                <option value="US">🇺🇸 +1</option>
-                <option value="GR">🇬🇷 +30</option>
-                <option value="ES">🇪🇸 +34</option>
-              </select>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => {
-                  setPhone(e.target.value);
-                  if (validationError) setValidationError(null);
-                }}
-                disabled={locked || isSubmitting}
-                placeholder="1234567890"
-                className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 text-sm sm:text-base break-all min-w-0"
-              />
-            </div>
-            {validationError && (contactMethod === 'phone' || validationError.includes('phone')) && (
-              <div className="mt-1 text-xs text-red-400">{validationError}</div>
-            )}
-          </>
+        <input
+          type="text"
+          value={contact}
+          onChange={(e) => {
+            setContact(e.target.value);
+            if (validationError) setValidationError(null);
+          }}
+          disabled={locked || isSubmitting}
+          placeholder="Email or phone (optional)"
+          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 text-sm sm:text-base"
+        />
+        <p className="text-xs text-white/30 mt-1">Leave contact info to get a response</p>
+        {validationError && (
+          <div className="mt-1 text-xs text-red-400">{validationError}</div>
         )}
       </div>
       
