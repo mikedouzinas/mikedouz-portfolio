@@ -29,6 +29,8 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
 
   // Observe the PARENT wrapper's height to determine compact mode
   // The parent is the flex container that constrains our available space
+  // Compact threshold: header(~44px) + 3 songs(~75px) + remaining(~20px) + padding(~48px) ≈ 190px
+  // Collapse well before overflow by using 220px threshold
   useEffect(() => {
     const el = parentSelector
       ? document.querySelector(parentSelector)
@@ -36,7 +38,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
     if (!el) return;
     const observer = new ResizeObserver((entries) => {
       const height = entries[0]?.contentRect.height ?? Infinity;
-      setCompact(height < 200);
+      setCompact(height < 220);
     });
     observer.observe(el);
     return () => observer.disconnect();
@@ -114,7 +116,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
   };
 
   return (
-    <div ref={containerRef} className="hidden md:block text-left max-h-full overflow-hidden" style={{ marginLeft: 'calc(50% - 96px)' }}>
+    <div ref={containerRef} className="hidden md:block text-left" style={{ marginLeft: 'calc(50% - 96px)' }}>
       {/* Collapsed view — always in DOM to hold position */}
       <div
         className="rounded-2xl overflow-hidden relative transition-transform duration-200 hover:scale-[1.02] cursor-pointer"
