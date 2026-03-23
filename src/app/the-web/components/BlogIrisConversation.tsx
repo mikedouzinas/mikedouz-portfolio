@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
+import { getRandomBlogLoadingMessage } from '../lib/loadingMessages';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -22,12 +23,34 @@ export default function BlogIrisConversation({
 }: BlogIrisConversationProps) {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [loadingMsg, setLoadingMsg] = useState(getRandomBlogLoadingMessage);
 
+  // Rotate loading message every 3s while streaming
+  useEffect(() => {
+    if (!isStreaming) return;
+    setLoadingMsg(getRandomBlogLoadingMessage());
+    const interval = setInterval(() => {
+      setLoadingMsg(getRandomBlogLoadingMessage());
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isStreaming]);
+
+  // Auto-scroll on new content
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages.length, messages[messages.length - 1]?.content]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = '0';
+      el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+    }
+  }, [input]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -36,6 +59,17 @@ export default function BlogIrisConversation({
     onSend(trimmed);
     setInput('');
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
+  // Show loading message when streaming and no assistant content yet
+  const lastMsg = messages[messages.length - 1];
+  const showLoadingMsg = isStreaming && (!lastMsg || lastMsg.role === 'user' || lastMsg.content === '');
 
   return (
     <div className="flex flex-col gap-2">
@@ -69,36 +103,39 @@ export default function BlogIrisConversation({
         </div>
       )}
 
+      {/* Loading message while waiting for Iris */}
+      {showLoadingMsg && (
+        <div className="flex items-center gap-2 py-1">
+          <div className="flex gap-1">
+            <div className="w-1 h-1 rounded-full bg-emerald-400 opacity-30 animate-pulse" />
+            <div className="w-1 h-1 rounded-full bg-emerald-400 opacity-60 animate-pulse" style={{ animationDelay: '150ms' }} />
+            <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" style={{ animationDelay: '300ms' }} />
+          </div>
+          <span className="text-[10px] text-white/30 italic">{loadingMsg}</span>
+        </div>
+      )}
+
       {/* Input */}
-      <form onSubmit={handleSubmit} className="flex items-center gap-1.5">
-        <input
-          type="text"
+      <form onSubmit={handleSubmit} className="flex items-end gap-1.5">
+        <textarea
+          ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Reply..."
+          onKeyDown={handleKeyDown}
+          placeholder={messages.length === 0 ? 'Questions or comments...' : 'Reply...'}
           disabled={disabled || isStreaming}
-          className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-2 text-[11px] text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors disabled:opacity-50"
+          rows={1}
+          className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-2 text-[11px] text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors disabled:opacity-50 resize-none leading-relaxed"
+          style={{ minHeight: '34px', maxHeight: '80px' }}
         />
         <button
           type="submit"
           disabled={!input.trim() || disabled || isStreaming}
-          className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-emerald-500 text-white transition-opacity disabled:opacity-30"
+          className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-emerald-500 text-white transition-opacity disabled:opacity-30 mb-1"
         >
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="rotate-90"
-          >
-            <path
-              d="M6 10V2M6 2L2.5 5.5M6 2L9.5 5.5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 10 4 15 9 20" />
+            <path d="M20 4v7a4 4 0 0 1-4 4H4" />
           </svg>
         </button>
       </form>
