@@ -30,7 +30,7 @@
   {
     "id": "proj_portfolio",
     "title": "mikeveson.com",
-    "summary": "A living personal site with Iris AI assistant, a Spotify music timeline, a blog with inline Iris interactions, and deep mode with hidden content. Much more than a portfolio.",
+    "summary": "A living personal site with Iris AI assistant, a Spotify music timeline, a blog with inline Iris interactions, and deep mode with hidden content. More than a portfolio.",
     "aliases": ["Iris", "Iris assistant", "mikeveson.com", "the web", "Mike's blog", "portfolio"],
     "specifics": [
       "Iris AI Assistant: Named after the Greek messenger goddess. Powered by Claude Sonnet 4.6 (claude-sonnet-4-6) with the full knowledge base passed in a prompt-cached system prompt — no embeddings or semantic search. Intent classification happens via a Claude tool call in a single API request. Config-driven quick actions suggest related items based on complexity, impact, and recency scores. Structured knowledge base with 851 skills, filters, and personal context.",
