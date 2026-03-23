@@ -15,6 +15,7 @@ interface BlogIrisConversationProps {
   onSend: (message: string) => void;
   disabled?: boolean;
   expanded?: boolean;
+  hideInput?: boolean;
 }
 
 export default function BlogIrisConversation({
@@ -23,6 +24,7 @@ export default function BlogIrisConversation({
   onSend,
   disabled,
   expanded,
+  hideInput,
 }: BlogIrisConversationProps) {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -131,8 +133,8 @@ export default function BlogIrisConversation({
         </div>
       )}
 
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="flex items-end gap-1.5">
+      {/* Input — hidden after max turns */}
+      {!hideInput && <form onSubmit={handleSubmit} className="flex items-end gap-1.5">
         <textarea
           ref={textareaRef}
           value={input}
@@ -155,7 +157,7 @@ export default function BlogIrisConversation({
             <path d="M20 4v7a4 4 0 0 1-4 4H4" />
           </svg>
         </button>
-      </form>
+      </form>}
     </div>
   );
 }

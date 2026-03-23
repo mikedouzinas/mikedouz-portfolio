@@ -63,7 +63,16 @@ export async function POST(
 
   if (mode === 'conversation') {
     // Claude for conversation — quality and nuance matter here
-    const systemPrompt = getConversationPrompt(post.title, postBody, irisContext, passage);
+    let systemPrompt = getConversationPrompt(post.title, postBody, irisContext, passage);
+
+    // Count user turns (history user messages + current message)
+    const userTurnCount = history.filter((h) => h.role === 'user').length + 1;
+    const MAX_TURNS = 3;
+
+    if (userTurnCount >= MAX_TURNS) {
+      systemPrompt += `\n\nIMPORTANT: This is the reader's final message in this conversation. After responding to their point, naturally close by letting them know you can help them draft a comment on the post or a direct message to Mike if they want to continue the conversation or share their thinking. Keep it brief and natural, not formulaic.`;
+    }
+
     const messages: Anthropic.MessageParam[] = [
       ...history.map((h) => ({
         role: h.role as 'user' | 'assistant',
@@ -74,7 +83,7 @@ export async function POST(
 
     const stream = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 600,
+      max_tokens: 1024,
       system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
       messages,
       stream: true,

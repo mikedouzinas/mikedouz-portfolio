@@ -218,7 +218,10 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
 
     if (!selection) return null;
 
+    const MAX_USER_TURNS = 3;
+    const userTurnCount = messages.filter((m) => m.role === 'user').length;
     const isStreaming = phase === 'streaming';
+    const chatExhausted = userTurnCount >= MAX_USER_TURNS && !isStreaming && phase === 'conversation';
     const showActions = phase === 'conversation' && messages.length > 0 && messages[messages.length - 1].role === 'assistant';
     const showDraftView = phase === 'drafting' || phase === 'draft_ready' || phase === 'submitting' || phase === 'submitted';
 
@@ -336,6 +339,7 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
               onSend={handleSend}
               disabled={isStreaming}
               expanded={expanded}
+              hideInput={chatExhausted}
             />
             {/* Hint below input when no messages yet */}
             {messages.length === 0 && (
