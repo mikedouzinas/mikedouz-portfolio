@@ -5,7 +5,7 @@
 import { type KBItem } from '@/lib/iris/schema';
 import { loadContact } from '@/lib/iris/load';
 import { generateGuardrailResponse, rewriteToValidQuery } from '@/lib/iris/intents';
-import { type QueryFilter } from './types';
+import { type QueryFilter, type AutoContactPlan } from './types';
 import { escapeAttribute } from './text';
 import { extractPrimaryYear } from './temporal';
 
@@ -160,6 +160,61 @@ export function buildGuardrailResponse(query: string): Response {
   const rewrite = rewriteToValidQuery(query);
   const suggestion = rewrite ? `\n\nTry asking something like: "${rewrite}".` : '';
   return streamTextResponse(`${base}${suggestion}`);
+}
+
+/**
+ * Plans automatic contact suggestions based on query patterns
+ * New signature includes contactToolCalled to short-circuit if Claude already called the contact tool.
+ *
+ * @param query - The user's query
+ * @param intent - The detected intent
+ * @param contactToolCalled - Whether Claude already called the contact tool during generation
+ * @returns Auto-contact plan or null if not applicable
+ */
+export function planAutoContact(query: string, intent: string, contactToolCalled: boolean): AutoContactPlan | null {
+  if (contactToolCalled) return null;
+  if (intent === 'contact') return null;
+
+  const lower = query.toLowerCase();
+  const draft = buildContactDraft(query);
+
+  if (/\b(future|upcoming|next|later)\b.*\bplan(s)?\b|\broadmap\b/.test(lower)) {
+    return {
+      reason: 'insufficient_context',
+      draft,
+      preface: "Mike hasn't shared his future plans publicly yet, so I teed up a note you can send him directly.",
+      open: 'auto'
+    };
+  }
+
+  if (/\b(thoughts?|opinion|stance|favorite|favourite)\b/.test(lower)) {
+    return {
+      reason: 'insufficient_context',
+      draft,
+      preface: "He hasn't published personal opinions on that, so I prepared a quick draft if you'd like to ask him yourself.",
+      open: 'auto'
+    };
+  }
+
+  if (/\b(collaborate|partner|hire|bring (him|you) on|consult|speaking|speaker|panel|work with|work together)\b/.test(lower)) {
+    return {
+      reason: 'more_detail',
+      draft,
+      preface: "I can connect you two directly so you can discuss the opportunity.",
+      open: 'auto'
+    };
+  }
+
+  if (/\bavailability\b|\bavailable\b|\bwork authorization\b|\bvisa\b|\bwhere\b.*\bbased\b/.test(lower)) {
+    return {
+      reason: 'more_detail',
+      draft,
+      preface: "If you'd like to confirm details or kick off a conversation, I queued up a quick message you can send.",
+      open: 'auto'
+    };
+  }
+
+  return null;
 }
 
 /**

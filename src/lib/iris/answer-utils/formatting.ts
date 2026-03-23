@@ -3,7 +3,7 @@
  */
 
 import { type KBItem } from '@/lib/iris/schema';
-import { resolveSkillIdsToNames } from './aliases';
+import { resolveSkillIdsToNames } from './text';
 import { extractPrimaryYear } from './temporal';
 
 /**

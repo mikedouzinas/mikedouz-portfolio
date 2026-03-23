@@ -22,7 +22,7 @@ export const config = {
   answerTimeoutMs: 400,             // Timeout for LLM suggestion refinement
   
   // API timeout settings
-  openaiTimeoutMs: 25000,          // Timeout for OpenAI API calls (25 seconds)
+  claudeTimeoutMs: 30000,          // Timeout for Claude API calls (30 seconds)
   retrievalTimeoutMs: 10000,       // Timeout for retrieval operations (10 seconds)
   
   // GitHub integration
@@ -39,19 +39,16 @@ export const config = {
   answerTargetLatencyMs: 1500,      // Target p50 latency for answers on broadband
   maxKBChunks: 100,                 // Maximum chunks to process for embeddings
   
-  // OpenAI model configuration
+  // Claude model configuration
   models: {
-    query_processing: 'gpt-4o-mini',
-    chat: 'gpt-4o-mini',                 // Fast, affordable model for chat
-    draft_generation: 'gpt-3.5-turbo',   // Even faster model for simple draft generation
-    embedding: 'text-embedding-3-small'  // Embedding model for RAG
+    chat: 'claude-sonnet-4-6'            // Claude model for chat
   },
-  
+
   // Answer generation settings
   chatSettings: {
     temperature: 1,               // Slightly higher temperature for more natural, conversational responses
-    maxTokens: 800,                 // Longer answers to provide more detailed, complete information
-    stream: true                    // Enable streaming responses
+    maxTokens: 1024,              // Longer answers to provide more detailed, complete information
+    stream: true                  // Enable streaming responses
   },
 
   // Synthesis Upgrade Feature Flags
@@ -77,7 +74,7 @@ export const config = {
  * Validates that required environment variables are present
  */
 export function validateEnvironment(): { valid: boolean; missing: string[] } {
-  const required = ['OPENAI_API_KEY'];
+  const required = ['ANTHROPIC_API_KEY'];
   // const optional = ['GITHUB_TOKEN']; // Gracefully degrade if missing
   
   const missing = required.filter(key => !process.env[key]);

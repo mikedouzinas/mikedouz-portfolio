@@ -5,7 +5,7 @@
 import { type KBItem } from '@/lib/iris/schema';
 import { type QueryFilter, type AliasEntry } from './types';
 import { normalizeQueryText, normalizeSkillToken } from './text';
-import { resolveSkillNamesToIds } from './aliases';
+import { resolveSkillNamesToIds } from './text';
 
 /**
  * Ensures a type is present in the filter's type array

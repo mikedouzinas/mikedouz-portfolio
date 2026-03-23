@@ -2,6 +2,8 @@
  * Text utilities for normalizing and matching query text
  */
 
+import { type KBItem } from '@/lib/iris/schema';
+
 /**
  * Normalizes query text by converting to lowercase, removing diacritics,
  * and standardizing whitespace
@@ -79,4 +81,57 @@ export function isFuzzyMatch(search: string, target: string): boolean {
  */
 export function escapeAttribute(value: string): string {
   return value.replace(/"/g, '&quot;');
+}
+
+/**
+ * Resolves skill names/aliases to their canonical skill IDs
+ * Handles fuzzy matching for names like "framer motion" → "framer_motion"
+ *
+ * @param skillNames - Array of skill names or aliases from user query
+ * @param allItems - All KB items (includes skills with kind: "skill")
+ * @returns Array of matching skill IDs
+ */
+export function resolveSkillNamesToIds(skillNames: string[], allItems: KBItem[]): string[] {
+  const skills = allItems.filter(item => item.kind === 'skill') as Array<KBItem & {
+    id: string;
+    name: string;
+    aliases?: string[];
+  }>;
+
+  const resolvedIds = new Set<string>();
+
+  for (const searchName of skillNames) {
+    const searchLower = searchName.toLowerCase().trim();
+
+    for (const skill of skills) {
+      const skillIdNormalized = skill.id.toLowerCase().replace(/[_-]/g, ' ');
+      const skillNameLower = skill.name.toLowerCase();
+      const aliasesLower = (skill.aliases || []).map(a => a.toLowerCase());
+
+      if (
+        isFuzzyMatch(searchLower, skillIdNormalized) ||
+        isFuzzyMatch(searchLower, skillNameLower) ||
+        aliasesLower.some(alias => isFuzzyMatch(searchLower, alias))
+      ) {
+        resolvedIds.add(skill.id);
+      }
+    }
+  }
+
+  return Array.from(resolvedIds);
+}
+
+/**
+ * Resolves an array of skill IDs to their display names
+ * Falls back to the ID if no match is found
+ *
+ * @param skillIds - Array of skill IDs
+ * @param skillMap - Map of skill ID to skill name
+ * @returns Array of skill names
+ */
+export function resolveSkillIdsToNames(skillIds: string[], skillMap: Map<string, string>): string[] {
+  return skillIds.map(id => {
+    const name = skillMap.get(id.toLowerCase());
+    return name || id;
+  });
 }
