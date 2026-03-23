@@ -29,8 +29,8 @@
   },
   {
     "id": "proj_portfolio",
-    "title": "mikeveson.com — Portfolio, Iris & The Web",
-    "summary": "A living personal site with Iris AI assistant, a Spotify music timeline, a blog with inline Iris interactions, deep mode with hidden content, and an endless runner game. Much more than a portfolio.",
+    "title": "mikeveson.com",
+    "summary": "A living personal site with Iris AI assistant, a Spotify music timeline, a blog with inline Iris interactions, and deep mode with hidden content. Much more than a portfolio.",
     "aliases": ["Iris", "Iris assistant", "mikeveson.com", "the web", "Mike's blog", "portfolio"],
     "specifics": [
       "Iris AI Assistant: Named after the Greek messenger goddess. Powered by Claude Sonnet 4.6 (claude-sonnet-4-6) with the full knowledge base passed in a prompt-cached system prompt — no embeddings or semantic search. Intent classification happens via a Claude tool call in a single API request. Config-driven quick actions suggest related items based on complexity, impact, and recency scores. Structured knowledge base with 851 skills, filters, and personal context.",
@@ -39,14 +39,13 @@
       "Spotify Music Timeline: Kleinberg burst detection algorithm on 4 years of Spotify listening data (53K+ plays). Identifies songs with abnormal replay frequency in compressed timeframes. Glassmorphic sidebar panel with progressive collapse (drops songs one by one on short viewports), hover glow effect, and an expandable full timeline with month grouping and audio previews.",
       "Deep Mode: Hidden layer triggered by clicking the profile photo. Reveals in-progress projects, blueprints, and the Spotify timeline. Animated green-blue border bars on viewport edges, profile ring gradient animation. Content sections fade in with staggered delays.",
       "Ask Mike Inbox: Contact system where Iris can draft messages on behalf of visitors. Smart contact field auto-detects email vs phone. Honeypot spam detection, rate limiting, rich HTML email notifications via Resend.",
-      "Ascent to Olympus: Alto's Odyssey-style endless runner game with personal meaning. Procedural terrain via Bezier curves, particle system with object pooling, depth-tier unlocking system where items unlock based on score (surface stuff early, deeply personal items later).",
       "Interactive UI: Global mouse glow effects, contained card glows with per-section colors, hover cards with rich previews, dark mode throughout, mobile-responsive with sheet-based navigation.",
-      "Production infrastructure: Redis caching (1hr TTL), IP-based rate limiting, Supabase PostgreSQL with RLS, Vercel deployment with cron jobs for Spotify data refresh, pre-computed embeddings at build time."
+      "Production infrastructure: Redis caching (1hr TTL), IP-based rate limiting, Supabase PostgreSQL with RLS, Vercel deployment with cron jobs for Spotify data refresh, pre-computed importance rankings at build time."
     ],
-    "skills": ["api_integration", "product_management", "typescript", "react", "nextjs", "tailwind_css", "framer_motion", "supabase", "redis", "nlp", "machine_learning", "writing", "data_structures", "signal_processing", "canvas_api", "sse", "web_audio"],
+    "skills": ["api_integration", "product_management", "typescript", "react", "nextjs", "tailwind_css", "framer_motion", "supabase", "redis", "nlp", "machine_learning", "writing", "data_structures", "signal_processing", "sse"],
     "tech_stack": ["Next.js 15", "React 19", "TypeScript", "Tailwind CSS", "Framer Motion", "Anthropic Claude API (claude-sonnet-4-6)", "Supabase", "Upstash Redis", "Resend", "Twilio", "Spotify API"],
     "architecture": "Next.js 15 App Router with server/client component split. Iris: full KB serialized into a prompt-cached system prompt, single-pass Claude Sonnet 4.6 call with tool-based intent classification and streaming response. Blog: Supabase-backed with full-text search and inline Iris conversations. Spotify: offline Kleinberg analysis → JSON → progressive UI. Deep mode: React Context + localStorage persistence.",
-    "tags": ["Web", "AI", "Full-Stack", "Iris", "Blog", "Music", "Games"],
+    "tags": ["Web", "AI", "Full-Stack", "Iris", "Blog", "Music"],
     "links": {
       "github": "https://github.com/mikedouzinas/mikedouz-portfolio",
       "live": "https://mikeveson.com",

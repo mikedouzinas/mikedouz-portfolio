@@ -118,10 +118,14 @@ export function computeProjectImportance(project: ProjectT): number {
     ((tagsText.includes('Full-Stack') || tagsText.includes('Web')) && 
      /Next\.js|App Router|backend|API Routes|production|deployed|live|serving/i.test(archText));
 
-  // Bonus for cutting-edge AI/ML work (RAG, transformers, diffusion, etc.)
+  // Bonus for cutting-edge AI/ML work (RAG, transformers, diffusion, Claude SDK, etc.)
   const hasCuttingEdgeAI = (project.skills as string[]).some(s =>
-    ['rag', 'sentence_transformers', 'diffusion_models', 'pytorch', 'opencv'].includes(s)
-  );
+    ['rag', 'sentence_transformers', 'diffusion_models', 'pytorch', 'opencv', 'nlp', 'machine_learning'].includes(s)
+  ) || /claude|anthropic|prompt.cach/i.test(allText);
+
+  // Bonus for projects with many distinct subsystems (specifics count as proxy)
+  const specificsCount = (project.specifics || []).length;
+  const hasMultipleSubsystems = specificsCount >= 6;
 
   // Weighted scoring (prioritize complexity and impact over recency)
   const complexityScore = skillComplexity * 6;            // Increased from 5 to 6 (most important)
@@ -133,12 +137,13 @@ export function computeProjectImportance(project: ProjectT): number {
   const githubScore = hasGithub * 5;                      // Code availability
   const impactScore = hasMetrics ? 25 : 0;                // User adoption/impact (Knight Life)
   const aiBonus = hasCuttingEdgeAI ? 10 : 0;              // Cutting-edge AI bonus (HiLiTe, Iris)
+  const subsystemBonus = hasMultipleSubsystems ? 10 : 0;  // Complex multi-subsystem projects
 
-  const rawScore = complexityScore + diversityScore + recencyScore + demoScore + productionScore + liveScore + githubScore + impactScore + aiBonus;
+  const rawScore = complexityScore + diversityScore + recencyScore + demoScore + productionScore + liveScore + githubScore + impactScore + aiBonus + subsystemBonus;
 
   // Normalize to 0-100
-  // Max possible: 60 + 25 + 10 + 12 + 12 + 12 + 5 + 25 + 10 = 171
-  return Math.min(Math.round((rawScore / 171) * 100), 100);
+  // Max possible: 60 + 25 + 10 + 12 + 12 + 12 + 5 + 25 + 10 + 10 = 181
+  return Math.min(Math.round((rawScore / 181) * 100), 100);
 }
 
 /**
