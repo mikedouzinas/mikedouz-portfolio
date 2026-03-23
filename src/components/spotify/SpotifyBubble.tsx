@@ -108,9 +108,13 @@ export default function SpotifyBubble() {
     <div ref={containerRef} className="hidden md:block text-left" style={{ marginLeft: 'calc(50% - 96px)', position: 'relative' }}>
       {/* Collapsed view — always in DOM to hold position */}
       <div
-        className="rounded-2xl shadow-lg shadow-black/20 overflow-hidden"
+        className="rounded-2xl overflow-hidden"
         style={{
-          backgroundColor: '#1a1a2e',
+          background: 'rgba(15,31,26,0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(29,185,84,0.2)',
+          boxShadow: '0 8px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)',
           marginRight: '1rem',
           visibility: expanded ? 'hidden' : 'visible',
         }}
@@ -118,7 +122,7 @@ export default function SpotifyBubble() {
         <div className="flex items-center justify-between px-3 py-2.5">
           <div className="flex items-center gap-2">
             <Music className="w-3.5 h-3.5" style={{ color: '#1DB954' }} />
-            <span className="text-[11px] font-semibold tracking-widest uppercase" style={{ color: '#9ca3af' }}>
+            <span className="text-[11px] font-semibold tracking-widest uppercase" style={{ color: '#86efac' }}>
               Mike&apos;s Music
             </span>
           </div>
@@ -168,16 +172,20 @@ export default function SpotifyBubble() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.12 }}
-            className="absolute left-0 bottom-0 z-50 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden"
+            className="absolute left-0 bottom-0 z-50 rounded-2xl overflow-hidden"
             style={{
-              backgroundColor: '#1a1a2e',
+              background: 'rgba(15,31,26,0.92)',
+              backdropFilter: 'blur(30px)',
+              WebkitBackdropFilter: 'blur(30px)',
+              border: '1px solid rgba(29,185,84,0.2)',
+              boxShadow: '0 8px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)',
               width: 'min(420px, calc(100vw / 3 - 1rem))',
             }}
           >
             <div className="flex items-center justify-between px-3 py-2.5">
               <div className="flex items-center gap-2">
                 <Music className="w-3.5 h-3.5" style={{ color: '#1DB954' }} />
-                <span className="text-[11px] font-semibold tracking-widest uppercase" style={{ color: '#9ca3af' }}>
+                <span className="text-[11px] font-semibold tracking-widest uppercase" style={{ color: '#86efac' }}>
                   Mike&apos;s Music
                 </span>
               </div>
@@ -202,7 +210,7 @@ export default function SpotifyBubble() {
                 <div key={month}>
                   <p
                     className="text-[10px] font-semibold tracking-widest uppercase mb-2 px-1 sticky top-0 py-1 z-10"
-                    style={{ color: '#1DB954', backgroundColor: '#1a1a2e' }}
+                    style={{ color: '#1DB954', backgroundColor: 'rgba(15,31,26,0.95)' }}
                   >
                     {formatMonth(month)}
                   </p>
