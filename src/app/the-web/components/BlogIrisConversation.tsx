@@ -109,11 +109,6 @@ export default function BlogIrisConversation({
                   >
                     {msg.content}
                   </ReactMarkdown>
-                  {isStreaming && i === messages.length - 1 && (
-                    <span className="inline-flex ml-0.5">
-                      <span className="animate-pulse">...</span>
-                    </span>
-                  )}
                 </div>
               )}
             </div>
@@ -150,9 +145,9 @@ export default function BlogIrisConversation({
         <button
           type="submit"
           disabled={!input.trim() || disabled || isStreaming}
-          className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-emerald-500 text-white transition-opacity disabled:opacity-30 mb-1"
+          className={`flex-shrink-0 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600 text-white border border-white/20 shadow-md transition-all duration-200 disabled:opacity-30 hover:shadow-lg hover:scale-105 mb-0.5 ${expanded ? 'w-8 h-8' : 'w-7 h-7'}`}
         >
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width={expanded ? '12' : '10'} height={expanded ? '12' : '10'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 10 4 15 9 20" />
             <path d="M20 4v7a4 4 0 0 1-4 4H4" />
           </svg>

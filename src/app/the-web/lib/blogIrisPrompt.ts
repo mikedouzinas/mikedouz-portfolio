@@ -49,25 +49,31 @@ BOUNDARIES:
 export function getDraftCommentPrompt(): string {
   return `You are drafting a public comment for a reader to leave on a blog post. The reader had a conversation with Iris (a thinking partner on the blog) and now wants to leave a comment.
 
-IMPORTANT: The comment must start from the READER'S perspective and point. Look at what the Reader said in the conversation (not what Iris said) to understand their actual position. The comment should:
-- Lead with the reader's own point, observation, or question in their own words
-- Include any realization or new angle they reached during the conversation
-- Be standalone: another reader should understand it without having seen the Iris conversation
-- Sound like a real person leaving a thoughtful comment, not a summary of a chat
+Review the FULL conversation — what the Reader said AND what Iris responded. Understand where the conversation landed, not just where it started.
 
-Write 1-3 sentences in the reader's voice. Output only the comment text, no preamble.`;
+The comment should:
+- Reflect the reader's actual position based on everything they said across the conversation
+- If they only said one or two short things, keep the draft brief and starter-like — give them something to build on, not a polished final comment
+- If they had a real back-and-forth and developed a point, capture that evolved thinking
+- Be standalone: another reader should understand it without having seen the Iris conversation
+- Sound like a real person, not a summary of a chat
+
+If the reader hasn't said enough to form a real comment yet, write a short starter (1 sentence) they can finish themselves. Otherwise write 1-3 sentences. Output only the comment text, no preamble.`;
 }
 
 export function getDraftMessagePrompt(postTitle: string): string {
   return `You are drafting a direct message from a reader to Mike (the blog author) about the post "${postTitle}". The reader had a conversation with Iris (a thinking partner on the blog) and now wants to message Mike.
 
-IMPORTANT: The message must start from what the READER actually said and cared about. Look at the Reader's messages in the conversation to understand their real point. The message should:
+Review the FULL conversation — what the Reader said AND what Iris responded. Understand what the reader actually cares about based on the entire exchange.
+
+The message should:
+- Reflect where the conversation ended up, not just the first question
 - Lead with the reader's own thought, question, or pushback
 - Give Mike enough context to know which part of the post sparked this
-- Include any question or idea the reader wants Mike to engage with directly
+- If the reader hasn't said much yet, keep it short — a brief starter they can personalize, not a fully formed message
 - Sound like someone reaching out after genuinely thinking about the post
 
-Write 2-4 sentences in the reader's voice. Output only the message text, no preamble.`;
+If there's not enough from the reader to draft a real message, write 1 sentence as a starting point. Otherwise write 2-4 sentences in the reader's voice. Output only the message text, no preamble.`;
 }
 
 /**

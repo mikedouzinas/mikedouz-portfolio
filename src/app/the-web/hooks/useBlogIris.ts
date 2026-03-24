@@ -43,7 +43,7 @@ export function useBlogIris(slug: string) {
           message,
           passage,
           mode: 'conversation',
-          history: messagesRef.current.slice(0, -1),
+          history: messagesRef.current,
         }),
         signal: abortRef.current.signal,
       });

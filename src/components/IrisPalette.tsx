@@ -1231,24 +1231,10 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             }
           }
 
-          // Stop reveal timer and flush any remaining text
+          // Stop reveal timer and flush remaining text immediately
           if (revealTimer) clearInterval(revealTimer);
-
-          // Reveal remaining text word by word before marking complete
-          const finishReveal = () => {
-            if (revealedLength >= accumulatedAnswer.length) {
-              setAnswer(accumulatedAnswer);
-              clearLoadingOnce();
-              return;
-            }
-            let next = revealedLength;
-            while (next < accumulatedAnswer.length && accumulatedAnswer[next] !== ' ' && accumulatedAnswer[next] !== '\n') next++;
-            while (next < accumulatedAnswer.length && (accumulatedAnswer[next] === ' ' || accumulatedAnswer[next] === '\n')) next++;
-            revealedLength = next;
-            setAnswer(accumulatedAnswer.slice(0, revealedLength));
-            requestAnimationFrame(finishReveal);
-          };
-          finishReveal();
+          setAnswer(accumulatedAnswer);
+          clearLoadingOnce();
         }
 
         // Check if stream was interrupted
