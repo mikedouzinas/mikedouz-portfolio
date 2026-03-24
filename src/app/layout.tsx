@@ -48,13 +48,12 @@ export const metadata: Metadata = {
 // Moved from metadata as per Next.js 15 requirements
 // Professional comment: width=device-width ensures proper mobile rendering
 // initial-scale=1 prevents automatic zoom on page load
-// maximum-scale=5 allows user zooming for accessibility while preventing excessive zoom
-// user-scalable=yes maintains accessibility (users can still zoom if needed)
+// maximum-scale=1 prevents iOS Safari from auto-zooming on input focus
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
-  userScalable: true,
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: 'cover',
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f9fafb" }, // Matches light mode background

@@ -51,15 +51,17 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
     // Use forwarded ref or internal ref
     const bubbleEl = (ref && typeof ref !== 'function' ? ref : internalRef) as React.RefObject<HTMLDivElement>;
 
-    // Track the passage text — updates with selection until locked
+    // Track the passage text for API calls — locked when conversation starts
     const passageRef = useRef(selection?.text || '');
 
     // Update passage from selection while no messages exist (Phase 1: adjusting)
-    useEffect(() => {
-      if (selection?.text && messages.length === 0) {
-        passageRef.current = selection.text;
-      }
-    }, [selection?.text, messages.length]);
+    // Use assignment outside useEffect so it's available in the same render cycle
+    if (selection?.text && messages.length === 0) {
+      passageRef.current = selection.text;
+    }
+
+    // Display text: use live selection text (always current), fall back to locked ref
+    const displayPassage = (messages.length === 0 ? selection?.text : null) || passageRef.current;
 
     // Lock selection and auto-expand when first message is sent
     const prevMessageCount = useRef(0);
@@ -301,8 +303,8 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex-1 min-w-0 text-[10px] text-white/35 italic truncate pr-2">
-            &ldquo;{passageRef.current.slice(0, expanded ? 120 : 60)}
-            {passageRef.current.length > (expanded ? 120 : 60) ? '...' : ''}&rdquo;
+            &ldquo;{displayPassage.slice(0, expanded ? 120 : 60)}
+            {displayPassage.length > (expanded ? 120 : 60) ? '...' : ''}&rdquo;
           </div>
           <div className="flex items-center gap-0.5 flex-shrink-0">
             {!isMobile && (
@@ -398,7 +400,7 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
       return (
         <div
           ref={bubbleEl}
-          className="fixed bottom-0 left-0 right-0 max-h-[70vh] z-50 rounded-t-2xl bg-gradient-to-br from-blue-600/[0.12] via-blue-500/[0.15] to-blue-600/[0.12] backdrop-blur-3xl backdrop-saturate-[2.2] border-t border-white/[0.12] shadow-[0_-8px_40px_rgba(37,99,235,0.15),0_0_0_1px_rgba(255,255,255,0.08),inset_0_0_0_1px_rgba(255,255,255,0.08)] p-4 overflow-y-auto"
+          className="fixed bottom-0 left-0 right-0 max-h-[85vh] z-50 rounded-t-2xl bg-gradient-to-br from-blue-600/[0.12] via-blue-500/[0.15] to-blue-600/[0.12] backdrop-blur-3xl backdrop-saturate-[2.2] border-t border-white/[0.12] shadow-[0_-8px_40px_rgba(37,99,235,0.15),0_0_0_1px_rgba(255,255,255,0.08),inset_0_0_0_1px_rgba(255,255,255,0.08)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] overflow-y-auto"
         >
           <div className="relative">
             <div className="absolute -inset-4 rounded-t-2xl bg-gradient-to-b from-white/[0.15] via-blue-400/[0.05] to-transparent pointer-events-none" />

@@ -283,7 +283,7 @@ export default function MessageComposer({
           placeholder="Type your message..."
           rows={2}
           maxLength={500}
-          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 disabled:cursor-not-allowed resize-none text-sm sm:text-base"
+          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 disabled:cursor-not-allowed resize-none text-base"
         />
         {message.length === 0 && (
           <div className="flex flex-wrap gap-1 mt-1 sm:mt-2">
@@ -312,7 +312,7 @@ export default function MessageComposer({
           }}
           disabled={locked || isSubmitting}
           placeholder="Email or phone (optional)"
-          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 text-sm sm:text-base"
+          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-0 disabled:opacity-50 text-base"
         />
         <p className="text-xs text-white/30 mt-1">Leave contact info to get a response</p>
         {validationError && (
@@ -326,7 +326,7 @@ export default function MessageComposer({
         <button
           onClick={handleSubmit}
           disabled={locked || isSubmitting || !message.trim()}
-          className="flex-1 relative flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-xl text-white font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 overflow-hidden text-sm sm:text-base"
+          className="flex-1 relative flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-xl text-white font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 overflow-hidden text-base"
           style={{
             background: 'linear-gradient(90deg, #6B4EFF 0%, #00A8FF 100%)',
           }}
