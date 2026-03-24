@@ -98,7 +98,7 @@ export default function SpotifyMobilePanel({ open, onClose }: SpotifyMobilePanel
         <div
           className="absolute inset-0 overflow-hidden flex flex-col"
           style={{
-            background: 'rgba(16,42,46,0.97)',
+            background: 'rgb(16,42,46)',
             opacity: open ? 1 : 0,
             transform: open ? 'scale(1)' : 'scale(0.97)',
             transition: 'opacity 0.15s ease, transform 0.15s ease',
@@ -135,7 +135,7 @@ export default function SpotifyMobilePanel({ open, onClose }: SpotifyMobilePanel
               <div key={month} className={i === 0 ? 'pt-3' : ''}>
                 <p
                   className="text-[10px] font-semibold tracking-widest uppercase mb-2 px-1 sticky top-0 py-1 z-10"
-                  style={{ color: '#34d399', backgroundColor: 'rgba(16,42,46,0.97)' }}
+                  style={{ color: '#34d399', backgroundColor: 'rgb(16,42,46)' }}
                 >
                   {formatMonth(month)}
                 </p>
