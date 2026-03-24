@@ -207,6 +207,11 @@ export function useSpotifyEmbed(): UseSpotifyEmbedReturn {
             });
 
             controller.addListener('ready', () => {
+              // On mobile, autoplay from an async callback is often blocked
+              // by the browser. Set isLoading=false immediately so the user
+              // sees the track as "selected, tap to play" instead of a
+              // loader that disappears with no playback.
+              setIsLoading(false);
               controller.play();
             });
           },

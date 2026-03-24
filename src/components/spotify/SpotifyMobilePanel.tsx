@@ -129,10 +129,10 @@ export default function SpotifyMobilePanel({ open, onClose }: SpotifyMobilePanel
           <div
             ref={scrollRef}
             onScroll={handleScroll}
-            className="flex-1 overflow-y-auto px-4 py-3 space-y-5"
+            className="flex-1 overflow-y-auto px-4 pb-3 space-y-5"
           >
-            {visibleData.map(({ month, moments }) => (
-              <div key={month}>
+            {visibleData.map(({ month, moments }, i) => (
+              <div key={month} className={i === 0 ? 'pt-3' : ''}>
                 <p
                   className="text-[10px] font-semibold tracking-widest uppercase mb-2 px-1 sticky top-0 py-1 z-10"
                   style={{ color: '#34d399', backgroundColor: 'rgba(16,42,46,0.97)' }}
