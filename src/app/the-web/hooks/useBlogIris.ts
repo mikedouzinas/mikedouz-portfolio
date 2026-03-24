@@ -54,6 +54,23 @@ export function useBlogIris(slug: string) {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let assistantContent = '';
+      let revealedLength = 0;
+      let revealTimer: ReturnType<typeof setInterval> | null = null;
+
+      const startReveal = () => {
+        if (revealTimer) return;
+        revealTimer = setInterval(() => {
+          if (revealedLength >= assistantContent.length) return;
+          let next = revealedLength;
+          while (next < assistantContent.length && assistantContent[next] !== ' ' && assistantContent[next] !== '\n') next++;
+          while (next < assistantContent.length && (assistantContent[next] === ' ' || assistantContent[next] === '\n')) next++;
+          revealedLength = next;
+          setState((s) => ({
+            ...s,
+            messages: [...newMessages, { role: 'assistant', content: assistantContent.slice(0, revealedLength) }],
+          }));
+        }, 30);
+      };
 
       while (true) {
         const { done, value } = await reader.read();
@@ -67,20 +84,35 @@ export function useBlogIris(slug: string) {
             const parsed = JSON.parse(data);
             if (parsed.content) {
               assistantContent += parsed.content;
-              setState((s) => ({
-                ...s,
-                messages: [...newMessages, { role: 'assistant', content: assistantContent }],
-              }));
+              startReveal();
             }
           } catch { /* skip malformed */ }
         }
       }
 
-      setState((s) => ({
-        ...s,
-        messages: [...newMessages, { role: 'assistant', content: assistantContent }],
-        phase: 'conversation',
-      }));
+      if (revealTimer) clearInterval(revealTimer);
+
+      // Drain remaining words
+      const finishReveal = () => {
+        if (revealedLength >= assistantContent.length) {
+          setState((s) => ({
+            ...s,
+            messages: [...newMessages, { role: 'assistant', content: assistantContent }],
+            phase: 'conversation',
+          }));
+          return;
+        }
+        let next = revealedLength;
+        while (next < assistantContent.length && assistantContent[next] !== ' ' && assistantContent[next] !== '\n') next++;
+        while (next < assistantContent.length && (assistantContent[next] === ' ' || assistantContent[next] === '\n')) next++;
+        revealedLength = next;
+        setState((s) => ({
+          ...s,
+          messages: [...newMessages, { role: 'assistant', content: assistantContent.slice(0, revealedLength) }],
+        }));
+        requestAnimationFrame(finishReveal);
+      };
+      finishReveal();
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {
         setState((s) => ({ ...s, phase: 'error', error: 'Something went wrong. Try again.' }));

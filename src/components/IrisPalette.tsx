@@ -45,10 +45,16 @@ import { getRandomLoadingConfig, getAnimationConfig, getRandomLoadingMessage } f
  */
 const SUGGESTIONS = [
     {
-      id: 'tech-skills',
+      id: 'about-site',
       icon: Code,
-      primary: "What are Mike's strongest technical skills?",
-      secondary: 'Languages, frameworks, and areas of expertise',
+      primary: 'What is this site, really?',
+      secondary: "There's more here than meets the eye",
+    },
+    {
+      id: 'who-is-mike',
+      icon: Briefcase,
+      primary: "Tell me about Mike's profile",
+      secondary: 'Background, experience, and what makes him tick',
     },
     {
       id: 'best-work',
@@ -59,20 +65,14 @@ const SUGGESTIONS = [
     {
       id: 'contact',
       icon: Mail,
-      primary: 'How can I contact Mike?',
-      secondary: 'Ask Iris to draft feedback or questions to send directly',
+      primary: 'I want to reach out to Mike',
+      secondary: 'Draft a message to send directly',
     },
     {
-      id: 'problem-solving',
+      id: 'hire',
       icon: Lightbulb,
-      primary: 'How does Mike approach problem-solving?',
-      secondary: 'Engineering philosophy and real examples',
-    },
-    {
-      id: 'experience',
-      icon: Briefcase,
-      primary: "Tell me about Mike's experience",
-      secondary: 'Internships, roles, and career progression',
+      primary: 'Why should I hire Mike?',
+      secondary: 'Skills, impact, and what makes him stand out',
     },
   ] as const;
 
@@ -1135,7 +1135,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
       const contentType = response.headers.get('content-type');
       
       if (contentType?.includes('text/event-stream')) {
-        // Real streaming from OpenAI
+        // Real streaming from Claude
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
         let accumulatedAnswer = '';
@@ -1144,6 +1144,49 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         let streamCompleted = false;
 
         if (reader) {
+          // Word-by-word reveal: tokens from Claude accumulate in a buffer,
+          // a timer releases them one word at a time for smooth left-to-right flow
+          let revealedLength = 0;
+          let revealTimer: ReturnType<typeof setInterval> | null = null;
+
+          const clearLoadingOnce = () => {
+            if (!loadingClearedRef.current) {
+              const elapsedTime = mainLoadingStartTime ? Date.now() - mainLoadingStartTime : 0;
+              const minDisplayTime = 300;
+              if (elapsedTime >= minDisplayTime) {
+                setMainLoadingConfig(null);
+                setMainLoadingStartTime(null);
+                loadingClearedRef.current = true;
+              } else {
+                setTimeout(() => {
+                  setMainLoadingConfig(null);
+                  setMainLoadingStartTime(null);
+                }, minDisplayTime - elapsedTime);
+                loadingClearedRef.current = true;
+              }
+            }
+          };
+
+          const startReveal = () => {
+            if (revealTimer) return;
+            revealTimer = setInterval(() => {
+              if (revealedLength >= accumulatedAnswer.length) return;
+              // Advance to the next word boundary
+              let next = revealedLength;
+              // Skip to next space or newline
+              while (next < accumulatedAnswer.length && accumulatedAnswer[next] !== ' ' && accumulatedAnswer[next] !== '\n') {
+                next++;
+              }
+              // Include the space/newline
+              while (next < accumulatedAnswer.length && (accumulatedAnswer[next] === ' ' || accumulatedAnswer[next] === '\n')) {
+                next++;
+              }
+              revealedLength = next;
+              setAnswer(accumulatedAnswer.slice(0, revealedLength));
+              clearLoadingOnce();
+            }, 30);
+          };
+
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
@@ -1163,44 +1206,17 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   const parsed = JSON.parse(data);
                   if (parsed.text) {
                     accumulatedAnswer += parsed.text;
-                    setAnswer(accumulatedAnswer);
-                    // Clear loading config when answer starts streaming (only once)
-                    // Professional comment: Add minimum display time (300ms) to ensure loader is visible
-                    // even for fast responses (cached, contact intent, GitHub activity)
-                    if (accumulatedAnswer.length > 0 && !loadingClearedRef.current) {
-                      const elapsedTime = mainLoadingStartTime ? Date.now() - mainLoadingStartTime : 0;
-                      const minDisplayTime = 300; // Minimum 300ms to show loader
-                      
-                      if (elapsedTime >= minDisplayTime) {
-                        // Enough time has passed, clear immediately
-                        setMainLoadingConfig(null);
-                        setMainLoadingStartTime(null);
-                        loadingClearedRef.current = true;
-                      } else {
-                        // Schedule clearing after minimum display time
-                        setTimeout(() => {
-                          setMainLoadingConfig(null);
-                          setMainLoadingStartTime(null);
-                        }, minDisplayTime - elapsedTime);
-                        loadingClearedRef.current = true;
-                      }
-                    }
+                    startReveal();
                   } else if (parsed.debug) {
-                    // Capture debug information
                     setDebugInfo(parsed.debug);
-                    // Capture intent for conversation history
                     if (parsed.debug.intent) {
                       finalIntent = parsed.debug.intent;
                     }
                   } else if (parsed.quickActions) {
-                    // Capture quick actions from stream
                     capturedQuickActions = parsed.quickActions;
                   } else if (parsed.queryId) {
-                    // Capture query ID for analytics tracking
                     setCurrentQueryId(parsed.queryId);
                   } else if (parsed.contactForm) {
-                    // Structured contact form event from Claude tool call
-                    // This replaces the XML <ui:contact /> parsing for the primary path
                     setPersistedDirective({
                       type: 'contact',
                       reason: parsed.contactForm.reason,
@@ -1209,11 +1225,30 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     });
                   }
                 } catch {
-                  // Skip invalid JSON - silently ignore parse errors
+                  // Skip invalid JSON
                 }
               }
             }
           }
+
+          // Stop reveal timer and flush any remaining text
+          if (revealTimer) clearInterval(revealTimer);
+
+          // Reveal remaining text word by word before marking complete
+          const finishReveal = () => {
+            if (revealedLength >= accumulatedAnswer.length) {
+              setAnswer(accumulatedAnswer);
+              clearLoadingOnce();
+              return;
+            }
+            let next = revealedLength;
+            while (next < accumulatedAnswer.length && accumulatedAnswer[next] !== ' ' && accumulatedAnswer[next] !== '\n') next++;
+            while (next < accumulatedAnswer.length && (accumulatedAnswer[next] === ' ' || accumulatedAnswer[next] === '\n')) next++;
+            revealedLength = next;
+            setAnswer(accumulatedAnswer.slice(0, revealedLength));
+            requestAnimationFrame(finishReveal);
+          };
+          finishReveal();
         }
 
         // Check if stream was interrupted
@@ -1869,7 +1904,6 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {/* Render current streaming answer */}
                       {renderMarkdownContent(renderedAnswer)}
                     </div>
                   )
