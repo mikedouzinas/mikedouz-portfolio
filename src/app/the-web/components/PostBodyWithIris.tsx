@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { useTextSelection, TextSelection } from '../hooks/useTextSelection';
 import BlogIrisBubble from './BlogIrisBubble';
 
@@ -13,13 +13,60 @@ interface PostBodyWithIrisProps {
 export default function PostBodyWithIris({ slug, postTitle, children }: PostBodyWithIrisProps) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
-  const { selection, clearSelection, lock, unlock } = useTextSelection(bodyRef, bubbleRef);
+  const { selection, setSelection, clearSelection, lock, unlock } = useTextSelection(bodyRef, bubbleRef);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  // Mobile: paragraph-tap to select
+  useEffect(() => {
+    if (!isMobile) return;
+    const container = bodyRef.current;
+    if (!container) return;
+
+    const handleTap = (e: Event) => {
+      const target = e.target as HTMLElement;
+
+      // Don't intercept taps on links, buttons, or other interactive elements
+      if (target.closest('a, button, input, textarea, [role="button"]')) return;
+
+      // Find the nearest paragraph-level element
+      const paragraph = target.closest('p, blockquote, li, h2, h3, h4');
+      if (!paragraph || !container.contains(paragraph)) return;
+
+      // Don't trigger if user is actually selecting text
+      const sel = document.getSelection();
+      if (sel && !sel.isCollapsed) return;
+
+      const text = paragraph.textContent?.trim();
+      if (!text || text.length < 10) return;
+
+      const rect = paragraph.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+
+      setSelection({
+        text,
+        rect,
+        containerRelative: {
+          top: rect.top - containerRect.top + container.scrollTop,
+          height: rect.height,
+        },
+      });
+    };
+
+    container.addEventListener('click', handleTap);
+    return () => container.removeEventListener('click', handleTap);
+  }, [isMobile, setSelection]);
 
   // Locked highlight position — persists after native selection clears
   const [highlightPos, setHighlightPos] = useState<{ top: number; height: number } | null>(null);
 
   const handleLock = useCallback(() => {
-    // Capture the container-relative rect before locking
     if (selection?.containerRelative) {
       setHighlightPos(selection.containerRelative);
     }

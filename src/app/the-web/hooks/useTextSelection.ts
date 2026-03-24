@@ -94,5 +94,5 @@ export function useTextSelection(
     };
   }, [containerRef, bubbleRef]);
 
-  return { selection, clearSelection, lock, unlock };
+  return { selection, setSelection, clearSelection, lock, unlock };
 }

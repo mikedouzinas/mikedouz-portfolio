@@ -136,7 +136,7 @@ export default function BlogIrisDraft({
         onChange={(e) => onDraftChange(e.target.value)}
         maxLength={maxChars}
         rows={4}
-        className="w-full bg-black/30 border border-white/[0.08] rounded-[10px] px-3 py-2 text-[11px] text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors resize-none leading-relaxed"
+        className="w-full bg-black/30 border border-white/[0.08] rounded-[10px] px-3 py-2 text-[11px] max-md:text-[16px] text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors resize-none leading-relaxed"
         placeholder={isComment ? 'Your comment...' : 'Your message to Mike...'}
       />
 
@@ -155,14 +155,14 @@ export default function BlogIrisDraft({
             value={authorName}
             onChange={(e) => setAuthorName(e.target.value)}
             placeholder="Name (optional)"
-            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-1.5 text-[11px] text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors"
+            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-1.5 text-[11px] max-md:text-[16px] text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors"
           />
           <input
             type="text"
             value={contact}
             onChange={(e) => setContact(e.target.value)}
             placeholder="Email (optional)"
-            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-1.5 text-[11px] text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors"
+            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-1.5 text-[11px] max-md:text-[16px] text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors"
           />
           <p className="text-[9px] text-white/25">or post anonymous</p>
         </div>
@@ -173,7 +173,7 @@ export default function BlogIrisDraft({
             value={contact}
             onChange={(e) => setContact(e.target.value)}
             placeholder="Email or phone (optional)"
-            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-1.5 text-[11px] text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors"
+            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-1.5 text-[11px] max-md:text-[16px] text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors"
           />
           <p className="text-[9px] text-white/25">Leave contact info to get a response</p>
         </div>

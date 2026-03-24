@@ -144,7 +144,7 @@ export default function BlogIrisConversation({
           placeholder={messages.length === 0 ? 'Questions or comments...' : 'Reply...'}
           disabled={disabled || isStreaming}
           rows={1}
-          className={`flex-1 bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-2 text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors disabled:opacity-50 resize-none leading-relaxed ${expanded ? 'text-[13px]' : 'text-[11px]'}`}
+          className={`flex-1 bg-white/[0.04] border border-white/[0.08] rounded-[10px] px-3 py-2 text-white/90 placeholder:text-white/30 outline-none focus:border-white/[0.16] transition-colors disabled:opacity-50 resize-none leading-relaxed ${expanded ? 'text-[13px]' : 'text-[11px] max-md:text-[16px]'}`}
           style={{ minHeight: expanded ? '40px' : '34px', maxHeight: expanded ? '120px' : '80px' }}
         />
         <button
