@@ -32,7 +32,9 @@ export function getMomentsByMonth(
     .sort(([a], [b]) => b.localeCompare(a))
     .map(([month, moments]) => ({
       month,
-      moments: moments.sort((a, b) => b.intensity - a.intensity),
+      moments: moments.sort((a, b) =>
+        a.dateRange.start.localeCompare(b.dateRange.start)
+      ),
     }));
 }
 

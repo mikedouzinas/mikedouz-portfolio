@@ -1,5 +1,263 @@
 [
   {
+    "id": "0644f2571275fe7a5c998cb60d91c778",
+    "trackName": "Fallen Star",
+    "artist": "The Neighbourhood",
+    "album": "Fallen Star",
+    "trackUri": "spotify:track:60F6pgM6H6miNr5AmjxwjL",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0286a26fe844d212d650debca2",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/60F6pgM6H6miNr5AmjxwjL",
+    "dateRange": {
+      "start": "2026-03-30",
+      "end": "2026-04-05"
+    },
+    "playCount": 6,
+    "weeksCount": 1,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-04-01",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-04-01",
+        "plays": 3
+      },
+      {
+        "date": "2026-04-05",
+        "plays": 3
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback"
+    ],
+    "context": {
+      "totalPlaysInWindow": 123,
+      "uniqueTracksInWindow": 86,
+      "timeOfDayDistribution": {
+        "0": 3,
+        "1": 2,
+        "2": 3,
+        "3": 1,
+        "4": 4,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 0,
+        "9": 1,
+        "10": 0,
+        "11": 4,
+        "12": 2,
+        "13": 1,
+        "14": 2,
+        "15": 4,
+        "16": 1,
+        "17": 2,
+        "18": 5,
+        "19": 0,
+        "20": 1,
+        "21": 1,
+        "22": 3,
+        "23": 2
+      },
+      "monthsActive": 13
+    }
+  },
+  {
+    "id": "11dc20887f5685f562614b871729a816",
+    "trackName": "Without a Warning",
+    "artist": "The Weeknd",
+    "album": "Hurry Up Tomorrow",
+    "trackUri": "spotify:track:6n6GfXu4i22rdsmRKe2eIn",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02982320da137d0de34410df61",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/6n6GfXu4i22rdsmRKe2eIn",
+    "dateRange": {
+      "start": "2026-03-23",
+      "end": "2026-03-29"
+    },
+    "playCount": 7,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-03-23",
+    "peakDayPlays": 6,
+    "hotDays": [
+      {
+        "date": "2026-03-23",
+        "plays": 6
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 113,
+      "uniqueTracksInWindow": 79,
+      "timeOfDayDistribution": {
+        "0": 2,
+        "1": 0,
+        "2": 2,
+        "3": 0,
+        "4": 1,
+        "5": 2,
+        "6": 0,
+        "7": 0,
+        "8": 1,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 1,
+        "14": 2,
+        "15": 2,
+        "16": 2,
+        "17": 0,
+        "18": 1,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 5,
+        "23": 5
+      },
+      "monthsActive": 3
+    }
+  },
+  {
+    "id": "d072bc788fe0052d419bec2c93ac6be4",
+    "trackName": "Drakkar Noir",
+    "artist": "Phoenix",
+    "album": "Bankrupt!",
+    "trackUri": "spotify:track:6CdWtrWlB3ejs39G69CBjq",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02ce012bca8ab9182d2dd7d0b5",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/6CdWtrWlB3ejs39G69CBjq",
+    "dateRange": {
+      "start": "2026-03-23",
+      "end": "2026-03-29"
+    },
+    "playCount": 14,
+    "weeksCount": 1,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-03-23",
+    "peakDayPlays": 13,
+    "hotDays": [
+      {
+        "date": "2026-03-23",
+        "plays": 13
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback"
+    ],
+    "context": {
+      "totalPlaysInWindow": 113,
+      "uniqueTracksInWindow": 79,
+      "timeOfDayDistribution": {
+        "0": 0,
+        "1": 0,
+        "2": 3,
+        "3": 1,
+        "4": 0,
+        "5": 0,
+        "6": 3,
+        "7": 7,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 1,
+        "13": 0,
+        "14": 2,
+        "15": 1,
+        "16": 1,
+        "17": 1,
+        "18": 1,
+        "19": 0,
+        "20": 1,
+        "21": 0,
+        "22": 10,
+        "23": 3
+      },
+      "monthsActive": 3
+    }
+  },
+  {
+    "id": "bbde0d08c120d803c643fafed4f309a3",
+    "trackName": "Selfless",
+    "artist": "The Strokes",
+    "album": "The New Abnormal",
+    "trackUri": "spotify:track:2t0wwvR15fc3K1ey8OiOaN",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02e3f1ba3de4659708c25d0f39",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/2t0wwvR15fc3K1ey8OiOaN",
+    "dateRange": {
+      "start": "2026-03-09",
+      "end": "2026-03-29"
+    },
+    "playCount": 6,
+    "weeksCount": 3,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2026-03-09",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-03-09",
+        "plays": 2
+      },
+      {
+        "date": "2026-03-22",
+        "plays": 2
+      },
+      {
+        "date": "2026-03-23",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 319,
+      "uniqueTracksInWindow": 185,
+      "timeOfDayDistribution": {
+        "0": 6,
+        "1": 7,
+        "2": 7,
+        "3": 2,
+        "4": 4,
+        "5": 0,
+        "6": 0,
+        "7": 1,
+        "8": 0,
+        "9": 4,
+        "10": 5,
+        "11": 4,
+        "12": 6,
+        "13": 5,
+        "14": 3,
+        "15": 6,
+        "16": 9,
+        "17": 5,
+        "18": 8,
+        "19": 7,
+        "20": 5,
+        "21": 3,
+        "22": 7,
+        "23": 7
+      },
+      "monthsActive": 14
+    }
+  },
+  {
     "id": "9e31679d3766c91bd841aa98367d95ea",
     "trackName": "Drakkar Noir",
     "artist": "Phoenix",
@@ -29,7 +287,8 @@
       }
     ],
     "insightTypes": [
-      "burst"
+      "burst",
+      "comeback"
     ],
     "context": {
       "totalPlaysInWindow": 323,
@@ -47,20 +306,20 @@
         "9": 0,
         "10": 0,
         "11": 0,
-        "12": 0,
+        "12": 1,
         "13": 0,
-        "14": 1,
-        "15": 0,
+        "14": 2,
+        "15": 1,
         "16": 1,
         "17": 1,
         "18": 1,
         "19": 0,
         "20": 1,
         "21": 0,
-        "22": 0,
-        "23": 0
+        "22": 10,
+        "23": 3
       },
-      "monthsActive": 2
+      "monthsActive": 3
     }
   },
   {
@@ -106,7 +365,7 @@
         "0": 1,
         "1": 1,
         "2": 1,
-        "3": 2,
+        "3": 3,
         "4": 0,
         "5": 5,
         "6": 0,
@@ -123,7 +382,7 @@
         "17": 0,
         "18": 1,
         "19": 1,
-        "20": 0,
+        "20": 1,
         "21": 1,
         "22": 0,
         "23": 1
@@ -178,7 +437,7 @@
         "0": 0,
         "1": 1,
         "2": 1,
-        "3": 0,
+        "3": 1,
         "4": 4,
         "5": 1,
         "6": 0,
@@ -195,10 +454,10 @@
         "17": 0,
         "18": 3,
         "19": 0,
-        "20": 1,
+        "20": 2,
         "21": 1,
         "22": 0,
-        "23": 1
+        "23": 2
       },
       "monthsActive": 2
     }
@@ -267,8 +526,8 @@
         "17": 0,
         "18": 0,
         "19": 1,
-        "20": 1,
-        "21": 0,
+        "20": 2,
+        "21": 1,
         "22": 1,
         "23": 3
       },
@@ -310,7 +569,7 @@
     ],
     "insightTypes": [
       "burst",
-      "one_and_done"
+      "comeback"
     ],
     "context": {
       "totalPlaysInWindow": 763,
@@ -330,7 +589,7 @@
         "11": 0,
         "12": 0,
         "13": 1,
-        "14": 1,
+        "14": 2,
         "15": 2,
         "16": 2,
         "17": 0,
@@ -338,10 +597,10 @@
         "19": 0,
         "20": 0,
         "21": 0,
-        "22": 0,
-        "23": 4
+        "22": 5,
+        "23": 5
       },
-      "monthsActive": 2
+      "monthsActive": 3
     }
   },
   {
@@ -473,6 +732,78 @@
     }
   },
   {
+    "id": "eef4eb2f835074adbc21aa7f9197db94",
+    "trackName": "E85",
+    "artist": "Don Toliver",
+    "album": "OCTANE",
+    "trackUri": "spotify:track:3B4cjvGlPvyBLNG3AzEgkZ",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0225c28f3c9fbdbab1a88dd619",
+    "spotifyUrl": "https://open.spotify.com/track/3B4cjvGlPvyBLNG3AzEgkZ",
+    "dateRange": {
+      "start": "2026-02-09",
+      "end": "2026-02-22"
+    },
+    "playCount": 14,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-02-17",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-02-17",
+        "plays": 3
+      },
+      {
+        "date": "2026-02-12",
+        "plays": 2
+      },
+      {
+        "date": "2026-02-14",
+        "plays": 2
+      },
+      {
+        "date": "2026-02-16",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback"
+    ],
+    "context": {
+      "totalPlaysInWindow": 763,
+      "uniqueTracksInWindow": 350,
+      "timeOfDayDistribution": {
+        "0": 5,
+        "1": 3,
+        "2": 2,
+        "3": 1,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 2,
+        "14": 2,
+        "15": 3,
+        "16": 0,
+        "17": 1,
+        "18": 0,
+        "19": 2,
+        "20": 1,
+        "21": 3,
+        "22": 3,
+        "23": 5
+      },
+      "monthsActive": 4
+    }
+  },
+  {
     "id": "744f13443fa4a06a29df28c01fa32f98",
     "trackName": "Elephant",
     "artist": "Tame Impala",
@@ -522,7 +853,7 @@
       "totalPlaysInWindow": 1033,
       "uniqueTracksInWindow": 415,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 3,
         "1": 1,
         "2": 5,
         "3": 4,
@@ -537,17 +868,17 @@
         "12": 1,
         "13": 3,
         "14": 1,
-        "15": 3,
+        "15": 4,
         "16": 2,
         "17": 1,
         "18": 5,
         "19": 5,
-        "20": 3,
+        "20": 4,
         "21": 7,
         "22": 4,
-        "23": 4
+        "23": 5
       },
-      "monthsActive": 14
+      "monthsActive": 15
     }
   },
   {
@@ -828,7 +1159,146 @@
     }
   },
   {
-    "id": "faf7b7913d22fec8dda86bfafd541980",
+    "id": "8c706bc8b5cee4d73dd9cf4b6abe3312",
+    "trackName": "11th Dimension",
+    "artist": "Julian Casablancas",
+    "album": "Phrazes For The Young",
+    "trackUri": "spotify:track:6i99ThziImjuFABb8rUQvy",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02c7eae07761b35ca163d75ef0",
+    "spotifyUrl": "https://open.spotify.com/track/6i99ThziImjuFABb8rUQvy",
+    "dateRange": {
+      "start": "2026-01-26",
+      "end": "2026-02-15"
+    },
+    "playCount": 15,
+    "weeksCount": 3,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-01-30",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-01-30",
+        "plays": 3
+      },
+      {
+        "date": "2026-01-29",
+        "plays": 2
+      },
+      {
+        "date": "2026-02-06",
+        "plays": 2
+      },
+      {
+        "date": "2026-02-12",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 999,
+      "uniqueTracksInWindow": 429,
+      "timeOfDayDistribution": {
+        "0": 1,
+        "1": 3,
+        "2": 1,
+        "3": 0,
+        "4": 0,
+        "5": 1,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 1,
+        "14": 1,
+        "15": 3,
+        "16": 0,
+        "17": 0,
+        "18": 2,
+        "19": 1,
+        "20": 1,
+        "21": 0,
+        "22": 0,
+        "23": 3
+      },
+      "monthsActive": 3
+    }
+  },
+  {
+    "id": "6a40ba9f39ccc38674b6d13e8fb4be06",
+    "trackName": "E85",
+    "artist": "Don Toliver",
+    "album": "OCTANE",
+    "trackUri": "spotify:track:3B4cjvGlPvyBLNG3AzEgkZ",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0225c28f3c9fbdbab1a88dd619",
+    "spotifyUrl": "https://open.spotify.com/track/3B4cjvGlPvyBLNG3AzEgkZ",
+    "dateRange": {
+      "start": "2026-01-26",
+      "end": "2026-02-01"
+    },
+    "playCount": 12,
+    "weeksCount": 1,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-01-30",
+    "peakDayPlays": 5,
+    "hotDays": [
+      {
+        "date": "2026-01-30",
+        "plays": 5
+      },
+      {
+        "date": "2026-01-31",
+        "plays": 4
+      },
+      {
+        "date": "2026-02-01",
+        "plays": 3
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback"
+    ],
+    "context": {
+      "totalPlaysInWindow": 318,
+      "uniqueTracksInWindow": 179,
+      "timeOfDayDistribution": {
+        "0": 5,
+        "1": 3,
+        "2": 2,
+        "3": 1,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 2,
+        "14": 2,
+        "15": 3,
+        "16": 0,
+        "17": 1,
+        "18": 0,
+        "19": 2,
+        "20": 1,
+        "21": 3,
+        "22": 3,
+        "23": 5
+      },
+      "monthsActive": 4
+    }
+  },
+  {
+    "id": "90de49aba4ba60f8b214fc88549192bf",
     "trackName": "Pleasure’s Mine",
     "artist": "Don Toliver",
     "album": "OCTANE",
@@ -838,10 +1308,10 @@
     "spotifyUrl": "https://open.spotify.com/track/19cgfclwwxsGGwaEbOn0B2",
     "dateRange": {
       "start": "2026-01-26",
-      "end": "2026-02-01"
+      "end": "2026-02-08"
     },
-    "playCount": 10,
-    "weeksCount": 1,
+    "playCount": 14,
+    "weeksCount": 2,
     "intensity": 1,
     "maxState": 1,
     "peakDay": "2026-02-01",
@@ -858,17 +1328,21 @@
       {
         "date": "2026-01-31",
         "plays": 3
+      },
+      {
+        "date": "2026-02-02",
+        "plays": 2
       }
     ],
     "insightTypes": [
       "burst"
     ],
     "context": {
-      "totalPlaysInWindow": 318,
-      "uniqueTracksInWindow": 179,
+      "totalPlaysInWindow": 588,
+      "uniqueTracksInWindow": 304,
       "timeOfDayDistribution": {
         "0": 3,
-        "1": 0,
+        "1": 1,
         "2": 2,
         "3": 3,
         "4": 0,
@@ -885,14 +1359,14 @@
         "15": 3,
         "16": 1,
         "17": 0,
-        "18": 1,
+        "18": 2,
         "19": 0,
         "20": 1,
         "21": 1,
         "22": 2,
         "23": 2
       },
-      "monthsActive": 3
+      "monthsActive": 4
     }
   },
   {
@@ -936,9 +1410,9 @@
       "uniqueTracksInWindow": 304,
       "timeOfDayDistribution": {
         "0": 2,
-        "1": 1,
+        "1": 2,
         "2": 1,
-        "3": 4,
+        "3": 5,
         "4": 0,
         "5": 2,
         "6": 0,
@@ -949,18 +1423,18 @@
         "11": 2,
         "12": 0,
         "13": 1,
-        "14": 2,
+        "14": 3,
         "15": 3,
         "16": 1,
         "17": 0,
         "18": 0,
         "19": 0,
         "20": 1,
-        "21": 3,
+        "21": 4,
         "22": 2,
         "23": 5
       },
-      "monthsActive": 3
+      "monthsActive": 4
     }
   },
   {
@@ -994,7 +1468,7 @@
       "timeOfDayDistribution": {
         "0": 6,
         "1": 7,
-        "2": 6,
+        "2": 7,
         "3": 2,
         "4": 4,
         "5": 0,
@@ -1008,14 +1482,14 @@
         "13": 5,
         "14": 3,
         "15": 6,
-        "16": 8,
+        "16": 9,
         "17": 5,
         "18": 8,
         "19": 7,
         "20": 5,
         "21": 3,
         "22": 7,
-        "23": 5
+        "23": 7
       },
       "monthsActive": 14
     }
@@ -1131,7 +1605,7 @@
       "totalPlaysInWindow": 1165,
       "uniqueTracksInWindow": 514,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 3,
         "1": 1,
         "2": 5,
         "3": 4,
@@ -1146,17 +1620,17 @@
         "12": 1,
         "13": 3,
         "14": 1,
-        "15": 3,
+        "15": 4,
         "16": 2,
         "17": 1,
         "18": 5,
         "19": 5,
-        "20": 3,
+        "20": 4,
         "21": 7,
         "22": 4,
-        "23": 4
+        "23": 5
       },
-      "monthsActive": 14
+      "monthsActive": 15
     }
   },
   {
@@ -1340,7 +1814,7 @@
       "totalPlaysInWindow": 1227,
       "uniqueTracksInWindow": 519,
       "timeOfDayDistribution": {
-        "0": 1,
+        "0": 2,
         "1": 2,
         "2": 1,
         "3": 0,
@@ -1358,14 +1832,14 @@
         "15": 1,
         "16": 3,
         "17": 2,
-        "18": 1,
+        "18": 2,
         "19": 1,
         "20": 2,
         "21": 0,
         "22": 5,
         "23": 2
       },
-      "monthsActive": 4
+      "monthsActive": 5
     }
   },
   {
@@ -1536,7 +2010,7 @@
       "timeOfDayDistribution": {
         "0": 6,
         "1": 7,
-        "2": 6,
+        "2": 7,
         "3": 2,
         "4": 4,
         "5": 0,
@@ -1550,14 +2024,14 @@
         "13": 5,
         "14": 3,
         "15": 6,
-        "16": 8,
+        "16": 9,
         "17": 5,
         "18": 8,
         "19": 7,
         "20": 5,
         "21": 3,
         "22": 7,
-        "23": 5
+        "23": 7
       },
       "monthsActive": 14
     }
@@ -1760,10 +2234,10 @@
         "19": 4,
         "20": 0,
         "21": 0,
-        "22": 2,
+        "22": 3,
         "23": 1
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -1809,8 +2283,8 @@
       "timeOfDayDistribution": {
         "0": 2,
         "1": 2,
-        "2": 2,
-        "3": 1,
+        "2": 3,
+        "3": 2,
         "4": 1,
         "5": 2,
         "6": 1,
@@ -1819,11 +2293,11 @@
         "9": 0,
         "10": 2,
         "11": 3,
-        "12": 1,
+        "12": 3,
         "13": 2,
         "14": 4,
         "15": 2,
-        "16": 3,
+        "16": 4,
         "17": 0,
         "18": 1,
         "19": 3,
@@ -1832,7 +2306,7 @@
         "22": 0,
         "23": 2
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -1893,6 +2367,67 @@
         "23": 0
       },
       "monthsActive": 2
+    }
+  },
+  {
+    "id": "1de0bd362fae7a166ca68f567a4f436c",
+    "trackName": "Endors Toi",
+    "artist": "Tame Impala",
+    "album": "Lonerism",
+    "trackUri": "spotify:track:0YuePEX4KyfLIPMdNLPwgQ",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02370c12f82872c9cfaee80193",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/0YuePEX4KyfLIPMdNLPwgQ",
+    "dateRange": {
+      "start": "2025-11-10",
+      "end": "2025-11-23"
+    },
+    "playCount": 6,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-11-12",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2025-11-12",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback"
+    ],
+    "context": {
+      "totalPlaysInWindow": 575,
+      "uniqueTracksInWindow": 312,
+      "timeOfDayDistribution": {
+        "0": 1,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 0,
+        "5": 2,
+        "6": 0,
+        "7": 1,
+        "8": 4,
+        "9": 3,
+        "10": 3,
+        "11": 2,
+        "12": 1,
+        "13": 1,
+        "14": 4,
+        "15": 5,
+        "16": 1,
+        "17": 3,
+        "18": 5,
+        "19": 1,
+        "20": 1,
+        "21": 2,
+        "22": 0,
+        "23": 1
+      },
+      "monthsActive": 10
     }
   },
   {
@@ -2129,8 +2664,8 @@
       "timeOfDayDistribution": {
         "0": 2,
         "1": 2,
-        "2": 2,
-        "3": 1,
+        "2": 3,
+        "3": 2,
         "4": 1,
         "5": 2,
         "6": 1,
@@ -2139,11 +2674,11 @@
         "9": 0,
         "10": 2,
         "11": 3,
-        "12": 1,
+        "12": 3,
         "13": 2,
         "14": 4,
         "15": 2,
-        "16": 3,
+        "16": 4,
         "17": 0,
         "18": 1,
         "19": 3,
@@ -2152,7 +2687,67 @@
         "22": 0,
         "23": 2
       },
-      "monthsActive": 9
+      "monthsActive": 10
+    }
+  },
+  {
+    "id": "79d87e9898da73119e26b2b820e17356",
+    "trackName": "The Dream Synopsis",
+    "artist": "The Last Shadow Puppets",
+    "album": "Everything You've Come To Expect",
+    "trackUri": "spotify:track:1iPeDwic3VEt0T75NyVoaG",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0299845928b10d57ec9f95e953",
+    "spotifyUrl": "https://open.spotify.com/track/1iPeDwic3VEt0T75NyVoaG",
+    "dateRange": {
+      "start": "2025-10-20",
+      "end": "2025-11-02"
+    },
+    "playCount": 5,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-10-30",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2025-10-30",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback"
+    ],
+    "context": {
+      "totalPlaysInWindow": 688,
+      "uniqueTracksInWindow": 384,
+      "timeOfDayDistribution": {
+        "0": 2,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 1,
+        "6": 2,
+        "7": 3,
+        "8": 2,
+        "9": 1,
+        "10": 4,
+        "11": 7,
+        "12": 1,
+        "13": 2,
+        "14": 0,
+        "15": 2,
+        "16": 1,
+        "17": 1,
+        "18": 1,
+        "19": 1,
+        "20": 1,
+        "21": 3,
+        "22": 1,
+        "23": 0
+      },
+      "monthsActive": 5
     }
   },
   {
@@ -2374,70 +2969,6 @@
     }
   },
   {
-    "id": "0dc80c1d5a9532586d08a0714491b6a3",
-    "trackName": "Afterthought",
-    "artist": "Tame Impala",
-    "album": "Deadbeat",
-    "trackUri": "spotify:track:4LqkSEGv7SpGzruiSTkfL5",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02208500450dcd0fd294d7bd3b",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/4LqkSEGv7SpGzruiSTkfL5",
-    "dateRange": {
-      "start": "2025-10-13",
-      "end": "2025-10-26"
-    },
-    "playCount": 12,
-    "weeksCount": 2,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2025-10-17",
-    "peakDayPlays": 7,
-    "hotDays": [
-      {
-        "date": "2025-10-17",
-        "plays": 7
-      },
-      {
-        "date": "2025-10-20",
-        "plays": 3
-      }
-    ],
-    "insightTypes": [
-      "burst"
-    ],
-    "context": {
-      "totalPlaysInWindow": 667,
-      "uniqueTracksInWindow": 328,
-      "timeOfDayDistribution": {
-        "0": 0,
-        "1": 0,
-        "2": 1,
-        "3": 0,
-        "4": 1,
-        "5": 0,
-        "6": 1,
-        "7": 0,
-        "8": 5,
-        "9": 2,
-        "10": 1,
-        "11": 1,
-        "12": 0,
-        "13": 0,
-        "14": 4,
-        "15": 0,
-        "16": 2,
-        "17": 0,
-        "18": 2,
-        "19": 0,
-        "20": 0,
-        "21": 0,
-        "22": 0,
-        "23": 3
-      },
-      "monthsActive": 6
-    }
-  },
-  {
     "id": "9439b20e739f851d59f7380ca0501690",
     "trackName": "Selfless",
     "artist": "The Strokes",
@@ -2485,7 +3016,7 @@
       "timeOfDayDistribution": {
         "0": 6,
         "1": 7,
-        "2": 6,
+        "2": 7,
         "3": 2,
         "4": 4,
         "5": 0,
@@ -2499,14 +3030,14 @@
         "13": 5,
         "14": 3,
         "15": 6,
-        "16": 8,
+        "16": 9,
         "17": 5,
         "18": 8,
         "19": 7,
         "20": 5,
         "21": 3,
         "22": 7,
-        "23": 5
+        "23": 7
       },
       "monthsActive": 14
     }
@@ -2782,7 +3313,7 @@
         "11": 2,
         "12": 1,
         "13": 1,
-        "14": 3,
+        "14": 4,
         "15": 5,
         "16": 1,
         "17": 3,
@@ -2793,7 +3324,7 @@
         "22": 0,
         "23": 1
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -2844,7 +3375,7 @@
       "totalPlaysInWindow": 1652,
       "uniqueTracksInWindow": 560,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 3,
         "1": 1,
         "2": 0,
         "3": 0,
@@ -2869,7 +3400,7 @@
         "22": 0,
         "23": 2
       },
-      "monthsActive": 6
+      "monthsActive": 7
     }
   },
   {
@@ -3017,6 +3548,70 @@
     }
   },
   {
+    "id": "632933091ac3b749c6cd308d08a4131f",
+    "trackName": "Posthumous Forgiveness",
+    "artist": "Tame Impala",
+    "album": "The Slow Rush",
+    "trackUri": "spotify:track:1KcOU0q9AMXV9xi4tSzzCc",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0258267bd34420a00d5cf83a49",
+    "spotifyUrl": "https://open.spotify.com/track/1KcOU0q9AMXV9xi4tSzzCc",
+    "dateRange": {
+      "start": "2025-09-08",
+      "end": "2025-09-28"
+    },
+    "playCount": 11,
+    "weeksCount": 3,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-09-13",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2025-09-13",
+        "plays": 2
+      },
+      {
+        "date": "2025-09-14",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback"
+    ],
+    "context": {
+      "totalPlaysInWindow": 759,
+      "uniqueTracksInWindow": 312,
+      "timeOfDayDistribution": {
+        "0": 2,
+        "1": 1,
+        "2": 0,
+        "3": 1,
+        "4": 0,
+        "5": 0,
+        "6": 2,
+        "7": 1,
+        "8": 3,
+        "9": 1,
+        "10": 0,
+        "11": 0,
+        "12": 2,
+        "13": 3,
+        "14": 3,
+        "15": 5,
+        "16": 4,
+        "17": 6,
+        "18": 2,
+        "19": 4,
+        "20": 2,
+        "21": 2,
+        "22": 1,
+        "23": 2
+      },
+      "monthsActive": 8
+    }
+  },
+  {
     "id": "efaaf9f9fe460a75bad1b486a78a9846",
     "trackName": "Endors Toi",
     "artist": "Tame Impala",
@@ -3063,7 +3658,7 @@
         "11": 2,
         "12": 1,
         "13": 1,
-        "14": 3,
+        "14": 4,
         "15": 5,
         "16": 1,
         "17": 3,
@@ -3074,7 +3669,7 @@
         "22": 0,
         "23": 1
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -3202,7 +3797,7 @@
       "uniqueTracksInWindow": 423,
       "timeOfDayDistribution": {
         "0": 2,
-        "1": 1,
+        "1": 2,
         "2": 0,
         "3": 0,
         "4": 0,
@@ -3219,14 +3814,14 @@
         "15": 6,
         "16": 2,
         "17": 4,
-        "18": 3,
+        "18": 4,
         "19": 1,
         "20": 2,
         "21": 1,
         "22": 0,
-        "23": 0
+        "23": 1
       },
-      "monthsActive": 7
+      "monthsActive": 8
     }
   },
   {
@@ -3302,6 +3897,82 @@
     }
   },
   {
+    "id": "8b851af4b86defe55da597b1ffcf6e3f",
+    "trackName": "The Dream Synopsis",
+    "artist": "The Last Shadow Puppets",
+    "album": "Everything You've Come To Expect",
+    "trackUri": "spotify:track:1iPeDwic3VEt0T75NyVoaG",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0299845928b10d57ec9f95e953",
+    "spotifyUrl": "https://open.spotify.com/track/1iPeDwic3VEt0T75NyVoaG",
+    "dateRange": {
+      "start": "2025-08-25",
+      "end": "2025-10-05"
+    },
+    "playCount": 27,
+    "weeksCount": 6,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-08-28",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2025-08-28",
+        "plays": 3
+      },
+      {
+        "date": "2025-09-07",
+        "plays": 3
+      },
+      {
+        "date": "2025-08-30",
+        "plays": 2
+      },
+      {
+        "date": "2025-09-06",
+        "plays": 2
+      },
+      {
+        "date": "2025-09-09",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback"
+    ],
+    "context": {
+      "totalPlaysInWindow": 1788,
+      "uniqueTracksInWindow": 602,
+      "timeOfDayDistribution": {
+        "0": 2,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 1,
+        "6": 2,
+        "7": 3,
+        "8": 2,
+        "9": 1,
+        "10": 4,
+        "11": 7,
+        "12": 1,
+        "13": 2,
+        "14": 0,
+        "15": 2,
+        "16": 1,
+        "17": 1,
+        "18": 1,
+        "19": 1,
+        "20": 1,
+        "21": 3,
+        "22": 1,
+        "23": 0
+      },
+      "monthsActive": 5
+    }
+  },
+  {
     "id": "21f6da1c5a330d91527f1125f61ecd98",
     "trackName": "Gata Only (Remix)",
     "artist": "FloyyMenor",
@@ -3359,14 +4030,14 @@
         "15": 2,
         "16": 3,
         "17": 1,
-        "18": 2,
+        "18": 3,
         "19": 2,
-        "20": 4,
+        "20": 5,
         "21": 1,
         "22": 0,
         "23": 0
       },
-      "monthsActive": 7
+      "monthsActive": 8
     }
   },
   {
@@ -3542,7 +4213,7 @@
     }
   },
   {
-    "id": "197aa73bfc61ad1148dfa1aaad1fe3fd",
+    "id": "7af572592437805aa4becb680ff8425e",
     "trackName": "COMË N GO",
     "artist": "Yeat",
     "album": "DANGEROUS SUMMER",
@@ -3552,10 +4223,10 @@
     "spotifyUrl": "https://open.spotify.com/track/2mNGL7mZILSqZHxGboJaO9",
     "dateRange": {
       "start": "2025-08-11",
-      "end": "2025-09-07"
+      "end": "2025-09-14"
     },
-    "playCount": 26,
-    "weeksCount": 4,
+    "playCount": 28,
+    "weeksCount": 5,
     "intensity": 2,
     "maxState": 2,
     "peakDay": "2025-08-12",
@@ -3586,13 +4257,13 @@
       "burst"
     ],
     "context": {
-      "totalPlaysInWindow": 1281,
-      "uniqueTracksInWindow": 506,
+      "totalPlaysInWindow": 1463,
+      "uniqueTracksInWindow": 516,
       "timeOfDayDistribution": {
         "0": 1,
         "1": 2,
         "2": 0,
-        "3": 0,
+        "3": 1,
         "4": 0,
         "5": 1,
         "6": 1,
@@ -3614,7 +4285,7 @@
         "22": 4,
         "23": 1
       },
-      "monthsActive": 5
+      "monthsActive": 6
     }
   },
   {
@@ -3791,7 +4462,7 @@
       "timeOfDayDistribution": {
         "0": 0,
         "1": 0,
-        "2": 1,
+        "2": 2,
         "3": 0,
         "4": 2,
         "5": 0,
@@ -3814,7 +4485,7 @@
         "22": 1,
         "23": 0
       },
-      "monthsActive": 5
+      "monthsActive": 6
     }
   },
   {
@@ -4344,7 +5015,7 @@
         "0": 2,
         "1": 4,
         "2": 1,
-        "3": 2,
+        "3": 3,
         "4": 2,
         "5": 1,
         "6": 0,
@@ -4558,7 +5229,7 @@
       "timeOfDayDistribution": {
         "0": 6,
         "1": 7,
-        "2": 6,
+        "2": 7,
         "3": 2,
         "4": 4,
         "5": 0,
@@ -4572,14 +5243,14 @@
         "13": 5,
         "14": 3,
         "15": 6,
-        "16": 8,
+        "16": 9,
         "17": 5,
         "18": 8,
         "19": 7,
         "20": 5,
         "21": 3,
         "22": 7,
-        "23": 5
+        "23": 7
       },
       "monthsActive": 14
     }
@@ -4618,7 +5289,7 @@
       "timeOfDayDistribution": {
         "0": 3,
         "1": 1,
-        "2": 3,
+        "2": 4,
         "3": 1,
         "4": 0,
         "5": 0,
@@ -4638,10 +5309,82 @@
         "19": 1,
         "20": 3,
         "21": 3,
-        "22": 2,
+        "22": 3,
         "23": 3
       },
-      "monthsActive": 12
+      "monthsActive": 13
+    }
+  },
+  {
+    "id": "a5006b6af11e4f221e8471f06a73e744",
+    "trackName": "Posthumous Forgiveness",
+    "artist": "Tame Impala",
+    "album": "The Slow Rush",
+    "trackUri": "spotify:track:1KcOU0q9AMXV9xi4tSzzCc",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0258267bd34420a00d5cf83a49",
+    "spotifyUrl": "https://open.spotify.com/track/1KcOU0q9AMXV9xi4tSzzCc",
+    "dateRange": {
+      "start": "2025-07-21",
+      "end": "2025-08-10"
+    },
+    "playCount": 15,
+    "weeksCount": 3,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-07-23",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2025-07-23",
+        "plays": 2
+      },
+      {
+        "date": "2025-07-27",
+        "plays": 2
+      },
+      {
+        "date": "2025-07-28",
+        "plays": 2
+      },
+      {
+        "date": "2025-07-29",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback"
+    ],
+    "context": {
+      "totalPlaysInWindow": 825,
+      "uniqueTracksInWindow": 311,
+      "timeOfDayDistribution": {
+        "0": 2,
+        "1": 1,
+        "2": 0,
+        "3": 1,
+        "4": 0,
+        "5": 0,
+        "6": 2,
+        "7": 1,
+        "8": 3,
+        "9": 1,
+        "10": 0,
+        "11": 0,
+        "12": 2,
+        "13": 3,
+        "14": 3,
+        "15": 5,
+        "16": 4,
+        "17": 6,
+        "18": 2,
+        "19": 4,
+        "20": 2,
+        "21": 2,
+        "22": 1,
+        "23": 2
+      },
+      "monthsActive": 8
     }
   },
   {
@@ -4773,7 +5516,7 @@
         "1": 3,
         "2": 4,
         "3": 4,
-        "4": 4,
+        "4": 5,
         "5": 1,
         "6": 1,
         "7": 3,
@@ -4788,13 +5531,13 @@
         "16": 7,
         "17": 4,
         "18": 5,
-        "19": 4,
+        "19": 5,
         "20": 5,
         "21": 5,
         "22": 4,
         "23": 3
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -4987,7 +5730,7 @@
         "0": 1,
         "1": 5,
         "2": 5,
-        "3": 3,
+        "3": 4,
         "4": 1,
         "5": 0,
         "6": 0,
@@ -5070,10 +5813,10 @@
         "19": 5,
         "20": 0,
         "21": 0,
-        "22": 1,
+        "22": 2,
         "23": 4
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -5520,7 +6263,8 @@
       }
     ],
     "insightTypes": [
-      "burst"
+      "burst",
+      "comeback"
     ],
     "context": {
       "totalPlaysInWindow": 1170,
@@ -5529,8 +6273,8 @@
         "0": 3,
         "1": 2,
         "2": 3,
-        "3": 0,
-        "4": 3,
+        "3": 1,
+        "4": 4,
         "5": 0,
         "6": 1,
         "7": 0,
@@ -5544,14 +6288,14 @@
         "15": 4,
         "16": 1,
         "17": 2,
-        "18": 3,
+        "18": 5,
         "19": 0,
-        "20": 0,
+        "20": 1,
         "21": 1,
-        "22": 1,
+        "22": 3,
         "23": 2
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -5594,7 +6338,7 @@
       "timeOfDayDistribution": {
         "0": 1,
         "1": 2,
-        "2": 3,
+        "2": 4,
         "3": 1,
         "4": 1,
         "5": 0,
@@ -5609,7 +6353,7 @@
         "14": 5,
         "15": 2,
         "16": 6,
-        "17": 3,
+        "17": 4,
         "18": 1,
         "19": 3,
         "20": 5,
@@ -5617,7 +6361,7 @@
         "22": 3,
         "23": 2
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -5680,7 +6424,7 @@
         "9": 0,
         "10": 3,
         "11": 2,
-        "12": 0,
+        "12": 1,
         "13": 0,
         "14": 2,
         "15": 0,
@@ -5693,7 +6437,7 @@
         "22": 2,
         "23": 3
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -6133,7 +6877,7 @@
       "timeOfDayDistribution": {
         "0": 6,
         "1": 7,
-        "2": 6,
+        "2": 7,
         "3": 2,
         "4": 4,
         "5": 0,
@@ -6147,14 +6891,14 @@
         "13": 5,
         "14": 3,
         "15": 6,
-        "16": 8,
+        "16": 9,
         "17": 5,
         "18": 8,
         "19": 7,
         "20": 5,
         "21": 3,
         "22": 7,
-        "23": 5
+        "23": 7
       },
       "monthsActive": 14
     }
@@ -6221,7 +6965,7 @@
         "10": 2,
         "11": 4,
         "12": 0,
-        "13": 0,
+        "13": 1,
         "14": 3,
         "15": 3,
         "16": 3,
@@ -6230,10 +6974,10 @@
         "19": 2,
         "20": 6,
         "21": 1,
-        "22": 4,
+        "22": 5,
         "23": 6
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -6792,7 +7536,7 @@
         "11": 1,
         "12": 1,
         "13": 1,
-        "14": 5,
+        "14": 6,
         "15": 1,
         "16": 2,
         "17": 3,
@@ -6803,7 +7547,7 @@
         "22": 1,
         "23": 1
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -6993,7 +7737,7 @@
       "timeOfDayDistribution": {
         "0": 1,
         "1": 2,
-        "2": 3,
+        "2": 4,
         "3": 1,
         "4": 1,
         "5": 0,
@@ -7008,7 +7752,7 @@
         "14": 5,
         "15": 2,
         "16": 6,
-        "17": 3,
+        "17": 4,
         "18": 1,
         "19": 3,
         "20": 5,
@@ -7016,7 +7760,7 @@
         "22": 3,
         "23": 2
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -7070,7 +7814,7 @@
       "timeOfDayDistribution": {
         "0": 5,
         "1": 5,
-        "2": 3,
+        "2": 4,
         "3": 1,
         "4": 1,
         "5": 0,
@@ -7081,7 +7825,7 @@
         "10": 0,
         "11": 1,
         "12": 0,
-        "13": 3,
+        "13": 4,
         "14": 4,
         "15": 4,
         "16": 3,
@@ -7093,7 +7837,7 @@
         "22": 7,
         "23": 5
       },
-      "monthsActive": 10
+      "monthsActive": 12
     }
   },
   {
@@ -7270,7 +8014,7 @@
       "timeOfDayDistribution": {
         "0": 1,
         "1": 2,
-        "2": 3,
+        "2": 4,
         "3": 1,
         "4": 1,
         "5": 0,
@@ -7285,7 +8029,7 @@
         "14": 5,
         "15": 2,
         "16": 6,
-        "17": 3,
+        "17": 4,
         "18": 1,
         "19": 3,
         "20": 5,
@@ -7293,7 +8037,7 @@
         "22": 3,
         "23": 2
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -7400,9 +8144,9 @@
       "totalPlaysInWindow": 245,
       "uniqueTracksInWindow": 140,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 3,
         "1": 3,
-        "2": 4,
+        "2": 5,
         "3": 3,
         "4": 2,
         "5": 1,
@@ -7464,7 +8208,7 @@
         "0": 5,
         "1": 1,
         "2": 4,
-        "3": 3,
+        "3": 4,
         "4": 3,
         "5": 4,
         "6": 0,
@@ -7486,7 +8230,7 @@
         "22": 1,
         "23": 1
       },
-      "monthsActive": 15
+      "monthsActive": 16
     }
   },
   {
@@ -7953,9 +8697,9 @@
       "totalPlaysInWindow": 306,
       "uniqueTracksInWindow": 154,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 3,
         "1": 3,
-        "2": 4,
+        "2": 5,
         "3": 3,
         "4": 2,
         "5": 1,
@@ -8158,7 +8902,8 @@
       }
     ],
     "insightTypes": [
-      "burst"
+      "burst",
+      "loyalty"
     ],
     "context": {
       "totalPlaysInWindow": 455,
@@ -8166,7 +8911,7 @@
       "timeOfDayDistribution": {
         "0": 3,
         "1": 5,
-        "2": 0,
+        "2": 1,
         "3": 5,
         "4": 3,
         "5": 2,
@@ -8189,7 +8934,7 @@
         "22": 2,
         "23": 2
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -8386,7 +9131,7 @@
         "0": 5,
         "1": 1,
         "2": 4,
-        "3": 3,
+        "3": 4,
         "4": 3,
         "5": 4,
         "6": 0,
@@ -8408,7 +9153,7 @@
         "22": 1,
         "23": 1
       },
-      "monthsActive": 15
+      "monthsActive": 16
     }
   },
   {
@@ -9622,7 +10367,7 @@
       "uniqueTracksInWindow": 262,
       "timeOfDayDistribution": {
         "0": 5,
-        "1": 5,
+        "1": 6,
         "2": 3,
         "3": 1,
         "4": 0,
@@ -9906,7 +10651,7 @@
       "uniqueTracksInWindow": 323,
       "timeOfDayDistribution": {
         "0": 5,
-        "1": 5,
+        "1": 6,
         "2": 3,
         "3": 0,
         "4": 0,
@@ -10303,7 +11048,7 @@
       "uniqueTracksInWindow": 205,
       "timeOfDayDistribution": {
         "0": 5,
-        "1": 5,
+        "1": 6,
         "2": 3,
         "3": 1,
         "4": 0,
@@ -10772,67 +11517,6 @@
     }
   },
   {
-    "id": "b484d58f2e5fb6b794ba49dae22f3e5c",
-    "trackName": "Young Metro",
-    "artist": "Future",
-    "album": "WE DON'T TRUST YOU",
-    "trackUri": "spotify:track:3OxL6MuctgZp1e0zxoAZhH",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02cec3fc072352b5f4f637d9fa",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/3OxL6MuctgZp1e0zxoAZhH",
-    "dateRange": {
-      "start": "2024-04-08",
-      "end": "2024-04-21"
-    },
-    "playCount": 7,
-    "weeksCount": 2,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2024-04-12",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2024-04-12",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "comeback"
-    ],
-    "context": {
-      "totalPlaysInWindow": 209,
-      "uniqueTracksInWindow": 108,
-      "timeOfDayDistribution": {
-        "0": 2,
-        "1": 3,
-        "2": 2,
-        "3": 1,
-        "4": 3,
-        "5": 0,
-        "6": 0,
-        "7": 1,
-        "8": 0,
-        "9": 0,
-        "10": 0,
-        "11": 1,
-        "12": 0,
-        "13": 4,
-        "14": 1,
-        "15": 2,
-        "16": 5,
-        "17": 2,
-        "18": 3,
-        "19": 4,
-        "20": 2,
-        "21": 3,
-        "22": 3,
-        "23": 0
-      },
-      "monthsActive": 15
-    }
-  },
-  {
     "id": "943c676fbdd594bc373a84c1ad4656d6",
     "trackName": "Feel It - From The Original Series “Invincible”",
     "artist": "d4vd",
@@ -10908,71 +11592,6 @@
         "23": 5
       },
       "monthsActive": 12
-    }
-  },
-  {
-    "id": "cd7223b1210b8166f5d8e65abfae2071",
-    "trackName": "Young Metro",
-    "artist": "Future",
-    "album": "WE DON'T TRUST YOU",
-    "trackUri": "spotify:track:3OxL6MuctgZp1e0zxoAZhH",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02cec3fc072352b5f4f637d9fa",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/3OxL6MuctgZp1e0zxoAZhH",
-    "dateRange": {
-      "start": "2024-03-25",
-      "end": "2024-03-31"
-    },
-    "playCount": 7,
-    "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2024-03-31",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2024-03-31",
-        "plays": 3
-      },
-      {
-        "date": "2024-03-28",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "comeback"
-    ],
-    "context": {
-      "totalPlaysInWindow": 170,
-      "uniqueTracksInWindow": 106,
-      "timeOfDayDistribution": {
-        "0": 2,
-        "1": 3,
-        "2": 2,
-        "3": 1,
-        "4": 3,
-        "5": 0,
-        "6": 0,
-        "7": 1,
-        "8": 0,
-        "9": 0,
-        "10": 0,
-        "11": 1,
-        "12": 0,
-        "13": 4,
-        "14": 1,
-        "15": 2,
-        "16": 5,
-        "17": 2,
-        "18": 3,
-        "19": 4,
-        "20": 2,
-        "21": 3,
-        "22": 3,
-        "23": 0
-      },
-      "monthsActive": 15
     }
   },
   {
@@ -11513,7 +12132,7 @@
       "uniqueTracksInWindow": 192,
       "timeOfDayDistribution": {
         "0": 3,
-        "1": 5,
+        "1": 6,
         "2": 7,
         "3": 6,
         "4": 6,
@@ -11537,7 +12156,7 @@
         "22": 2,
         "23": 0
       },
-      "monthsActive": 21
+      "monthsActive": 22
     }
   },
   {
@@ -11851,7 +12470,7 @@
       "uniqueTracksInWindow": 181,
       "timeOfDayDistribution": {
         "0": 3,
-        "1": 5,
+        "1": 6,
         "2": 7,
         "3": 6,
         "4": 6,
@@ -11875,7 +12494,7 @@
         "22": 2,
         "23": 0
       },
-      "monthsActive": 21
+      "monthsActive": 22
     }
   },
   {
@@ -12039,7 +12658,7 @@
         "0": 9,
         "1": 14,
         "2": 10,
-        "3": 4,
+        "3": 5,
         "4": 5,
         "5": 1,
         "6": 1,
@@ -12061,7 +12680,7 @@
         "22": 6,
         "23": 11
       },
-      "monthsActive": 29
+      "monthsActive": 30
     }
   },
   {
@@ -12487,7 +13106,7 @@
         "0": 9,
         "1": 14,
         "2": 10,
-        "3": 4,
+        "3": 5,
         "4": 5,
         "5": 1,
         "6": 1,
@@ -12509,7 +13128,7 @@
         "22": 6,
         "23": 11
       },
-      "monthsActive": 29
+      "monthsActive": 30
     }
   },
   {
@@ -12930,7 +13549,7 @@
       "uniqueTracksInWindow": 521,
       "timeOfDayDistribution": {
         "0": 4,
-        "1": 4,
+        "1": 5,
         "2": 7,
         "3": 1,
         "4": 5,
@@ -12944,7 +13563,7 @@
         "12": 3,
         "13": 7,
         "14": 6,
-        "15": 5,
+        "15": 6,
         "16": 3,
         "17": 3,
         "18": 5,
@@ -14321,7 +14940,7 @@
         "0": 9,
         "1": 14,
         "2": 10,
-        "3": 4,
+        "3": 5,
         "4": 5,
         "5": 1,
         "6": 1,
@@ -14343,7 +14962,7 @@
         "22": 6,
         "23": 11
       },
-      "monthsActive": 29
+      "monthsActive": 30
     }
   },
   {
@@ -14443,7 +15062,7 @@
       "totalPlaysInWindow": 1071,
       "uniqueTracksInWindow": 296,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 3,
         "1": 5,
         "2": 7,
         "3": 5,
@@ -14468,7 +15087,7 @@
         "22": 5,
         "23": 1
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
@@ -15217,7 +15836,7 @@
         "0": 10,
         "1": 16,
         "2": 6,
-        "3": 9,
+        "3": 10,
         "4": 14,
         "5": 11,
         "6": 4,
@@ -15239,7 +15858,7 @@
         "22": 12,
         "23": 8
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
@@ -15661,7 +16280,7 @@
         "0": 10,
         "1": 16,
         "2": 6,
-        "3": 9,
+        "3": 10,
         "4": 14,
         "5": 11,
         "6": 4,
@@ -15683,7 +16302,7 @@
         "22": 12,
         "23": 8
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
@@ -16931,7 +17550,7 @@
         "0": 0,
         "1": 7,
         "2": 5,
-        "3": 6,
+        "3": 7,
         "4": 4,
         "5": 0,
         "6": 2,
@@ -16953,7 +17572,7 @@
         "22": 5,
         "23": 4
       },
-      "monthsActive": 16
+      "monthsActive": 17
     }
   },
   {
@@ -17133,7 +17752,7 @@
         "9": 1,
         "10": 3,
         "11": 4,
-        "12": 8,
+        "12": 9,
         "13": 9,
         "14": 11,
         "15": 8,
@@ -17143,7 +17762,7 @@
         "19": 13,
         "20": 8,
         "21": 13,
-        "22": 13,
+        "22": 14,
         "23": 22
       },
       "monthsActive": 33
@@ -17189,8 +17808,8 @@
       "timeOfDayDistribution": {
         "0": 18,
         "1": 26,
-        "2": 25,
-        "3": 13,
+        "2": 26,
+        "3": 14,
         "4": 7,
         "5": 3,
         "6": 3,
@@ -18331,8 +18950,8 @@
       "timeOfDayDistribution": {
         "0": 18,
         "1": 26,
-        "2": 25,
-        "3": 13,
+        "2": 26,
+        "3": 14,
         "4": 7,
         "5": 3,
         "6": 3,
@@ -18477,7 +19096,7 @@
         "9": 1,
         "10": 3,
         "11": 4,
-        "12": 8,
+        "12": 9,
         "13": 9,
         "14": 11,
         "15": 8,
@@ -18487,7 +19106,7 @@
         "19": 13,
         "20": 8,
         "21": 13,
-        "22": 13,
+        "22": 14,
         "23": 22
       },
       "monthsActive": 33
@@ -18896,7 +19515,7 @@
         "0": 10,
         "1": 16,
         "2": 6,
-        "3": 9,
+        "3": 10,
         "4": 14,
         "5": 11,
         "6": 4,
@@ -18918,7 +19537,7 @@
         "22": 12,
         "23": 8
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
@@ -19155,7 +19774,7 @@
       "timeOfDayDistribution": {
         "0": 13,
         "1": 11,
-        "2": 9,
+        "2": 10,
         "3": 5,
         "4": 0,
         "5": 3,
@@ -19166,7 +19785,7 @@
         "10": 5,
         "11": 2,
         "12": 5,
-        "13": 5,
+        "13": 6,
         "14": 10,
         "15": 3,
         "16": 6,
@@ -19178,7 +19797,7 @@
         "22": 9,
         "23": 11
       },
-      "monthsActive": 33
+      "monthsActive": 34
     }
   },
   {
@@ -19361,7 +19980,7 @@
         "0": 9,
         "1": 14,
         "2": 10,
-        "3": 4,
+        "3": 5,
         "4": 5,
         "5": 1,
         "6": 1,
@@ -19383,7 +20002,7 @@
         "22": 6,
         "23": 11
       },
-      "monthsActive": 29
+      "monthsActive": 30
     }
   },
   {
@@ -19899,8 +20518,8 @@
       "timeOfDayDistribution": {
         "0": 18,
         "1": 26,
-        "2": 25,
-        "3": 13,
+        "2": 26,
+        "3": 14,
         "4": 7,
         "5": 3,
         "6": 3,
@@ -19971,7 +20590,7 @@
         "9": 1,
         "10": 3,
         "11": 4,
-        "12": 8,
+        "12": 9,
         "13": 9,
         "14": 11,
         "15": 8,
@@ -19981,7 +20600,7 @@
         "19": 13,
         "20": 8,
         "21": 13,
-        "22": 13,
+        "22": 14,
         "23": 22
       },
       "monthsActive": 33
@@ -20166,7 +20785,7 @@
         "19": 11,
         "20": 4,
         "21": 6,
-        "22": 13,
+        "22": 14,
         "23": 7
       },
       "monthsActive": 33
@@ -20346,7 +20965,7 @@
         "13": 6,
         "14": 10,
         "15": 11,
-        "16": 10,
+        "16": 11,
         "17": 10,
         "18": 11,
         "19": 16,
@@ -20394,7 +21013,7 @@
         "0": 1,
         "1": 1,
         "2": 2,
-        "3": 1,
+        "3": 2,
         "4": 0,
         "5": 1,
         "6": 0,
@@ -21187,7 +21806,7 @@
         "0": 11,
         "1": 15,
         "2": 13,
-        "3": 9,
+        "3": 10,
         "4": 6,
         "5": 1,
         "6": 3,
@@ -21643,9 +22262,9 @@
       "uniqueTracksInWindow": 283,
       "timeOfDayDistribution": {
         "0": 3,
-        "1": 4,
+        "1": 5,
         "2": 3,
-        "3": 3,
+        "3": 4,
         "4": 0,
         "5": 0,
         "6": 0,
@@ -21657,7 +22276,7 @@
         "12": 4,
         "13": 4,
         "14": 1,
-        "15": 6,
+        "15": 7,
         "16": 1,
         "17": 2,
         "18": 1,
@@ -21667,7 +22286,7 @@
         "22": 5,
         "23": 3
       },
-      "monthsActive": 20
+      "monthsActive": 21
     }
   },
   {
@@ -21730,6 +22349,68 @@
         "23": 5
       },
       "monthsActive": 19
+    }
+  },
+  {
+    "id": "a99bcea26e75a66d6e20f6d7f072f280",
+    "trackName": "Female Robbery",
+    "artist": "The Neighbourhood",
+    "album": "I Love You.",
+    "trackUri": "spotify:track:4BDnfINTlfJPmLp1UV6CXt",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028265a736a1eb838ad5a0b921",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/4BDnfINTlfJPmLp1UV6CXt",
+    "dateRange": {
+      "start": "2023-05-22",
+      "end": "2023-06-18"
+    },
+    "playCount": 8,
+    "weeksCount": 4,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-06-05",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-06-05",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 932,
+      "uniqueTracksInWindow": 322,
+      "timeOfDayDistribution": {
+        "0": 6,
+        "1": 7,
+        "2": 7,
+        "3": 3,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 1,
+        "9": 2,
+        "10": 0,
+        "11": 1,
+        "12": 3,
+        "13": 4,
+        "14": 8,
+        "15": 2,
+        "16": 2,
+        "17": 4,
+        "18": 6,
+        "19": 3,
+        "20": 5,
+        "21": 3,
+        "22": 3,
+        "23": 4
+      },
+      "monthsActive": 21
     }
   },
   {
@@ -21834,7 +22515,7 @@
       "timeOfDayDistribution": {
         "0": 13,
         "1": 11,
-        "2": 9,
+        "2": 10,
         "3": 5,
         "4": 0,
         "5": 3,
@@ -21845,7 +22526,7 @@
         "10": 5,
         "11": 2,
         "12": 5,
-        "13": 5,
+        "13": 6,
         "14": 10,
         "15": 3,
         "16": 6,
@@ -21857,69 +22538,7 @@
         "22": 9,
         "23": 11
       },
-      "monthsActive": 33
-    }
-  },
-  {
-    "id": "a99bcea26e75a66d6e20f6d7f072f280",
-    "trackName": "Female Robbery",
-    "artist": "The Neighbourhood",
-    "album": "I Love You.",
-    "trackUri": "spotify:track:4BDnfINTlfJPmLp1UV6CXt",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028265a736a1eb838ad5a0b921",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/4BDnfINTlfJPmLp1UV6CXt",
-    "dateRange": {
-      "start": "2023-05-22",
-      "end": "2023-06-18"
-    },
-    "playCount": 8,
-    "weeksCount": 4,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2023-06-05",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-06-05",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "comeback",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 932,
-      "uniqueTracksInWindow": 322,
-      "timeOfDayDistribution": {
-        "0": 6,
-        "1": 7,
-        "2": 7,
-        "3": 3,
-        "4": 1,
-        "5": 0,
-        "6": 1,
-        "7": 0,
-        "8": 1,
-        "9": 2,
-        "10": 0,
-        "11": 1,
-        "12": 3,
-        "13": 4,
-        "14": 8,
-        "15": 2,
-        "16": 2,
-        "17": 3,
-        "18": 6,
-        "19": 3,
-        "20": 5,
-        "21": 3,
-        "22": 3,
-        "23": 4
-      },
-      "monthsActive": 20
+      "monthsActive": 34
     }
   },
   {
@@ -22035,7 +22654,7 @@
         "19": 11,
         "20": 4,
         "21": 6,
-        "22": 13,
+        "22": 14,
         "23": 7
       },
       "monthsActive": 33
@@ -22337,8 +22956,8 @@
     },
     "playCount": 5,
     "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2023-05-15",
     "peakDayPlays": 0,
     "hotDays": [],
@@ -22352,7 +22971,7 @@
       "uniqueTracksInWindow": 205,
       "timeOfDayDistribution": {
         "0": 5,
-        "1": 1,
+        "1": 2,
         "2": 4,
         "3": 3,
         "4": 0,
@@ -22480,8 +23099,8 @@
       "timeOfDayDistribution": {
         "0": 18,
         "1": 26,
-        "2": 25,
-        "3": 13,
+        "2": 26,
+        "3": 14,
         "4": 7,
         "5": 3,
         "6": 3,
@@ -22912,7 +23531,7 @@
         "0": 3,
         "1": 6,
         "2": 4,
-        "3": 1,
+        "3": 2,
         "4": 3,
         "5": 1,
         "6": 1,
@@ -22934,7 +23553,7 @@
         "22": 1,
         "23": 9
       },
-      "monthsActive": 18
+      "monthsActive": 19
     }
   },
   {
@@ -22974,7 +23593,7 @@
         "0": 8,
         "1": 6,
         "2": 3,
-        "3": 4,
+        "3": 5,
         "4": 2,
         "5": 1,
         "6": 0,
@@ -22996,7 +23615,7 @@
         "22": 2,
         "23": 2
       },
-      "monthsActive": 25
+      "monthsActive": 26
     }
   },
   {
@@ -23189,7 +23808,7 @@
         "13": 6,
         "14": 10,
         "15": 11,
-        "16": 10,
+        "16": 11,
         "17": 10,
         "18": 11,
         "19": 16,
@@ -23426,7 +24045,7 @@
         "19": 11,
         "20": 4,
         "21": 6,
-        "22": 13,
+        "22": 14,
         "23": 7
       },
       "monthsActive": 33
@@ -23538,7 +24157,7 @@
         "0": 1,
         "1": 1,
         "2": 2,
-        "3": 1,
+        "3": 2,
         "4": 0,
         "5": 1,
         "6": 0,
@@ -23757,6 +24376,63 @@
     }
   },
   {
+    "id": "a00a791992f0d74e7d8aac2d6f3e1677",
+    "trackName": "Female Robbery",
+    "artist": "The Neighbourhood",
+    "album": "I Love You.",
+    "trackUri": "spotify:track:4BDnfINTlfJPmLp1UV6CXt",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028265a736a1eb838ad5a0b921",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/4BDnfINTlfJPmLp1UV6CXt",
+    "dateRange": {
+      "start": "2023-04-17",
+      "end": "2023-04-30"
+    },
+    "playCount": 5,
+    "weeksCount": 2,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-04-17",
+    "peakDayPlays": 0,
+    "hotDays": [],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 461,
+      "uniqueTracksInWindow": 183,
+      "timeOfDayDistribution": {
+        "0": 6,
+        "1": 7,
+        "2": 7,
+        "3": 3,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 1,
+        "9": 2,
+        "10": 0,
+        "11": 1,
+        "12": 3,
+        "13": 4,
+        "14": 8,
+        "15": 2,
+        "16": 2,
+        "17": 4,
+        "18": 6,
+        "19": 3,
+        "20": 5,
+        "21": 3,
+        "22": 3,
+        "23": 4
+      },
+      "monthsActive": 21
+    }
+  },
+  {
     "id": "6c5dfa692f7ec0e13026f4261fd43d50",
     "trackName": "Brazil",
     "artist": "Declan McKenna",
@@ -23843,7 +24519,7 @@
       "timeOfDayDistribution": {
         "0": 13,
         "1": 11,
-        "2": 9,
+        "2": 10,
         "3": 5,
         "4": 0,
         "5": 3,
@@ -23854,7 +24530,7 @@
         "10": 5,
         "11": 2,
         "12": 5,
-        "13": 5,
+        "13": 6,
         "14": 10,
         "15": 3,
         "16": 6,
@@ -23866,7 +24542,7 @@
         "22": 9,
         "23": 11
       },
-      "monthsActive": 33
+      "monthsActive": 34
     }
   },
   {
@@ -23927,63 +24603,6 @@
     }
   },
   {
-    "id": "a00a791992f0d74e7d8aac2d6f3e1677",
-    "trackName": "Female Robbery",
-    "artist": "The Neighbourhood",
-    "album": "I Love You.",
-    "trackUri": "spotify:track:4BDnfINTlfJPmLp1UV6CXt",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028265a736a1eb838ad5a0b921",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/4BDnfINTlfJPmLp1UV6CXt",
-    "dateRange": {
-      "start": "2023-04-17",
-      "end": "2023-04-30"
-    },
-    "playCount": 5,
-    "weeksCount": 2,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2023-04-17",
-    "peakDayPlays": 0,
-    "hotDays": [],
-    "insightTypes": [
-      "burst",
-      "comeback",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 461,
-      "uniqueTracksInWindow": 183,
-      "timeOfDayDistribution": {
-        "0": 6,
-        "1": 7,
-        "2": 7,
-        "3": 3,
-        "4": 1,
-        "5": 0,
-        "6": 1,
-        "7": 0,
-        "8": 1,
-        "9": 2,
-        "10": 0,
-        "11": 1,
-        "12": 3,
-        "13": 4,
-        "14": 8,
-        "15": 2,
-        "16": 2,
-        "17": 3,
-        "18": 6,
-        "19": 3,
-        "20": 5,
-        "21": 3,
-        "22": 3,
-        "23": 4
-      },
-      "monthsActive": 20
-    }
-  },
-  {
     "id": "f18fe1afe7df671e39c367f54537c8a5",
     "trackName": "Cigarette Daydreams",
     "artist": "Cage The Elephant",
@@ -24017,7 +24636,7 @@
       "totalPlaysInWindow": 403,
       "uniqueTracksInWindow": 176,
       "timeOfDayDistribution": {
-        "0": 8,
+        "0": 9,
         "1": 6,
         "2": 9,
         "3": 9,
@@ -24042,7 +24661,7 @@
         "22": 9,
         "23": 4
       },
-      "monthsActive": 35
+      "monthsActive": 36
     }
   },
   {
@@ -24264,7 +24883,7 @@
       "timeOfDayDistribution": {
         "0": 4,
         "1": 5,
-        "2": 3,
+        "2": 4,
         "3": 2,
         "4": 1,
         "5": 0,
@@ -24287,7 +24906,7 @@
         "22": 1,
         "23": 3
       },
-      "monthsActive": 14
+      "monthsActive": 15
     }
   },
   {
@@ -24410,7 +25029,7 @@
         "1": 9,
         "2": 10,
         "3": 11,
-        "4": 3,
+        "4": 4,
         "5": 4,
         "6": 3,
         "7": 2,
@@ -24427,7 +25046,7 @@
         "18": 8,
         "19": 13,
         "20": 6,
-        "21": 10,
+        "21": 11,
         "22": 10,
         "23": 11
       },
@@ -24615,7 +25234,7 @@
         "9": 1,
         "10": 3,
         "11": 4,
-        "12": 8,
+        "12": 9,
         "13": 9,
         "14": 11,
         "15": 8,
@@ -24625,7 +25244,7 @@
         "19": 13,
         "20": 8,
         "21": 13,
-        "22": 13,
+        "22": 14,
         "23": 22
       },
       "monthsActive": 33
@@ -25042,10 +25661,10 @@
         "19": 2,
         "20": 2,
         "21": 5,
-        "22": 3,
-        "23": 4
+        "22": 4,
+        "23": 5
       },
-      "monthsActive": 21
+      "monthsActive": 22
     }
   },
   {
@@ -25399,9 +26018,9 @@
         "20": 7,
         "21": 6,
         "22": 4,
-        "23": 5
+        "23": 6
       },
-      "monthsActive": 24
+      "monthsActive": 25
     }
   },
   {
@@ -25760,7 +26379,7 @@
         "0": 9,
         "1": 14,
         "2": 10,
-        "3": 4,
+        "3": 5,
         "4": 5,
         "5": 1,
         "6": 1,
@@ -25782,7 +26401,7 @@
         "22": 6,
         "23": 11
       },
-      "monthsActive": 29
+      "monthsActive": 30
     }
   },
   {
@@ -25820,9 +26439,9 @@
       "uniqueTracksInWindow": 274,
       "timeOfDayDistribution": {
         "0": 3,
-        "1": 4,
+        "1": 5,
         "2": 3,
-        "3": 3,
+        "3": 4,
         "4": 0,
         "5": 0,
         "6": 0,
@@ -25834,7 +26453,7 @@
         "12": 4,
         "13": 4,
         "14": 1,
-        "15": 6,
+        "15": 7,
         "16": 1,
         "17": 2,
         "18": 1,
@@ -25844,7 +26463,7 @@
         "22": 5,
         "23": 3
       },
-      "monthsActive": 20
+      "monthsActive": 21
     }
   },
   {
@@ -26212,7 +26831,7 @@
         "19": 11,
         "20": 4,
         "21": 6,
-        "22": 13,
+        "22": 14,
         "23": 7
       },
       "monthsActive": 33
@@ -26459,7 +27078,7 @@
         "0": 3,
         "1": 6,
         "2": 2,
-        "3": 6,
+        "3": 7,
         "4": 5,
         "5": 3,
         "6": 2,
@@ -26468,7 +27087,7 @@
         "9": 1,
         "10": 0,
         "11": 2,
-        "12": 0,
+        "12": 1,
         "13": 1,
         "14": 3,
         "15": 3,
@@ -26478,10 +27097,10 @@
         "19": 4,
         "20": 7,
         "21": 0,
-        "22": 7,
+        "22": 8,
         "23": 5
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
@@ -27138,7 +27757,7 @@
       "totalPlaysInWindow": 900,
       "uniqueTracksInWindow": 249,
       "timeOfDayDistribution": {
-        "0": 8,
+        "0": 9,
         "1": 6,
         "2": 9,
         "3": 9,
@@ -27163,7 +27782,7 @@
         "22": 9,
         "23": 4
       },
-      "monthsActive": 35
+      "monthsActive": 36
     }
   },
   {
@@ -28031,7 +28650,7 @@
         "13": 6,
         "14": 10,
         "15": 11,
-        "16": 10,
+        "16": 11,
         "17": 10,
         "18": 11,
         "19": 16,
@@ -28082,9 +28701,9 @@
       "uniqueTracksInWindow": 121,
       "timeOfDayDistribution": {
         "0": 3,
-        "1": 4,
+        "1": 5,
         "2": 3,
-        "3": 3,
+        "3": 4,
         "4": 0,
         "5": 0,
         "6": 0,
@@ -28096,7 +28715,7 @@
         "12": 4,
         "13": 4,
         "14": 1,
-        "15": 6,
+        "15": 7,
         "16": 1,
         "17": 2,
         "18": 1,
@@ -28106,7 +28725,7 @@
         "22": 5,
         "23": 3
       },
-      "monthsActive": 20
+      "monthsActive": 21
     }
   },
   {
@@ -28953,72 +29572,6 @@
     }
   },
   {
-    "id": "f1d672eb78c5cf1a1af5fd5f7b911fef",
-    "trackName": "Sundress",
-    "artist": "A$AP Rocky",
-    "album": "Sundress",
-    "trackUri": "spotify:track:2aPTvyE09vUCRwVvj0I8WK",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021ae967e4a02c7a39eb3c189b",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/2aPTvyE09vUCRwVvj0I8WK",
-    "dateRange": {
-      "start": "2023-02-06",
-      "end": "2023-03-26"
-    },
-    "playCount": 22,
-    "weeksCount": 7,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2023-02-17",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-02-17",
-        "plays": 2
-      },
-      {
-        "date": "2023-03-16",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "comeback",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 1941,
-      "uniqueTracksInWindow": 319,
-      "timeOfDayDistribution": {
-        "0": 5,
-        "1": 1,
-        "2": 4,
-        "3": 3,
-        "4": 0,
-        "5": 1,
-        "6": 0,
-        "7": 1,
-        "8": 0,
-        "9": 0,
-        "10": 1,
-        "11": 1,
-        "12": 5,
-        "13": 4,
-        "14": 2,
-        "15": 5,
-        "16": 1,
-        "17": 1,
-        "18": 6,
-        "19": 2,
-        "20": 2,
-        "21": 9,
-        "22": 1,
-        "23": 5
-      },
-      "monthsActive": 19
-    }
-  },
-  {
     "id": "fd2b2fb4336fe7db935fcf2bdaa3d13e",
     "trackName": "NEW MAGIC WAND",
     "artist": "Tyler, The Creator",
@@ -29151,6 +29704,68 @@
         "23": 3
       },
       "monthsActive": 19
+    }
+  },
+  {
+    "id": "c54a52b53facdacf7bd62c6e805d9ffc",
+    "trackName": "Female Robbery",
+    "artist": "The Neighbourhood",
+    "album": "I Love You.",
+    "trackUri": "spotify:track:4BDnfINTlfJPmLp1UV6CXt",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028265a736a1eb838ad5a0b921",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/4BDnfINTlfJPmLp1UV6CXt",
+    "dateRange": {
+      "start": "2023-02-06",
+      "end": "2023-03-26"
+    },
+    "playCount": 18,
+    "weeksCount": 7,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-02-10",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-02-10",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 1941,
+      "uniqueTracksInWindow": 319,
+      "timeOfDayDistribution": {
+        "0": 6,
+        "1": 7,
+        "2": 7,
+        "3": 3,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 1,
+        "9": 2,
+        "10": 0,
+        "11": 1,
+        "12": 3,
+        "13": 4,
+        "14": 8,
+        "15": 2,
+        "16": 2,
+        "17": 4,
+        "18": 6,
+        "19": 3,
+        "20": 5,
+        "21": 3,
+        "22": 3,
+        "23": 4
+      },
+      "monthsActive": 21
     }
   },
   {
@@ -29308,7 +29923,7 @@
       "totalPlaysInWindow": 555,
       "uniqueTracksInWindow": 160,
       "timeOfDayDistribution": {
-        "0": 8,
+        "0": 9,
         "1": 6,
         "2": 9,
         "3": 9,
@@ -29333,7 +29948,7 @@
         "22": 9,
         "23": 4
       },
-      "monthsActive": 35
+      "monthsActive": 36
     }
   },
   {
@@ -29511,6 +30126,72 @@
     }
   },
   {
+    "id": "f1d672eb78c5cf1a1af5fd5f7b911fef",
+    "trackName": "Sundress",
+    "artist": "A$AP Rocky",
+    "album": "Sundress",
+    "trackUri": "spotify:track:2aPTvyE09vUCRwVvj0I8WK",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021ae967e4a02c7a39eb3c189b",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/2aPTvyE09vUCRwVvj0I8WK",
+    "dateRange": {
+      "start": "2023-02-06",
+      "end": "2023-03-26"
+    },
+    "playCount": 22,
+    "weeksCount": 7,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2023-02-17",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-02-17",
+        "plays": 2
+      },
+      {
+        "date": "2023-03-16",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 1941,
+      "uniqueTracksInWindow": 319,
+      "timeOfDayDistribution": {
+        "0": 5,
+        "1": 2,
+        "2": 4,
+        "3": 3,
+        "4": 0,
+        "5": 1,
+        "6": 0,
+        "7": 1,
+        "8": 0,
+        "9": 0,
+        "10": 1,
+        "11": 1,
+        "12": 5,
+        "13": 4,
+        "14": 2,
+        "15": 5,
+        "16": 1,
+        "17": 1,
+        "18": 6,
+        "19": 2,
+        "20": 2,
+        "21": 9,
+        "22": 1,
+        "23": 5
+      },
+      "monthsActive": 19
+    }
+  },
+  {
     "id": "106a804f4b3da55e4e3dad3ab138e976",
     "trackName": "Les",
     "artist": "Childish Gambino",
@@ -29562,7 +30243,7 @@
       "timeOfDayDistribution": {
         "0": 13,
         "1": 11,
-        "2": 9,
+        "2": 10,
         "3": 5,
         "4": 0,
         "5": 3,
@@ -29573,7 +30254,7 @@
         "10": 5,
         "11": 2,
         "12": 5,
-        "13": 5,
+        "13": 6,
         "14": 10,
         "15": 3,
         "16": 6,
@@ -29585,7 +30266,7 @@
         "22": 9,
         "23": 11
       },
-      "monthsActive": 33
+      "monthsActive": 34
     }
   },
   {
@@ -29717,68 +30398,6 @@
         "23": 3
       },
       "monthsActive": 15
-    }
-  },
-  {
-    "id": "c54a52b53facdacf7bd62c6e805d9ffc",
-    "trackName": "Female Robbery",
-    "artist": "The Neighbourhood",
-    "album": "I Love You.",
-    "trackUri": "spotify:track:4BDnfINTlfJPmLp1UV6CXt",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028265a736a1eb838ad5a0b921",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/4BDnfINTlfJPmLp1UV6CXt",
-    "dateRange": {
-      "start": "2023-02-06",
-      "end": "2023-03-26"
-    },
-    "playCount": 18,
-    "weeksCount": 7,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2023-02-10",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-02-10",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "comeback",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 1941,
-      "uniqueTracksInWindow": 319,
-      "timeOfDayDistribution": {
-        "0": 6,
-        "1": 7,
-        "2": 7,
-        "3": 3,
-        "4": 1,
-        "5": 0,
-        "6": 1,
-        "7": 0,
-        "8": 1,
-        "9": 2,
-        "10": 0,
-        "11": 1,
-        "12": 3,
-        "13": 4,
-        "14": 8,
-        "15": 2,
-        "16": 2,
-        "17": 3,
-        "18": 6,
-        "19": 3,
-        "20": 5,
-        "21": 3,
-        "22": 3,
-        "23": 4
-      },
-      "monthsActive": 20
     }
   },
   {
@@ -30281,9 +30900,9 @@
       "uniqueTracksInWindow": 171,
       "timeOfDayDistribution": {
         "0": 3,
-        "1": 4,
+        "1": 5,
         "2": 3,
-        "3": 3,
+        "3": 4,
         "4": 0,
         "5": 0,
         "6": 0,
@@ -30295,7 +30914,7 @@
         "12": 4,
         "13": 4,
         "14": 1,
-        "15": 6,
+        "15": 7,
         "16": 1,
         "17": 2,
         "18": 1,
@@ -30305,7 +30924,7 @@
         "22": 5,
         "23": 3
       },
-      "monthsActive": 20
+      "monthsActive": 21
     }
   },
   {
@@ -30425,8 +31044,8 @@
       "timeOfDayDistribution": {
         "0": 18,
         "1": 26,
-        "2": 25,
-        "3": 13,
+        "2": 26,
+        "3": 14,
         "4": 7,
         "5": 3,
         "6": 3,
@@ -31440,7 +32059,7 @@
         "0": 3,
         "1": 6,
         "2": 4,
-        "3": 1,
+        "3": 2,
         "4": 3,
         "5": 1,
         "6": 1,
@@ -31462,7 +32081,7 @@
         "22": 1,
         "23": 9
       },
-      "monthsActive": 18
+      "monthsActive": 19
     }
   },
   {
@@ -31634,7 +32253,7 @@
         "0": 8,
         "1": 6,
         "2": 3,
-        "3": 4,
+        "3": 5,
         "4": 2,
         "5": 1,
         "6": 0,
@@ -31656,7 +32275,7 @@
         "22": 2,
         "23": 2
       },
-      "monthsActive": 25
+      "monthsActive": 26
     }
   },
   {
@@ -32047,7 +32666,7 @@
         "9": 1,
         "10": 3,
         "11": 4,
-        "12": 8,
+        "12": 9,
         "13": 9,
         "14": 11,
         "15": 8,
@@ -32057,7 +32676,7 @@
         "19": 13,
         "20": 8,
         "21": 13,
-        "22": 13,
+        "22": 14,
         "23": 22
       },
       "monthsActive": 33
@@ -32100,7 +32719,7 @@
         "0": 3,
         "1": 6,
         "2": 2,
-        "3": 6,
+        "3": 7,
         "4": 5,
         "5": 3,
         "6": 2,
@@ -32109,7 +32728,7 @@
         "9": 1,
         "10": 0,
         "11": 2,
-        "12": 0,
+        "12": 1,
         "13": 1,
         "14": 3,
         "15": 3,
@@ -32119,10 +32738,10 @@
         "19": 4,
         "20": 7,
         "21": 0,
-        "22": 7,
+        "22": 8,
         "23": 5
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
@@ -32183,7 +32802,7 @@
         "13": 6,
         "14": 10,
         "15": 11,
-        "16": 10,
+        "16": 11,
         "17": 10,
         "18": 11,
         "19": 16,
@@ -32248,7 +32867,7 @@
         "0": 11,
         "1": 15,
         "2": 13,
-        "3": 9,
+        "3": 10,
         "4": 6,
         "5": 1,
         "6": 3,
@@ -32591,9 +33210,9 @@
         "20": 7,
         "21": 6,
         "22": 4,
-        "23": 5
+        "23": 6
       },
-      "monthsActive": 24
+      "monthsActive": 25
     }
   },
   {
@@ -32650,7 +33269,7 @@
         "1": 9,
         "2": 10,
         "3": 11,
-        "4": 3,
+        "4": 4,
         "5": 4,
         "6": 3,
         "7": 2,
@@ -32667,7 +33286,7 @@
         "18": 8,
         "19": 13,
         "20": 6,
-        "21": 10,
+        "21": 11,
         "22": 10,
         "23": 11
       },
@@ -32775,8 +33394,8 @@
       "timeOfDayDistribution": {
         "0": 18,
         "1": 26,
-        "2": 25,
-        "3": 13,
+        "2": 26,
+        "3": 14,
         "4": 7,
         "5": 3,
         "6": 3,
@@ -33110,6 +33729,68 @@
         "19": 2,
         "20": 2,
         "21": 5,
+        "22": 4,
+        "23": 5
+      },
+      "monthsActive": 22
+    }
+  },
+  {
+    "id": "80789ec938fa13adb64a3887200ba9e7",
+    "trackName": "Female Robbery",
+    "artist": "The Neighbourhood",
+    "album": "I Love You.",
+    "trackUri": "spotify:track:4BDnfINTlfJPmLp1UV6CXt",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028265a736a1eb838ad5a0b921",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/4BDnfINTlfJPmLp1UV6CXt",
+    "dateRange": {
+      "start": "2023-01-09",
+      "end": "2023-01-29"
+    },
+    "playCount": 8,
+    "weeksCount": 3,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-01-23",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-01-23",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 548,
+      "uniqueTracksInWindow": 143,
+      "timeOfDayDistribution": {
+        "0": 6,
+        "1": 7,
+        "2": 7,
+        "3": 3,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 1,
+        "9": 2,
+        "10": 0,
+        "11": 1,
+        "12": 3,
+        "13": 4,
+        "14": 8,
+        "15": 2,
+        "16": 2,
+        "17": 4,
+        "18": 6,
+        "19": 3,
+        "20": 5,
+        "21": 3,
         "22": 3,
         "23": 4
       },
@@ -33463,7 +34144,7 @@
       "timeOfDayDistribution": {
         "0": 13,
         "1": 11,
-        "2": 9,
+        "2": 10,
         "3": 5,
         "4": 0,
         "5": 3,
@@ -33474,7 +34155,7 @@
         "10": 5,
         "11": 2,
         "12": 5,
-        "13": 5,
+        "13": 6,
         "14": 10,
         "15": 3,
         "16": 6,
@@ -33486,7 +34167,7 @@
         "22": 9,
         "23": 11
       },
-      "monthsActive": 33
+      "monthsActive": 34
     }
   },
   {
@@ -33526,7 +34207,7 @@
         "0": 3,
         "1": 6,
         "2": 4,
-        "3": 1,
+        "3": 2,
         "4": 3,
         "5": 1,
         "6": 1,
@@ -33548,7 +34229,7 @@
         "22": 1,
         "23": 9
       },
-      "monthsActive": 18
+      "monthsActive": 19
     }
   },
   {
@@ -33847,68 +34528,6 @@
         "23": 7
       },
       "monthsActive": 25
-    }
-  },
-  {
-    "id": "80789ec938fa13adb64a3887200ba9e7",
-    "trackName": "Female Robbery",
-    "artist": "The Neighbourhood",
-    "album": "I Love You.",
-    "trackUri": "spotify:track:4BDnfINTlfJPmLp1UV6CXt",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028265a736a1eb838ad5a0b921",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/4BDnfINTlfJPmLp1UV6CXt",
-    "dateRange": {
-      "start": "2023-01-09",
-      "end": "2023-01-29"
-    },
-    "playCount": 8,
-    "weeksCount": 3,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2023-01-23",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-01-23",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "comeback",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 548,
-      "uniqueTracksInWindow": 143,
-      "timeOfDayDistribution": {
-        "0": 6,
-        "1": 7,
-        "2": 7,
-        "3": 3,
-        "4": 1,
-        "5": 0,
-        "6": 1,
-        "7": 0,
-        "8": 1,
-        "9": 2,
-        "10": 0,
-        "11": 1,
-        "12": 3,
-        "13": 4,
-        "14": 8,
-        "15": 2,
-        "16": 2,
-        "17": 3,
-        "18": 6,
-        "19": 3,
-        "20": 5,
-        "21": 3,
-        "22": 3,
-        "23": 4
-      },
-      "monthsActive": 20
     }
   },
   {
@@ -34460,9 +35079,9 @@
         "20": 7,
         "21": 6,
         "22": 4,
-        "23": 5
+        "23": 6
       },
-      "monthsActive": 24
+      "monthsActive": 25
     }
   },
   {
@@ -34775,7 +35394,7 @@
         "0": 3,
         "1": 6,
         "2": 2,
-        "3": 6,
+        "3": 7,
         "4": 5,
         "5": 3,
         "6": 2,
@@ -34784,7 +35403,7 @@
         "9": 1,
         "10": 0,
         "11": 2,
-        "12": 0,
+        "12": 1,
         "13": 1,
         "14": 3,
         "15": 3,
@@ -34794,10 +35413,10 @@
         "19": 4,
         "20": 7,
         "21": 0,
-        "22": 7,
+        "22": 8,
         "23": 5
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
