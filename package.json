@@ -21,7 +21,8 @@
     "spotify:pull": "tsx scripts/pull_spotify.ts",
     "spotify:rebuild": "npm run spotify:refresh && npm run spotify:analyze",
     "spotify:sync": "npm run spotify:pull && npm run spotify:analyze",
-    "spotify:auth": "tsx scripts/spotify_auth.ts"
+    "spotify:auth": "tsx scripts/spotify_auth.ts",
+    "sync:soundtracks": "tsx scripts/sync_soundtracks.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
