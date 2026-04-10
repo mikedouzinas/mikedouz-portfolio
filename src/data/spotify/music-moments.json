@@ -1,6 +1,6 @@
 [
   {
-    "id": "0644f2571275fe7a5c998cb60d91c778",
+    "id": "269b9b3305c9c19a9e435c3252e47b25",
     "trackName": "Fallen Star",
     "artist": "The Neighbourhood",
     "album": "Fallen Star",
@@ -10,10 +10,10 @@
     "spotifyUrl": "https://open.spotify.com/track/60F6pgM6H6miNr5AmjxwjL",
     "dateRange": {
       "start": "2026-03-30",
-      "end": "2026-04-05"
+      "end": "2026-04-12"
     },
-    "playCount": 6,
-    "weeksCount": 1,
+    "playCount": 8,
+    "weeksCount": 2,
     "intensity": 1,
     "maxState": 1,
     "peakDay": "2026-04-01",
