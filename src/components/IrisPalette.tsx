@@ -418,6 +418,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
   const panelRef = useRef<HTMLDivElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
   const loadingClearedRef = useRef(false); // Track if loading config has been cleared
+  const abortControllerRef = useRef<AbortController | null>(null); // Abort in-flight streams on close
+  const revealTimerRef = useRef<ReturnType<typeof setInterval> | null>(null); // Word-by-word reveal timer
 
   /**
    * Check if content overflows and user is not at bottom
@@ -730,6 +732,13 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
     
     // Reset all state when closing, including view mode
     if (!open) {
+      // Abort any in-flight stream so it doesn't race with the next query
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = null;
+      if (revealTimerRef.current) {
+        clearInterval(revealTimerRef.current);
+        revealTimerRef.current = null;
+      }
       setViewMode('suggestions');
       setQuery('');
       setSelectedIndex(0);
@@ -1062,8 +1071,16 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
       // Searching phase (no longer tracking loading phases)
 
+      // Abort any previous in-flight request before starting a new one
+      abortControllerRef.current?.abort();
+      if (revealTimerRef.current) {
+        clearInterval(revealTimerRef.current);
+        revealTimerRef.current = null;
+      }
+
       // Create AbortController for timeout handling
       const controller = new AbortController();
+      abortControllerRef.current = controller;
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
       // Build query params
@@ -1147,7 +1164,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
           // Word-by-word reveal: tokens from Claude accumulate in a buffer,
           // a timer releases them one word at a time for smooth left-to-right flow
           let revealedLength = 0;
-          let revealTimer: ReturnType<typeof setInterval> | null = null;
+          revealTimerRef.current = null;
 
           const clearLoadingOnce = () => {
             if (!loadingClearedRef.current) {
@@ -1168,8 +1185,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
           };
 
           const startReveal = () => {
-            if (revealTimer) return;
-            revealTimer = setInterval(() => {
+            if (revealTimerRef.current) return;
+            revealTimerRef.current = setInterval(() => {
               if (revealedLength >= accumulatedAnswer.length) return;
               // Advance to the next word boundary
               let next = revealedLength;
@@ -1232,7 +1249,8 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
           }
 
           // Stop reveal timer and flush remaining text immediately
-          if (revealTimer) clearInterval(revealTimer);
+          if (revealTimerRef.current) clearInterval(revealTimerRef.current);
+          revealTimerRef.current = null;
           setAnswer(accumulatedAnswer);
           clearLoadingOnce();
         }
@@ -1289,17 +1307,26 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         setAnswer(answerText);
       }
     } catch (error) {
-      console.error('[IrisPalette] Failed to get answer:', error);
-      
-      // Check if it's a timeout error
+      // Clean up reveal timer on any error (it's scoped inside try, so won't reach post-stream cleanup)
+      if (revealTimerRef.current) {
+        clearInterval(revealTimerRef.current);
+        revealTimerRef.current = null;
+      }
+
       if (error instanceof Error && error.name === 'AbortError') {
+        // If the palette was closed (controller cleared), silently discard — palette is gone
+        if (!abortControllerRef.current) return;
+        // Otherwise it was a timeout
         setAnswer('⏱️ Your request timed out due to slow internet connection. Please check your WiFi and try again.');
       } else if (error instanceof Error && error.message.includes('fetch')) {
+        console.error('[IrisPalette] Failed to get answer:', error);
         setAnswer('🌐 Network error: Unable to connect to the server. Please check your internet connection and try again.');
       } else {
+        console.error('[IrisPalette] Failed to get answer:', error);
         setAnswer('Sorry, I couldn\'t process your question. Please try again or rephrase it.');
       }
     } finally {
+      abortControllerRef.current = null;
       setIsProcessingQuery(false);
       setMainLoadingConfig(null); // Clear loading config when processing stops
       setMainLoadingStartTime(null); // Clear loading start time

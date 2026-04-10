@@ -126,9 +126,13 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
   const actions: QuickAction[] = [];
   const { fullAnswer, intent, results, rankings, depth = 0, visitedNodes: _visitedNodes = [] } = context;
 
-  // Handle contact directive
-  if (hasContactDirective(fullAnswer)) {
-    return generateContactActions();
+  // Handle contact intent or contact directive — show LinkedIn, GitHub, Email buttons
+  if (intent === 'contact' || hasContactDirective(fullAnswer)) {
+    const contactActions = generateContactActions();
+    if (depth < 4) {
+      contactActions.push({ type: 'custom_input', label: 'Ask a follow up...' });
+    }
+    return contactActions;
   }
 
   // Depth limiting

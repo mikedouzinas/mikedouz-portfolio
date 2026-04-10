@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -26,9 +26,20 @@ export function useBlogIris(slug: string) {
     error: null,
   });
   const abortRef = useRef<AbortController | null>(null);
+  const revealTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const messagesRef = useRef<Message[]>([]);
 
   messagesRef.current = state.messages;
+
+  // Abort in-flight stream on unmount (e.g., navigating away from the post)
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+      if (revealTimerRef.current) {
+        clearInterval(revealTimerRef.current);
+      }
+    };
+  }, []);
 
   const sendMessage = useCallback(async (message: string, passage: string) => {
     const newMessages: Message[] = [...messagesRef.current, { role: 'user', content: message }];
@@ -48,18 +59,21 @@ export function useBlogIris(slug: string) {
         signal: abortRef.current.signal,
       });
 
-      if (!res.ok) throw new Error('API error');
-      if (!res.body) throw new Error('No stream');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || 'Something went wrong. Try again.');
+      }
+      if (!res.body) throw new Error('Something went wrong. Try again.');
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let assistantContent = '';
       let revealedLength = 0;
-      let revealTimer: ReturnType<typeof setInterval> | null = null;
+      revealTimerRef.current = null;
 
       const startReveal = () => {
-        if (revealTimer) return;
-        revealTimer = setInterval(() => {
+        if (revealTimerRef.current) return;
+        revealTimerRef.current = setInterval(() => {
           if (revealedLength >= assistantContent.length) return;
           let next = revealedLength;
           while (next < assistantContent.length && assistantContent[next] !== ' ' && assistantContent[next] !== '\n') next++;
@@ -90,7 +104,8 @@ export function useBlogIris(slug: string) {
         }
       }
 
-      if (revealTimer) clearInterval(revealTimer);
+      if (revealTimerRef.current) clearInterval(revealTimerRef.current);
+      revealTimerRef.current = null;
 
       // Drain remaining words
       const finishReveal = () => {
@@ -114,8 +129,13 @@ export function useBlogIris(slug: string) {
       };
       finishReveal();
     } catch (err) {
+      if (revealTimerRef.current) {
+        clearInterval(revealTimerRef.current);
+        revealTimerRef.current = null;
+      }
       if ((err as Error).name !== 'AbortError') {
-        setState((s) => ({ ...s, phase: 'error', error: 'Something went wrong. Try again.' }));
+        const message = (err as Error).message || 'Something went wrong. Try again.';
+        setState((s) => ({ ...s, phase: 'error', error: message }));
       }
     }
   }, [slug]);
@@ -168,6 +188,11 @@ export function useBlogIris(slug: string) {
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
+    abortRef.current = null;
+    if (revealTimerRef.current) {
+      clearInterval(revealTimerRef.current);
+      revealTimerRef.current = null;
+    }
     setState({ messages: [], phase: 'idle', draft: '', draftType: null, error: null });
   }, []);
 

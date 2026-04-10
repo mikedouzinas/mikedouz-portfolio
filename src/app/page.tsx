@@ -12,6 +12,7 @@ import { useDeepMode } from '@/components/DeepModeContext';
 import DeepModeBorder from '@/components/DeepModeBorder';
 import ExpandableSection from '@/components/ExpandableSection';
 import InProgressSection from '@/components/InProgressSection';
+import WebBanner from '@/components/WebBanner';
 import { workExperiences, projects, blogs } from '@/data/loaders';
 
 
@@ -69,6 +70,13 @@ function HomeContent() {
           {/* About Section */}
           <section id="about" className="hidden md:block md:mt-16">
             <About />
+          </section>
+
+          {/* The Web: new post banner */}
+          <section className="!mt-4 md:!mt-8 !mb-0">
+            <div className="max-w-[42rem] mx-auto">
+              <WebBanner />
+            </div>
           </section>
 
           {/* Experience Section */}

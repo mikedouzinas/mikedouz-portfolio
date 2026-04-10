@@ -240,7 +240,7 @@ export async function createNoContextResponse(query?: string, intent?: string): 
     const fallbackMessage =
       `Mike hasn't shared anything about that yet. Here are some ways to explore what he has shared:\n\n` +
       `**Quick Actions:** Use the buttons below to see his projects, experiences, and more.\n\n` +
-      `**Search Bar:** You can also type a new question in the search bar above to explore different topics.\n\n`
+      `**Search Bar:** You can also type a new question in the search bar to explore different topics.\n\n`
     // Debug: Log fallback message
     console.log(`Fallback Message Length: ${fallbackMessage.length} characters`);
     console.log('\nFallback Response:');

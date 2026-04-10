@@ -13,7 +13,7 @@ import {
 
 const RequestSchema = z.object({
   message: z.string().min(1).max(2000),
-  passage: z.string().min(1).max(1000),
+  passage: z.string().min(1).max(5000),
   mode: z.enum(['conversation', 'draft_comment', 'draft_message']),
   history: z.array(z.object({
     role: z.enum(['user', 'assistant']),
@@ -43,7 +43,16 @@ export async function POST(
   let body;
   try {
     body = RequestSchema.parse(await request.json());
-  } catch {
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      const passageError = err.issues.find((e: z.ZodIssue) => e.path.includes('passage'));
+      if (passageError) {
+        return Response.json(
+          { error: 'Please highlight a smaller amount of text and try again.' },
+          { status: 400 }
+        );
+      }
+    }
     return Response.json({ error: 'Invalid request' }, { status: 400 });
   }
 
@@ -83,7 +92,7 @@ export async function POST(
 
     const stream = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
+      max_tokens: 2048,
       system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
       messages,
       stream: true,
