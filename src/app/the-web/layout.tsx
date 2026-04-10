@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import MouseGlow from '@/components/mouse_glow';
+import WebPattern from './components/WebPattern';
 
 export const metadata: Metadata = {
   title: 'The Web | Mike Veson',
@@ -13,5 +15,11 @@ export const metadata: Metadata = {
 };
 
 export default function BlogLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <MouseGlow color="#2dd4bf" />
+      <WebPattern />
+      {children}
+    </>
+  );
 }

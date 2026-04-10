@@ -1,7 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-export default function MouseGlow() {
+interface MouseGlowProps {
+  color?: string; // CSS color for the glow (default: blue)
+}
+
+export default function MouseGlow({ color }: MouseGlowProps = {}) {
   const [position, setPosition] = useState({ x: -100, y: -100 });
   // Track whether cursor is over an element with custom glow (to hide global glow)
   const [isOverCustomGlow, setIsOverCustomGlow] = useState(false);
@@ -75,7 +79,10 @@ export default function MouseGlow() {
       }}
     >
       {/* Simple ring-style glow that looked better than the gradient approach */}
-      <div className="w-20 h-20 bg-blue-300 dark:bg-blue-500 opacity-50 rounded-full filter blur-3xl mix-blend-screen" />
+      <div
+        className={`w-20 h-20 opacity-50 rounded-full filter blur-3xl mix-blend-screen ${color ? '' : 'bg-blue-300 dark:bg-blue-500'}`}
+        style={color ? { backgroundColor: color } : undefined}
+      />
     </div>
   );
 }

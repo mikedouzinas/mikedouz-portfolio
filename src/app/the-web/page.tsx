@@ -3,12 +3,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import MouseGlow from "@/components/mouse_glow";
 import { BlogPostPreview } from "@/lib/blog";
 import PostCard from "./components/PostCard";
 import TagFilter from "./components/TagFilter";
 import SearchBar from "./components/SearchBar";
-import WebPattern from "./components/WebPattern";
 import WebLoader from "./components/WebLoader";
 import SubscribeWidget from "./components/SubscribeWidget";
 
@@ -94,8 +92,6 @@ export default function BlogPage() {
           </motion.div>
         )}
       </AnimatePresence>
-      <MouseGlow />
-      <WebPattern />
 
       <div className="relative max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
         <motion.div
