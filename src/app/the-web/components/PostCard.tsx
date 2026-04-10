@@ -12,7 +12,7 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, index }: PostCardProps) {
-  const glowColor = post.theme?.accent_color || "45, 212, 191";
+  const glowColor = "45, 212, 191";
 
   const formattedDate = new Date(post.published_at).toLocaleDateString(
     "en-US",
