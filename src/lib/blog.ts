@@ -19,6 +19,13 @@ export interface BlogPostTheme {
   custom_class?: string;
 }
 
+export interface SoundtrackTrack {
+  trackUri: string;      // "spotify:track:xxx"
+  trackName: string;
+  artist: string;
+  albumArtUrl: string;   // Spotify CDN image URL
+}
+
 export interface BlogPost {
   id: string;
   slug: string;
@@ -34,6 +41,7 @@ export interface BlogPost {
   images: { url: string; alt?: string }[];
   theme: BlogPostTheme;
   iris_context?: string | null;
+  soundtrack: SoundtrackTrack[] | null;
 }
 
 export interface BlogPostPreview {
@@ -61,6 +69,7 @@ export interface CreateBlogPostInput {
   theme?: BlogPostTheme;
   status?: 'draft' | 'published';
   iris_context?: string;
+  soundtrack?: SoundtrackTrack[];
 }
 
 // ---------------------------------------------------------------------------
@@ -183,7 +192,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
 
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context')
+    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context, soundtrack')
     .eq('slug', slug)
     .eq('status', 'published')
     .single();
@@ -200,6 +209,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
         ...data,
         theme: data.theme as BlogPostTheme,
         images: data.images as { url: string; alt?: string }[],
+        soundtrack: (data.soundtrack as SoundtrackTrack[] | null) ?? null,
       }
     : null;
 }
@@ -254,8 +264,9 @@ export async function createBlogPost(
       status: input.status || 'published',
       reading_time: calculateReadingTime(input.body),
       iris_context: input.iris_context || null,
+      soundtrack: input.soundtrack || null,
     })
-    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context')
+    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context, soundtrack')
     .single();
 
   if (error) {
@@ -267,6 +278,7 @@ export async function createBlogPost(
     ...data,
     theme: data.theme as BlogPostTheme,
     images: data.images as { url: string; alt?: string }[],
+    soundtrack: (data.soundtrack as SoundtrackTrack[] | null) ?? null,
   };
 }
 
@@ -295,12 +307,13 @@ export async function updateBlogPost(
   if (updates.theme !== undefined) payload.theme = updates.theme;
   if (updates.status !== undefined) payload.status = updates.status;
   if (updates.iris_context !== undefined) payload.iris_context = updates.iris_context || null;
+  if (updates.soundtrack !== undefined) payload.soundtrack = updates.soundtrack || null;
 
   const { data, error } = await supabase
     .from('blog_posts')
     .update(payload)
     .eq('slug', slug)
-    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context')
+    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context, soundtrack')
     .single();
 
   if (error) {
@@ -312,6 +325,7 @@ export async function updateBlogPost(
     ...data,
     theme: data.theme as BlogPostTheme,
     images: data.images as { url: string; alt?: string }[],
+    soundtrack: (data.soundtrack as SoundtrackTrack[] | null) ?? null,
   };
 }
 
