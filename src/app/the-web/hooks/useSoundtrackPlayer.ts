@@ -15,6 +15,9 @@ export function useSoundtrackPlayer(soundtrack: SoundtrackTrack[]) {
   const [autoAdvancing, setAutoAdvancing] = useState(false);
 
   const embed = useSpotifyEmbed();
+  // Destructure stable refs to avoid re-running effects on every render
+  // (embed returns a new object each render, but callbacks are stable via useCallback)
+  const { togglePlay: embedTogglePlay, stop: embedStop } = embed;
 
   // Convert SoundtrackTrack to a MusicMoment-shaped object for useSpotifyEmbed.
   // Only the fields that useSpotifyEmbed actually uses: id, trackUri, spotifyUrl.
@@ -55,7 +58,7 @@ export function useSoundtrackPlayer(soundtrack: SoundtrackTrack[]) {
       const nextIdx = (currentIndex + 1) % soundtrack.length;
       setCurrentIndex(nextIdx);
       setPreviewEnded(false);
-      embed.togglePlay(asMoments[nextIdx]);
+      embedTogglePlay(asMoments[nextIdx]);
       // Reset flag after a short delay to avoid re-triggering
       const timer = setTimeout(() => setAutoAdvancing(false), 500);
       return () => clearTimeout(timer);
@@ -64,41 +67,46 @@ export function useSoundtrackPlayer(soundtrack: SoundtrackTrack[]) {
     if (trackEnded && soundtrack.length === 1) {
       setPreviewEnded(true);
     }
-  }, [trackEnded, autoAdvancing, currentIndex, soundtrack.length, asMoments, embed]);
+  }, [trackEnded, autoAdvancing, currentIndex, soundtrack.length, asMoments, embedTogglePlay]);
 
   const play = useCallback(() => {
     if (!asMoments[currentIndex]) return;
     setPreviewEnded(false);
-    embed.togglePlay(asMoments[currentIndex]);
-  }, [asMoments, currentIndex, embed]);
+    embedTogglePlay(asMoments[currentIndex]);
+  }, [asMoments, currentIndex, embedTogglePlay]);
 
   const pause = useCallback(() => {
     if (isCurrentPlaying && embed.isPlaying) {
-      embed.togglePlay(asMoments[currentIndex]);
+      embedTogglePlay(asMoments[currentIndex]);
     }
-  }, [asMoments, currentIndex, embed, isCurrentPlaying]);
+  }, [asMoments, currentIndex, embedTogglePlay, embed.isPlaying, isCurrentPlaying]);
 
   const togglePlay = useCallback(() => {
     if (isCurrentPlaying) {
-      embed.togglePlay(asMoments[currentIndex]);
+      embedTogglePlay(asMoments[currentIndex]);
     } else {
       play();
     }
-  }, [asMoments, currentIndex, embed, isCurrentPlaying, play]);
+  }, [asMoments, currentIndex, embedTogglePlay, isCurrentPlaying, play]);
 
   const next = useCallback(() => {
     const nextIdx = (currentIndex + 1) % soundtrack.length;
     setCurrentIndex(nextIdx);
     setPreviewEnded(false);
-    embed.togglePlay(asMoments[nextIdx]);
-  }, [asMoments, currentIndex, embed, soundtrack.length]);
+    embedTogglePlay(asMoments[nextIdx]);
+  }, [asMoments, currentIndex, embedTogglePlay, soundtrack.length]);
 
   const prev = useCallback(() => {
     const prevIdx = (currentIndex - 1 + soundtrack.length) % soundtrack.length;
     setCurrentIndex(prevIdx);
     setPreviewEnded(false);
-    embed.togglePlay(asMoments[prevIdx]);
-  }, [asMoments, currentIndex, embed, soundtrack.length]);
+    embedTogglePlay(asMoments[prevIdx]);
+  }, [asMoments, currentIndex, embedTogglePlay, soundtrack.length]);
+
+  // Stop destroys the embed unconditionally — used by dismiss to avoid leaking audio
+  const stop = useCallback(() => {
+    embedStop();
+  }, [embedStop]);
 
   return {
     currentTrack,
@@ -115,6 +123,7 @@ export function useSoundtrackPlayer(soundtrack: SoundtrackTrack[]) {
     pause,
     next,
     prev,
+    stop,
     containerRef: embed.containerRef,
   };
 }

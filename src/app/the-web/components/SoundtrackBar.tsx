@@ -118,7 +118,7 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
           {/* Close button */}
           <button
             onClick={() => {
-              player.pause();
+              player.stop();
               setDismissed(true);
             }}
             className="flex-shrink-0 w-4 h-4 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
