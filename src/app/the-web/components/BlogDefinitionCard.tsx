@@ -18,7 +18,7 @@ interface BlogDefinitionCardProps {
 // Kind-based trigger styling
 const TRIGGER_STYLES: Record<string, string> = {
   clarification:
-    'text-purple-300/90 decoration-dotted decoration-purple-500/30 underline underline-offset-4 hover:text-purple-200 hover:decoration-purple-400/50 cursor-help',
+    'text-teal-300/90 decoration-dotted decoration-teal-500/30 underline underline-offset-4 hover:text-teal-200 hover:decoration-teal-400/50 cursor-help',
   reference:
     'text-blue-300/90 decoration-dotted decoration-blue-500/30 underline underline-offset-4 hover:text-blue-200 hover:decoration-blue-400/50 cursor-help',
   aside:

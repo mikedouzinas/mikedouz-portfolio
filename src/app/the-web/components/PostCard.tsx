@@ -12,7 +12,7 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, index }: PostCardProps) {
-  const glowColor = post.theme?.accent_color || "168, 85, 247";
+  const glowColor = post.theme?.accent_color || "45, 212, 191";
 
   const formattedDate = new Date(post.published_at).toLocaleDateString(
     "en-US",
@@ -61,7 +61,7 @@ export default function PostCard({ post, index }: PostCardProps) {
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-0.5 text-xs rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20"
+                  className="px-2 py-0.5 text-xs rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20"
                 >
                   {tag}
                 </span>

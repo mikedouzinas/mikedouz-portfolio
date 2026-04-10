@@ -30,8 +30,8 @@ export default function TagFilter({ tags, activeTag, onTagClick }: TagFilterProp
               onClick={() => onTagClick(isActive ? null : tag)}
               className={`px-3 py-1 text-xs rounded-full border transition-colors ${
                 isActive
-                  ? "bg-purple-500 text-white border-purple-500"
-                  : "bg-transparent text-gray-400 border-gray-600 hover:border-purple-500/50 hover:text-purple-300"
+                  ? "bg-teal-500 text-white border-teal-500"
+                  : "bg-transparent text-gray-400 border-gray-600 hover:border-teal-500/50 hover:text-teal-300"
               }`}
             >
               {tag}

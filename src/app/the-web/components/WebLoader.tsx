@@ -79,7 +79,7 @@ export default function WebLoader() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.2 }}
-          className="text-sm text-purple-400/70"
+          className="text-sm text-teal-400/70"
         >
           {message}
         </motion.span>

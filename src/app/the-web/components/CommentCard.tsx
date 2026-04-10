@@ -21,7 +21,7 @@ function avatarColor(name: string): string {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
   const colors = [
-    'bg-purple-500/60',
+    'bg-teal-500/60',
     'bg-blue-500/60',
     'bg-emerald-500/60',
     'bg-amber-500/60',
@@ -135,7 +135,7 @@ export default function CommentCard({
             {comment.author_name}
           </span>
           {comment.is_admin && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 font-medium">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-400 font-medium">
               author
             </span>
           )}
@@ -158,7 +158,7 @@ export default function CommentCard({
           {onReply && (
             <button
               onClick={() => onReply(comment.id, comment.author_name)}
-              className="text-xs text-gray-500 hover:text-purple-400 transition-colors"
+              className="text-xs text-gray-500 hover:text-teal-400 transition-colors"
             >
               reply
             </button>

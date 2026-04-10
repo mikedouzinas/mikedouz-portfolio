@@ -113,7 +113,7 @@ export default function SubscribeWidget() {
           if (open && isDone) reset();
           setOpen((o) => !o);
         }}
-        className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors lowercase shrink-0"
+        className="text-sm font-medium text-teal-400 hover:text-teal-300 transition-colors lowercase shrink-0"
       >
         {open ? "close" : "subscribe"}
       </button>
@@ -132,7 +132,7 @@ export default function SubscribeWidget() {
                   key="success-email"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-sm text-purple-400"
+                  className="text-sm text-teal-400"
                 >
                   check your email to confirm.
                 </motion.p>
@@ -141,7 +141,7 @@ export default function SubscribeWidget() {
                   key="success-sms"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-sm text-purple-400"
+                  className="text-sm text-teal-400"
                 >
                   you&apos;re in. you&apos;ll get a text when i publish.
                 </motion.p>
@@ -178,12 +178,12 @@ export default function SubscribeWidget() {
                       }}
                       placeholder="000000"
                       autoFocus
-                      className="w-28 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 text-center tracking-widest focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 transition-colors"
+                      className="w-28 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 text-center tracking-widest focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition-colors"
                     />
                     <button
                       type="submit"
                       disabled={smsCode.length !== 6 || state === "confirming"}
-                      className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
+                      className="bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
                     >
                       {state === "confirming" ? "..." : "confirm"}
                     </button>
@@ -202,12 +202,12 @@ export default function SubscribeWidget() {
                       }}
                       placeholder="email address"
                       autoFocus
-                      className="flex-1 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 transition-colors"
+                      className="flex-1 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition-colors"
                     />
                     <button
                       type="submit"
                       disabled={state === "submitting"}
-                      className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
+                      className="bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
                     >
                       {state === "submitting" ? "..." : "subscribe"}
                     </button>

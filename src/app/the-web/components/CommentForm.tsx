@@ -117,14 +117,14 @@ export default function CommentForm({
           value={authorName}
           onChange={(e) => setAuthorName(e.target.value)}
           maxLength={100}
-          className="flex-1 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 outline-none transition-colors"
+          className="flex-1 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 outline-none transition-colors"
         />
         <input
           type="email"
           placeholder="email (optional, not displayed)"
           value={authorEmail}
           onChange={(e) => setAuthorEmail(e.target.value)}
-          className="flex-1 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 outline-none transition-colors"
+          className="flex-1 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 outline-none transition-colors"
         />
       </div>
 
@@ -135,7 +135,7 @@ export default function CommentForm({
           onChange={(e) => setBody(e.target.value)}
           maxLength={5000}
           rows={3}
-          className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 outline-none transition-colors resize-y min-h-[80px]"
+          className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 outline-none transition-colors resize-y min-h-[80px]"
         />
         <div className="flex justify-end mt-1">
           {body.length > 0 && body.length < 10 && (
@@ -181,7 +181,7 @@ export default function CommentForm({
         <button
           type="submit"
           disabled={!canSubmit || submitting}
-          className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/30 rounded-lg px-4 py-2 text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 border border-teal-500/30 rounded-lg px-4 py-2 text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {submitting ? 'posting...' : 'post comment'}
         </button>

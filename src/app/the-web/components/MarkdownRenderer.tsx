@@ -40,7 +40,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
           a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
             <a
               href={href}
-              className="text-purple-400 hover:text-purple-300 underline underline-offset-2"
+              className="text-teal-400 hover:text-teal-300 underline underline-offset-2"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -48,7 +48,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             </a>
           ),
           blockquote: ({ children }: { children?: React.ReactNode }) => (
-            <blockquote className="border-l-2 border-purple-500/50 pl-4 my-4 text-gray-400 italic">
+            <blockquote className="border-l-2 border-teal-500/50 pl-4 my-4 text-gray-400 italic">
               {children}
             </blockquote>
           ),
@@ -60,7 +60,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
               );
             }
             return (
-              <code className="bg-gray-800 px-1.5 py-0.5 rounded text-sm text-purple-300">
+              <code className="bg-gray-800 px-1.5 py-0.5 rounded text-sm text-teal-300">
                 {children}
               </code>
             );

@@ -180,7 +180,7 @@ export default function CommentSection({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             onClick={() => setShowForm(true)}
-            className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+            className="text-sm text-teal-400 hover:text-teal-300 transition-colors"
           >
             {hasComments ? 'add comment' : 'start the discussion'}
           </motion.button>

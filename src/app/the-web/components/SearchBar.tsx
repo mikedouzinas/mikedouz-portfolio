@@ -41,7 +41,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         value={value}
         onChange={handleChange}
         placeholder="Search the web..."
-        className="w-full px-4 py-2.5 text-sm bg-gray-800/50 border border-gray-700 rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20"
+        className="w-full px-4 py-2.5 text-sm bg-gray-800/50 border border-gray-700 rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20"
       />
       {value && (
         <button

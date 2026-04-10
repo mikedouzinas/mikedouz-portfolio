@@ -33,7 +33,7 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
         style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', opacity: 0 }}
       />
 
-      <div className="rounded-xl bg-gradient-to-r from-[#1DB954]/[0.08] to-emerald-500/[0.08] border border-white/[0.06] mb-8 overflow-hidden">
+      <div className="rounded-xl bg-gradient-to-r from-[#2dd4bf]/[0.08] to-teal-400/[0.08] border border-white/[0.06] mb-8 overflow-hidden">
         <div className="flex items-center gap-2.5 px-3 py-2">
           {/* Album art — 32px on mobile, 40px on sm+ */}
           <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded-lg overflow-hidden">
@@ -61,15 +61,15 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
           {/* Play / Pause button */}
           <button
             onClick={player.togglePlay}
-            className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full bg-[#1DB954]/20 hover:bg-[#1DB954]/30 transition-colors"
+            className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/30 transition-colors"
             aria-label={player.isPlaying ? 'Pause' : 'Play'}
           >
             {player.isLoading ? (
               <LoadingBars />
             ) : player.isPlaying ? (
-              <Pause className="w-3.5 h-3.5 text-[#1DB954]" fill="#1DB954" />
+              <Pause className="w-3.5 h-3.5 text-[#2dd4bf]" fill="#2dd4bf" />
             ) : (
-              <Play className="w-3.5 h-3.5 text-[#1DB954] ml-0.5" fill="#1DB954" />
+              <Play className="w-3.5 h-3.5 text-[#2dd4bf] ml-0.5" fill="#2dd4bf" />
             )}
           </button>
 
@@ -107,7 +107,7 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
                   key={i}
                   className={`rounded-full transition-colors ${
                     i === currentIndex
-                      ? 'w-1.5 h-1.5 bg-[#1DB954]'
+                      ? 'w-1.5 h-1.5 bg-[#2dd4bf]'
                       : 'w-1 h-1 bg-white/20'
                   }`}
                 />
@@ -128,14 +128,6 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
           </button>
         </div>
 
-        {/* Progress bar */}
-        <div className="h-0.5 bg-white/[0.06]">
-          <div
-            className="h-full bg-gradient-to-r from-[#1DB954] to-emerald-500 transition-[width] duration-300"
-            style={{ width: `${player.progress * 100}%` }}
-          />
-        </div>
-
         {/* Preview ended message */}
         {player.previewEnded && (
           <div className="px-3 py-1.5 text-[10px] text-white/40 border-t border-white/[0.04]">
@@ -144,7 +136,7 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
               href="https://open.spotify.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#1DB954]/70 hover:text-[#1DB954] transition-colors underline"
+              className="text-[#2dd4bf]/70 hover:text-[#2dd4bf] transition-colors underline"
             >
               Log in to Spotify
             </a>{' '}
@@ -166,7 +158,7 @@ function LoadingBars() {
           className="rounded-full"
           style={{
             width: 2,
-            backgroundColor: '#1DB954',
+            backgroundColor: '#2dd4bf',
             animation: `eqBounce 0.8s ease-in-out ${i * 0.15}s infinite alternate`,
           }}
         />

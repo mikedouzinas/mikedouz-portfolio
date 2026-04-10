@@ -84,7 +84,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                 <Link
                   key={tag}
                   href={`/the-web?tag=${encodeURIComponent(tag)}`}
-                  className="px-2.5 py-0.5 text-xs rounded-full bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 transition-colors"
+                  className="px-2.5 py-0.5 text-xs rounded-full bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 transition-colors"
                 >
                   {tag}
                 </Link>
@@ -124,7 +124,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             {next ? (
               <Link
                 href={`/the-web/${next.slug}`}
-                className="text-sm text-gray-400 hover:text-purple-300 transition-colors"
+                className="text-sm text-gray-400 hover:text-teal-300 transition-colors"
               >
                 &larr; {next.title}
               </Link>
@@ -134,7 +134,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             {prev ? (
               <Link
                 href={`/the-web/${prev.slug}`}
-                className="text-sm text-gray-400 hover:text-purple-300 transition-colors text-right"
+                className="text-sm text-gray-400 hover:text-teal-300 transition-colors text-right"
               >
                 {prev.title} &rarr;
               </Link>
