@@ -400,7 +400,7 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
       return (
         <div
           ref={bubbleEl}
-          className="fixed bottom-0 left-0 right-0 max-h-[85vh] z-50 rounded-t-2xl bg-gradient-to-br from-blue-600/[0.12] via-blue-500/[0.15] to-blue-600/[0.12] backdrop-blur-3xl backdrop-saturate-[2.2] border-t border-white/[0.12] shadow-[0_-8px_40px_rgba(37,99,235,0.15),0_0_0_1px_rgba(255,255,255,0.08),inset_0_0_0_1px_rgba(255,255,255,0.08)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] overflow-y-auto"
+          className="fixed bottom-0 left-0 right-0 max-h-[85vh] z-50 rounded-t-2xl bg-gradient-to-br from-blue-600/[0.12] via-blue-500/[0.15] to-blue-600/[0.12] backdrop-blur-3xl backdrop-saturate-[2.2] shadow-[0_-8px_40px_rgba(37,99,235,0.15)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] overflow-y-auto"
         >
           <div className="relative">
             <div className="absolute -inset-4 rounded-t-2xl bg-gradient-to-b from-white/[0.15] via-blue-400/[0.05] to-transparent pointer-events-none" />
@@ -418,8 +418,7 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
     const glassClasses = `
       bg-gradient-to-br from-blue-600/[0.12] via-blue-500/[0.15] to-blue-600/[0.12]
       backdrop-blur-3xl backdrop-saturate-[2.2]
-      border border-white/[0.12]
-      shadow-[0_8px_40px_rgba(37,99,235,0.15),0_0_0_1px_rgba(255,255,255,0.08),inset_0_0_0_1px_rgba(255,255,255,0.08)]
+      shadow-[0_8px_40px_rgba(37,99,235,0.15)]
       rounded-2xl overflow-y-auto
     `;
 
