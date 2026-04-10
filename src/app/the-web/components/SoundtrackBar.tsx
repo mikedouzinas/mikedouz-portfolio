@@ -127,22 +127,6 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
             <X className="w-2.5 h-2.5 text-white/30" />
           </button>
         </div>
-
-        {/* Preview ended message */}
-        {player.previewEnded && (
-          <div className="px-3 py-1.5 text-[10px] text-white/40 border-t border-white/[0.04]">
-            Preview ended.{' '}
-            <a
-              href="https://open.spotify.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#2dd4bf]/70 hover:text-[#2dd4bf] transition-colors underline"
-            >
-              Log in to Spotify
-            </a>{' '}
-            for full tracks.
-          </div>
-        )}
       </div>
     </>
   );
