@@ -185,24 +185,25 @@ export function useSpotifyEmbed(): UseSpotifyEmbedReturn {
                 setIsPlaying(false);
                 setProgress(1);
                 setPosition(Math.floor((effectiveDurationRef.current || d.position) / 1000));
-                setDuration(Math.floor((effectiveDurationRef.current || d.position) / 1000));
+                setDuration(Math.floor(d.duration / 1000));
                 wasPlayingRef.current = false;
                 return;
               }
 
-              userToggledRef.current = false;
+              // Only reset userToggled when resuming, not on every update
+              // (prevents race where the flag clears before the paused update arrives)
+              if (playing) userToggledRef.current = false;
               wasPlayingRef.current = playing;
               setIsLoading(false);
               setIsPlaying(playing);
 
-              if (d.position > 0) {
-                // Use effective duration if known, otherwise use reported duration
+              if (d.duration > 0) {
+                setDuration(Math.floor(d.duration / 1000));
+              }
+              if (d.position > 0 && d.duration > 0) {
                 const effDur = effectiveDurationRef.current || d.duration;
-                if (effDur > 0) {
-                  setProgress(Math.min(d.position / effDur, 1));
-                  setPosition(Math.floor(d.position / 1000));
-                  setDuration(Math.floor(effDur / 1000));
-                }
+                setProgress(Math.min(d.position / effDur, 1));
+                setPosition(Math.floor(d.position / 1000));
               }
             });
 
