@@ -32,6 +32,16 @@ const CreatePostSchema = z.object({
     .optional(),
   status: z.enum(['draft', 'published']).optional(),
   iris_context: z.string().optional(),
+  soundtrack: z
+    .array(
+      z.object({
+        trackUri: z.string().startsWith('spotify:track:'),
+        trackName: z.string().min(1),
+        artist: z.string().min(1),
+        albumArtUrl: z.string().url(),
+      }),
+    )
+    .optional(),
 });
 
 /**
