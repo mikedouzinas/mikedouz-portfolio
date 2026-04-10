@@ -8,6 +8,7 @@ import ShareButton from '../components/ShareButton';
 import CommentSection from '../components/CommentSection';
 import SubscribeWidget from '../components/SubscribeWidget';
 import IrisHighlightHint from '../components/IrisHighlightHint';
+import SoundtrackBar from '../components/SoundtrackBar';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -94,6 +95,11 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         {/* Iris highlight hint */}
         <IrisHighlightHint />
+
+        {/* Soundtrack */}
+        {post.soundtrack && post.soundtrack.length > 0 && (
+          <SoundtrackBar soundtrack={post.soundtrack} />
+        )}
 
         {/* Body */}
         <PostBodyWithIris slug={slug} postTitle={post.title}>
