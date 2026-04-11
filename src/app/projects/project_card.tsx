@@ -15,7 +15,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <BaseCard 
       href={project.githubLink}
-      glowColor="34, 197, 94"  // Green glow for projects
+      glowColor="99, 102, 241"  // Indigo glow for projects
       glowIntensity={0.35}
     >
       <div
