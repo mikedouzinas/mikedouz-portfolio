@@ -22,27 +22,29 @@ export interface ElevenLabsAlignment {
  */
 export function stripMarkdownToParagraphs(markdown: string): string[] {
   const stripped = markdown
-    .replace(/```[\s\S]*?```/g, '')        // fenced code blocks
-    .replace(/`[^`]+`/g, '')               // inline code
-    .replace(/#{1,6}\s+(.+)/g, '$1')       // headings → keep text
-    .replace(/\*\*([^*]+)\*\*/g, '$1')     // bold
-    .replace(/\*([^*]+)\*/g, '$1')         // italic
-    .replace(/__([^_]+)__/g, '$1')     // double-underscore bold
-    .replace(/_([^_]+)_/g, '$1')       // underscore italic
+    .replace(/```[\s\S]*?```/g, '')          // fenced code blocks
+    .replace(/`[^`]+`/g, '')                 // inline code
+    .replace(/#{1,6}\s+(.+)/g, '$1')         // headings → keep text
+    .replace(/\*\*([^*]+)\*\*/g, '$1')       // bold
+    .replace(/\*([^*]+)\*/g, '$1')           // italic
+    .replace(/__([^_]+)__/g, '$1')           // double-underscore bold
+    .replace(/_([^_]+)_/g, '$1')             // underscore italic
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
-    .replace(/^[-*+]\s+/gm, '')            // unordered list markers
-    .replace(/^\d+\.\s+/gm, '')            // ordered list markers
-    .replace(/^>\s+/gm, '')                // blockquotes
-    .replace(/::[\s\S]*?::/g, '')          // hoverdef custom syntax
-    .replace(/^[-*_]{3,}\s*$/gm, '')   // horizontal rules
-    .replace(/<[^>]+>/g, '')            // HTML tags
-    .replace(/\n{3,}/g, '\n\n')            // collapse excess newlines
+    .replace(/^[-*+]\s+/gm, '')              // unordered list markers
+    .replace(/^\d+\.\s+/gm, '')              // ordered list markers
+    .replace(/^>\s+/gm, '')                  // blockquotes
+    // Hoverdef: keep the visible text (first field), discard the definition payload.
+    // Syntax: ::visible text|definition|key=value...::
+    .replace(/::([^|:]+)\|[\s\S]*?::/g, '$1')
+    .replace(/^[-*_]{3,}\s*$/gm, '')         // horizontal rules
+    .replace(/<[^>]+>/g, '')                  // HTML tags
+    .replace(/\n{3,}/g, '\n\n')              // collapse excess newlines
     .trim();
 
   return stripped
     .split(/\n\n+/)
     .map((p) => p.replace(/\n/g, ' ').trim())
-    .filter((p) => p.length > 10); // skip very short fragments
+    .filter((p) => p.length > 0); // only skip truly empty strings
 }
 
 /**
