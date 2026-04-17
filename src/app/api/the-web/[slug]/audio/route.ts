@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { env } from '@/lib/env';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import {
   stripMarkdownToParagraphs,
   deriveParagraphTimestamps,
@@ -20,6 +21,20 @@ type RouteParams = { params: Promise<{ slug: string }> };
 
 export async function POST(req: NextRequest, { params }: RouteParams) {
   const { slug } = await params;
+
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    return NextResponse.json({ error: 'Invalid slug' }, { status: 400 });
+  }
+
+  const ip = getClientIp(req);
+  const userAgent = req.headers.get('user-agent') ?? '';
+  const rateLimit = checkRateLimit(ip, userAgent);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'rate_limited', message: 'Too many requests' },
+      { status: 429 },
+    );
+  }
 
   try {
     const supabaseAdmin = getSupabaseAdmin();
@@ -120,12 +135,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
         };
 
         // Decode base64 audio
-        const binaryStr = atob(elevenData.audio_base64);
-        const bytes = new Uint8Array(binaryStr.length);
-        for (let i = 0; i < binaryStr.length; i++) {
-          bytes[i] = binaryStr.charCodeAt(i);
-        }
-        audioBuffer = bytes.buffer;
+        audioBuffer = Buffer.from(elevenData.audio_base64, 'base64').buffer;
 
         // Estimate total duration from alignment data
         const lastIdx = elevenData.alignment.character_end_times_seconds.length - 1;
@@ -171,7 +181,6 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       generatingSet.delete(slug);
     }
   } catch (error) {
-    generatingSet.delete(slug);
     console.error('[audio] Generation error:', error);
     return NextResponse.json(
       { error: 'audio_unavailable', message: 'Failed to generate audio.' },
