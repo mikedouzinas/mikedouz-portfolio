@@ -91,7 +91,12 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
             aria-valuemin={0}
             aria-valuemax={duration}
             aria-valuenow={currentTime}
+            tabIndex={0}
             onClick={handleSeek}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight') seek(Math.min(currentTime + 5, duration));
+              else if (e.key === 'ArrowLeft') seek(Math.max(currentTime - 5, 0));
+            }}
             className="h-1 bg-gray-700 rounded-full cursor-pointer overflow-hidden"
           >
             <div
