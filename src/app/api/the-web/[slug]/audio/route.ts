@@ -1,5 +1,6 @@
 // src/app/api/the-web/[slug]/audio/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { Redis } from '@upstash/redis';
 import { env } from '@/lib/env';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
@@ -14,8 +15,16 @@ import {
 export const runtime = 'nodejs';
 export const maxDuration = 60; // seconds — ElevenLabs generation can take up to 30s
 
-// In-memory generation lock: prevents duplicate ElevenLabs calls for the same slug
-const generatingSet = new Set<string>();
+// Redis-based generation lock: survives serverless cold starts, prevents duplicate ElevenLabs calls
+function getRedis(): Redis | null {
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    return null;
+  }
+  return new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+}
 
 type RouteParams = { params: Promise<{ slug: string }> };
 
@@ -57,16 +66,22 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ audioUrl, timestampsUrl });
     }
 
-    // 2. Rate limit: only one generation per slug at a time
-    if (generatingSet.has(slug)) {
-      return NextResponse.json(
-        { error: 'audio_generating', message: 'Audio is already being generated, try again shortly.' },
-        { status: 429 },
-      );
+    // 2. Rate limit: only one generation per slug at a time (Redis NX lock, 60s TTL)
+    const redis = getRedis();
+    const lockKey = `audio-gen-lock:${slug}`;
+    if (redis) {
+      const acquired = await redis.set(lockKey, '1', { nx: true, ex: 60 });
+      if (!acquired) {
+        return NextResponse.json(
+          { error: 'audio_generating', message: 'Audio is already being generated, try again shortly.' },
+          { status: 429 },
+        );
+      }
     }
 
     // 3. Validate ElevenLabs is configured
     if (!env.elevenLabsApiKey || !env.elevenLabsVoiceId) {
+      if (redis) await redis.del(lockKey);
       return NextResponse.json(
         { error: 'audio_unavailable', message: 'Audio generation is not configured.' },
         { status: 503 },
@@ -81,10 +96,9 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       .single();
 
     if (postError || !postData) {
+      if (redis) await redis.del(lockKey);
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
-
-    generatingSet.add(slug);
 
     try {
       const paragraphs = stripMarkdownToParagraphs(postData.body as string);
@@ -134,8 +148,9 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
           alignment: ElevenLabsAlignment;
         };
 
-        // Decode base64 audio
-        audioBuffer = Buffer.from(elevenData.audio_base64, 'base64').buffer;
+        // Decode base64 audio — use slice to avoid Node.js buffer pool offset issues
+        const audioNodeBuf = Buffer.from(elevenData.audio_base64, 'base64');
+        audioBuffer = audioNodeBuf.buffer.slice(audioNodeBuf.byteOffset, audioNodeBuf.byteOffset + audioNodeBuf.byteLength);
 
         // Estimate total duration from alignment data
         const lastIdx = elevenData.alignment.character_end_times_seconds.length - 1;
@@ -178,7 +193,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
       return NextResponse.json({ audioUrl, timestampsUrl });
     } finally {
-      generatingSet.delete(slug);
+      if (redis) await redis.del(lockKey);
     }
   } catch (error) {
     console.error('[audio] Generation error:', error);

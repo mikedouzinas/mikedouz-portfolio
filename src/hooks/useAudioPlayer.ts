@@ -41,6 +41,7 @@ export function useAudioPlayer(slug: string, postTitle: string, coverImage: stri
   const timestampsRef = useRef<AudioTimestamps | null>(null);
   const rafRef = useRef<number | null>(null);
   const hasInitiatedRef = useRef(false);
+  const generatingAttemptsRef = useRef(0);
   // Store initiate in a ref to allow safe recursive calls without dependency issues
   const initiateRef = useRef<() => Promise<void>>(async () => {});
 
@@ -92,8 +93,11 @@ export function useAudioPlayer(slug: string, postTitle: string, coverImage: stri
     });
 
     navigator.mediaSession.setActionHandler('play', () => {
+      if (!audio.src) return;
       audio.play().catch(() => {});
       setStatus('playing');
+      cancelRaf();
+      rafRef.current = requestAnimationFrame(tick);
     });
     navigator.mediaSession.setActionHandler('pause', () => {
       audio.pause();
@@ -122,7 +126,15 @@ export function useAudioPlayer(slug: string, postTitle: string, coverImage: stri
       if (res.status === 429) {
         const body = await res.json().catch(() => ({})) as { error?: string };
         if (body.error === 'audio_generating') {
-          // Generation in progress elsewhere — retry after delay
+          // Generation in progress elsewhere — retry after delay (cap at 10 attempts = 50s)
+          generatingAttemptsRef.current++;
+          if (generatingAttemptsRef.current >= 10) {
+            generatingAttemptsRef.current = 0;
+            setStatus('error');
+            setErrorMessage('Audio generation is taking too long. Please try again.');
+            hasInitiatedRef.current = false;
+            return;
+          }
           setStatus('generating');
           await new Promise((r) => setTimeout(r, 5000));
           hasInitiatedRef.current = false;
@@ -170,6 +182,7 @@ export function useAudioPlayer(slug: string, postTitle: string, coverImage: stri
         setErrorMessage("Couldn't load audio.");
       });
 
+      generatingAttemptsRef.current = 0;
       setStatus('ready');
     } catch (err) {
       console.error('[useAudioPlayer] initiate error:', err);
