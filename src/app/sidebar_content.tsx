@@ -78,30 +78,52 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                         textWrapperClass="mt-4 text-center"
                     />
                 </div>
-                {/* Navigation links aligned with the profile container */}
+                {/* Navigation links with sliding pill indicator */}
                 <nav className="mt-8 w-48 mx-auto hidden md:block">
-                    <ul className="space-y-4 text-left">
-                        {navItems.map((item) => {
-                            const isActive = activeSection === item.id;
-                            return (
-                                <li key={item.id}>
-                                    <a
-                                        href={`#${item.id}`}
-                                        onClick={handleNavClick(item.id)}
-                                        className={`
-              group flex items-center transition-all duration-300 ease-in-out 
-              text-xs uppercase tracking-wide 
-              ${isActive ? 'text-[#ff7f32] dark:text-blue-500' : 'text-gray-500 hover:text-[#ff7f32] dark:hover:text-blue-500'}`}>
-                                        <div className={`transition-all duration-300 ease-in-out ${isActive
-                                            ? 'bg-[#ff7f32] dark:bg-blue-500 w-4 mr-4'
-                                            : 'bg-gray-900 dark:bg-white w-2 mr-2 group-hover:w-4 group-hover:mr-4'} h-4`}
-                                        ></div>
-                                        <span>{item.label}</span>
-                                    </a>
-                                </li>
-                            );
-                        })}
-                    </ul>
+                    {(() => {
+                        const ITEM_HEIGHT = 36;
+                        const activeIndex = navItems.findIndex(item => item.id === activeSection);
+                        return (
+                            <div style={{ position: 'relative' }}>
+                                <div style={{
+                                    position: 'absolute',
+                                    left: 0,
+                                    width: '100%',
+                                    height: ITEM_HEIGHT,
+                                    borderRadius: 7,
+                                    background: 'rgba(96, 165, 250, 0.13)',
+                                    border: '1px solid rgba(96, 165, 250, 0.25)',
+                                    top: activeIndex >= 0 ? activeIndex * ITEM_HEIGHT : 0,
+                                    opacity: activeIndex >= 0 ? 1 : 0,
+                                    transition: 'top 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease',
+                                    pointerEvents: 'none',
+                                }} />
+                                <ul>
+                                    {navItems.map((item) => {
+                                        const isActive = activeSection === item.id;
+                                        return (
+                                            <li key={item.id} style={{ height: ITEM_HEIGHT, display: 'flex', alignItems: 'center' }}>
+                                                <a
+                                                    href={`#${item.id}`}
+                                                    onClick={handleNavClick(item.id)}
+                                                    className={`
+                                        text-xs uppercase tracking-wide font-medium w-full px-3
+                                        transition-colors duration-200
+                                        ${isActive
+                                            ? 'text-blue-300 font-semibold'
+                                            : 'text-gray-500 hover:text-gray-300'}
+                                    `}
+                                                    style={{ position: 'relative', zIndex: 1 }}
+                                                >
+                                                    {item.label}
+                                                </a>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        );
+                    })()}
                 </nav>
             </div>
             {/* Spotify music timeline (deep mode only) */}
