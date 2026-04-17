@@ -1,5 +1,34 @@
 [
   {
+    "id": "fd4174080374529f811e45b209921bae",
+    "trackName": "How Much Is Weed?",
+    "artist": "Dominic Fike",
+    "album": "Sunburn",
+    "trackUri": "spotify:track:44KWbTVZev3SWdv1t5UoYE",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e025b26c1b56d89c1416d21db60",
+    "spotifyUrl": "https://open.spotify.com/track/44KWbTVZev3SWdv1t5UoYE",
+    "dateRange": {
+      "start": "2026-04-06",
+      "end": "2026-04-19"
+    },
+    "playCount": 14,
+    "weeksCount": 2,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2026-04-12",
+    "peakDayPlays": 7,
+    "hotDays": [
+      {
+        "date": "2026-04-12",
+        "plays": 7
+      },
+      {
+        "date": "2026-04-15",
+        "plays": 3
+      }
+    ]
+  },
+  {
     "id": "269b9b3305c9c19a9e435c3252e47b25",
     "trackName": "Fallen Star",
     "artist": "The Neighbourhood",
@@ -12,7 +41,7 @@
       "start": "2026-03-30",
       "end": "2026-04-12"
     },
-    "playCount": 8,
+    "playCount": 11,
     "weeksCount": 2,
     "intensity": 1,
     "maxState": 1,
@@ -26,6 +55,10 @@
       {
         "date": "2026-04-05",
         "plays": 3
+      },
+      {
+        "date": "2026-04-10",
+        "plays": 2
       }
     ]
   },
@@ -429,7 +462,7 @@
     ]
   },
   {
-    "id": "1d1a0fed6bb605a59b1e44ab044583bb",
+    "id": "83e0b1c7669b94cda90ac9f17789b227",
     "trackName": "KRYPTONITE",
     "artist": "Don Toliver",
     "album": "HARDSTONE PSYCHO",
@@ -439,10 +472,10 @@
     "spotifyUrl": "https://open.spotify.com/track/3mLDq0hbHkafZoy4GvF7EG",
     "dateRange": {
       "start": "2026-02-02",
-      "end": "2026-03-15"
+      "end": "2026-02-15"
     },
-    "playCount": 16,
-    "weeksCount": 6,
+    "playCount": 13,
+    "weeksCount": 2,
     "intensity": 1,
     "maxState": 1,
     "peakDay": "2026-02-10",
@@ -746,8 +779,8 @@
     },
     "playCount": 7,
     "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2026-01-10",
     "peakDayPlays": 4,
     "hotDays": [
@@ -795,6 +828,31 @@
       },
       {
         "date": "2026-01-03",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "006f2fe81d2f07347f775a0ee1680267",
+    "trackName": "Politix",
+    "artist": "Balu Brigada",
+    "album": "Portal",
+    "trackUri": "spotify:track:2rSp12ZJ679lU7dalojvVZ",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021fc8017bbf246da18b953789",
+    "spotifyUrl": "https://open.spotify.com/track/2rSp12ZJ679lU7dalojvVZ",
+    "dateRange": {
+      "start": "2025-12-29",
+      "end": "2026-01-18"
+    },
+    "playCount": 7,
+    "weeksCount": 3,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-01-18",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-01-18",
         "plays": 2
       }
     ]
@@ -848,8 +906,8 @@
     },
     "playCount": 10,
     "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-12-23",
     "peakDayPlays": 5,
     "hotDays": [
@@ -1030,6 +1088,26 @@
     ]
   },
   {
+    "id": "4fe736b69136fdf5f23ce27cec369967",
+    "trackName": "Politix",
+    "artist": "Balu Brigada",
+    "album": "Portal",
+    "trackUri": "spotify:track:2rSp12ZJ679lU7dalojvVZ",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021fc8017bbf246da18b953789",
+    "spotifyUrl": "https://open.spotify.com/track/2rSp12ZJ679lU7dalojvVZ",
+    "dateRange": {
+      "start": "2025-12-01",
+      "end": "2025-12-21"
+    },
+    "playCount": 7,
+    "weeksCount": 3,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-12-01",
+    "peakDayPlays": 0,
+    "hotDays": []
+  },
+  {
     "id": "58a318c3be367e0e06088d011dda2c18",
     "trackName": "Mo City Flexologist",
     "artist": "surelynotsibi42",
@@ -1128,6 +1206,31 @@
       {
         "date": "2025-11-24",
         "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "dbf0bc7ba1eb62dc64a86c608c934237",
+    "trackName": "Politix",
+    "artist": "Balu Brigada",
+    "album": "Portal",
+    "trackUri": "spotify:track:2rSp12ZJ679lU7dalojvVZ",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021fc8017bbf246da18b953789",
+    "spotifyUrl": "https://open.spotify.com/track/2rSp12ZJ679lU7dalojvVZ",
+    "dateRange": {
+      "start": "2025-11-17",
+      "end": "2025-11-23"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-11-20",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2025-11-20",
+        "plays": 3
       }
     ]
   },
@@ -1233,6 +1336,35 @@
     "peakDay": "2025-11-03",
     "peakDayPlays": 0,
     "hotDays": []
+  },
+  {
+    "id": "15e45dc7aff18dbe4cbfa7b25e50fbbb",
+    "trackName": "Politix",
+    "artist": "Balu Brigada",
+    "album": "Portal",
+    "trackUri": "spotify:track:2rSp12ZJ679lU7dalojvVZ",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021fc8017bbf246da18b953789",
+    "spotifyUrl": "https://open.spotify.com/track/2rSp12ZJ679lU7dalojvVZ",
+    "dateRange": {
+      "start": "2025-11-03",
+      "end": "2025-11-09"
+    },
+    "playCount": 10,
+    "weeksCount": 1,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-11-05",
+    "peakDayPlays": 5,
+    "hotDays": [
+      {
+        "date": "2025-11-05",
+        "plays": 5
+      },
+      {
+        "date": "2025-11-08",
+        "plays": 2
+      }
+    ]
   },
   {
     "id": "685d5077d5da572fc8ee4fcc1e56d2e5",
@@ -1374,6 +1506,48 @@
     ]
   },
   {
+    "id": "d6d9dcaf91f75fd972de57f666a03544",
+    "trackName": "Obsolete",
+    "artist": "Tame Impala",
+    "album": "Deadbeat",
+    "trackUri": "spotify:track:0On1SxfkvTOfzvjVgFLK7V",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02208500450dcd0fd294d7bd3b",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/0On1SxfkvTOfzvjVgFLK7V",
+    "dateRange": {
+      "start": "2025-10-13",
+      "end": "2025-11-23"
+    },
+    "playCount": 40,
+    "weeksCount": 6,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2025-10-17",
+    "peakDayPlays": 10,
+    "hotDays": [
+      {
+        "date": "2025-10-17",
+        "plays": 10
+      },
+      {
+        "date": "2025-10-22",
+        "plays": 4
+      },
+      {
+        "date": "2025-10-18",
+        "plays": 3
+      },
+      {
+        "date": "2025-10-19",
+        "plays": 3
+      },
+      {
+        "date": "2025-10-20",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "ab11c5498f9c76d8af42c07d32e86262",
     "trackName": "Television Rules the Nation / Crescendolls",
     "artist": "Daft Punk",
@@ -1400,48 +1574,6 @@
       {
         "date": "2025-10-15",
         "plays": 3
-      }
-    ]
-  },
-  {
-    "id": "c270a3084efe4cfc9731abb9b7e327fb",
-    "trackName": "Obsolete",
-    "artist": "Tame Impala",
-    "album": "Deadbeat",
-    "trackUri": "spotify:track:0On1SxfkvTOfzvjVgFLK7V",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02208500450dcd0fd294d7bd3b",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/0On1SxfkvTOfzvjVgFLK7V",
-    "dateRange": {
-      "start": "2025-10-13",
-      "end": "2025-11-02"
-    },
-    "playCount": 30,
-    "weeksCount": 3,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2025-10-17",
-    "peakDayPlays": 10,
-    "hotDays": [
-      {
-        "date": "2025-10-17",
-        "plays": 10
-      },
-      {
-        "date": "2025-10-22",
-        "plays": 4
-      },
-      {
-        "date": "2025-10-18",
-        "plays": 3
-      },
-      {
-        "date": "2025-10-19",
-        "plays": 3
-      },
-      {
-        "date": "2025-10-20",
-        "plays": 2
       }
     ]
   },
@@ -1712,7 +1844,7 @@
     ]
   },
   {
-    "id": "03b47e0d8129cb44b088e03652940778",
+    "id": "ab4785abd316ffae8416a06b44f40ca5",
     "trackName": "Oh Lord",
     "artist": "Foxy Shazam",
     "album": "Foxy Shazam",
@@ -1722,10 +1854,10 @@
     "spotifyUrl": "https://open.spotify.com/track/5iJU96441eAZ2VdWgxdyJa",
     "dateRange": {
       "start": "2025-09-15",
-      "end": "2025-10-05"
+      "end": "2025-10-26"
     },
-    "playCount": 21,
-    "weeksCount": 3,
+    "playCount": 28,
+    "weeksCount": 6,
     "intensity": 1,
     "maxState": 1,
     "peakDay": "2025-09-18",
@@ -1737,6 +1869,10 @@
       },
       {
         "date": "2025-09-20",
+        "plays": 3
+      },
+      {
+        "date": "2025-10-22",
         "plays": 3
       },
       {
@@ -3897,7 +4033,7 @@
     ]
   },
   {
-    "id": "e8faf45bc42e34549a69b95fba385f1b",
+    "id": "d81cfff1764efb8f5917db5ad304b12c",
     "trackName": "sdp interlude",
     "artist": "Travis Scott",
     "album": "Birds In The Trap Sing McKnight",
@@ -3907,10 +4043,10 @@
     "spotifyUrl": "https://open.spotify.com/track/4gh0ZnHzaTMT1sDga7Ek0N",
     "dateRange": {
       "start": "2025-04-21",
-      "end": "2026-03-15"
+      "end": "2026-04-12"
     },
-    "playCount": 35,
-    "weeksCount": 47,
+    "playCount": 39,
+    "weeksCount": 51,
     "intensity": 1,
     "maxState": 1,
     "peakDay": "2025-12-20",
@@ -3918,6 +4054,14 @@
     "hotDays": [
       {
         "date": "2025-12-20",
+        "plays": 2
+      },
+      {
+        "date": "2026-04-10",
+        "plays": 2
+      },
+      {
+        "date": "2026-04-11",
         "plays": 2
       }
     ]
@@ -8403,6 +8547,27 @@
     "weeksCount": 2,
     "intensity": 2,
     "maxState": 2,
+    "peakDay": "2023-08-28",
+    "peakDayPlays": 0,
+    "hotDays": []
+  },
+  {
+    "id": "841d0ffb904713762dfcbb97da9715d6",
+    "trackName": "You Only Live Once",
+    "artist": "The Strokes",
+    "album": "First Impressions Of Earth",
+    "trackUri": "spotify:track:4fPBB44eDH71YohayI4eKV",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e026898a982ff3c6049ba52586c",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/4fPBB44eDH71YohayI4eKV",
+    "dateRange": {
+      "start": "2023-08-28",
+      "end": "2023-09-10"
+    },
+    "playCount": 5,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2023-08-28",
     "peakDayPlays": 0,
     "hotDays": []
