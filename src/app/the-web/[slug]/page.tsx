@@ -2,9 +2,8 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getPostBySlug, getAdjacentPosts } from '@/lib/blog';
-import MarkdownRenderer from '../components/MarkdownRenderer';
-import PostBodyWithIris from '../components/PostBodyWithIris';
 import ShareButton from '../components/ShareButton';
+import ListenFeature from './components/ListenFeature';
 import CommentSection from '../components/CommentSection';
 import SubscribeWidget from '../components/SubscribeWidget';
 import IrisHighlightHint from '../components/IrisHighlightHint';
@@ -102,9 +101,13 @@ export default async function BlogPostPage({ params }: PageProps) {
         )}
 
         {/* Body */}
-        <PostBodyWithIris slug={slug} postTitle={post.title}>
-          <MarkdownRenderer content={post.body} />
-        </PostBodyWithIris>
+        <ListenFeature
+          slug={slug}
+          postTitle={post.title}
+          postBody={post.body}
+          readingTime={post.reading_time}
+          coverImage={post.cover_image ?? null}
+        />
 
         {/* Bottom subscribe */}
         <div className="mt-12 pt-8 border-t border-gray-800 flex items-baseline justify-between gap-4 flex-wrap">
