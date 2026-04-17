@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import Image from 'next/image';
@@ -9,10 +9,44 @@ import BlogDefinitionCard from './BlogDefinitionCard';
 
 interface MarkdownRendererProps {
   content: string;
+  activeParagraphIndex?: number; // -1 or undefined = no highlighting
 }
 
-export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
+export default function MarkdownRenderer({ content, activeParagraphIndex = -1 }: MarkdownRendererProps) {
   const processedContent = preprocessDefinitions(content);
+
+  // Track manual scrolling to pause auto-scroll
+  const isUserScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Paragraph counter — reset on each render, incremented by the p renderer
+  const paraCounterRef = useRef(0);
+  paraCounterRef.current = 0;
+
+  // Detect manual scroll → pause auto-scroll for 4 seconds
+  useEffect(() => {
+    const onScroll = () => {
+      isUserScrollingRef.current = true;
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
+        isUserScrollingRef.current = false;
+      }, 4000);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
+  }, []);
+
+  // Auto-scroll to active paragraph when it changes
+  useEffect(() => {
+    if (activeParagraphIndex < 0 || isUserScrollingRef.current) return;
+    const el = document.querySelector<HTMLElement>(`[data-para-idx="${activeParagraphIndex}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [activeParagraphIndex]);
 
   return (
     <ReactMarkdown
@@ -34,9 +68,26 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
               {children}
             </h3>
           ),
-          p: ({ children }: { children?: React.ReactNode }) => (
-            <p className="text-base leading-7 text-gray-300 mb-4">{children}</p>
-          ),
+          p: ({ children }: { children?: React.ReactNode }) => {
+            const idx = paraCounterRef.current++;
+            const isActive = activeParagraphIndex === idx;
+            const isPast = activeParagraphIndex > idx && activeParagraphIndex >= 0;
+            return (
+              <p
+                data-para-idx={idx}
+                className={[
+                  'text-base leading-7 mb-4 transition-all duration-200',
+                  isActive
+                    ? 'text-gray-100 bg-teal-500/[0.08] border-l-2 border-teal-500 pl-3 -ml-[13px]'
+                    : isPast
+                    ? 'text-gray-300 opacity-50'
+                    : 'text-gray-300',
+                ].join(' ')}
+              >
+                {children}
+              </p>
+            );
+          },
           a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
             <a
               href={href}
