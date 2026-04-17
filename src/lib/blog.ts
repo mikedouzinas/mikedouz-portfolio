@@ -42,6 +42,10 @@ export interface BlogPost {
   theme: BlogPostTheme;
   iris_context?: string | null;
   soundtrack: SoundtrackTrack[] | null;
+  // Audio listen feature
+  has_audio: boolean;
+  audio_generated_at: string | null;
+  recorded_audio_url: string | null;
 }
 
 export interface BlogPostPreview {
@@ -192,7 +196,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
 
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context, soundtrack')
+    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context, soundtrack, has_audio, audio_generated_at, recorded_audio_url')
     .eq('slug', slug)
     .eq('status', 'published')
     .single();
@@ -210,6 +214,9 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
         theme: data.theme as BlogPostTheme,
         images: data.images as { url: string; alt?: string }[],
         soundtrack: (data.soundtrack as SoundtrackTrack[] | null) ?? null,
+        has_audio: data.has_audio ?? false,
+        audio_generated_at: data.audio_generated_at ?? null,
+        recorded_audio_url: data.recorded_audio_url ?? null,
       }
     : null;
 }
@@ -266,7 +273,7 @@ export async function createBlogPost(
       iris_context: input.iris_context || null,
       soundtrack: input.soundtrack || null,
     })
-    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context, soundtrack')
+    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context, soundtrack, has_audio, audio_generated_at, recorded_audio_url')
     .single();
 
   if (error) {
@@ -279,6 +286,9 @@ export async function createBlogPost(
     theme: data.theme as BlogPostTheme,
     images: data.images as { url: string; alt?: string }[],
     soundtrack: (data.soundtrack as SoundtrackTrack[] | null) ?? null,
+    has_audio: data.has_audio ?? false,
+    audio_generated_at: data.audio_generated_at ?? null,
+    recorded_audio_url: data.recorded_audio_url ?? null,
   };
 }
 
@@ -313,7 +323,7 @@ export async function updateBlogPost(
     .from('blog_posts')
     .update(payload)
     .eq('slug', slug)
-    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context, soundtrack')
+    .select('id, slug, title, subtitle, body, tags, published_at, updated_at, status, reading_time, cover_image, images, theme, iris_context, soundtrack, has_audio, audio_generated_at, recorded_audio_url')
     .single();
 
   if (error) {
@@ -326,6 +336,9 @@ export async function updateBlogPost(
     theme: data.theme as BlogPostTheme,
     images: data.images as { url: string; alt?: string }[],
     soundtrack: (data.soundtrack as SoundtrackTrack[] | null) ?? null,
+    has_audio: data.has_audio ?? false,
+    audio_generated_at: data.audio_generated_at ?? null,
+    recorded_audio_url: data.recorded_audio_url ?? null,
   };
 }
 

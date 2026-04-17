@@ -43,6 +43,10 @@ export const env = {
   twilioAccountSid: process.env.TWILIO_ACCOUNT_SID || '',
   twilioAuthToken: process.env.TWILIO_AUTH_TOKEN || '',
   twilioPhoneNumber: process.env.TWILIO_PHONE_NUMBER || '',
+
+  // ElevenLabs configuration (for audio listen feature)
+  elevenLabsApiKey: process.env.ELEVENLABS_API_KEY || '',
+  elevenLabsVoiceId: process.env.ELEVENLABS_VOICE_ID || '',
 } as const;
 
 /**
