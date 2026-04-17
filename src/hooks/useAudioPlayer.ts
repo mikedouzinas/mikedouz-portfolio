@@ -22,7 +22,7 @@ export interface UseAudioPlayerReturn {
   activeParagraphIndex: number;
   speed: number;
   errorMessage: string | null;
-  play: () => void;
+  play: () => Promise<void>;
   pause: () => void;
   seek: (time: number) => void;
   cycleSpeed: () => void;
@@ -65,7 +65,13 @@ export function useAudioPlayer(slug: string, postTitle: string, coverImage: stri
     const ts = timestampsRef.current;
     if (ts) {
       const idx = ts.paragraphs.findIndex((p) => t >= p.start && t < p.end);
-      setActiveParagraphIndex(idx >= 0 ? idx : ts.paragraphs.length - 1);
+      if (idx >= 0) {
+        setActiveParagraphIndex(idx);
+      } else if (t < (ts.paragraphs[0]?.start ?? 0)) {
+        setActiveParagraphIndex(-1); // before content starts
+      } else {
+        setActiveParagraphIndex(ts.paragraphs.length - 1); // after last paragraph
+      }
     }
 
     rafRef.current = requestAnimationFrame(tick);
@@ -95,9 +101,11 @@ export function useAudioPlayer(slug: string, postTitle: string, coverImage: stri
     });
     navigator.mediaSession.setActionHandler('seekforward', () => {
       audio.currentTime = Math.min(audio.currentTime + 30, audio.duration);
+      setCurrentTime(audio.currentTime);
     });
     navigator.mediaSession.setActionHandler('seekbackward', () => {
       audio.currentTime = Math.max(audio.currentTime - 15, 0);
+      setCurrentTime(audio.currentTime);
     });
   }, []);
 
@@ -179,6 +187,7 @@ export function useAudioPlayer(slug: string, postTitle: string, coverImage: stri
   const play = useCallback(async () => {
     if (status === 'idle' || status === 'error') {
       await initiate();
+      return; // let the 'ready' useEffect trigger play
     }
 
     const audio = audioRef.current;
