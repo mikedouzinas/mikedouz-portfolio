@@ -27,11 +27,15 @@ export function stripMarkdownToParagraphs(markdown: string): string[] {
     .replace(/#{1,6}\s+(.+)/g, '$1')       // headings → keep text
     .replace(/\*\*([^*]+)\*\*/g, '$1')     // bold
     .replace(/\*([^*]+)\*/g, '$1')         // italic
+    .replace(/__([^_]+)__/g, '$1')     // double-underscore bold
+    .replace(/_([^_]+)_/g, '$1')       // underscore italic
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
     .replace(/^[-*+]\s+/gm, '')            // unordered list markers
     .replace(/^\d+\.\s+/gm, '')            // ordered list markers
     .replace(/^>\s+/gm, '')                // blockquotes
     .replace(/::[\s\S]*?::/g, '')          // hoverdef custom syntax
+    .replace(/^[-*_]{3,}\s*$/gm, '')   // horizontal rules
+    .replace(/<[^>]+>/g, '')            // HTML tags
     .replace(/\n{3,}/g, '\n\n')            // collapse excess newlines
     .trim();
 
@@ -66,7 +70,7 @@ export function deriveParagraphTimestamps(
     }
 
     const endCharIndex = Math.min(charIndex + para.length - 1, alignment.characters.length - 1);
-    searchOffset = charIndex + 1;
+    searchOffset = charIndex + para.length;
 
     const start = alignment.character_start_times_seconds[charIndex] ?? 0;
     const end = alignment.character_end_times_seconds[endCharIndex] ?? duration;
