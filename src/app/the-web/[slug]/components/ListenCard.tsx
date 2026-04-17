@@ -22,7 +22,11 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
   const isPlaying = status === 'playing';
   const isReady = status !== 'idle' && status !== 'error';
   const progress = duration > 0 ? currentTime / duration : 0;
-  const remaining = Math.max(0, duration - currentTime);
+
+  // Floor elapsed once — remaining derived from the same integer so both
+  // tick at exactly the same moment and never appear out of sync.
+  const elapsedSec = Math.floor(currentTime);
+  const remainingSec = Math.max(0, Math.round(duration) - elapsedSec);
 
   function handlePlayPause() {
     if (isPlaying) pause();
@@ -41,7 +45,7 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
     if (status === 'generating') return 'Generating audio…';
     if (status === 'loading') return 'Loading…';
     if (isReady && duration > 0) {
-      return `${formatTime(currentTime)} · ${formatTime(remaining)} remaining · Mike Veson`;
+      return `${formatTime(elapsedSec)} · ${formatTime(remainingSec)} remaining · Mike Veson`;
     }
     return `${readingTime} min · Mike Veson`;
   })();
@@ -54,15 +58,15 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
         <button
           onClick={handlePlayPause}
           disabled={isLoading}
-          aria-label={isPlaying ? 'Pause' : 'Play'}
-          className="w-10 h-10 rounded-full bg-teal-500 text-black flex items-center justify-center flex-shrink-0 hover:bg-teal-400 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          aria-label={isLoading ? 'Loading' : isPlaying ? 'Pause' : 'Play'}
+          className="w-10 h-10 rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/35 flex items-center justify-center flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
-            <Loader2 size={16} className="animate-spin" />
+            <Loader2 size={16} className="animate-spin text-[#2dd4bf]" />
           ) : isPlaying ? (
-            <Pause size={16} fill="currentColor" />
+            <Pause size={16} fill="#2dd4bf" className="text-[#2dd4bf]" />
           ) : (
-            <Play size={16} fill="currentColor" className="translate-x-px" />
+            <Play size={16} fill="#2dd4bf" className="text-[#2dd4bf] translate-x-px" />
           )}
         </button>
 
@@ -106,8 +110,8 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
           </div>
           {duration > 0 && (
             <div className="flex justify-between text-xs text-gray-600 mt-1">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
+              <span>{formatTime(elapsedSec)}</span>
+              <span>{formatTime(Math.round(duration))}</span>
             </div>
           )}
         </>

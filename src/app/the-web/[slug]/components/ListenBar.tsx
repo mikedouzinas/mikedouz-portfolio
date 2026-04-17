@@ -11,8 +11,8 @@ interface ListenBarProps {
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
+  const s = seconds % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
 }
 
 export default function ListenBar({ player, postTitle }: ListenBarProps) {
@@ -22,16 +22,26 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
   const isLoading = status === 'loading' || status === 'generating';
   const isVisible = status !== 'idle' && status !== 'error';
   const progress = duration > 0 ? currentTime / duration : 0;
-  const remaining = Math.max(0, duration - currentTime);
+
+  // Floor elapsed once — remaining is derived from the same integer so both
+  // tick at exactly the same moment and never appear out of sync.
+  const elapsedSec = Math.floor(currentTime);
+  const remainingSec = Math.max(0, Math.round(duration) - elapsedSec);
 
   if (!isVisible) return null;
+
+  const PlayPauseIcon = ({ size }: { size: number }) => {
+    if (isLoading) return <Loader2 size={size} className="animate-spin text-[#2dd4bf]" />;
+    if (isPlaying) return <Pause size={size} fill="#2dd4bf" className="text-[#2dd4bf]" />;
+    return <Play size={size} fill="#2dd4bf" className="text-[#2dd4bf] translate-x-px" />;
+  };
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-teal-500/10">
       {/* Thin teal progress strip */}
       <div className="h-0.5 bg-gray-800">
         <div
-          className="h-full bg-teal-500 transition-none"
+          className="h-full bg-[#2dd4bf] transition-none"
           style={{ width: `${progress * 100}%` }}
         />
       </div>
@@ -44,20 +54,16 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
             onClick={isPlaying ? pause : play}
             disabled={isLoading}
             aria-label={isLoading ? 'Loading' : isPlaying ? 'Pause' : 'Play'}
-            className="w-7 h-7 rounded-full bg-teal-500 text-black flex items-center justify-center flex-shrink-0 hover:bg-teal-400 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-7 h-7 rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/35 flex items-center justify-center flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading
-              ? <Loader2 size={12} className="animate-spin" />
-              : isPlaying
-                ? <Pause size={12} fill="currentColor" />
-                : <Play size={12} fill="currentColor" className="translate-x-px" />}
+            <PlayPauseIcon size={12} />
           </button>
 
           <span className="text-xs text-gray-300 truncate flex-1 min-w-0">{postTitle}</span>
 
           {duration > 0 && (
             <span className="text-xs text-gray-500 whitespace-nowrap">
-              {formatTime(currentTime)} · {formatTime(remaining)} left
+              {formatTime(elapsedSec)} · {formatTime(remainingSec)} left
             </span>
           )}
 
@@ -86,18 +92,14 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
               onClick={isPlaying ? pause : play}
               disabled={isLoading}
               aria-label={isLoading ? 'Loading' : isPlaying ? 'Pause' : 'Play'}
-              className="w-9 h-9 rounded-full bg-teal-500 text-black flex items-center justify-center flex-shrink-0 hover:bg-teal-400 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-9 h-9 rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/35 flex items-center justify-center flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading
-                ? <Loader2 size={14} className="animate-spin" />
-                : isPlaying
-                  ? <Pause size={14} fill="currentColor" />
-                  : <Play size={14} fill="currentColor" className="translate-x-px" />}
+              <PlayPauseIcon size={14} />
             </button>
             <div className="flex-1 min-w-0">
               <div className="text-xs text-gray-300 truncate">{postTitle}</div>
               {duration > 0 && (
-                <div className="text-xs text-gray-500">{formatTime(currentTime)} · {formatTime(remaining)} remaining</div>
+                <div className="text-xs text-gray-500">{formatTime(elapsedSec)} · {formatTime(remainingSec)} remaining</div>
               )}
             </div>
           </div>
