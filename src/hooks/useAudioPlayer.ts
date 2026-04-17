@@ -1,7 +1,7 @@
 // src/hooks/useAudioPlayer.ts
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, type RefObject } from 'react';
 import type { AudioTimestamps } from '@/lib/audioUtils';
 
 export type AudioStatus =
@@ -29,7 +29,12 @@ export interface UseAudioPlayerReturn {
   jumpToActiveParagraph: () => void;
 }
 
-export function useAudioPlayer(slug: string, postTitle: string, coverImage: string | null): UseAudioPlayerReturn {
+export function useAudioPlayer(
+  slug: string,
+  postTitle: string,
+  coverImage: string | null,
+  contentRef?: RefObject<HTMLElement | null>,
+): UseAudioPlayerReturn {
   const [status, setStatus] = useState<AudioStatus>('idle');
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -124,7 +129,20 @@ export function useAudioPlayer(slug: string, postTitle: string, coverImage: stri
     setErrorMessage(null);
 
     try {
-      const res = await fetch(`/api/the-web/${slug}/audio`, { method: 'POST' });
+      // Collect paragraph texts from the rendered DOM. These are the exact strings
+      // the renderer assigns data-para-idx to, so timestamps derived from them
+      // will align perfectly with the visual highlighting — no regex approximation.
+      const paragraphs: string[] = contentRef?.current
+        ? Array.from(contentRef.current.querySelectorAll('[data-para-idx]'))
+            .map((el) => el.textContent?.replace(/\s+/g, ' ').trim() ?? '')
+            .filter((t) => t.length > 0)
+        : [];
+
+      const res = await fetch(`/api/the-web/${slug}/audio`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paragraphs }),
+      });
 
       if (res.status === 429) {
         const body = await res.json().catch(() => ({})) as { error?: string };

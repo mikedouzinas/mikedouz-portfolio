@@ -101,9 +101,24 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     }
 
     try {
-      const paragraphs = stripMarkdownToParagraphs(postData.body as string);
-      // Use SSML break tags between paragraphs so ElevenLabs adds natural pauses
-      const plainText = paragraphs.join(' <break time="600ms"/> ');
+      // Prefer client-provided paragraphs (collected from the rendered DOM — exact alignment).
+      // Fall back to server-side stripping if the client didn't send any.
+      let clientParagraphs: string[] = [];
+      try {
+        const body = await req.json() as { paragraphs?: unknown };
+        if (Array.isArray(body.paragraphs)) {
+          clientParagraphs = (body.paragraphs as unknown[])
+            .filter((p): p is string => typeof p === 'string' && p.trim().length > 0)
+            .map((p) => p.trim());
+        }
+      } catch {
+        // No body or invalid JSON — use server-side fallback
+      }
+      const paragraphs = clientParagraphs.length > 0
+        ? clientParagraphs
+        : stripMarkdownToParagraphs(postData.body as string);
+
+      const plainText = paragraphs.join('\n\n');
       let timestamps: AudioTimestamps;
       let audioBuffer: ArrayBuffer;
 
