@@ -62,17 +62,20 @@ export function useAudioPlayer(slug: string, postTitle: string, coverImage: stri
     const t = audio.currentTime;
     setCurrentTime(t);
 
-    // Derive active paragraph from timestamps
+    // Derive active paragraph from timestamps.
+    // Reverse-scan: find the last paragraph whose start time we've passed.
+    // This handles inter-paragraph gaps naturally — we stay on the current
+    // paragraph during pauses rather than jumping to the last paragraph.
     const ts = timestampsRef.current;
-    if (ts) {
-      const idx = ts.paragraphs.findIndex((p) => t >= p.start && t < p.end);
-      if (idx >= 0) {
-        setActiveParagraphIndex(idx);
-      } else if (t < (ts.paragraphs[0]?.start ?? 0)) {
-        setActiveParagraphIndex(-1); // before content starts
-      } else {
-        setActiveParagraphIndex(ts.paragraphs.length - 1); // after last paragraph
+    if (ts && ts.paragraphs.length > 0) {
+      let activeIdx = -1;
+      for (let i = ts.paragraphs.length - 1; i >= 0; i--) {
+        if (t >= ts.paragraphs[i].start) {
+          activeIdx = i;
+          break;
+        }
       }
+      setActiveParagraphIndex(activeIdx);
     }
 
     rafRef.current = requestAnimationFrame(tick);

@@ -102,7 +102,8 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
     try {
       const paragraphs = stripMarkdownToParagraphs(postData.body as string);
-      const plainText = paragraphs.join('\n\n');
+      // Use SSML break tags between paragraphs so ElevenLabs adds natural pauses
+      const plainText = paragraphs.join(' <break time="600ms"/> ');
       let timestamps: AudioTimestamps;
       let audioBuffer: ArrayBuffer;
 

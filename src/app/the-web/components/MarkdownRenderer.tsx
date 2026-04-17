@@ -54,25 +54,37 @@ export default function MarkdownRenderer({ content, activeParagraphIndex = -1 }:
       rehypePlugins={[rehypeRaw]}
       components={
         {
-          h1: ({ children }: { children?: React.ReactNode }) => (
-            <h1 className="text-2xl sm:text-3xl font-bold mt-10 mb-4 text-gray-100">
-              {children}
-            </h1>
-          ),
-          h2: ({ children }: { children?: React.ReactNode }) => (
-            <h2 className="text-xl sm:text-2xl font-semibold mt-8 mb-3 text-gray-100">
-              {children}
-            </h2>
-          ),
-          h3: ({ children }: { children?: React.ReactNode }) => (
-            <h3 className="text-lg sm:text-xl font-semibold mt-6 mb-2 text-gray-200">
-              {children}
-            </h3>
-          ),
+          // Headings must increment paraCounterRef to stay in sync with the
+          // timestamp paragraph list. stripMarkdownToParagraphs includes heading
+          // text as separate entries; if we don't advance the counter here,
+          // every heading shifts the paragraph index by 1 and highlighting drifts.
+          h1: ({ children }: { children?: React.ReactNode }) => {
+            paraCounterRef.current++;
+            return (
+              <h1 className="text-2xl sm:text-3xl font-bold mt-10 mb-4 text-gray-100">
+                {children}
+              </h1>
+            );
+          },
+          h2: ({ children }: { children?: React.ReactNode }) => {
+            paraCounterRef.current++;
+            return (
+              <h2 className="text-xl sm:text-2xl font-semibold mt-8 mb-3 text-gray-100">
+                {children}
+              </h2>
+            );
+          },
+          h3: ({ children }: { children?: React.ReactNode }) => {
+            paraCounterRef.current++;
+            return (
+              <h3 className="text-lg sm:text-xl font-semibold mt-6 mb-2 text-gray-200">
+                {children}
+              </h3>
+            );
+          },
           p: ({ children }: { children?: React.ReactNode }) => {
             const idx = paraCounterRef.current++;
             const isActive = activeParagraphIndex === idx;
-            const isPast = activeParagraphIndex > idx && activeParagraphIndex >= 0;
             return (
               <p
                 data-para-idx={idx}
@@ -80,8 +92,6 @@ export default function MarkdownRenderer({ content, activeParagraphIndex = -1 }:
                   'text-base leading-7 mb-4 transition-all duration-200',
                   isActive
                     ? 'text-gray-100 bg-teal-500/[0.08] border-l-2 border-teal-500 pl-3 -ml-[13px]'
-                    : isPast
-                    ? 'text-gray-300 opacity-50'
                     : 'text-gray-300',
                 ].join(' ')}
               >

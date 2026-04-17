@@ -47,9 +47,9 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
   })();
 
   return (
-    <div className="rounded-xl bg-gradient-to-br from-teal-500/[0.08] to-teal-400/[0.04] border border-teal-500/20 p-4 mb-8">
+    <div className="rounded-xl bg-gradient-to-br from-teal-500/[0.08] to-teal-400/[0.04] border border-teal-500/20 p-3 mb-5">
       {/* Controls row */}
-      <div className="flex items-center gap-3 mb-3">
+      <div className="flex items-center gap-3 mb-2.5">
         {/* Play / Pause button */}
         <button
           onClick={handlePlayPause}
@@ -83,31 +83,33 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
         )}
       </div>
 
-      {/* Progress bar — only when duration is known */}
-      {duration > 0 && (
+      {/* Progress bar — always visible; interactive once duration is known */}
+      {status !== 'error' && (
         <>
           <div
-            role="slider"
-            aria-valuemin={0}
-            aria-valuemax={duration}
-            aria-valuenow={currentTime}
-            tabIndex={0}
-            onClick={handleSeek}
-            onKeyDown={(e) => {
+            role={duration > 0 ? 'slider' : undefined}
+            aria-valuemin={duration > 0 ? 0 : undefined}
+            aria-valuemax={duration > 0 ? duration : undefined}
+            aria-valuenow={duration > 0 ? currentTime : undefined}
+            tabIndex={duration > 0 ? 0 : undefined}
+            onClick={duration > 0 ? handleSeek : undefined}
+            onKeyDown={duration > 0 ? (e) => {
               if (e.key === 'ArrowRight') seek(Math.min(currentTime + 5, duration));
               else if (e.key === 'ArrowLeft') seek(Math.max(currentTime - 5, 0));
-            }}
-            className="h-1 bg-gray-700 rounded-full cursor-pointer overflow-hidden"
+            } : undefined}
+            className={`h-1 bg-gray-700 rounded-full overflow-hidden ${duration > 0 ? 'cursor-pointer' : ''}`}
           >
             <div
               className="h-full bg-teal-500 rounded-full transition-none"
               style={{ width: `${progress * 100}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs text-gray-600 mt-1">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(duration)}</span>
-          </div>
+          {duration > 0 && (
+            <div className="flex justify-between text-xs text-gray-600 mt-1">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
+          )}
         </>
       )}
     </div>
