@@ -20,8 +20,7 @@ export default function MarkdownRenderer({ content, activeParagraphIndex = -1 }:
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Paragraph counter — reset on each render, incremented by the p renderer
-  const paraCounterRef = useRef(0);
-  paraCounterRef.current = 0;
+  let paraCounter = 0;
 
   // Detect manual scroll → pause auto-scroll for 4 seconds
   useEffect(() => {
@@ -69,7 +68,7 @@ export default function MarkdownRenderer({ content, activeParagraphIndex = -1 }:
             </h3>
           ),
           p: ({ children }: { children?: React.ReactNode }) => {
-            const idx = paraCounterRef.current++;
+            const idx = paraCounter++;
             const isActive = activeParagraphIndex === idx;
             const isPast = activeParagraphIndex > idx && activeParagraphIndex >= 0;
             return (
