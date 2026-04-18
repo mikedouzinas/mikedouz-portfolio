@@ -7,6 +7,7 @@ import { useAdminMode } from '@/hooks/useAdminMode';
 import { getMusicInsights } from '@/data/spotify/loader';
 import SpotifyAdminDetail from '@/components/spotify/SpotifyAdminDetail';
 import FloatingNotes from './FloatingNotes';
+import AlbumArtFallback from './AlbumArtFallback';
 
 interface SpotifyCardProps {
   moment: MusicMoment;
@@ -132,9 +133,7 @@ export default function SpotifyCard({
                 className="object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Play className="w-3 h-3 text-gray-500" />
-              </div>
+              <AlbumArtFallback seed={moment.trackUri || moment.trackName} iconSize={14} />
             )}
 
             {/* Play/pause/loading overlay */}
@@ -213,7 +212,7 @@ export default function SpotifyCard({
                   className="object-cover"
                 />
               ) : (
-                <div className="w-full h-full" />
+                <AlbumArtFallback seed={moment.trackUri || moment.trackName} iconSize={22} />
               )}
 
               {/* Play/pause/loading — always visible when playing or loading */}

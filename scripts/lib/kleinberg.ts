@@ -259,42 +259,54 @@ export function splitIntoPeaks(
   }
   // Handle trailing valley (ignore — it just means the burst ends early)
 
-  if (splitPoints.length === 0) {
-    // No split: whole region is one peak
-    const totalPlays = regionCounts.reduce((a, b) => a + b, 0);
-    if (totalPlays < 5) return [];
-    return [{ relStart: 0, relEnd: regionLen - 1, plays: totalPlays, weeks: regionLen }];
-  }
-
   // Build candidate peak ranges from split points.
-  // Each split point marks the index where a new peak begins (the valley sits
-  // just before it). We trim leading/trailing valley weeks from each sub-peak
-  // so that valley weeks never appear inside a peak.
-  const boundaries = [0, ...splitPoints, regionLen]; // start indices + sentinel end
+  const boundaries = splitPoints.length === 0
+    ? [0, regionLen]
+    : [0, ...splitPoints, regionLen];
   const peaks: Peak[] = [];
+
+  // Thresholds applied to each sub-peak:
+  // - MIN_PLAYS_PER_PEAK: prevents a single-play peak from being an "era"
+  // - MIN_MAX_WEEKLY_COUNT: a real peak must have at least one week of real
+  //   intensity. Filters "phantom" bursts from songs played sporadically over
+  //   many months (e.g., interludes auto-played as part of albums).
+  // - TAIL_TRIM_RATIO: trim leading/trailing weeks below this fraction of the
+  //   peak's max weekly count. Cuts sporadic tails without dropping the song.
+  const MIN_PLAYS_PER_PEAK = 5;
+  const MIN_MAX_WEEKLY_COUNT = 3;
+  const TAIL_TRIM_RATIO = 0.3;
 
   for (let p = 0; p < boundaries.length - 1; p++) {
     let relStart = boundaries[p];
     let relEnd = boundaries[p + 1] - 1;
 
-    // Trim leading valley weeks
+    // First pass: trim valley weeks (below valleyThreshold)
     while (relStart <= relEnd && isValley[relStart]) relStart++;
-    // Trim trailing valley weeks
     while (relEnd >= relStart && isValley[relEnd]) relEnd--;
+    if (relStart > relEnd) continue;
 
-    if (relStart > relEnd) continue; // entirely valley — skip
+    // Second pass: tail-trim weeks below TAIL_TRIM_RATIO of the peak max.
+    // This tightens the range so that a burst isn't padded by weeks where
+    // the track was played only a couple of times.
+    let maxCount = 0;
+    for (let i = relStart; i <= relEnd; i++) {
+      if (regionCounts[i] > maxCount) maxCount = regionCounts[i];
+    }
+    const tailThreshold = maxCount * TAIL_TRIM_RATIO;
+    while (relStart <= relEnd && regionCounts[relStart] < tailThreshold) relStart++;
+    while (relEnd >= relStart && regionCounts[relEnd] < tailThreshold) relEnd--;
+    if (relStart > relEnd) continue;
+
+    // Reject phantom peaks: a real peak must have at least one week with
+    // MIN_MAX_WEEKLY_COUNT plays. A song played 1–2x/week for 50 weeks is not
+    // a peak regardless of cumulative play count.
+    if (maxCount < MIN_MAX_WEEKLY_COUNT) continue;
 
     const slice = regionCounts.slice(relStart, relEnd + 1);
     const plays = slice.reduce((a, b) => a + b, 0);
-    if (plays < 5) continue; // skip undersized peaks
-    peaks.push({ relStart, relEnd, plays, weeks: relEnd - relStart + 1 });
-  }
+    if (plays < MIN_PLAYS_PER_PEAK) continue;
 
-  // If filtering removed all sub-peaks, fall back to whole region
-  if (peaks.length === 0) {
-    const totalPlays = regionCounts.reduce((a, b) => a + b, 0);
-    if (totalPlays < 5) return [];
-    return [{ relStart: 0, relEnd: regionLen - 1, plays: totalPlays, weeks: regionLen }];
+    peaks.push({ relStart, relEnd, plays, weeks: relEnd - relStart + 1 });
   }
 
   return peaks;

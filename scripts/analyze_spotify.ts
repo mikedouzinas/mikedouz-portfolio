@@ -164,7 +164,9 @@ async function main(): Promise<void> {
       numStates: 4,
     });
 
-    // Extract burst regions (state >= 1)
+    // Extract burst regions (state >= 1) to keep warm-listen songs that never
+    // quite spike to state 2. Tail-trimming and a minimum-peak-height filter
+    // in splitIntoPeaks keep sporadic long tails and phantom interludes out.
     const regions = extractBurstRegions(states, 1);
     if (regions.length === 0) continue;
 
@@ -190,12 +192,29 @@ async function main(): Promise<void> {
 
         if (!startWeekIso || !endWeekIso) continue;
 
-        // Date range: start of first week → end of last week (Sunday = +6 days)
-        const endDate = new Date(endWeekIso);
-        endDate.setUTCDate(endDate.getUTCDate() + 6);
-        const endIso = endDate.toISOString().slice(0, 10);
+        // Week window: Monday of first peak week → Sunday of last peak week
+        const weekWindowEnd = new Date(endWeekIso);
+        weekWindowEnd.setUTCDate(weekWindowEnd.getUTCDate() + 6);
+        const weekWindowStart = startWeekIso;
+        const weekWindowEndIso = weekWindowEnd.toISOString().slice(0, 10);
 
-        const dateRange = { start: startWeekIso, end: endIso };
+        // Tighten the date range to the actual first/last play dates within
+        // the week window. Otherwise a range can end in the future (e.g.
+        // peak includes the current week → range ends Sunday even if no
+        // plays have happened yet this week).
+        let actualStart: string | null = null;
+        let actualEnd: string | null = null;
+        for (const [dayIso, count] of db.entries()) {
+          if (count > 0 && dayIso >= weekWindowStart && dayIso <= weekWindowEndIso) {
+            if (actualStart === null || dayIso < actualStart) actualStart = dayIso;
+            if (actualEnd === null || dayIso > actualEnd) actualEnd = dayIso;
+          }
+        }
+
+        const dateRange = {
+          start: actualStart ?? weekWindowStart,
+          end: actualEnd ?? weekWindowEndIso,
+        };
 
         // Find hot days within this date range (all days with 2+ plays, sorted desc)
         const daysInRange: Array<{ date: string; plays: number }> = [];

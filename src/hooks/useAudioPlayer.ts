@@ -24,6 +24,7 @@ export interface UseAudioPlayerReturn {
   errorMessage: string | null;
   play: () => Promise<void>;
   pause: () => void;
+  stop: () => void;
   seek: (time: number) => void;
   cycleSpeed: () => void;
   jumpToActiveParagraph: () => void;
@@ -206,6 +207,9 @@ export function useAudioPlayer(
       generatingAttemptsRef.current = 0;
       setStatus('ready');
     } catch (err) {
+      // If stop() was called while we were loading, hasInitiatedRef is false —
+      // bail silently; status is already 'idle'.
+      if (!hasInitiatedRef.current) return;
       console.error('[useAudioPlayer] initiate error:', err);
       setStatus('error');
       setErrorMessage("Couldn't load audio. Try again.");
@@ -245,6 +249,23 @@ export function useAudioPlayer(
     audioRef.current?.pause();
     cancelRaf();
     setStatus('paused');
+  }, [cancelRaf]);
+
+  const stop = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      // Don't set src = '' — that fires an 'error' event on the element.
+      // Just drop the reference; the element will be GC'd.
+      audioRef.current = null;
+    }
+    cancelRaf();
+    hasInitiatedRef.current = false;
+    timestampsRef.current = null;
+    setStatus('idle');
+    setCurrentTime(0);
+    setDuration(0);
+    setActiveParagraphIndex(-1);
+    setErrorMessage(null);
   }, [cancelRaf]);
 
   const seek = useCallback((time: number) => {
@@ -301,6 +322,7 @@ export function useAudioPlayer(
     errorMessage,
     play,
     pause,
+    stop,
     seek,
     cycleSpeed,
     jumpToActiveParagraph,

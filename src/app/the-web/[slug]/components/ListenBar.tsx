@@ -1,7 +1,7 @@
 // src/app/the-web/[slug]/components/ListenBar.tsx
 'use client';
 
-import { Play, Pause, ArrowDown, Loader2 } from 'lucide-react';
+import { Play, Pause, ArrowDown, Loader2, X } from 'lucide-react';
 import type { UseAudioPlayerReturn } from '@/hooks/useAudioPlayer';
 
 interface ListenBarProps {
@@ -16,17 +16,17 @@ function formatTime(seconds: number): string {
 }
 
 export default function ListenBar({ player, postTitle }: ListenBarProps) {
-  const { status, currentTime, duration, speed, play, pause, cycleSpeed, jumpToActiveParagraph } = player;
+  const { status, currentTime, duration, speed, play, pause, stop, cycleSpeed, jumpToActiveParagraph } = player;
 
   const isPlaying = status === 'playing';
   const isLoading = status === 'loading' || status === 'generating';
   const isVisible = status !== 'idle' && status !== 'error';
   const progress = duration > 0 ? currentTime / duration : 0;
 
-  // Floor elapsed once — remaining is derived from the same integer so both
-  // tick at exactly the same moment and never appear out of sync.
+  // Floor elapsed; use floor (not round) for duration so remainingSec hits 0
+  // at the same moment the audio ends, never showing "1 left" on the last tick.
   const elapsedSec = Math.floor(currentTime);
-  const remainingSec = Math.max(0, Math.round(duration) - elapsedSec);
+  const remainingSec = Math.max(0, Math.floor(duration) - elapsedSec);
 
   if (!isVisible) return null;
 
@@ -83,9 +83,18 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
           >
             <ArrowDown size={14} />
           </button>
+
+          <button
+            onClick={stop}
+            aria-label="Close player"
+            title="Close player"
+            className="text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0"
+          >
+            <X size={14} />
+          </button>
         </div>
 
-        {/* Mobile: two rows */}
+        {/* Mobile: two rows — X always in top row so it's never off-screen */}
         <div className="flex sm:hidden flex-col py-2 gap-1.5">
           <div className="flex items-center gap-2.5">
             <button
@@ -102,6 +111,14 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
                 <div className="text-xs text-gray-500">{formatTime(elapsedSec)} · {formatTime(remainingSec)} remaining</div>
               )}
             </div>
+            {/* X always visible in the top row on mobile */}
+            <button
+              onClick={stop}
+              aria-label="Close player"
+              className="text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0 p-1"
+            >
+              <X size={16} />
+            </button>
           </div>
 
           <div className="flex items-center gap-2">

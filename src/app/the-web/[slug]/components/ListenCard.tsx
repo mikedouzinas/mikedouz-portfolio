@@ -26,7 +26,7 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
   // Floor elapsed once — remaining derived from the same integer so both
   // tick at exactly the same moment and never appear out of sync.
   const elapsedSec = Math.floor(currentTime);
-  const remainingSec = Math.max(0, Math.round(duration) - elapsedSec);
+  const remainingSec = Math.max(0, Math.floor(duration) - elapsedSec);
 
   function handlePlayPause() {
     if (isPlaying) pause();
@@ -42,8 +42,8 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
 
   const subtitleText = (() => {
     if (status === 'error') return player.errorMessage ?? "Couldn't load audio";
-    if (status === 'generating') return 'Generating audio…';
-    if (status === 'loading') return 'Loading…';
+    if (status === 'generating') return 'Downloading the audio for this post. This may take a minute.';
+    if (status === 'loading') return 'Downloading the audio for this post. This may take a minute.';
     if (isReady && duration > 0) {
       return `${formatTime(elapsedSec)} · ${formatTime(remainingSec)} remaining · Mike Veson`;
     }

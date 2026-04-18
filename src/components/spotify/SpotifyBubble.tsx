@@ -210,9 +210,12 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
 
       {/* Expanded view — always in DOM, toggled via opacity/pointer-events for instant open */}
       <div
+        data-has-contained-glow="true"
         className="fixed z-50 rounded-2xl overflow-hidden transition-all duration-[120ms]"
         style={{
-          background: 'rgba(16,42,46,0.95)',
+          background: 'rgb(13,34,37)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           border: '1px solid rgba(52,211,153,0.25)',
           boxShadow: expanded
             ? '0 12px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)'
@@ -226,6 +229,7 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
           willChange: 'transform, opacity',
         }}
       >
+        <ContainedMouseGlow color="52, 211, 153" intensity={0.25} />
             <div className="flex items-center justify-between px-3 py-2.5">
               <div className="flex items-center gap-2">
                 <Music className="w-3.5 h-3.5" style={{ color: '#1DB954' }} />
@@ -252,12 +256,20 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
             >
               {visibleData.map(({ month, moments }) => (
                 <div key={month}>
-                  <p
-                    className="text-[10px] font-semibold tracking-widest uppercase mb-2 px-1 sticky top-0 py-1 z-10"
-                    style={{ color: '#34d399', backgroundColor: 'rgba(16,42,46,0.95)' }}
-                  >
-                    {formatMonth(month)}
-                  </p>
+                  <div className="sticky top-0 z-10 mb-2 py-1 px-1">
+                    <span
+                      className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-widest uppercase"
+                      style={{
+                        color: '#34d399',
+                        backgroundColor: 'rgba(13,34,37,0.85)',
+                        backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
+                        border: '1px solid rgba(52,211,153,0.15)',
+                      }}
+                    >
+                      {formatMonth(month)}
+                    </span>
+                  </div>
                   <div className="space-y-2">
                     {moments.map((moment) => (
                       <SpotifyCard

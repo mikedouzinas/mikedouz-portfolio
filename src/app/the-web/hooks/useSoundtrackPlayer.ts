@@ -89,19 +89,31 @@ export function useSoundtrackPlayer(soundtrack: SoundtrackTrack[]) {
     }
   }, [asMoments, currentIndex, embedTogglePlay, isCurrentPlaying, play]);
 
+  const wasPlaying = isCurrentPlaying && embed.isPlaying;
+
   const next = useCallback(() => {
     const nextIdx = (currentIndex + 1) % soundtrack.length;
     setCurrentIndex(nextIdx);
     setPreviewEnded(false);
-    embedTogglePlay(asMoments[nextIdx]);
-  }, [asMoments, currentIndex, embedTogglePlay, soundtrack.length]);
+    // Only auto-play the next track if we were actively playing.
+    // When paused, navigating should update the selection without starting playback.
+    if (wasPlaying) {
+      embedTogglePlay(asMoments[nextIdx]);
+    } else {
+      embedStop();
+    }
+  }, [asMoments, currentIndex, embedTogglePlay, embedStop, soundtrack.length, wasPlaying]);
 
   const prev = useCallback(() => {
     const prevIdx = (currentIndex - 1 + soundtrack.length) % soundtrack.length;
     setCurrentIndex(prevIdx);
     setPreviewEnded(false);
-    embedTogglePlay(asMoments[prevIdx]);
-  }, [asMoments, currentIndex, embedTogglePlay, soundtrack.length]);
+    if (wasPlaying) {
+      embedTogglePlay(asMoments[prevIdx]);
+    } else {
+      embedStop();
+    }
+  }, [asMoments, currentIndex, embedTogglePlay, embedStop, soundtrack.length, wasPlaying]);
 
   // Stop destroys the embed unconditionally — used by dismiss to avoid leaking audio
   const stop = useCallback(() => {

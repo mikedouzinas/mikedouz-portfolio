@@ -6,10 +6,10 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import {
   stripMarkdownToParagraphs,
-  deriveParagraphTimestamps,
   estimateParagraphTimestamps,
   ElevenLabsAlignment,
   AudioTimestamps,
+  ParagraphTimestamp,
 } from '@/lib/audioUtils';
 
 export const runtime = 'nodejs';
@@ -118,7 +118,6 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
         ? clientParagraphs
         : stripMarkdownToParagraphs(postData.body as string);
 
-      const plainText = paragraphs.join('\n\n');
       let timestamps: AudioTimestamps;
       let audioBuffer: ArrayBuffer;
 
@@ -133,45 +132,58 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
         const estimatedDuration = audioBuffer.byteLength / 16000;
         timestamps = estimateParagraphTimestamps(paragraphs, estimatedDuration);
       } else {
-        // TTS: call ElevenLabs with-timestamps endpoint
-        const elevenResponse = await fetch(
-          `https://api.elevenlabs.io/v1/text-to-speech/${env.elevenLabsVoiceId}/with-timestamps`,
-          {
-            method: 'POST',
-            headers: {
-              'xi-api-key': env.elevenLabsApiKey,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              text: plainText,
-              model_id: 'eleven_turbo_v2_5',
-              voice_settings: {
-                stability: 0.5,
-                similarity_boost: 0.75,
+        // TTS: call ElevenLabs per-paragraph (parallel) so each paragraph gets
+        // its own exact alignment data. Timestamps are built as cumulative sums —
+        // no anchor search, no approximation.
+        const paraResults = await Promise.all(
+          paragraphs.map(async (para) => {
+            const resp = await fetch(
+              `https://api.elevenlabs.io/v1/text-to-speech/${env.elevenLabsVoiceId}/with-timestamps`,
+              {
+                method: 'POST',
+                headers: {
+                  'xi-api-key': env.elevenLabsApiKey,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  text: para,
+                  model_id: 'eleven_turbo_v2_5',
+                  voice_settings: {
+                    stability: 0.5,
+                    similarity_boost: 0.75,
+                  },
+                }),
               },
-            }),
-          },
+            );
+            if (!resp.ok) {
+              const errText = await resp.text();
+              console.error('[audio] ElevenLabs paragraph error:', errText);
+              throw new Error('ElevenLabs API request failed');
+            }
+            const data = await resp.json() as {
+              audio_base64: string;
+              alignment: ElevenLabsAlignment;
+            };
+            const buf = Buffer.from(data.audio_base64, 'base64');
+            const paraDuration = data.alignment.character_end_times_seconds.at(-1) ?? 0;
+            return { buf, paraDuration };
+          }),
         );
 
-        if (!elevenResponse.ok) {
-          const errText = await elevenResponse.text();
-          console.error('[audio] ElevenLabs error:', errText);
-          throw new Error('ElevenLabs API request failed');
-        }
+        // Concatenate all paragraph buffers into one mp3
+        const combined = Buffer.concat(paraResults.map((r) => r.buf));
+        audioBuffer = combined.buffer.slice(combined.byteOffset, combined.byteOffset + combined.byteLength);
 
-        const elevenData = await elevenResponse.json() as {
-          audio_base64: string;
-          alignment: ElevenLabsAlignment;
-        };
-
-        // Decode base64 audio — use slice to avoid Node.js buffer pool offset issues
-        const audioNodeBuf = Buffer.from(elevenData.audio_base64, 'base64');
-        audioBuffer = audioNodeBuf.buffer.slice(audioNodeBuf.byteOffset, audioNodeBuf.byteOffset + audioNodeBuf.byteLength);
-
-        // Estimate total duration from alignment data
-        const lastIdx = elevenData.alignment.character_end_times_seconds.length - 1;
-        const duration = elevenData.alignment.character_end_times_seconds[lastIdx] ?? 0;
-        timestamps = deriveParagraphTimestamps(paragraphs, elevenData.alignment, duration);
+        // Build timestamps as exact cumulative sums
+        let offset = 0;
+        const totalDuration = paraResults.reduce((sum, r) => sum + r.paraDuration, 0);
+        const tsParas: ParagraphTimestamp[] = paragraphs.map((para, i) => {
+          const start = offset;
+          const end = offset + paraResults[i].paraDuration;
+          offset = end;
+          return { index: i, start, end, text: para.slice(0, 100) };
+        });
+        timestamps = { paragraphs: tsParas, duration: totalDuration };
       }
 
       // 5. Upload audio to Supabase Storage

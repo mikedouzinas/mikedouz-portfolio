@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Play, Pause, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import type { SoundtrackTrack } from '@/lib/blog';
 import { useSoundtrackPlayer } from '../hooks/useSoundtrackPlayer';
+import AlbumArtFallback from '@/components/spotify/AlbumArtFallback';
 
 function formatTime(s: number): string {
   const m = Math.floor(s / 60);
@@ -37,14 +38,22 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
         <div className="flex items-center gap-2.5 px-3 py-2">
           {/* Album art — 32px on mobile, 40px on sm+ */}
           <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded-lg overflow-hidden">
-            <Image
-              src={currentTrack.albumArtUrl}
-              alt={`${currentTrack.trackName} album art`}
-              fill
-              sizes="40px"
-              className="object-cover"
-              unoptimized
-            />
+            {currentTrack.albumArtUrl ? (
+              <Image
+                src={currentTrack.albumArtUrl}
+                alt={`${currentTrack.trackName} album art`}
+                fill
+                sizes="40px"
+                className="object-cover"
+                unoptimized
+              />
+            ) : (
+              <AlbumArtFallback
+                seed={currentTrack.trackUri || currentTrack.trackName}
+                iconSize={16}
+                rounded="rounded-lg"
+              />
+            )}
           </div>
 
           {/* Prev button */}
