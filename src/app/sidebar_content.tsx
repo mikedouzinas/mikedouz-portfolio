@@ -72,18 +72,19 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
     return (
         <div className="flex flex-col h-full p-8 text-center md:text-center">
             <div className="flex-shrink-0">
-                {/* Profile container: fixed width and centered */}
-                <div className="w-48 mx-auto">
-                    <HomeContent
-                        imageContainerSize="w-[13.5rem] h-[13.5rem]"
-                        imageSize="w-[13rem] h-[13rem]"
-                        headingSize="text-4xl"
-                        containerClass="flex flex-col items-center justify-center py-8"
-                        textWrapperClass="mt-4 text-center"
-                    />
-                </div>
+                {/* Shared container: profile + nav share same left edge */}
+                <div className="w-fit mx-auto">
+                    <div className="w-48">
+                        <HomeContent
+                            imageContainerSize="w-[13.5rem] h-[13.5rem]"
+                            imageSize="w-[13rem] h-[13rem]"
+                            headingSize="text-4xl"
+                            containerClass="flex flex-col items-center justify-center py-8"
+                            textWrapperClass="mt-4 text-center"
+                        />
+                    </div>
                 {/* Navigation links with sliding pill indicator */}
-                <nav className="mt-8 w-fit mx-auto hidden md:block">
+                <nav className="mt-8 w-fit hidden md:block">
                     <div style={{ position: 'relative' }}>
                         <div style={{
                             position: 'absolute',
@@ -124,6 +125,7 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                         </ul>
                     </div>
                 </nav>
+                </div>
             </div>
             {/* Spotify music timeline (deep mode only) */}
             <div className="flex-1 min-h-0 flex items-center py-6" id="spotify-sidebar-wrapper">
