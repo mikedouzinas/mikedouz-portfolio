@@ -83,7 +83,7 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                     />
                 </div>
                 {/* Navigation links with sliding pill indicator */}
-                <nav className="mt-8 w-48 mx-auto hidden md:block">
+                <nav className="mt-8 w-fit mx-auto hidden md:block">
                     <div style={{ position: 'relative' }}>
                         <div style={{
                             position: 'absolute',
@@ -98,7 +98,7 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                             transition: 'top 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease',
                             pointerEvents: 'none',
                         }} />
-                        <ul>
+                        <ul className="text-left">
                             {navItems.map((item) => {
                                 const isActive = activeSection === item.id;
                                 return (
@@ -108,7 +108,7 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                                             onClick={handleNavClick(item.id)}
                                             aria-current={isActive ? 'location' : undefined}
                                             className={`
-                                                text-xs uppercase tracking-wide w-full px-3
+                                                block text-xs uppercase tracking-wide px-3
                                                 transition-colors duration-200
                                                 ${isActive
                                                     ? 'text-blue-300 font-semibold'
