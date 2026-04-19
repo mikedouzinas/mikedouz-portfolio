@@ -131,7 +131,15 @@ async function main(): Promise<void> {
   // 3. Per-track Kleinberg + peak extraction ----------------------------------
   const moments: MusicMoment[] = [];
 
-  const MIN_TOTAL_PLAYS = 10;
+  // Weeks of zero-context to keep on each side after trimming.
+  // Without this, a new song with plays in only one week produces a
+  // single-element array and Kleinberg cannot detect a burst.
+  const CONTEXT_WEEKS = 4;
+
+  // Minimum raw plays before a track enters the Kleinberg pipeline.
+  // Lowered from 10 to 5 because the external baseRate parameter now
+  // correctly handles new songs without needing a long history.
+  const MIN_TOTAL_PLAYS = 5;
 
   for (const [trackKey, wb] of weekBuckets) {
     // Total play count filter
@@ -141,6 +149,11 @@ async function main(): Promise<void> {
 
     const meta = trackMeta.get(trackKey)!;
 
+    // All-time average plays/week for this track. Used as Kleinberg's baseRate
+    // so the burst doesn't inflate its own baseline. For new songs this is
+    // near zero, making even a modest spike register as a clear burst.
+    const trackBaseRate = totalPlays / allWeeks.length;
+
     // Build dense weekly count array aligned to global week index
     const weeklyCounts: number[] = new Array(allWeeks.length).fill(0);
     for (const [weekIso, count] of wb.entries()) {
@@ -148,20 +161,24 @@ async function main(): Promise<void> {
       if (idx !== undefined) weeklyCounts[idx] = count;
     }
 
-    // Trim leading/trailing zeros for a tighter Kleinberg window
+    // Trim leading/trailing zeros but keep CONTEXT_WEEKS of context on each
+    // side so Kleinberg has contrast for new songs with a single active week.
     let lo = 0;
     let hi = weeklyCounts.length - 1;
     while (lo <= hi && weeklyCounts[lo] === 0) lo++;
     while (hi >= lo && weeklyCounts[hi] === 0) hi--;
     if (lo > hi) continue;
+    lo = Math.max(0, lo - CONTEXT_WEEKS);
+    hi = Math.min(weeklyCounts.length - 1, hi + CONTEXT_WEEKS);
 
     const trimmedCounts = weeklyCounts.slice(lo, hi + 1);
 
-    // Run Kleinberg
+    // Run Kleinberg with the track's all-time average as the explicit baseRate
     const { states } = kleinbergBurstDetection(trimmedCounts, {
       s: 2.0,
       gamma: 2.0,
       numStates: 4,
+      baseRate: trackBaseRate,
     });
 
     // Extract burst regions (state >= 1) to keep warm-listen songs that never

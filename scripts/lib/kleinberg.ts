@@ -18,6 +18,12 @@ export interface KleinbergParams {
   gamma?: number;
   /** Number of hidden states. Default: 4 */
   numStates?: number;
+  /**
+   * Override the baseline event rate (state-0 rate). When provided, this
+   * replaces the default mean-of-input estimate. Pass the track's all-time
+   * average plays/week so the baseline isn't inflated by the burst itself.
+   */
+  baseRate?: number;
 }
 
 export interface KleinbergResult {
@@ -75,10 +81,11 @@ export function kleinbergBurstDetection(
     return { states: [], stateRates: [] };
   }
 
-  // Base rate = mean of event counts (floor at a small positive value to avoid
-  // log(0) in the emission cost when baseRate == 0).
+  // Base rate: use caller-supplied value if provided (e.g. all-time average
+  // plays/week), otherwise fall back to the mean of the input window.
+  // The caller-supplied value prevents the burst from inflating its own baseline.
   const sum = eventCounts.reduce((a, b) => a + b, 0);
-  const baseRate = Math.max(sum / T, 1e-9);
+  const baseRate = Math.max(params.baseRate ?? sum / T, 1e-9);
 
   // State rates: rate_i = baseRate * s^i
   const stateRates: number[] = new Array(numStates);
