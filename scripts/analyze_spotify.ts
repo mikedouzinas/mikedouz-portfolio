@@ -246,6 +246,13 @@ async function main(): Promise<void> {
         const peakDay = hotDays[0]?.date || startWeekIso;
         const peakDayPlays = hotDays[0]?.plays || 0;
 
+        // Density filter: a moment requires either a single day with 3+ plays
+        // (intensity) or at least 2 separate days with 2+ plays (sustained).
+        // Filters out songs played once a day passively over a week.
+        const hasIntensity = peakDayPlays >= 3;
+        const hasSustained = hotDays.length >= 2;
+        if (!hasIntensity && !hasSustained) continue;
+
         // Intensity: maxState of the burst region (already in region.maxState)
         const intensity = region.maxState;
 
