@@ -1,39 +1,5 @@
 [
   {
-    "id": "05b1c1f6ed687c4d88409226c95519ad",
-    "trackName": "sdp interlude",
-    "artist": "Travis Scott",
-    "album": "Birds In The Trap Sing McKnight",
-    "trackUri": "spotify:track:4gh0ZnHzaTMT1sDga7Ek0N",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028752a7355996e64709247c53",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/4gh0ZnHzaTMT1sDga7Ek0N",
-    "dateRange": {
-      "start": "2026-04-10",
-      "end": "2026-04-17"
-    },
-    "playCount": 8,
-    "weeksCount": 2,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2026-04-17",
-    "peakDayPlays": 4,
-    "hotDays": [
-      {
-        "date": "2026-04-17",
-        "plays": 4
-      },
-      {
-        "date": "2026-04-10",
-        "plays": 2
-      },
-      {
-        "date": "2026-04-11",
-        "plays": 2
-      }
-    ]
-  },
-  {
     "id": "46af710900c539a8721fbc920bb1bc14",
     "trackName": "Selfless",
     "artist": "The Strokes",
@@ -628,7 +594,7 @@
   },
   {
     "id": "d6e98f922dff99bd4a7b23513d18a4e0",
-    "trackName": "Pleasure’s Mine",
+    "trackName": "Pleasure\u2019s Mine",
     "artist": "Don Toliver",
     "album": "OCTANE",
     "trackUri": "spotify:track:19cgfclwwxsGGwaEbOn0B2",
@@ -1177,9 +1143,9 @@
   },
   {
     "id": "a8ef1d655114f8b4af2630ea3c0900f3",
-    "trackName": "Cant del Barça - Himne Oficial del FC Barcelona",
+    "trackName": "Cant del Bar\u00e7a - Himne Oficial del FC Barcelona",
     "artist": "FC Barcelona",
-    "album": "Cant del Barça",
+    "album": "Cant del Bar\u00e7a",
     "trackUri": "spotify:track:5xXjygXDO7SQirJo37KBxV",
     "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e026e05e3242dca6653bd38f2e4",
     "previewUrl": null,
@@ -1348,7 +1314,7 @@
   },
   {
     "id": "4ecf17cbaf8274fc424a354549b954e4",
-    "trackName": "When I’m Alone",
+    "trackName": "When I\u2019m Alone",
     "artist": "Post Malone",
     "album": "Twelve Carat Toothache",
     "trackUri": "spotify:track:5Ja2u1FPlVxrxeMWEa2dcn",
@@ -1711,9 +1677,9 @@
   },
   {
     "id": "f2f997d845a137fdb8119465c12b5a0d",
-    "trackName": "crystallized (feat. Inéz)",
+    "trackName": "crystallized (feat. In\u00e9z)",
     "artist": "John Summit",
-    "album": "crystallized (feat. Inéz)",
+    "album": "crystallized (feat. In\u00e9z)",
     "trackUri": "spotify:track:6YiIWuVXS4AqF1KvUGMwyx",
     "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02452dceb1878dbde2fa433c73",
     "previewUrl": null,
@@ -2309,7 +2275,7 @@
   },
   {
     "id": "29aa3db7098695f42ade98a2f463ba49",
-    "trackName": "COMË N GO",
+    "trackName": "COM\u00cb N GO",
     "artist": "Yeat",
     "album": "DANGEROUS SUMMER",
     "trackUri": "spotify:track:2mNGL7mZILSqZHxGboJaO9",
@@ -3442,7 +3408,7 @@
     "id": "a8ed1640a41c5363117b300d4b563d8d",
     "trackName": "Sigue",
     "artist": "Beny Jr",
-    "album": "Capítulo 1",
+    "album": "Cap\u00edtulo 1",
     "trackUri": "spotify:track:63ZedTAVRCICh2CNLWnsPZ",
     "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02eb63a2f7274a563b3895b5aa",
     "previewUrl": null,
@@ -3597,7 +3563,7 @@
   },
   {
     "id": "9a0f4585320297d7b373ea375922784d",
-    "trackName": "ORCHESTRATË",
+    "trackName": "ORCHESTRAT\u00cb",
     "artist": "Yeat",
     "album": "LYFESTYLE",
     "trackUri": "spotify:track:3Ygb9jYG5TeibrrKJzCPmV",
@@ -3795,7 +3761,7 @@
     "id": "496146efb854096e96607b0253845b03",
     "trackName": "Sigue",
     "artist": "Beny Jr",
-    "album": "Capítulo 1",
+    "album": "Cap\u00edtulo 1",
     "trackUri": "spotify:track:63ZedTAVRCICh2CNLWnsPZ",
     "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02eb63a2f7274a563b3895b5aa",
     "previewUrl": null,
@@ -4145,7 +4111,7 @@
     "id": "189d8707db0bafadfb4b6d1d2903981a",
     "trackName": "Sigue",
     "artist": "Beny Jr",
-    "album": "Capítulo 1",
+    "album": "Cap\u00edtulo 1",
     "trackUri": "spotify:track:63ZedTAVRCICh2CNLWnsPZ",
     "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02eb63a2f7274a563b3895b5aa",
     "previewUrl": null,
@@ -4211,7 +4177,7 @@
   },
   {
     "id": "cba3d15c2167507d16c94490b1550d82",
-    "trackName": "ORCHESTRATË",
+    "trackName": "ORCHESTRAT\u00cb",
     "artist": "Yeat",
     "album": "LYFESTYLE",
     "trackUri": "spotify:track:3Ygb9jYG5TeibrrKJzCPmV",
@@ -4435,7 +4401,7 @@
   },
   {
     "id": "e2eec7a5ac635802b9b59f84960977b5",
-    "trackName": "Qué Pasaría...",
+    "trackName": "Qu\u00e9 Pasar\u00eda...",
     "artist": "Rauw Alejandro",
     "album": "Cosa Nuestra",
     "trackUri": "spotify:track:0l0vcZMU7AOeQmUIREoI2U",
@@ -5212,7 +5178,7 @@
   },
   {
     "id": "b97a2878a1bd194f7934f7049fa1a221",
-    "trackName": "Feel It - From The Original Series “Invincible”",
+    "trackName": "Feel It - From The Original Series \u201cInvincible\u201d",
     "artist": "d4vd",
     "album": "Feel It",
     "trackUri": "spotify:track:3SAga35lAPYdjj3qyfEsCF",
@@ -5422,7 +5388,7 @@
   },
   {
     "id": "23aef0b8d57c92ac4a2ce488e1b82b5c",
-    "trackName": "Feel It - From The Original Series “Invincible”",
+    "trackName": "Feel It - From The Original Series \u201cInvincible\u201d",
     "artist": "d4vd",
     "album": "Feel It",
     "trackUri": "spotify:track:3SAga35lAPYdjj3qyfEsCF",
@@ -5588,7 +5554,7 @@
   },
   {
     "id": "942b41278888c1817eae53442a4711a3",
-    "trackName": "Feel It - From The Original Series “Invincible”",
+    "trackName": "Feel It - From The Original Series \u201cInvincible\u201d",
     "artist": "d4vd",
     "album": "Feel It",
     "trackUri": "spotify:track:3SAga35lAPYdjj3qyfEsCF",
@@ -5668,7 +5634,7 @@
   },
   {
     "id": "7dc9a9fef9100fefc5036dc57e2833bf",
-    "trackName": "If We Being Rëal",
+    "trackName": "If We Being R\u00ebal",
     "artist": "Yeat",
     "album": "2093",
     "trackUri": "spotify:track:0YThXX1dqUpYBLyJNAsF9N",
@@ -5710,7 +5676,7 @@
   },
   {
     "id": "b1dffa378c077d90918ba8036e095402",
-    "trackName": "Tell më",
+    "trackName": "Tell m\u00eb",
     "artist": "Yeat",
     "album": "2093",
     "trackUri": "spotify:track:1ObrUCFugAMJoXcvpggbOd",
@@ -5941,7 +5907,7 @@
   {
     "id": "78c71f1682740b0a1382d1188a9d2990",
     "trackName": "BURN",
-    "artist": "¥$",
+    "artist": "\u00a5$",
     "album": "VULTURES 1",
     "trackUri": "spotify:track:04CyMEHliadfQWMUJb1w99",
     "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e029c654f315df05ae7c6ec8980",
