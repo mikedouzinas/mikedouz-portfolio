@@ -187,8 +187,20 @@ export function useAudioPlayer(
       audio.preload = 'auto';
       audioRef.current = audio;
 
+      // Use timestamps duration as the source of truth — concatenated MP3 buffers
+      // often lack a valid Xing/VBRI header, causing mobile browsers to misreport
+      // audio.duration (e.g. showing only the first paragraph's length).
+      const knownDuration = ts.duration > 0 ? ts.duration : null;
+      if (knownDuration) setDuration(knownDuration);
+
       audio.addEventListener('loadedmetadata', () => {
-        setDuration(audio.duration);
+        const d = audio.duration;
+        // Only trust the browser's duration if it's finite and close to what we expect
+        if (isFinite(d) && d > 0 && (!knownDuration || Math.abs(d - knownDuration) < knownDuration * 0.1)) {
+          setDuration(d);
+        } else if (knownDuration) {
+          setDuration(knownDuration);
+        }
       });
 
       audio.addEventListener('ended', () => {
