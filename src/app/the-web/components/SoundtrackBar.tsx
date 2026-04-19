@@ -126,7 +126,7 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
 
           {/* Soundtrack label */}
           <span className="hidden sm:inline text-[9px] text-white/25 tracking-wide flex-shrink-0">
-            Songs Mike listened to writing this, curated by Iris
+            Listened to while writing · assembled by Iris
           </span>
 
           {/* Close button */}
