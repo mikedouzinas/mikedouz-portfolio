@@ -1,6 +1,143 @@
 [
   {
-    "id": "7a2e786f2919ee4b6f65d32144b36f27",
+    "id": "05b1c1f6ed687c4d88409226c95519ad",
+    "trackName": "sdp interlude",
+    "artist": "Travis Scott",
+    "album": "Birds In The Trap Sing McKnight",
+    "trackUri": "spotify:track:4gh0ZnHzaTMT1sDga7Ek0N",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028752a7355996e64709247c53",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/4gh0ZnHzaTMT1sDga7Ek0N",
+    "dateRange": {
+      "start": "2026-04-10",
+      "end": "2026-04-17"
+    },
+    "playCount": 8,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-04-17",
+    "peakDayPlays": 4,
+    "hotDays": [
+      {
+        "date": "2026-04-17",
+        "plays": 4
+      },
+      {
+        "date": "2026-04-10",
+        "plays": 2
+      },
+      {
+        "date": "2026-04-11",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "loyalty",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 289,
+      "uniqueTracksInWindow": 169,
+      "timeOfDayDistribution": {
+        "0": 3,
+        "1": 0,
+        "2": 6,
+        "3": 2,
+        "4": 2,
+        "5": 0,
+        "6": 1,
+        "7": 2,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 2,
+        "15": 3,
+        "16": 5,
+        "17": 1,
+        "18": 4,
+        "19": 1,
+        "20": 5,
+        "21": 5,
+        "22": 3,
+        "23": 6
+      },
+      "monthsActive": 19
+    }
+  },
+  {
+    "id": "46af710900c539a8721fbc920bb1bc14",
+    "trackName": "Selfless",
+    "artist": "The Strokes",
+    "album": "The New Abnormal",
+    "trackUri": "spotify:track:2t0wwvR15fc3K1ey8OiOaN",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02e3f1ba3de4659708c25d0f39",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/2t0wwvR15fc3K1ey8OiOaN",
+    "dateRange": {
+      "start": "2026-04-10",
+      "end": "2026-04-18"
+    },
+    "playCount": 8,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-04-18",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-04-18",
+        "plays": 3
+      },
+      {
+        "date": "2026-04-17",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 342,
+      "uniqueTracksInWindow": 189,
+      "timeOfDayDistribution": {
+        "0": 10,
+        "1": 7,
+        "2": 7,
+        "3": 2,
+        "4": 4,
+        "5": 0,
+        "6": 0,
+        "7": 1,
+        "8": 0,
+        "9": 4,
+        "10": 5,
+        "11": 4,
+        "12": 6,
+        "13": 5,
+        "14": 3,
+        "15": 7,
+        "16": 9,
+        "17": 5,
+        "18": 8,
+        "19": 7,
+        "20": 7,
+        "21": 3,
+        "22": 7,
+        "23": 8
+      },
+      "monthsActive": 15
+    }
+  },
+  {
+    "id": "ad7681e72fab74a0c8cca6eea2b25cf7",
     "trackName": "How Much Is Weed?",
     "artist": "Dominic Fike",
     "album": "Sunburn",
@@ -9,12 +146,12 @@
     "spotifyUrl": "https://open.spotify.com/track/44KWbTVZev3SWdv1t5UoYE",
     "dateRange": {
       "start": "2026-04-09",
-      "end": "2026-04-15"
+      "end": "2026-04-18"
     },
-    "playCount": 14,
+    "playCount": 17,
     "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2026-04-12",
     "peakDayPlays": 7,
     "hotDays": [
@@ -25,6 +162,10 @@
       {
         "date": "2026-04-15",
         "plays": 3
+      },
+      {
+        "date": "2026-04-17",
+        "plays": 2
       }
     ],
     "insightTypes": [
@@ -32,10 +173,10 @@
       "one_and_done"
     ],
     "context": {
-      "totalPlaysInWindow": 270,
-      "uniqueTracksInWindow": 164,
+      "totalPlaysInWindow": 378,
+      "uniqueTracksInWindow": 202,
       "timeOfDayDistribution": {
-        "0": 0,
+        "0": 1,
         "1": 0,
         "2": 0,
         "3": 0,
@@ -58,13 +199,13 @@
         "20": 1,
         "21": 0,
         "22": 1,
-        "23": 2
+        "23": 4
       },
       "monthsActive": 2
     }
   },
   {
-    "id": "272a3883f3c834527c7721563274c7ba",
+    "id": "a16c77156e13c197151054b4de29740c",
     "trackName": "Fallen Star",
     "artist": "The Neighbourhood",
     "album": "Fallen Star",
@@ -74,10 +215,10 @@
     "spotifyUrl": "https://open.spotify.com/track/60F6pgM6H6miNr5AmjxwjL",
     "dateRange": {
       "start": "2026-04-01",
-      "end": "2026-04-11"
+      "end": "2026-04-17"
     },
-    "playCount": 11,
-    "weeksCount": 2,
+    "playCount": 13,
+    "weeksCount": 3,
     "intensity": 1,
     "maxState": 1,
     "peakDay": "2026-04-01",
@@ -98,11 +239,12 @@
     ],
     "insightTypes": [
       "burst",
-      "comeback"
+      "comeback",
+      "one_and_done"
     ],
     "context": {
-      "totalPlaysInWindow": 291,
-      "uniqueTracksInWindow": 158,
+      "totalPlaysInWindow": 503,
+      "uniqueTracksInWindow": 242,
       "timeOfDayDistribution": {
         "0": 4,
         "1": 2,
@@ -127,7 +269,7 @@
         "20": 1,
         "21": 1,
         "22": 3,
-        "23": 3
+        "23": 4
       },
       "monthsActive": 13
     }
@@ -227,7 +369,7 @@
       "totalPlaysInWindow": 55,
       "uniqueTracksInWindow": 30,
       "timeOfDayDistribution": {
-        "0": 1,
+        "0": 3,
         "1": 0,
         "2": 3,
         "3": 1,
@@ -247,7 +389,7 @@
         "17": 1,
         "18": 1,
         "19": 0,
-        "20": 1,
+        "20": 3,
         "21": 0,
         "22": 10,
         "23": 5
@@ -292,7 +434,7 @@
       "totalPlaysInWindow": 218,
       "uniqueTracksInWindow": 146,
       "timeOfDayDistribution": {
-        "0": 1,
+        "0": 3,
         "1": 0,
         "2": 3,
         "3": 1,
@@ -312,7 +454,7 @@
         "17": 1,
         "18": 1,
         "19": 0,
-        "20": 1,
+        "20": 3,
         "21": 0,
         "22": 10,
         "23": 5
@@ -387,7 +529,7 @@
         "14": 2,
         "15": 4,
         "16": 2,
-        "17": 1,
+        "17": 2,
         "18": 5,
         "19": 5,
         "20": 4,
@@ -438,7 +580,7 @@
       "totalPlaysInWindow": 310,
       "uniqueTracksInWindow": 169,
       "timeOfDayDistribution": {
-        "0": 1,
+        "0": 2,
         "1": 1,
         "2": 1,
         "3": 3,
@@ -870,7 +1012,7 @@
         "16": 0,
         "17": 1,
         "18": 0,
-        "19": 3,
+        "19": 4,
         "20": 1,
         "21": 3,
         "22": 3,
@@ -1073,7 +1215,7 @@
         "19": 1,
         "20": 0,
         "21": 1,
-        "22": 0,
+        "22": 1,
         "23": 7
       },
       "monthsActive": 4
@@ -1138,7 +1280,7 @@
         "16": 0,
         "17": 1,
         "18": 0,
-        "19": 3,
+        "19": 4,
         "20": 1,
         "21": 3,
         "22": 3,
@@ -1332,7 +1474,7 @@
       "timeOfDayDistribution": {
         "0": 1,
         "1": 3,
-        "2": 1,
+        "2": 2,
         "3": 0,
         "4": 0,
         "5": 1,
@@ -1347,7 +1489,7 @@
         "14": 1,
         "15": 3,
         "16": 0,
-        "17": 0,
+        "17": 1,
         "18": 2,
         "19": 1,
         "20": 1,
@@ -1355,7 +1497,7 @@
         "22": 0,
         "23": 3
       },
-      "monthsActive": 3
+      "monthsActive": 4
     }
   },
   {
@@ -1449,8 +1591,8 @@
     },
     "playCount": 5,
     "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2026-01-12",
     "peakDayPlays": 0,
     "hotDays": [],
@@ -1463,7 +1605,7 @@
       "totalPlaysInWindow": 412,
       "uniqueTracksInWindow": 265,
       "timeOfDayDistribution": {
-        "0": 7,
+        "0": 10,
         "1": 7,
         "2": 7,
         "3": 2,
@@ -1483,7 +1625,7 @@
         "17": 5,
         "18": 8,
         "19": 7,
-        "20": 5,
+        "20": 7,
         "21": 3,
         "22": 7,
         "23": 8
@@ -1619,7 +1761,7 @@
         "14": 2,
         "15": 4,
         "16": 2,
-        "17": 1,
+        "17": 2,
         "18": 5,
         "19": 5,
         "20": 4,
@@ -1682,7 +1824,7 @@
         "17": 4,
         "18": 2,
         "19": 3,
-        "20": 0,
+        "20": 1,
         "21": 1,
         "22": 0,
         "23": 1
@@ -2146,7 +2288,7 @@
         "17": 4,
         "18": 2,
         "19": 3,
-        "20": 0,
+        "20": 1,
         "21": 1,
         "22": 0,
         "23": 1
@@ -2169,8 +2311,8 @@
     },
     "playCount": 10,
     "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2025-12-19",
     "peakDayPlays": 2,
     "hotDays": [
@@ -2188,7 +2330,7 @@
       "totalPlaysInWindow": 847,
       "uniqueTracksInWindow": 438,
       "timeOfDayDistribution": {
-        "0": 7,
+        "0": 10,
         "1": 7,
         "2": 7,
         "3": 2,
@@ -2208,7 +2350,7 @@
         "17": 5,
         "18": 8,
         "19": 7,
-        "20": 5,
+        "20": 7,
         "21": 3,
         "22": 7,
         "23": 8
@@ -2529,7 +2671,7 @@
         "17": 4,
         "18": 2,
         "19": 3,
-        "20": 0,
+        "20": 1,
         "21": 1,
         "22": 0,
         "23": 1
@@ -2849,7 +2991,7 @@
         "17": 4,
         "18": 2,
         "19": 3,
-        "20": 0,
+        "20": 1,
         "21": 1,
         "22": 0,
         "23": 1
@@ -2954,7 +3096,7 @@
       "totalPlaysInWindow": 424,
       "uniqueTracksInWindow": 271,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 4,
         "1": 0,
         "2": 0,
         "3": 0,
@@ -3215,8 +3357,8 @@
     },
     "playCount": 16,
     "weeksCount": 5,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2025-10-09",
     "peakDayPlays": 3,
     "hotDays": [
@@ -3246,7 +3388,7 @@
       "totalPlaysInWindow": 1272,
       "uniqueTracksInWindow": 533,
       "timeOfDayDistribution": {
-        "0": 7,
+        "0": 10,
         "1": 7,
         "2": 7,
         "3": 2,
@@ -3266,7 +3408,7 @@
         "17": 5,
         "18": 8,
         "19": 7,
-        "20": 5,
+        "20": 7,
         "21": 3,
         "22": 7,
         "23": 8
@@ -3828,7 +3970,7 @@
         "14": 3,
         "15": 5,
         "16": 4,
-        "17": 6,
+        "17": 7,
         "18": 2,
         "19": 4,
         "20": 2,
@@ -4240,7 +4382,7 @@
       "totalPlaysInWindow": 1393,
       "uniqueTracksInWindow": 494,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 4,
         "1": 0,
         "2": 0,
         "3": 0,
@@ -4957,8 +5099,8 @@
     },
     "playCount": 11,
     "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2025-08-04",
     "peakDayPlays": 3,
     "hotDays": [
@@ -4988,7 +5130,7 @@
       "totalPlaysInWindow": 329,
       "uniqueTracksInWindow": 180,
       "timeOfDayDistribution": {
-        "0": 7,
+        "0": 10,
         "1": 7,
         "2": 7,
         "3": 2,
@@ -5008,7 +5150,7 @@
         "17": 5,
         "18": 8,
         "19": 7,
-        "20": 5,
+        "20": 7,
         "21": 3,
         "22": 7,
         "23": 8
@@ -5255,7 +5397,7 @@
       "uniqueTracksInWindow": 432,
       "timeOfDayDistribution": {
         "0": 1,
-        "1": 4,
+        "1": 5,
         "2": 2,
         "3": 0,
         "4": 2,
@@ -5279,7 +5421,7 @@
         "22": 0,
         "23": 1
       },
-      "monthsActive": 5
+      "monthsActive": 6
     }
   },
   {
@@ -5336,10 +5478,10 @@
         "19": 1,
         "20": 3,
         "21": 3,
-        "22": 3,
+        "22": 4,
         "23": 3
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -5453,7 +5595,7 @@
       "timeOfDayDistribution": {
         "0": 1,
         "1": 2,
-        "2": 3,
+        "2": 4,
         "3": 4,
         "4": 0,
         "5": 0,
@@ -5476,7 +5618,7 @@
         "22": 2,
         "23": 1
       },
-      "monthsActive": 7
+      "monthsActive": 8
     }
   },
   {
@@ -5540,7 +5682,7 @@
         "14": 3,
         "15": 5,
         "16": 4,
-        "17": 6,
+        "17": 7,
         "18": 2,
         "19": 4,
         "20": 2,
@@ -6457,7 +6599,7 @@
         "20": 1,
         "21": 1,
         "22": 3,
-        "23": 3
+        "23": 4
       },
       "monthsActive": 13
     }
@@ -6939,68 +7081,6 @@
     }
   },
   {
-    "id": "f3f21cb3bcf9e4b6d6074ce63d99e6ec",
-    "trackName": "Selfless",
-    "artist": "The Strokes",
-    "album": "The New Abnormal",
-    "trackUri": "spotify:track:2t0wwvR15fc3K1ey8OiOaN",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02e3f1ba3de4659708c25d0f39",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/2t0wwvR15fc3K1ey8OiOaN",
-    "dateRange": {
-      "start": "2025-05-19",
-      "end": "2025-06-22"
-    },
-    "playCount": 15,
-    "weeksCount": 5,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2025-06-03",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2025-06-03",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "comeback",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 1183,
-      "uniqueTracksInWindow": 465,
-      "timeOfDayDistribution": {
-        "0": 7,
-        "1": 7,
-        "2": 7,
-        "3": 2,
-        "4": 4,
-        "5": 0,
-        "6": 0,
-        "7": 1,
-        "8": 0,
-        "9": 4,
-        "10": 5,
-        "11": 4,
-        "12": 6,
-        "13": 5,
-        "14": 3,
-        "15": 7,
-        "16": 9,
-        "17": 5,
-        "18": 8,
-        "19": 7,
-        "20": 5,
-        "21": 3,
-        "22": 7,
-        "23": 8
-      },
-      "monthsActive": 15
-    }
-  },
-  {
     "id": "ebe71ca28ac8bd55c3aa238855a06c93",
     "trackName": "Hard To Explain",
     "artist": "The Strokes",
@@ -7139,6 +7219,68 @@
     }
   },
   {
+    "id": "f3f21cb3bcf9e4b6d6074ce63d99e6ec",
+    "trackName": "Selfless",
+    "artist": "The Strokes",
+    "album": "The New Abnormal",
+    "trackUri": "spotify:track:2t0wwvR15fc3K1ey8OiOaN",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02e3f1ba3de4659708c25d0f39",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/2t0wwvR15fc3K1ey8OiOaN",
+    "dateRange": {
+      "start": "2025-05-19",
+      "end": "2025-06-22"
+    },
+    "playCount": 15,
+    "weeksCount": 5,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-06-03",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2025-06-03",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 1183,
+      "uniqueTracksInWindow": 465,
+      "timeOfDayDistribution": {
+        "0": 10,
+        "1": 7,
+        "2": 7,
+        "3": 2,
+        "4": 4,
+        "5": 0,
+        "6": 0,
+        "7": 1,
+        "8": 0,
+        "9": 4,
+        "10": 5,
+        "11": 4,
+        "12": 6,
+        "13": 5,
+        "14": 3,
+        "15": 7,
+        "16": 9,
+        "17": 5,
+        "18": 8,
+        "19": 7,
+        "20": 7,
+        "21": 3,
+        "22": 7,
+        "23": 8
+      },
+      "monthsActive": 15
+    }
+  },
+  {
     "id": "7c026f91cb9dad31349c05ffdd8b3f6a",
     "trackName": "4X4",
     "artist": "Travis Scott",
@@ -7196,7 +7338,7 @@
     }
   },
   {
-    "id": "9a28ccae1cb19a365289fa9dc79c0446",
+    "id": "9a0f4585320297d7b373ea375922784d",
     "trackName": "ORCHESTRATË",
     "artist": "Yeat",
     "album": "LYFESTYLE",
@@ -7206,10 +7348,10 @@
     "spotifyUrl": "https://open.spotify.com/track/3Ygb9jYG5TeibrrKJzCPmV",
     "dateRange": {
       "start": "2025-05-19",
-      "end": "2025-05-25"
+      "end": "2025-05-29"
     },
-    "playCount": 5,
-    "weeksCount": 1,
+    "playCount": 7,
+    "weeksCount": 2,
     "intensity": 1,
     "maxState": 1,
     "peakDay": "2025-05-19",
@@ -7226,8 +7368,8 @@
       "loyalty"
     ],
     "context": {
-      "totalPlaysInWindow": 251,
-      "uniqueTracksInWindow": 135,
+      "totalPlaysInWindow": 346,
+      "uniqueTracksInWindow": 167,
       "timeOfDayDistribution": {
         "0": 1,
         "1": 5,
@@ -7252,9 +7394,9 @@
         "20": 1,
         "21": 5,
         "22": 3,
-        "23": 2
+        "23": 3
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -8552,9 +8694,9 @@
         "20": 1,
         "21": 5,
         "22": 3,
-        "23": 2
+        "23": 3
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -17586,7 +17728,7 @@
         "15": 8,
         "16": 7,
         "17": 14,
-        "18": 12,
+        "18": 13,
         "19": 13,
         "20": 8,
         "21": 14,
@@ -19444,7 +19586,7 @@
         "15": 8,
         "16": 7,
         "17": 14,
-        "18": 12,
+        "18": 13,
         "19": 13,
         "20": 8,
         "21": 14,
@@ -20424,7 +20566,7 @@
         "15": 8,
         "16": 7,
         "17": 14,
-        "18": 12,
+        "18": 13,
         "19": 13,
         "20": 8,
         "21": 14,
@@ -20487,7 +20629,7 @@
         "12": 11,
         "13": 5,
         "14": 4,
-        "15": 6,
+        "15": 7,
         "16": 7,
         "17": 5,
         "18": 10,
@@ -22418,7 +22560,7 @@
         "12": 11,
         "13": 5,
         "14": 4,
-        "15": 6,
+        "15": 7,
         "16": 7,
         "17": 5,
         "18": 10,
@@ -24681,7 +24823,7 @@
         "15": 8,
         "16": 7,
         "17": 14,
-        "18": 12,
+        "18": 13,
         "19": 13,
         "20": 8,
         "21": 14,
@@ -24813,7 +24955,7 @@
         "12": 11,
         "13": 5,
         "14": 4,
-        "15": 6,
+        "15": 7,
         "16": 7,
         "17": 5,
         "18": 10,
@@ -27740,7 +27882,7 @@
       "totalPlaysInWindow": 1189,
       "uniqueTracksInWindow": 271,
       "timeOfDayDistribution": {
-        "0": 6,
+        "0": 7,
         "1": 7,
         "2": 7,
         "3": 7,
@@ -31816,7 +31958,7 @@
         "15": 8,
         "16": 7,
         "17": 14,
-        "18": 12,
+        "18": 13,
         "19": 13,
         "20": 8,
         "21": 14,
@@ -32725,7 +32867,7 @@
       "totalPlaysInWindow": 1053,
       "uniqueTracksInWindow": 199,
       "timeOfDayDistribution": {
-        "0": 6,
+        "0": 7,
         "1": 7,
         "2": 7,
         "3": 7,
@@ -35083,7 +35225,7 @@
       "totalPlaysInWindow": 574,
       "uniqueTracksInWindow": 61,
       "timeOfDayDistribution": {
-        "0": 6,
+        "0": 7,
         "1": 7,
         "2": 7,
         "3": 7,

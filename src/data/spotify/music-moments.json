@@ -1,6 +1,70 @@
 [
   {
-    "id": "7a2e786f2919ee4b6f65d32144b36f27",
+    "id": "05b1c1f6ed687c4d88409226c95519ad",
+    "trackName": "sdp interlude",
+    "artist": "Travis Scott",
+    "album": "Birds In The Trap Sing McKnight",
+    "trackUri": "spotify:track:4gh0ZnHzaTMT1sDga7Ek0N",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028752a7355996e64709247c53",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/4gh0ZnHzaTMT1sDga7Ek0N",
+    "dateRange": {
+      "start": "2026-04-10",
+      "end": "2026-04-17"
+    },
+    "playCount": 8,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-04-17",
+    "peakDayPlays": 4,
+    "hotDays": [
+      {
+        "date": "2026-04-17",
+        "plays": 4
+      },
+      {
+        "date": "2026-04-10",
+        "plays": 2
+      },
+      {
+        "date": "2026-04-11",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "46af710900c539a8721fbc920bb1bc14",
+    "trackName": "Selfless",
+    "artist": "The Strokes",
+    "album": "The New Abnormal",
+    "trackUri": "spotify:track:2t0wwvR15fc3K1ey8OiOaN",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02e3f1ba3de4659708c25d0f39",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/2t0wwvR15fc3K1ey8OiOaN",
+    "dateRange": {
+      "start": "2026-04-10",
+      "end": "2026-04-18"
+    },
+    "playCount": 8,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-04-18",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-04-18",
+        "plays": 3
+      },
+      {
+        "date": "2026-04-17",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "ad7681e72fab74a0c8cca6eea2b25cf7",
     "trackName": "How Much Is Weed?",
     "artist": "Dominic Fike",
     "album": "Sunburn",
@@ -9,12 +73,12 @@
     "spotifyUrl": "https://open.spotify.com/track/44KWbTVZev3SWdv1t5UoYE",
     "dateRange": {
       "start": "2026-04-09",
-      "end": "2026-04-15"
+      "end": "2026-04-18"
     },
-    "playCount": 14,
+    "playCount": 17,
     "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2026-04-12",
     "peakDayPlays": 7,
     "hotDays": [
@@ -25,11 +89,15 @@
       {
         "date": "2026-04-15",
         "plays": 3
+      },
+      {
+        "date": "2026-04-17",
+        "plays": 2
       }
     ]
   },
   {
-    "id": "272a3883f3c834527c7721563274c7ba",
+    "id": "a16c77156e13c197151054b4de29740c",
     "trackName": "Fallen Star",
     "artist": "The Neighbourhood",
     "album": "Fallen Star",
@@ -39,10 +107,10 @@
     "spotifyUrl": "https://open.spotify.com/track/60F6pgM6H6miNr5AmjxwjL",
     "dateRange": {
       "start": "2026-04-01",
-      "end": "2026-04-11"
+      "end": "2026-04-17"
     },
-    "playCount": 11,
-    "weeksCount": 2,
+    "playCount": 13,
+    "weeksCount": 3,
     "intensity": 1,
     "maxState": 1,
     "peakDay": "2026-04-01",
@@ -724,8 +792,8 @@
     },
     "playCount": 5,
     "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2026-01-12",
     "peakDayPlays": 0,
     "hotDays": []
@@ -1062,8 +1130,8 @@
     },
     "playCount": 10,
     "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2025-12-19",
     "peakDayPlays": 2,
     "hotDays": [
@@ -1554,8 +1622,8 @@
     },
     "playCount": 16,
     "weeksCount": 5,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2025-10-09",
     "peakDayPlays": 3,
     "hotDays": [
@@ -2436,8 +2504,8 @@
     },
     "playCount": 11,
     "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2025-08-04",
     "peakDayPlays": 3,
     "hotDays": [
@@ -3413,32 +3481,6 @@
     ]
   },
   {
-    "id": "f3f21cb3bcf9e4b6d6074ce63d99e6ec",
-    "trackName": "Selfless",
-    "artist": "The Strokes",
-    "album": "The New Abnormal",
-    "trackUri": "spotify:track:2t0wwvR15fc3K1ey8OiOaN",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02e3f1ba3de4659708c25d0f39",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/2t0wwvR15fc3K1ey8OiOaN",
-    "dateRange": {
-      "start": "2025-05-19",
-      "end": "2025-06-22"
-    },
-    "playCount": 15,
-    "weeksCount": 5,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2025-06-03",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2025-06-03",
-        "plays": 2
-      }
-    ]
-  },
-  {
     "id": "ebe71ca28ac8bd55c3aa238855a06c93",
     "trackName": "Hard To Explain",
     "artist": "The Strokes",
@@ -3507,6 +3549,32 @@
     ]
   },
   {
+    "id": "f3f21cb3bcf9e4b6d6074ce63d99e6ec",
+    "trackName": "Selfless",
+    "artist": "The Strokes",
+    "album": "The New Abnormal",
+    "trackUri": "spotify:track:2t0wwvR15fc3K1ey8OiOaN",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02e3f1ba3de4659708c25d0f39",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/2t0wwvR15fc3K1ey8OiOaN",
+    "dateRange": {
+      "start": "2025-05-19",
+      "end": "2025-06-22"
+    },
+    "playCount": 15,
+    "weeksCount": 5,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-06-03",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2025-06-03",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "7c026f91cb9dad31349c05ffdd8b3f6a",
     "trackName": "4X4",
     "artist": "Travis Scott",
@@ -3528,7 +3596,7 @@
     "hotDays": []
   },
   {
-    "id": "9a28ccae1cb19a365289fa9dc79c0446",
+    "id": "9a0f4585320297d7b373ea375922784d",
     "trackName": "ORCHESTRATË",
     "artist": "Yeat",
     "album": "LYFESTYLE",
@@ -3538,10 +3606,10 @@
     "spotifyUrl": "https://open.spotify.com/track/3Ygb9jYG5TeibrrKJzCPmV",
     "dateRange": {
       "start": "2025-05-19",
-      "end": "2025-05-25"
+      "end": "2025-05-29"
     },
-    "playCount": 5,
-    "weeksCount": 1,
+    "playCount": 7,
+    "weeksCount": 2,
     "intensity": 1,
     "maxState": 1,
     "peakDay": "2025-05-19",
