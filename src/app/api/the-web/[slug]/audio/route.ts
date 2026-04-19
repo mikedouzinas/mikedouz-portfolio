@@ -132,11 +132,13 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
         const estimatedDuration = audioBuffer.byteLength / 16000;
         timestamps = estimateParagraphTimestamps(paragraphs, estimatedDuration);
       } else {
-        // TTS: call ElevenLabs per-paragraph (parallel) so each paragraph gets
-        // its own exact alignment data. Timestamps are built as cumulative sums —
-        // no anchor search, no approximation.
-        const paraResults = await Promise.all(
-          paragraphs.map(async (para) => {
+        // TTS: call ElevenLabs per-paragraph so each paragraph gets its own exact
+        // alignment data. Batched at 5 concurrent to stay under ElevenLabs' limit.
+        const ELEVENLABS_CONCURRENCY = 5;
+        const paraResults: { buf: Buffer; paraDuration: number }[] = [];
+        for (let i = 0; i < paragraphs.length; i += ELEVENLABS_CONCURRENCY) {
+          const batch = paragraphs.slice(i, i + ELEVENLABS_CONCURRENCY);
+          const batchResults = await Promise.all(batch.map(async (para) => {
             const resp = await fetch(
               `https://api.elevenlabs.io/v1/text-to-speech/${env.elevenLabsVoiceId}/with-timestamps`,
               {
@@ -167,8 +169,9 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
             const buf = Buffer.from(data.audio_base64, 'base64');
             const paraDuration = data.alignment.character_end_times_seconds.at(-1) ?? 0;
             return { buf, paraDuration };
-          }),
-        );
+          }));
+          paraResults.push(...batchResults);
+        }
 
         // Concatenate all paragraph buffers into one mp3
         const combined = Buffer.concat(paraResults.map((r) => r.buf));
@@ -224,7 +227,8 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       if (redis) await redis.del(lockKey);
     }
   } catch (error) {
-    console.error('[audio] Generation error:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[audio] Generation error:', message);
     return NextResponse.json(
       { error: 'audio_unavailable', message: 'Failed to generate audio.' },
       { status: 503 },
