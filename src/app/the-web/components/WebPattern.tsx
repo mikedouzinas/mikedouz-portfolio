@@ -21,6 +21,14 @@ export default function WebPattern({ className }: WebPatternProps) {
   const handleMouseMove = useCallback((e: MouseEvent) => {
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
+      let el = e.target as HTMLElement | null;
+      while (el && el !== document.body) {
+        if (el.dataset?.suppressWeb === 'true') {
+          setMousePos({ x: -500, y: -500 });
+          return;
+        }
+        el = el.parentElement;
+      }
       setMousePos({ x: e.clientX, y: e.clientY });
     });
   }, []);

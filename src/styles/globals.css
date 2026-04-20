@@ -238,6 +238,20 @@ html {
     to { stroke-dashoffset: -1000; }
   }
 
+  /* Blog Iris bubble: Iron Man HUD entrance */
+  @keyframes iris-hud-in {
+    0%   { opacity: 0; transform: scale(0.88); filter: blur(3px); }
+    45%  { opacity: 1; filter: blur(0); }
+    68%  { transform: scale(1.016); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0); }
+  }
+
+
+  .iris-hud-enter {
+    animation: iris-hud-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+
   /* Remove borders from IrisPalette suggestion items */
   [role="option"],
   [role="option"]:focus,

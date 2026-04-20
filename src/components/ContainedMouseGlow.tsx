@@ -139,7 +139,7 @@ export default function ContainedMouseGlow({
   return (
     <div
       ref={glowRef}
-      className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden"
+      className="absolute inset-0 pointer-events-none rounded-[inherit] overflow-hidden"
       style={{
         opacity: isHovering ? 1 : 0,
         transition: 'opacity 300ms ease-out',

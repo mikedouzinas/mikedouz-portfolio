@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getPostBySlug, getAdjacentPosts } from '@/lib/blog';
 import ShareButton from '../components/ShareButton';
+import SummarizeButton from '../components/SummarizeButton';
 import ListenFeature from './components/ListenFeature';
 import CommentSection from '../components/CommentSection';
 import SubscribeWidget from '../components/SubscribeWidget';
@@ -69,12 +70,15 @@ export default async function BlogPostPage({ params }: PageProps) {
             <p className="mt-2 text-lg text-gray-400">{post.subtitle}</p>
           )}
 
-          <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
-            <time dateTime={post.published_at}>{formattedDate}</time>
-            <span>&middot;</span>
-            <span>{post.reading_time} min read</span>
-            <span>&middot;</span>
-            <ShareButton />
+          <div className="mt-4 flex items-center justify-between gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <time dateTime={post.published_at}>{formattedDate}</time>
+              <span>&middot;</span>
+              <span>{post.reading_time} min read</span>
+              <span>&middot;</span>
+              <ShareButton />
+            </div>
+            <SummarizeButton slug={slug} postTitle={post.title} />
           </div>
 
           {post.tags.length > 0 && (

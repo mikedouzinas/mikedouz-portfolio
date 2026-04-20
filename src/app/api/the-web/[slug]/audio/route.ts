@@ -3,10 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { env } from '@/lib/env';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
-import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import {
   stripMarkdownToParagraphs,
   estimateParagraphTimestamps,
+  getMp3DurationSeconds,
+  deriveParagraphTimestamps,
+  stripMetadataFrames,
   ElevenLabsAlignment,
   AudioTimestamps,
   ParagraphTimestamp,
@@ -33,16 +35,6 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
   if (!/^[a-z0-9-]+$/.test(slug)) {
     return NextResponse.json({ error: 'Invalid slug' }, { status: 400 });
-  }
-
-  const ip = getClientIp(req);
-  const userAgent = req.headers.get('user-agent') ?? '';
-  const rateLimit = checkRateLimit(ip, userAgent);
-  if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: 'rate_limited', message: 'Too many requests' },
-      { status: 429 },
-    );
   }
 
   try {
@@ -132,62 +124,88 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
         const estimatedDuration = audioBuffer.byteLength / 16000;
         timestamps = estimateParagraphTimestamps(paragraphs, estimatedDuration);
       } else {
-        // TTS: call ElevenLabs per-paragraph so each paragraph gets its own exact
-        // alignment data. Batched at 5 concurrent to stay under ElevenLabs' limit.
-        const ELEVENLABS_CONCURRENCY = 5;
-        const paraResults: { buf: Buffer; paraDuration: number }[] = [];
-        for (let i = 0; i < paragraphs.length; i += ELEVENLABS_CONCURRENCY) {
-          const batch = paragraphs.slice(i, i + ELEVENLABS_CONCURRENCY);
-          const batchResults = await Promise.all(batch.map(async (para) => {
+        // TTS: group paragraphs into char-limited batches and make ONE ElevenLabs call
+        // per batch. Within each batch, deriveParagraphTimestamps uses the character-level
+        // alignment to get exact paragraph start times — zero cumulative drift within a
+        // batch. Between batches we use getMp3DurationSeconds to measure the boundary
+        // (only 1-2 measurements for a typical post vs one per paragraph before).
+        const CHARS_PER_BATCH = 2000;
+        type BatchInfo = { paras: string[]; startIdx: number };
+        const batches: BatchInfo[] = [];
+        {
+          let cur: string[] = [];
+          let curChars = 0;
+          let curStart = 0;
+          for (let i = 0; i < paragraphs.length; i++) {
+            const p = paragraphs[i].slice(0, 2500); // safety cap per ElevenLabs limit
+            if (cur.length > 0 && curChars + p.length + 2 > CHARS_PER_BATCH) {
+              batches.push({ paras: cur, startIdx: curStart });
+              cur = [p]; curChars = p.length; curStart = i;
+            } else {
+              cur.push(p); curChars += p.length + 2; // +2 for \n\n separator
+            }
+          }
+          if (cur.length > 0) batches.push({ paras: cur, startIdx: curStart });
+        }
+
+        // Process batches — 3 at a time (each = 1 ElevenLabs call, well within the 6-limit)
+        const BATCH_CONCURRENCY = 3;
+        const batchBufs: Buffer[] = new Array(batches.length);
+        const batchTsArr: AudioTimestamps[] = new Array(batches.length);
+
+        for (let b = 0; b < batches.length; b += BATCH_CONCURRENCY) {
+          await Promise.all(batches.slice(b, b + BATCH_CONCURRENCY).map(async (batch, j) => {
+            const idx = b + j;
+            const text = batch.paras.join('\n\n');
             const resp = await fetch(
               `https://api.elevenlabs.io/v1/text-to-speech/${env.elevenLabsVoiceId}/with-timestamps`,
               {
                 method: 'POST',
-                headers: {
-                  'xi-api-key': env.elevenLabsApiKey,
-                  'Content-Type': 'application/json',
-                },
+                headers: { 'xi-api-key': env.elevenLabsApiKey, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  text: para,
+                  text,
                   model_id: 'eleven_turbo_v2_5',
-                  voice_settings: {
-                    stability: 0.5,
-                    similarity_boost: 0.75,
-                    speed: 0.9,
-                  },
+                  voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: 0.9 },
                 }),
               },
             );
             if (!resp.ok) {
               const errText = await resp.text();
-              console.error('[audio] ElevenLabs paragraph error:', errText);
+              console.error('[audio] ElevenLabs batch error:', errText);
               throw new Error('ElevenLabs API request failed');
             }
-            const data = await resp.json() as {
-              audio_base64: string;
-              alignment: ElevenLabsAlignment;
-            };
-            const buf = Buffer.from(data.audio_base64, 'base64');
-            const paraDuration = data.alignment.character_end_times_seconds.at(-1) ?? 0;
-            return { buf, paraDuration };
+            const data = await resp.json() as { audio_base64: string; alignment: ElevenLabsAlignment };
+            // Strip Xing/Info/VBRI metadata frames before storing. ElevenLabs embeds a
+            // Xing header in every generated MP3 that tells the browser "N frames total."
+            // Concatenating multiple batch files leaves the browser reading Batch 1's header
+            // and clamping seeks to Batch 1's duration. Stripping leaves a pure CBR stream
+            // the browser can seek across by byte-offset arithmetic.
+            const buf = stripMetadataFrames(Buffer.from(data.audio_base64, 'base64'));
+            batchBufs[idx] = buf;
+            batchTsArr[idx] = deriveParagraphTimestamps(batch.paras, data.alignment, getMp3DurationSeconds(buf));
           }));
-          paraResults.push(...batchResults);
         }
 
-        // Concatenate all paragraph buffers into one mp3
-        const combined = Buffer.concat(paraResults.map((r) => r.buf));
-        audioBuffer = combined.buffer.slice(combined.byteOffset, combined.byteOffset + combined.byteLength);
+        // Stitch batches: add cumulative time offset from all preceding batches
+        let cumulativeOffset = 0;
+        const allParaTs: ParagraphTimestamp[] = [];
+        for (let b = 0; b < batches.length; b++) {
+          const bts = batchTsArr[b];
+          for (let j = 0; j < batches[b].paras.length; j++) {
+            const p = bts.paragraphs[j];
+            allParaTs.push({
+              ...p,
+              index: batches[b].startIdx + j,
+              start: cumulativeOffset + p.start,
+              end: cumulativeOffset + p.end,
+            });
+          }
+          cumulativeOffset += bts.duration;
+        }
 
-        // Build timestamps as exact cumulative sums
-        let offset = 0;
-        const totalDuration = paraResults.reduce((sum, r) => sum + r.paraDuration, 0);
-        const tsParas: ParagraphTimestamp[] = paragraphs.map((para, i) => {
-          const start = offset;
-          const end = offset + paraResults[i].paraDuration;
-          offset = end;
-          return { index: i, start, end, text: para.slice(0, 100) };
-        });
-        timestamps = { paragraphs: tsParas, duration: totalDuration };
+        const combined = Buffer.concat(batchBufs);
+        audioBuffer = combined.buffer.slice(combined.byteOffset, combined.byteOffset + combined.byteLength);
+        timestamps = { paragraphs: allParaTs, duration: cumulativeOffset };
       }
 
       // 5. Upload audio to Supabase Storage

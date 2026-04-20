@@ -18,6 +18,7 @@ interface BlogIrisBubbleProps {
   selection: TextSelection | null;
   onClose: () => void;
   onLock: () => void;
+  initialMessage?: string;
 }
 
 const BUBBLE_WIDTH = 290;
@@ -27,7 +28,7 @@ const EXPANDED_WIDTH = 560;
 const EXPANDED_MAX_HEIGHT = 520;
 
 const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
-  function BlogIrisBubble({ slug, postTitle, selection, onClose, onLock }, ref) {
+  function BlogIrisBubble({ slug, postTitle, selection, onClose, onLock, initialMessage }, ref) {
     const {
       messages,
       phase,
@@ -44,7 +45,7 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
     } = useBlogIris(slug);
 
     const [isMobile, setIsMobile] = useState(false);
-    const [expanded, setExpanded] = useState(false);
+    const [expanded, setExpanded] = useState(true);
     const [showDiscard, setShowDiscard] = useState(false);
     const internalRef = useRef<HTMLDivElement>(null);
 
@@ -62,6 +63,17 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
 
     // Display text: use live selection text (always current), fall back to locked ref
     const displayPassage = (messages.length === 0 ? selection?.text : null) || passageRef.current;
+
+    // Auto-send initial message (e.g. from Summarize button).
+    // Keyed on initialMessage so Strict Mode's remount re-schedules after its own cleanup.
+    // messages.length guard prevents re-sending if the prop is stable across later renders.
+    useEffect(() => {
+      if (!initialMessage || messages.length > 0) return;
+      const t = setTimeout(() => {
+        sendMessage(initialMessage, passageRef.current);
+      }, 120);
+      return () => clearTimeout(t);
+    }, [initialMessage]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Lock selection and auto-expand when first message is sent
     const prevMessageCount = useRef(0);
@@ -227,45 +239,35 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
     const showActions = phase === 'conversation' && messages.length > 0 && messages[messages.length - 1].role === 'assistant';
     const showDraftView = phase === 'drafting' || phase === 'draft_ready' || phase === 'submitting' || phase === 'submitted';
 
-    // Position bubble: compute both compact and expanded as explicit pixel values
-    // so CSS transition can smoothly interpolate between them
+    // Position bubble: expanded = centered, compact = right of post body
     const getDesktopStyle = (): React.CSSProperties => {
-      // Compute compact position
+      if (expanded) {
+        return {
+          position: 'fixed',
+          top: (window.innerHeight - EXPANDED_MAX_HEIGHT) / 2,
+          left: (window.innerWidth - EXPANDED_WIDTH) / 2,
+          width: EXPANDED_WIDTH,
+          maxHeight: EXPANDED_MAX_HEIGHT,
+          zIndex: 50,
+        };
+      }
+
       const rect = selection.rect;
       const selectionMidY = rect.top + rect.height / 2;
       let compactTop = selectionMidY - BUBBLE_ESTIMATED_HEIGHT / 2;
 
       const postBody = document.querySelector('[data-post-body]');
-      const containerRight = postBody
-        ? postBody.getBoundingClientRect().right
-        : rect.right;
-
+      const containerRight = postBody ? postBody.getBoundingClientRect().right : rect.right;
       let compactLeft = containerRight + BUBBLE_GAP;
 
       if (compactLeft + BUBBLE_WIDTH > window.innerWidth - 16) {
-        const containerLeft = postBody
-          ? postBody.getBoundingClientRect().left
-          : rect.left;
+        const containerLeft = postBody ? postBody.getBoundingClientRect().left : rect.left;
         compactLeft = containerLeft - BUBBLE_WIDTH - BUBBLE_GAP;
       }
       if (compactLeft < 16) compactLeft = 16;
       if (compactTop < 16) compactTop = 16;
       if (compactTop + BUBBLE_ESTIMATED_HEIGHT > window.innerHeight - 16) {
         compactTop = window.innerHeight - BUBBLE_ESTIMATED_HEIGHT - 16;
-      }
-
-      if (expanded) {
-        // Center on screen with explicit pixel values
-        const expandedTop = (window.innerHeight - EXPANDED_MAX_HEIGHT) / 2;
-        const expandedLeft = (window.innerWidth - EXPANDED_WIDTH) / 2;
-        return {
-          position: 'fixed',
-          top: expandedTop,
-          left: expandedLeft,
-          width: EXPANDED_WIDTH,
-          maxHeight: EXPANDED_MAX_HEIGHT,
-          zIndex: 50,
-        };
       }
 
       return {
@@ -400,7 +402,7 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
       return (
         <div
           ref={bubbleEl}
-          className="fixed bottom-0 left-0 right-0 max-h-[85vh] z-50 rounded-t-2xl bg-teal-500/[0.08] border border-teal-400/[0.12] backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.3)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] overflow-y-auto"
+          className="iris-hud-enter fixed bottom-0 left-0 right-0 max-h-[85vh] z-50 rounded-t-2xl bg-teal-500/[0.08] border border-teal-400/[0.12] backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.3)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] overflow-y-auto"
         >
           <div className="relative">
             <div className="relative">
@@ -421,20 +423,22 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
     `;
 
     return (
-      <div
-        ref={bubbleEl}
-        data-has-contained-glow="true"
-        style={getDesktopStyle()}
-        className={`${glassClasses} transition-[top,left,width,max-height,padding,box-shadow] duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
-          expanded
-            ? 'p-5 shadow-[0_0_80px_40px_rgba(0,0,0,0.35),0_4px_24px_rgba(0,0,0,0.25)]'
-            : 'p-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.25)]'
-        }`}
-      >
-        <div className="relative">
-          {bubbleContent}
+      <>
+        <div
+          ref={bubbleEl}
+          data-has-contained-glow="true"
+          style={getDesktopStyle()}
+          className={`iris-hud-enter ${glassClasses} transition-[top,left,width,max-height,padding,box-shadow] duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
+            expanded
+              ? 'p-5 shadow-[0_0_80px_40px_rgba(0,0,0,0.35),0_4px_24px_rgba(0,0,0,0.25)]'
+              : 'p-3.5 shadow-[0_8px_48px_rgba(0,0,0,0.65),0_2px_12px_rgba(0,0,0,0.4)]'
+          }`}
+        >
+          <div className="relative">
+            {bubbleContent}
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 );

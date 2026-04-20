@@ -48,6 +48,12 @@ export default function BlogIrisConversation({
     }
   }, [messages.length, messages[messages.length - 1]?.content]);
 
+  // Auto-focus textarea on mount
+  useEffect(() => {
+    const timer = setTimeout(() => textareaRef.current?.focus(), 80);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Auto-resize textarea
   useEffect(() => {
     const el = textareaRef.current;

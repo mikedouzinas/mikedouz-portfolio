@@ -74,8 +74,7 @@ export function useAudioPlayer(
     // paragraph during pauses rather than jumping to the last paragraph.
     const ts = timestampsRef.current;
     if (ts && ts.paragraphs.length > 0) {
-      // Small lead offset compensates for MP3 concatenation encoder delay
-      const HIGHLIGHT_LEAD_S = 0.15;
+      const HIGHLIGHT_LEAD_S = 0.03;
       let activeIdx = -1;
       for (let i = ts.paragraphs.length - 1; i >= 0; i--) {
         if (t + HIGHLIGHT_LEAD_S >= ts.paragraphs[i].start) {
@@ -170,7 +169,8 @@ export function useAudioPlayer(
       }
 
       if (!res.ok) {
-        throw new Error('Failed to get audio URL');
+        const errBody = await res.json().catch(() => ({})) as { message?: string };
+        throw new Error(errBody.message ?? 'Failed to get audio URL');
       }
 
       const { audioUrl, timestampsUrl } = await res.json() as {
@@ -189,19 +189,29 @@ export function useAudioPlayer(
       audio.preload = 'auto';
       audioRef.current = audio;
 
-      // Use timestamps duration as the source of truth — concatenated MP3 buffers
-      // often lack a valid Xing/VBRI header, causing mobile browsers to misreport
-      // audio.duration (e.g. showing only the first paragraph's length).
-      const knownDuration = ts.duration > 0 ? ts.duration : null;
-      if (knownDuration) setDuration(knownDuration);
+      // Seed duration from timestamps so the bar appears immediately.
+      if (ts.duration > 0) setDuration(ts.duration);
 
       audio.addEventListener('loadedmetadata', () => {
         const d = audio.duration;
-        // Only trust the browser's duration if it's finite and close to what we expect
-        if (isFinite(d) && d > 0 && (!knownDuration || Math.abs(d - knownDuration) < knownDuration * 0.1)) {
+        // Trust the browser's duration if it's finite and within 2× of our calculated
+        // value. This rejects the mobile Safari bug (reports ~10s for a long file) while
+        // accepting small real discrepancies. When accepted, scale all timestamps so
+        // seek positions are always anchored to the real audio length.
+        const tsDur = ts.duration;
+        if (isFinite(d) && d > 0 && tsDur > 0 && d > tsDur * 0.25 && d < tsDur * 4) {
           setDuration(d);
-        } else if (knownDuration) {
-          setDuration(knownDuration);
+          if (Math.abs(d - tsDur) > 0.5) {
+            const scale = d / tsDur;
+            timestampsRef.current = {
+              duration: d,
+              paragraphs: ts.paragraphs.map(p => ({
+                ...p,
+                start: p.start * scale,
+                end: p.end * scale,
+              })),
+            };
+          }
         }
       });
 

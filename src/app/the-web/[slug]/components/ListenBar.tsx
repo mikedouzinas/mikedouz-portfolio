@@ -23,10 +23,7 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
   const isVisible = status !== 'idle' && status !== 'error';
   const progress = duration > 0 ? currentTime / duration : 0;
 
-  // Floor elapsed; use floor (not round) for duration so remainingSec hits 0
-  // at the same moment the audio ends, never showing "1 left" on the last tick.
-  const elapsedSec = Math.floor(currentTime);
-  const remainingSec = Math.max(0, Math.floor(duration) - elapsedSec);
+  const remainingSec = Math.max(0, Math.floor(duration) - Math.floor(currentTime));
 
   if (!isVisible) return null;
 
@@ -37,7 +34,7 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-teal-500/10">
+    <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-teal-500/10">
       {/* Thin teal progress strip */}
       <div className="h-0.5 bg-gray-800">
         <div
@@ -63,7 +60,7 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
 
           {duration > 0 && (
             <span className="text-xs text-gray-500 whitespace-nowrap">
-              {formatTime(elapsedSec)} · {formatTime(remainingSec)} left
+              {formatTime(remainingSec)} left
             </span>
           )}
 
@@ -108,7 +105,7 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
             <div className="flex-1 min-w-0">
               <div className="text-xs text-gray-300 truncate">{postTitle}</div>
               {duration > 0 && (
-                <div className="text-xs text-gray-500">{formatTime(elapsedSec)} · {formatTime(remainingSec)} remaining</div>
+                <div className="text-xs text-gray-500">{formatTime(remainingSec)} remaining</div>
               )}
             </div>
             {/* X always visible in the top row on mobile */}

@@ -1,3 +1,130 @@
+/**
+ * Removes Xing/Info/VBRI metadata frames from an MP3 buffer.
+ *
+ * ElevenLabs embeds a Xing/Info header at the start of every generated MP3. That
+ * header tells the browser "this file has N frames." When we concatenate multiple
+ * batch MP3s the browser reads Batch 1's header and thinks the whole file is
+ * Batch-1-duration long — so seeking is clamped to the first batch. Stripping
+ * these frames leaves a pure CBR audio stream; browsers seek CBR by byte-offset
+ * arithmetic and correctly cover the full file length.
+ */
+export function stripMetadataFrames(buf: Buffer): Buffer {
+  const BITRATES_V1 = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0];
+  const BITRATES_V2 = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0];
+  const SAMPLE_RATES = [44100, 48000, 32000, 0];
+
+  const keep: Array<{ start: number; end: number }> = [];
+  let i = 0;
+
+  while (i < buf.length - 3) {
+    if (buf[i] !== 0xFF || (buf[i + 1] & 0xE0) !== 0xE0) { i++; continue; }
+
+    const b1 = buf[i + 1];
+    const b2 = buf[i + 2];
+    const mpegVersion = (b1 >> 3) & 0x3;
+    if (mpegVersion === 1) { i++; continue; }
+
+    const layer = (b1 >> 1) & 0x3;
+    if (layer !== 1) { i++; continue; }
+
+    const bitrateIdx = (b2 >> 4) & 0xF;
+    const srIdx = (b2 >> 2) & 0x3;
+    if (bitrateIdx === 0 || bitrateIdx === 15 || srIdx === 3) { i++; continue; }
+
+    const isMpeg1 = mpegVersion === 3;
+    const bitrate = (isMpeg1 ? BITRATES_V1[bitrateIdx] : BITRATES_V2[bitrateIdx]) * 1000;
+    const sr = isMpeg1 ? SAMPLE_RATES[srIdx] : SAMPLE_RATES[srIdx] / 2;
+    const samplesPerFrame = isMpeg1 ? 1152 : 576;
+    const padding = (b2 >> 1) & 0x1;
+    const frameSize = Math.floor(samplesPerFrame * bitrate / (8 * sr)) + padding;
+
+    if (frameSize < 4) { i++; continue; }
+
+    const b3 = buf[i + 3];
+    const isMono = ((b3 >> 6) & 0x3) === 3;
+    const xingOff = isMpeg1 ? (isMono ? 21 : 36) : (isMono ? 13 : 21);
+    let isMetadata = false;
+    if (i + xingOff + 4 <= buf.length) {
+      const tag = buf.slice(i + xingOff, i + xingOff + 4).toString('latin1');
+      isMetadata = tag === 'Xing' || tag === 'Info' || tag === 'VBRI';
+    }
+
+    if (!isMetadata) keep.push({ start: i, end: i + frameSize });
+    i += frameSize;
+  }
+
+  if (keep.length === 0) return buf;
+
+  const total = keep.reduce((sum, r) => sum + (r.end - r.start), 0);
+  const out = Buffer.allocUnsafe(total);
+  let offset = 0;
+  for (const r of keep) {
+    buf.copy(out, offset, r.start, r.end);
+    offset += r.end - r.start;
+  }
+  return out;
+}
+
+/**
+ * Parses an MP3 buffer frame-by-frame to measure its exact playable duration.
+ * More accurate than using ElevenLabs' character_end_times_seconds, which doesn't
+ * account for trailing silence or encoder padding after the last spoken character.
+ */
+export function getMp3DurationSeconds(buf: Buffer): number {
+  // Bitrate tables (kbps) indexed by header bits [4..7] of byte 2
+  const BITRATES_V1 = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0];
+  const BITRATES_V2 = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0];
+  const SAMPLE_RATES = [44100, 48000, 32000, 0];
+
+  let totalSamples = 0;
+  let sampleRate = 44100;
+  let i = 0;
+
+  while (i < buf.length - 3) {
+    if (buf[i] !== 0xFF || (buf[i + 1] & 0xE0) !== 0xE0) { i++; continue; }
+
+    const b1 = buf[i + 1];
+    const b2 = buf[i + 2];
+    const mpegVersion = (b1 >> 3) & 0x3; // 3=MPEG1, 2=MPEG2, 0=MPEG2.5, 1=reserved
+    if (mpegVersion === 1) { i++; continue; }
+
+    const layer = (b1 >> 1) & 0x3; // 1=LayerIII, 2=LayerII, 3=LayerI
+    if (layer !== 1) { i++; continue; }
+
+    const bitrateIdx = (b2 >> 4) & 0xF;
+    const srIdx = (b2 >> 2) & 0x3;
+    if (bitrateIdx === 0 || bitrateIdx === 15 || srIdx === 3) { i++; continue; }
+
+    const isMpeg1 = mpegVersion === 3;
+    const bitrate = (isMpeg1 ? BITRATES_V1[bitrateIdx] : BITRATES_V2[bitrateIdx]) * 1000;
+    const sr = isMpeg1 ? SAMPLE_RATES[srIdx] : SAMPLE_RATES[srIdx] / 2;
+    const samplesPerFrame = isMpeg1 ? 1152 : 576;
+    const padding = (b2 >> 1) & 0x1;
+    const frameSize = Math.floor(samplesPerFrame * bitrate / (8 * sr)) + padding;
+
+    if (frameSize < 4) { i++; continue; }
+
+    // Skip Xing/INFO/VBRI metadata frames — they have a valid MP3 header but contain
+    // no audio. Counting them as 1152 samples would overestimate duration by ~26ms/chunk.
+    const b3 = buf[i + 3];
+    const isMono = ((b3 >> 6) & 0x3) === 3;
+    const xingOff = isMpeg1 ? (isMono ? 21 : 36) : (isMono ? 13 : 21);
+    if (i + xingOff + 4 <= buf.length) {
+      const tag = buf.slice(i + xingOff, i + xingOff + 4).toString('latin1');
+      if (tag === 'Xing' || tag === 'Info' || tag === 'VBRI') {
+        i += frameSize;
+        continue;
+      }
+    }
+
+    sampleRate = sr;
+    totalSamples += samplesPerFrame;
+    i += frameSize;
+  }
+
+  return sampleRate > 0 ? totalSamples / sampleRate : 0;
+}
+
 export interface ParagraphTimestamp {
   index: number;
   start: number; // seconds

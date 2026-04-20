@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Play, Pause, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, X } from 'lucide-react';
 import type { SoundtrackTrack } from '@/lib/blog';
 import { useSoundtrackPlayer } from '../hooks/useSoundtrackPlayer';
 import AlbumArtFallback from '@/components/spotify/AlbumArtFallback';
@@ -56,42 +56,45 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
             )}
           </div>
 
-          {/* Prev button */}
-          {trackCount > 1 && (
-            <button
-              onClick={player.prev}
-              className="flex-shrink-0 w-6 h-6 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-              aria-label="Previous track"
-            >
-              <ChevronLeft className="w-3.5 h-3.5 text-white/50" />
-            </button>
-          )}
-
-          {/* Play / Pause button */}
-          <button
-            onClick={player.togglePlay}
-            className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/30 transition-colors"
-            aria-label={player.isPlaying ? 'Pause' : 'Play'}
-          >
-            {player.isLoading ? (
-              <LoadingBars />
-            ) : player.isPlaying ? (
-              <Pause className="w-3.5 h-3.5 text-[#2dd4bf]" fill="#2dd4bf" />
-            ) : (
-              <Play className="w-3.5 h-3.5 text-[#2dd4bf] ml-0.5" fill="#2dd4bf" />
+          {/* Transport controls — tight grouping around the play button */}
+          <div className="flex items-center gap-0.5">
+            {/* Prev button */}
+            {trackCount > 1 && (
+              <button
+                onClick={player.prev}
+                className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                aria-label="Previous track"
+              >
+                <SkipBack className="w-3.5 h-3.5" fill="currentColor" />
+              </button>
             )}
-          </button>
 
-          {/* Next button */}
-          {trackCount > 1 && (
+            {/* Play / Pause button */}
             <button
-              onClick={player.next}
-              className="flex-shrink-0 w-6 h-6 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-              aria-label="Next track"
+              onClick={player.togglePlay}
+              className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/30 transition-colors"
+              aria-label={player.isPlaying ? 'Pause' : 'Play'}
             >
-              <ChevronRight className="w-3.5 h-3.5 text-white/50" />
+              {player.isLoading ? (
+                <LoadingBars />
+              ) : player.isPlaying ? (
+                <Pause className="w-3.5 h-3.5 text-[#2dd4bf]" fill="#2dd4bf" />
+              ) : (
+                <Play className="w-3.5 h-3.5 text-[#2dd4bf] ml-0.5" fill="#2dd4bf" />
+              )}
             </button>
-          )}
+
+            {/* Next button */}
+            {trackCount > 1 && (
+              <button
+                onClick={player.next}
+                className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                aria-label="Next track"
+              >
+                <SkipForward className="w-3.5 h-3.5" fill="currentColor" />
+              </button>
+            )}
+          </div>
 
           {/* Track info */}
           <div className="flex-1 min-w-0">

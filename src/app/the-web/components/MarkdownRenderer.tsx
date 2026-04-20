@@ -12,17 +12,33 @@ interface MarkdownRendererProps {
   activeParagraphIndex?: number; // -1 or undefined = no highlighting
 }
 
+// Rehype plugin: assigns a deterministic `data-para-idx` to every <p> in the
+// tree. Runs against the hast tree (not during React render), so it produces
+// the same indices on server and client — unlike a render-time counter which
+// double-counts under React StrictMode and causes hydration mismatches.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function rehypeAddParaIdx() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tree: any) => {
+    let i = 0;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const walk = (node: any) => {
+      if (node?.type === 'element' && node.tagName === 'p') {
+        node.properties = node.properties || {};
+        node.properties['data-para-idx'] = i++;
+      }
+      if (node?.children) node.children.forEach(walk);
+    };
+    walk(tree);
+  };
+}
+
 export default function MarkdownRenderer({ content, activeParagraphIndex = -1 }: MarkdownRendererProps) {
   const processedContent = preprocessDefinitions(content);
 
   // Track manual scrolling to pause auto-scroll
   const isUserScrollingRef = useRef(false);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Paragraph counter — ref avoids mutation-in-render issues under concurrent mode.
-  // Reset to 0 at the start of every render pass (safe: render is synchronous).
-  const paraCounterRef = useRef(0);
-  paraCounterRef.current = 0;
 
   // Detect manual scroll → pause auto-scroll for 4 seconds
   useEffect(() => {
@@ -51,7 +67,7 @@ export default function MarkdownRenderer({ content, activeParagraphIndex = -1 }:
 
   return (
     <ReactMarkdown
-      rehypePlugins={[rehypeRaw]}
+      rehypePlugins={[rehypeRaw, rehypeAddParaIdx]}
       components={
         {
           h1: ({ children }: { children?: React.ReactNode }) => (
@@ -69,8 +85,10 @@ export default function MarkdownRenderer({ content, activeParagraphIndex = -1 }:
               {children}
             </h3>
           ),
-          p: ({ children }: { children?: React.ReactNode }) => {
-            const idx = paraCounterRef.current++;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          p: ({ node, children }: { node?: any; children?: React.ReactNode }) => {
+            const rawIdx = node?.properties?.['data-para-idx'];
+            const idx = typeof rawIdx === 'number' ? rawIdx : Number(rawIdx ?? -1);
             const isActive = activeParagraphIndex === idx;
             return (
               <p
