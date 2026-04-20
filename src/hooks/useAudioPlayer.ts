@@ -74,9 +74,11 @@ export function useAudioPlayer(
     // paragraph during pauses rather than jumping to the last paragraph.
     const ts = timestampsRef.current;
     if (ts && ts.paragraphs.length > 0) {
+      // Small lead offset compensates for MP3 concatenation encoder delay
+      const HIGHLIGHT_LEAD_S = 0.15;
       let activeIdx = -1;
       for (let i = ts.paragraphs.length - 1; i >= 0; i--) {
-        if (t >= ts.paragraphs[i].start) {
+        if (t + HIGHLIGHT_LEAD_S >= ts.paragraphs[i].start) {
           activeIdx = i;
           break;
         }

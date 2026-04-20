@@ -153,6 +153,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
                   voice_settings: {
                     stability: 0.5,
                     similarity_boost: 0.75,
+                    speed: 0.9,
                   },
                 }),
               },
