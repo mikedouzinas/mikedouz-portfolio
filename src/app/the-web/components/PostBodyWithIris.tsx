@@ -45,8 +45,8 @@ export default function PostBodyWithIris({ slug, postTitle, children }: PostBody
             top: showLine.top,
             height: showLine.height,
             width: 3,
-            background: '#10b981',
-            boxShadow: '0 0 8px rgba(16, 185, 129, 0.5), 0 0 20px rgba(16, 185, 129, 0.2)',
+            background: '#2dd4bf',
+            boxShadow: 'none',
           }}
         />
       )}

@@ -318,7 +318,7 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
                 title={expanded ? 'Collapse' : 'Expand'}
               >
                 {expanded
-                  ? <Minimize2 className="w-2.5 h-2.5 text-blue-400/70" />
+                  ? <Minimize2 className="w-2.5 h-2.5 text-teal-400/70" />
                   : <Maximize2 className="w-2.5 h-2.5 text-white/40" />
                 }
               </button>
@@ -400,10 +400,9 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
       return (
         <div
           ref={bubbleEl}
-          className="fixed bottom-0 left-0 right-0 max-h-[85vh] z-50 rounded-t-2xl bg-gradient-to-br from-blue-600/[0.18] via-blue-500/[0.22] to-blue-600/[0.18] backdrop-blur-3xl backdrop-saturate-[2.2] shadow-[0_-12px_50px_rgba(0,0,0,0.5),0_-4px_20px_rgba(37,99,235,0.2)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] overflow-y-auto"
+          className="fixed bottom-0 left-0 right-0 max-h-[85vh] z-50 rounded-t-2xl bg-teal-500/[0.08] border border-teal-400/[0.12] backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.3)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] overflow-y-auto"
         >
           <div className="relative">
-            <div className="absolute -inset-4 rounded-t-2xl bg-gradient-to-b from-white/[0.15] via-blue-400/[0.05] to-transparent pointer-events-none" />
             <div className="relative">
               <div className="flex justify-center mb-3">
                 <div className="w-8 h-1 rounded-full bg-white/20" />
@@ -416,9 +415,8 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
     }
 
     const glassClasses = `
-      bg-gradient-to-br from-blue-600/[0.18] via-blue-500/[0.22] to-blue-600/[0.18]
-      backdrop-blur-3xl backdrop-saturate-[2.2]
-      shadow-[0_12px_50px_rgba(0,0,0,0.5),0_4px_20px_rgba(37,99,235,0.2)]
+      bg-teal-500/[0.08] border border-teal-400/[0.12]
+      backdrop-blur-xl
       rounded-2xl overflow-y-auto
     `;
 
@@ -427,13 +425,12 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
         ref={bubbleEl}
         data-has-contained-glow="true"
         style={getDesktopStyle()}
-        className={`${glassClasses} transition-[top,left,width,max-height,padding] duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
-          expanded ? 'p-5' : 'p-3.5'
+        className={`${glassClasses} transition-[top,left,width,max-height,padding,box-shadow] duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          expanded
+            ? 'p-5 shadow-[0_0_80px_40px_rgba(0,0,0,0.35),0_4px_24px_rgba(0,0,0,0.25)]'
+            : 'p-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.25)]'
         }`}
       >
-        {/* Glass sheen overlays */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.15] via-blue-400/[0.05] to-transparent pointer-events-none" />
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent pointer-events-none" />
         <div className="relative">
           {bubbleContent}
         </div>

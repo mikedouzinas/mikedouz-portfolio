@@ -30,7 +30,7 @@ export default function PostCard({ post, index }: PostCardProps) {
           data-has-contained-glow="true"
           className="relative overflow-hidden rounded-xl cursor-pointer group hover:shadow-lg transition-shadow duration-300 hover:bg-gradient-to-br hover:from-gray-800 hover:to-gray-700 p-5"
         >
-          <ContainedMouseGlow color={glowColor} />
+          <ContainedMouseGlow color={glowColor} intensity={0.18} size={140} />
 
           <div className="flex items-center gap-3 text-xs text-gray-500 mb-2">
             <span>{formattedDate}</span>

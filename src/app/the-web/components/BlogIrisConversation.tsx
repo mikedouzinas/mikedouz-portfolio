@@ -145,7 +145,7 @@ export default function BlogIrisConversation({
         <button
           type="submit"
           disabled={!input.trim() || disabled || isStreaming}
-          className={`flex-shrink-0 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600 text-white border border-white/20 shadow-md transition-all duration-200 disabled:opacity-30 hover:shadow-lg hover:scale-105 mb-0.5 ${expanded ? 'w-8 h-8' : 'w-7 h-7'}`}
+          className={`flex-shrink-0 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600 text-white border border-white/20 transition-all duration-200 disabled:opacity-30 mb-0.5 ${expanded ? 'w-8 h-8' : 'w-7 h-7'}`}
         >
           <svg width={expanded ? '12' : '10'} height={expanded ? '12' : '10'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 10 4 15 9 20" />
