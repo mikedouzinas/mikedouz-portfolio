@@ -1055,7 +1055,7 @@ npm run clear:cache         # Clear Redis cache (if script exists)
 
 ## 🔭 Related Projects (Olympus Ecosystem)
 
-### Apollo x FreeWrite
+### Apollo x freewrite
 
 Built on top of [freewrite by Farza](https://github.com/farzaa/freewrite) — a minimalist writing tool with a timer, ambient video background, and distraction-free UI. Fork lives at [github.com/mikedouzinas/apollo](https://github.com/mikedouzinas/apollo).
 

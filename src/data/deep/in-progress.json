@@ -66,11 +66,11 @@
   },
   {
     "id": "apollo-freewrite",
-    "title": "Apollo x FreeWrite",
+    "title": "Apollo x freewrite",
     "section": "projects",
     "status": "building",
     "parent": "The Olympus Project",
-    "summary": "A fork of FreeWrite by Farza — a minimalist writing platform with a timer, ambient video, and distraction-free UI — extended with Apollo, my personal knowledge layer. Turns a single writing session into a complete thinking environment.",
+    "summary": "A fork of freewrite by Farza — a minimalist writing platform with a timer, ambient video, and distraction-free UI — extended with Apollo, my personal knowledge layer. Turns a single writing session into a complete thinking environment.",
     "specifics": [
       "Built on top of freewrite by Farza (farzaa/freewrite) — a writing tool designed to get thoughts out fast, with a timer, ambient video background, and a minimal UI that gets out of your way",
       "Added an in-platform AI chat using the forked Claude Code repository, so you can think and converse without leaving the writing environment",
