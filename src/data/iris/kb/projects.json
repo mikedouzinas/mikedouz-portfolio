@@ -30,22 +30,26 @@
   {
     "id": "proj_portfolio",
     "title": "mikeveson.com",
-    "summary": "A living personal site with Iris AI assistant, a Spotify music timeline, a blog with inline Iris interactions, and deep mode with hidden content. More than a portfolio.",
+    "summary": "A living personal site with Iris AI assistant, AI voice reading, a Spotify music timeline, a blog with inline Iris interactions, per-post soundtracks, and deep mode with hidden content. More than a portfolio.",
     "aliases": ["Iris", "Iris assistant", "mikeveson.com", "the web", "Mike's blog", "portfolio"],
     "specifics": [
-      "Iris AI Assistant: Named after the Greek messenger goddess. Powered by Claude Sonnet 4.6 (claude-sonnet-4-6) with the full knowledge base passed in a prompt-cached system prompt — no embeddings or semantic search. Intent classification happens via a Claude tool call in a single API request. Config-driven quick actions suggest related items based on complexity, impact, and recency scores. Structured knowledge base with 851 skills, filters, and personal context.",
-      "The Web (Blog): Full blog system at /the-web with Supabase backend, full-text search, tag filtering, markdown rendering, spider-web hover reveal pattern, commenting with threaded replies, and a subscribe system (email + SMS via Twilio). Per-post theming with custom accent colors.",
-      "Blog Iris Interactions: Readers can highlight any text on a blog post and open an Iris-powered conversation bubble. The goal is to make the blog a more collaborative space where readers can engage deeply with the ideas, ask questions, and have productive discussions that help them learn more. Iris responds using the post content and optional author context documents. Readers can then have Iris draft a comment or a direct message to Mike, making the writing feel like a conversation rather than a broadcast.",
-      "Spotify Music Timeline: Kleinberg burst detection algorithm on 4 years of Spotify listening data (53K+ plays). Identifies songs with abnormal replay frequency in compressed timeframes. Glassmorphic sidebar panel with progressive collapse (drops songs one by one on short viewports), hover glow effect, and an expandable full timeline with month grouping and audio previews.",
+      "Iris AI Assistant: Named after the Greek messenger goddess. Powered by Claude Sonnet 4.6 with the full knowledge base passed in a prompt-cached system prompt — no embeddings or semantic search. Intent classification happens via a Claude tool call in a single API request. Config-driven quick actions suggest related items based on complexity, impact, and recency scores. Structured knowledge base with 851 skills, filters, and personal context. Iris now opens directly to the center console — no highlight-then-expand friction. Iris can also generate full summaries, TL;DRs, and draft comments or direct messages from any blog post.",
+      "The Web (Blog): Full blog system at /the-web with Supabase backend, full-text search, tag filtering, markdown rendering, spider-web hover reveal pattern. Green glass-type design consistent across Spotify and audio components. Per-post theming with custom accent colors.",
+      "AI Voice Reading: Every post on the blog reads back in a voice trained on Mike's voice using ElevenLabs. Supports Safari background audio on iPhone — leave the app and it keeps playing like a podcast player.",
+      "Per-Post Music Soundtrack: When Mike publishes a post, the site automatically curates the Spotify tracks he listened to while writing it and surfaces them alongside the post. Readers can get into his headspace through the music that accompanied the thinking.",
+      "Home Page Advertisement System: When a new blog post drops, an advertisement card fires automatically on the home page following the same visual design language as the rest of the site. Green design with webbed background.",
+      "New Logo: Designed with a graphic designer — a planet between two webs, in the same green as the site. Built for visual consistency across the blog and audio components.",
+      "Blog Iris Interactions: Readers can highlight any text on a blog post and open an Iris-powered conversation bubble. Iris responds using the post content and optional author context documents. Readers can then have Iris draft a comment or a direct message to Mike, making the writing feel like a conversation rather than a broadcast.",
+      "Spotify Music Timeline: Kleinberg burst detection algorithm on 4 years of Spotify listening data (53K+ plays). Identifies songs with abnormal replay frequency in compressed timeframes. Glassmorphic sidebar panel with progressive collapse, hover glow effect, and an expandable full timeline with month grouping and audio previews.",
       "Deep Mode: Hidden layer triggered by clicking the profile photo. Reveals in-progress projects, blueprints, and the Spotify timeline. Animated green-blue border bars on viewport edges, profile ring gradient animation. Content sections fade in with staggered delays.",
       "Ask Mike Inbox: Contact system where Iris can draft messages on behalf of visitors. Smart contact field auto-detects email vs phone. Honeypot spam detection, rate limiting, rich HTML email notifications via Resend.",
       "Interactive UI: Global mouse glow effects, contained card glows with per-section colors, hover cards with rich previews, dark mode throughout, mobile-responsive with sheet-based navigation.",
       "Production infrastructure: Redis caching (1hr TTL), IP-based rate limiting, Supabase PostgreSQL with RLS, Vercel deployment with cron jobs for Spotify data refresh, pre-computed importance rankings at build time."
     ],
-    "skills": ["api_integration", "product_management", "typescript", "react", "nextjs", "tailwind_css", "framer_motion", "supabase", "redis", "nlp", "machine_learning", "writing", "data_structures", "signal_processing", "sse"],
-    "tech_stack": ["Next.js 15", "React 19", "TypeScript", "Tailwind CSS", "Framer Motion", "Anthropic Claude API (claude-sonnet-4-6)", "Supabase", "Upstash Redis", "Resend", "Twilio", "Spotify API"],
-    "architecture": "Next.js 15 App Router with server/client component split. Iris: full KB serialized into a prompt-cached system prompt, single-pass Claude Sonnet 4.6 call with tool-based intent classification and streaming response. Blog: Supabase-backed with full-text search and inline Iris conversations. Spotify: offline Kleinberg analysis → JSON → progressive UI. Deep mode: React Context + localStorage persistence.",
-    "tags": ["Web", "AI", "Full-Stack", "Iris", "Blog", "Music"],
+    "skills": ["api_integration", "product_management", "typescript", "react", "nextjs", "tailwind_css", "framer_motion", "supabase", "redis", "nlp", "machine_learning", "writing", "data_structures", "signal_processing", "sse", "swift", "voice_synthesis"],
+    "tech_stack": ["Next.js 15", "React 19", "TypeScript", "Tailwind CSS", "Framer Motion", "Anthropic Claude API (claude-sonnet-4-6)", "ElevenLabs", "Supabase", "Upstash Redis", "Resend", "Twilio", "Spotify API", "Web Audio API"],
+    "architecture": "Next.js 15 App Router with server/client component split. Iris: full KB serialized into a prompt-cached system prompt, single-pass Claude Sonnet 4.6 call with tool-based intent classification and streaming response. Blog: Supabase-backed with full-text search, inline Iris conversations, and AI voice via ElevenLabs. Spotify: offline Kleinberg analysis + per-post soundtrack curation. Deep mode: React Context + localStorage persistence.",
+    "tags": ["Web", "AI", "Full-Stack", "Iris", "Blog", "Music", "Voice"],
     "links": {
       "github": "https://github.com/mikedouzinas/mikedouz-portfolio",
       "live": "https://mikeveson.com",
@@ -53,6 +57,29 @@
     },
     "dates": {
       "start": "2025-02"
+    }
+  },
+  {
+    "id": "proj_apollo_freewrite",
+    "title": "Apollo x FreeWrite",
+    "summary": "A fork of FreeWrite by Farza — a minimalist writing platform with a timer, ambient video, and distraction-free UI — extended with Apollo, Mike's personal knowledge layer. Turns freewriting into a complete thinking environment.",
+    "aliases": ["Apollo", "FreeWrite", "apollo freewrite", "apollo x freewrite", "writing system"],
+    "specifics": [
+      "Built on top of freewrite by Farza (farzaa/freewrite) — a writing tool designed to get thoughts out fast, with a timer, ambient video background, and minimal UI",
+      "Added an in-platform AI chat using the forked Claude Code repository, so you can think and converse without leaving the writing environment",
+      "Added an AI processor that connects to a vault of the user's choosing — defaults to an LLM wiki-style connector that ingests and organizes what you write",
+      "Added a Process button that sends the session directly to the vault via Claude Code — removes the step between writing something and having it captured where it belongs",
+      "The result is a single environment for freewriting, thinking with AI, and filing — no context switching"
+    ],
+    "skills": ["product_management", "writing", "ai_integration", "api_integration"],
+    "tech_stack": ["FreeWrite (fork)", "Claude Code (fork)", "Anthropic Claude API"],
+    "tags": ["Writing", "AI", "Olympus", "Self-Knowledge"],
+    "links": {
+      "github": "https://github.com/mikedouzinas/apollo",
+      "source": "https://gist.github.com/rohitg00/2067ab416f7bbe447c1977edaaa681e2"
+    },
+    "dates": {
+      "start": "2026-04"
     }
   },
   {

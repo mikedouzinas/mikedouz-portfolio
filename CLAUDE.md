@@ -1,6 +1,6 @@
 # CLAUDE.md - AI Assistant Guide
 
-**Last Updated**: 2026-03-23
+**Last Updated**: 2026-04-20
 **Project**: mikeveson.com — Portfolio, Iris AI Assistant & The Web
 **Stack**: Next.js 15, React 19, TypeScript, Anthropic Claude, Redis, Supabase, Twilio, Resend
 
@@ -299,7 +299,15 @@ Quick actions provide ALL links (GitHub, LinkedIn, demo, company).
 Iris is instructed to NEVER include raw URLs in response text - only reference that resources exist (e.g., "The code is on GitHub").
 This prevents duplicate links (text + button) and provides consistent UX.
 
-### 2. Ask Mike Inbox System
+### 2. Blog Iris UX Improvements (April 2026)
+
+- **Center console auto-focus**: Iris opens directly to the typing indicator — immediate input, no extra steps.
+- **Full summaries and TL;DR**: Iris can generate a full summary of a post or a TL;DR, then open it up for questions.
+- **Comment and message drafting**: Iris can draft a comment or direct message to Mike based on the conversation, letting readers interact without leaving the post.
+
+---
+
+### 3. Ask Mike Inbox System
 
 **Location**: `src/app/api/inbox/route.ts`, `src/app/admin/inbox/page.tsx`
 
@@ -322,7 +330,38 @@ Iris emits structured directives during streaming:
 
 **Parser**: `src/components/iris/useUiDirectives.ts`
 
-### 3. Mouse Glow System
+### 3. AI Voice Reading System
+
+**Purpose**: Every blog post on The Web can be listened to in a voice trained on Mike's voice via ElevenLabs. Designed for accessibility and on-the-go reading.
+
+**Key behaviors**:
+- Any post at `/the-web/[slug]` has a play button that reads the post aloud using ElevenLabs voice synthesis
+- Safari on iPhone supports background audio — the post keeps playing when you leave the app, like a podcast
+
+**Tech**: ElevenLabs API, Web Audio API, Safari MediaSession API for background playback controls.
+
+---
+
+### 4. Per-Post Music Soundtrack
+
+**Purpose**: When Mike publishes a post, the site automatically surfaces the Spotify tracks he was listening to while writing it. Readers can get into his headspace through music.
+
+**How it works**:
+- On publish, the system pulls Mike's recent Spotify listening history and associates it with the post
+- Curated tracks surface alongside the post on `/the-web/[slug]`
+- Extends the existing Spotify integration (Kleinberg burst detection timeline in deep mode)
+
+---
+
+### 5. Home Page Advertisement System
+
+**Purpose**: When a new blog post drops, an advertisement card fires automatically on the home page following the same design language as the rest of the site.
+
+**Design**: Green design with webbed background, consistent with The Web's visual identity.
+
+---
+
+### 6. Mouse Glow System
 
 **Files**: `src/components/mouse_glow.tsx`, `src/components/ContainedMouseGlow.tsx`
 
@@ -1014,6 +1053,30 @@ npm run clear:cache         # Clear Redis cache (if script exists)
 
 ---
 
+## 🔭 Related Projects (Olympus Ecosystem)
+
+### Apollo x FreeWrite
+
+Built on top of [freewrite by Farza](https://github.com/farzaa/freewrite) — a minimalist writing tool with a timer, ambient video background, and distraction-free UI. Fork lives at [github.com/mikedouzinas/apollo](https://github.com/mikedouzinas/apollo).
+
+**What Mike added:**
+- In-platform AI chat using the forked Claude Code repository — think and converse without leaving the writing environment
+- AI processor that connects to a vault of the user's choosing, defaulting to an LLM wiki-style connector ([reference](https://gist.github.com/rohitg00/2067ab416f7bbe447c1977edaaa681e2))
+- Process button that sends the session directly to the vault via Claude Code — writing captures immediately where it belongs
+
+The result is a single environment for freewriting, thinking with AI, and filing.
+
+### Iris Mobile (Swift)
+
+A native iOS version of the Iris thinking partner, forked from the Claude Code codebase and translated to Swift. Lives in a separate repo (`~/Downloads/Dev/iris-mobile/`).
+
+Key capabilities added in April 2026:
+- Listen to any vault file or chat with phone closed (background audio)
+- Same Claude Code-style interface, now on iPhone
+- Designed for Google summer internship — keeps Iris accessible when away from a laptop
+
+---
+
 ## 🎮 Games: Ascent to Olympus (Archived)
 
 The Ascent to Olympus endless runner game has been archived and is no longer part of the live site. The spec document at `docs/FEATURE_olympus-ascent-game.md` and game code at `src/app/games/olympus-ascent/` may still exist in git history for reference but should not be developed further.
@@ -1117,8 +1180,8 @@ Table: `blog_posts`
 
 ---
 
-**Last Updated**: 2026-03-10
-**Version**: 1.1
+**Last Updated**: 2026-04-20
+**Version**: 1.2
 **Maintainer**: Mike Veson (mike@douzinas.com)
 
 For questions about this guide or the codebase, press ⌘K on [mikeveson.com](https://mikeveson.com) and ask Iris!
