@@ -76,6 +76,7 @@
       "Added an in-platform AI chat using the forked Claude Code repository, so you can think and converse without leaving the writing environment",
       "Added an AI processor that connects to a vault of the user's choosing — defaults to an LLM wiki-style connector that ingests and organizes what you write",
       "Added a Process button that sends the session directly to the vault via Claude Code — no steps between writing something and having it captured where it belongs",
+      "Supports multiple sessions open simultaneously — different topics stay genuinely separate, with each processed independently into the vault",
       "The result is a single environment for freewriting, AI conversation, and filing"
     ],
     "aliases": ["apollo freewrite", "apollo x freewrite", "freewrite", "writing system"],
