@@ -65,6 +65,29 @@
     }
   },
   {
+    "id": "apollo-freewrite",
+    "title": "Apollo x FreeWrite",
+    "section": "projects",
+    "status": "building",
+    "parent": "The Olympus Project",
+    "summary": "A fork of FreeWrite by Farza — a minimalist writing platform with a timer, ambient video, and distraction-free UI — extended with Apollo, my personal knowledge layer. Turns a single writing session into a complete thinking environment.",
+    "specifics": [
+      "Built on top of freewrite by Farza (farzaa/freewrite) — a writing tool designed to get thoughts out fast, with a timer, ambient video background, and a minimal UI that gets out of your way",
+      "Added an in-platform AI chat using the forked Claude Code repository, so you can think and converse without leaving the writing environment",
+      "Added an AI processor that connects to a vault of the user's choosing — defaults to an LLM wiki-style connector that ingests and organizes what you write",
+      "Added a Process button that sends the session directly to the vault via Claude Code — no steps between writing something and having it captured where it belongs",
+      "The result is a single environment for freewriting, AI conversation, and filing"
+    ],
+    "aliases": ["apollo freewrite", "apollo x freewrite", "freewrite", "writing system"],
+    "connections": ["apollo", "project-olympus"],
+    "skills": ["ai_integration", "writing"],
+    "tags": ["writing", "ai", "olympus"],
+    "links": {
+      "github": "https://github.com/mikedouzinas/apollo",
+      "source": "https://gist.github.com/rohitg00/2067ab416f7bbe447c1977edaaa681e2"
+    }
+  },
+  {
     "id": "rankd",
     "title": "Rankd",
     "section": "projects",

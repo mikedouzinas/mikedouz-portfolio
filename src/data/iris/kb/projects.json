@@ -60,29 +60,6 @@
     }
   },
   {
-    "id": "proj_apollo_freewrite",
-    "title": "Apollo x FreeWrite",
-    "summary": "A fork of FreeWrite by Farza — a minimalist writing platform with a timer, ambient video, and distraction-free UI — extended with Apollo, Mike's personal knowledge layer. Turns freewriting into a complete thinking environment.",
-    "aliases": ["Apollo", "FreeWrite", "apollo freewrite", "apollo x freewrite", "writing system"],
-    "specifics": [
-      "Built on top of freewrite by Farza (farzaa/freewrite) — a writing tool designed to get thoughts out fast, with a timer, ambient video background, and minimal UI",
-      "Added an in-platform AI chat using the forked Claude Code repository, so you can think and converse without leaving the writing environment",
-      "Added an AI processor that connects to a vault of the user's choosing — defaults to an LLM wiki-style connector that ingests and organizes what you write",
-      "Added a Process button that sends the session directly to the vault via Claude Code — removes the step between writing something and having it captured where it belongs",
-      "The result is a single environment for freewriting, thinking with AI, and filing — no context switching"
-    ],
-    "skills": ["product_management", "writing", "ai_integration", "api_integration"],
-    "tech_stack": ["FreeWrite (fork)", "Claude Code (fork)", "Anthropic Claude API"],
-    "tags": ["Writing", "AI", "Olympus", "Self-Knowledge"],
-    "links": {
-      "github": "https://github.com/mikedouzinas/apollo",
-      "source": "https://gist.github.com/rohitg00/2067ab416f7bbe447c1977edaaa681e2"
-    },
-    "dates": {
-      "start": "2026-04"
-    }
-  },
-  {
     "id": "proj_euros",
     "title": "Euro Predictor",
     "summary": "Predicted Euro 2024 outcomes by scraping data and training ML models. Reached top 3% in UEFA's prediction game.",

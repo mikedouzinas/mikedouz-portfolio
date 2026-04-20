@@ -11,6 +11,7 @@ import {
   Book,
   Lamp,
   NotepadText,
+  NotebookPen,
   UtensilsCrossed,
   Armchair,
   ExternalLink,
@@ -48,6 +49,7 @@ const ITEM_ICONS: Record<string, LucideIcon> = {
   tree: Book,
   lantern: Lamp,
   "important-things": NotepadText,
+  "apollo-freewrite": NotebookPen,
   tavern: UtensilsCrossed,
   "green-room": Armchair,
 };
