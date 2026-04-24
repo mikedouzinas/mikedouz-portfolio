@@ -1,6 +1,31 @@
 [
   {
-    "id": "a52b2fe06f6e19383f5ac3a82ebee990",
+    "id": "57d15a61379c6073ac0bb38baf1547b3",
+    "trackName": "The Show Goes On",
+    "artist": "Lupe Fiasco",
+    "album": "Lasers",
+    "trackUri": "spotify:track:4NTWZqvfQTlOMitlVn6tew",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0220cac893b7a494f729128dac",
+    "spotifyUrl": "https://open.spotify.com/track/4NTWZqvfQTlOMitlVn6tew",
+    "dateRange": {
+      "start": "2026-04-23",
+      "end": "2026-04-23"
+    },
+    "playCount": 9,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-04-23",
+    "peakDayPlays": 9,
+    "hotDays": [
+      {
+        "date": "2026-04-23",
+        "plays": 9
+      }
+    ]
+  },
+  {
+    "id": "af4b125c443f800d14c37d72d20f8ad2",
     "trackName": "Back Home",
     "artist": "Yeat",
     "album": "ADL",
@@ -9,10 +34,10 @@
     "spotifyUrl": "https://open.spotify.com/track/40oYjPdjvFBCZH1Smsk46H",
     "dateRange": {
       "start": "2026-04-18",
-      "end": "2026-04-18"
+      "end": "2026-04-21"
     },
-    "playCount": 6,
-    "weeksCount": 1,
+    "playCount": 12,
+    "weeksCount": 2,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-04-18",
@@ -21,11 +46,15 @@
       {
         "date": "2026-04-18",
         "plays": 6
+      },
+      {
+        "date": "2026-04-20",
+        "plays": 5
       }
     ]
   },
   {
-    "id": "46af710900c539a8721fbc920bb1bc14",
+    "id": "b9283e203b5d5cce914bb4cc82cf0e3c",
     "trackName": "Selfless",
     "artist": "The Strokes",
     "album": "The New Abnormal",
@@ -35,10 +64,10 @@
     "spotifyUrl": "https://open.spotify.com/track/2t0wwvR15fc3K1ey8OiOaN",
     "dateRange": {
       "start": "2026-04-10",
-      "end": "2026-04-18"
+      "end": "2026-04-21"
     },
-    "playCount": 8,
-    "weeksCount": 2,
+    "playCount": 10,
+    "weeksCount": 3,
     "intensity": 2,
     "maxState": 2,
     "peakDay": "2026-04-18",
@@ -89,7 +118,7 @@
     ]
   },
   {
-    "id": "ad7681e72fab74a0c8cca6eea2b25cf7",
+    "id": "3ea12c4ae4ae23461105f04a57995c3b",
     "trackName": "How Much Is Weed?",
     "artist": "Dominic Fike",
     "album": "Sunburn",
@@ -98,9 +127,9 @@
     "spotifyUrl": "https://open.spotify.com/track/44KWbTVZev3SWdv1t5UoYE",
     "dateRange": {
       "start": "2026-04-09",
-      "end": "2026-04-18"
+      "end": "2026-04-19"
     },
-    "playCount": 17,
+    "playCount": 19,
     "weeksCount": 2,
     "intensity": 3,
     "maxState": 3,
@@ -117,6 +146,10 @@
       },
       {
         "date": "2026-04-17",
+        "plays": 2
+      },
+      {
+        "date": "2026-04-19",
         "plays": 2
       }
     ]
@@ -147,7 +180,7 @@
     ]
   },
   {
-    "id": "075e9037428ad3f3aa1ee0d26cd494da",
+    "id": "ffa48fb7c299888c331bc204be991336",
     "trackName": "Raindance (feat. Tems)",
     "artist": "Dave",
     "album": "The Boy Who Played the Harp",
@@ -156,10 +189,10 @@
     "spotifyUrl": "https://open.spotify.com/track/3oTuTpF1F3A7rEC6RKsMRz",
     "dateRange": {
       "start": "2026-04-08",
-      "end": "2026-04-18"
+      "end": "2026-04-21"
     },
-    "playCount": 8,
-    "weeksCount": 2,
+    "playCount": 10,
+    "weeksCount": 3,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-04-12",
@@ -193,6 +226,35 @@
       {
         "date": "2026-04-16",
         "plays": 5
+      }
+    ]
+  },
+  {
+    "id": "8e818dc88cb83511b527db540f2bc057",
+    "trackName": "4:25",
+    "artist": "Balu Brigada",
+    "album": "Portal",
+    "trackUri": "spotify:track:2cjQAWtDFoWVWdXr0oKfef",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021fc8017bbf246da18b953789",
+    "spotifyUrl": "https://open.spotify.com/track/2cjQAWtDFoWVWdXr0oKfef",
+    "dateRange": {
+      "start": "2026-04-06",
+      "end": "2026-04-21"
+    },
+    "playCount": 10,
+    "weeksCount": 3,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-04-12",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-04-12",
+        "plays": 2
+      },
+      {
+        "date": "2026-04-13",
+        "plays": 2
       }
     ]
   },
@@ -924,8 +986,8 @@
     },
     "playCount": 6,
     "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2026-02-16",
     "peakDayPlays": 2,
     "hotDays": [
@@ -6537,6 +6599,35 @@
     ]
   },
   {
+    "id": "86d33162c8efba925cb1153a99ce7fb8",
+    "trackName": "International Love (feat. Chris Brown)",
+    "artist": "Pitbull",
+    "album": "Planet Pit (Deluxe Version)",
+    "trackUri": "spotify:track:62zFEHfAYl5kdHYOivj4BC",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021dc7483a9fcfce54822a2f19",
+    "spotifyUrl": "https://open.spotify.com/track/62zFEHfAYl5kdHYOivj4BC",
+    "dateRange": {
+      "start": "2025-04-21",
+      "end": "2025-04-25"
+    },
+    "playCount": 7,
+    "weeksCount": 1,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-04-21",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2025-04-21",
+        "plays": 3
+      },
+      {
+        "date": "2025-04-22",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "07e7ed36695c3dcec3b93ca0b0e3cc87",
     "trackName": "Telescope",
     "artist": "Cage The Elephant",
@@ -11894,6 +11985,48 @@
     ]
   },
   {
+    "id": "cfc85c50bb5dbb14caec8fb85831aaa2",
+    "trackName": "Heartless",
+    "artist": "The Weeknd",
+    "album": "After Hours",
+    "trackUri": "spotify:track:6bnF93Rx87YqUBLSgjiMU8",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028863bc11d2aa12b54f5aeb36",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/6bnF93Rx87YqUBLSgjiMU8",
+    "dateRange": {
+      "start": "2023-07-31",
+      "end": "2023-09-02"
+    },
+    "playCount": 21,
+    "weeksCount": 5,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-07-31",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-07-31",
+        "plays": 2
+      },
+      {
+        "date": "2023-08-01",
+        "plays": 2
+      },
+      {
+        "date": "2023-08-03",
+        "plays": 2
+      },
+      {
+        "date": "2023-08-04",
+        "plays": 2
+      },
+      {
+        "date": "2023-09-02",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "b862832fa5e0117b611ca86cdfe8d6ea",
     "trackName": "Often",
     "artist": "The Weeknd",
@@ -12117,48 +12250,6 @@
       },
       {
         "date": "2023-08-03",
-        "plays": 2
-      }
-    ]
-  },
-  {
-    "id": "cfc85c50bb5dbb14caec8fb85831aaa2",
-    "trackName": "Heartless",
-    "artist": "The Weeknd",
-    "album": "After Hours",
-    "trackUri": "spotify:track:6bnF93Rx87YqUBLSgjiMU8",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028863bc11d2aa12b54f5aeb36",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/6bnF93Rx87YqUBLSgjiMU8",
-    "dateRange": {
-      "start": "2023-07-31",
-      "end": "2023-09-02"
-    },
-    "playCount": 21,
-    "weeksCount": 5,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2023-07-31",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-07-31",
-        "plays": 2
-      },
-      {
-        "date": "2023-08-01",
-        "plays": 2
-      },
-      {
-        "date": "2023-08-03",
-        "plays": 2
-      },
-      {
-        "date": "2023-08-04",
-        "plays": 2
-      },
-      {
-        "date": "2023-09-02",
         "plays": 2
       }
     ]
@@ -13701,8 +13792,8 @@
     },
     "playCount": 20,
     "weeksCount": 6,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2023-04-15",
     "peakDayPlays": 2,
     "hotDays": [
@@ -14046,8 +14137,8 @@
     },
     "playCount": 20,
     "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2023-03-18",
     "peakDayPlays": 6,
     "hotDays": [
@@ -14462,6 +14553,36 @@
     ]
   },
   {
+    "id": "8daea6eee093e93f23044449c8801991",
+    "trackName": "Heartless",
+    "artist": "The Weeknd",
+    "album": "After Hours",
+    "trackUri": "spotify:track:6bnF93Rx87YqUBLSgjiMU8",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028863bc11d2aa12b54f5aeb36",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/6bnF93Rx87YqUBLSgjiMU8",
+    "dateRange": {
+      "start": "2023-02-28",
+      "end": "2023-03-26"
+    },
+    "playCount": 11,
+    "weeksCount": 4,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-02-28",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-02-28",
+        "plays": 2
+      },
+      {
+        "date": "2023-03-19",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "844e7cf8eae9f4be4ba00b2f417b92be",
     "trackName": "Father Stretch My Hands Pt. 1",
     "artist": "Kanye West",
@@ -14551,36 +14672,6 @@
       },
       {
         "date": "2023-03-25",
-        "plays": 2
-      }
-    ]
-  },
-  {
-    "id": "8daea6eee093e93f23044449c8801991",
-    "trackName": "Heartless",
-    "artist": "The Weeknd",
-    "album": "After Hours",
-    "trackUri": "spotify:track:6bnF93Rx87YqUBLSgjiMU8",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e028863bc11d2aa12b54f5aeb36",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/6bnF93Rx87YqUBLSgjiMU8",
-    "dateRange": {
-      "start": "2023-02-28",
-      "end": "2023-03-26"
-    },
-    "playCount": 11,
-    "weeksCount": 4,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2023-02-28",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-02-28",
-        "plays": 2
-      },
-      {
-        "date": "2023-03-19",
         "plays": 2
       }
     ]
