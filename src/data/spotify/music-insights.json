@@ -1,6 +1,6 @@
 [
   {
-    "id": "57d15a61379c6073ac0bb38baf1547b3",
+    "id": "dfd4bf3b077ec4122cddfd4edc42b7ec",
     "trackName": "The Show Goes On",
     "artist": "Lupe Fiasco",
     "album": "Lasers",
@@ -9,9 +9,9 @@
     "spotifyUrl": "https://open.spotify.com/track/4NTWZqvfQTlOMitlVn6tew",
     "dateRange": {
       "start": "2026-04-23",
-      "end": "2026-04-23"
+      "end": "2026-04-26"
     },
-    "playCount": 9,
+    "playCount": 10,
     "weeksCount": 1,
     "intensity": 3,
     "maxState": 3,
@@ -24,16 +24,15 @@
       }
     ],
     "insightTypes": [
-      "burst",
-      "one_and_done"
+      "burst"
     ],
     "context": {
-      "totalPlaysInWindow": 18,
-      "uniqueTracksInWindow": 8,
+      "totalPlaysInWindow": 99,
+      "uniqueTracksInWindow": 74,
       "timeOfDayDistribution": {
         "0": 0,
         "1": 0,
-        "2": 0,
+        "2": 1,
         "3": 0,
         "4": 0,
         "5": 0,
@@ -53,14 +52,81 @@
         "19": 0,
         "20": 0,
         "21": 0,
-        "22": 1,
+        "22": 2,
         "23": 0
       },
       "monthsActive": 1
     }
   },
   {
-    "id": "af4b125c443f800d14c37d72d20f8ad2",
+    "id": "cb5b0e12a33418bbd4433344bc25f855",
+    "trackName": "Apocalypse Dreams",
+    "artist": "Tame Impala",
+    "album": "Lonerism",
+    "trackUri": "spotify:track:7qU7vhCPKhkDiJYGoboISc",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02370c12f82872c9cfaee80193",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/7qU7vhCPKhkDiJYGoboISc",
+    "dateRange": {
+      "start": "2026-04-20",
+      "end": "2026-04-24"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-04-22",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-04-22",
+        "plays": 2
+      },
+      {
+        "date": "2026-04-24",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 179,
+      "uniqueTracksInWindow": 130,
+      "timeOfDayDistribution": {
+        "0": 3,
+        "1": 2,
+        "2": 4,
+        "3": 2,
+        "4": 1,
+        "5": 2,
+        "6": 1,
+        "7": 2,
+        "8": 2,
+        "9": 0,
+        "10": 2,
+        "11": 3,
+        "12": 3,
+        "13": 2,
+        "14": 5,
+        "15": 2,
+        "16": 4,
+        "17": 0,
+        "18": 2,
+        "19": 4,
+        "20": 2,
+        "21": 1,
+        "22": 1,
+        "23": 2
+      },
+      "monthsActive": 10
+    }
+  },
+  {
+    "id": "ecd09f053a7d73309076cbe993d5ec24",
     "trackName": "Back Home",
     "artist": "Yeat",
     "album": "ADL",
@@ -69,9 +135,9 @@
     "spotifyUrl": "https://open.spotify.com/track/40oYjPdjvFBCZH1Smsk46H",
     "dateRange": {
       "start": "2026-04-18",
-      "end": "2026-04-21"
+      "end": "2026-04-25"
     },
-    "playCount": 12,
+    "playCount": 13,
     "weeksCount": 2,
     "intensity": 3,
     "maxState": 3,
@@ -88,12 +154,11 @@
       }
     ],
     "insightTypes": [
-      "burst",
-      "one_and_done"
+      "burst"
     ],
     "context": {
-      "totalPlaysInWindow": 169,
-      "uniqueTracksInWindow": 114,
+      "totalPlaysInWindow": 256,
+      "uniqueTracksInWindow": 157,
       "timeOfDayDistribution": {
         "0": 1,
         "1": 0,
@@ -109,22 +174,22 @@
         "11": 0,
         "12": 2,
         "13": 1,
-        "14": 0,
+        "14": 1,
         "15": 0,
-        "16": 0,
+        "16": 1,
         "17": 0,
         "18": 0,
         "19": 3,
         "20": 0,
         "21": 0,
-        "22": 3,
+        "22": 4,
         "23": 0
       },
       "monthsActive": 1
     }
   },
   {
-    "id": "b9283e203b5d5cce914bb4cc82cf0e3c",
+    "id": "a1f4617420702fbbac2198dac145a627",
     "trackName": "Selfless",
     "artist": "The Strokes",
     "album": "The New Abnormal",
@@ -134,9 +199,9 @@
     "spotifyUrl": "https://open.spotify.com/track/2t0wwvR15fc3K1ey8OiOaN",
     "dateRange": {
       "start": "2026-04-10",
-      "end": "2026-04-21"
+      "end": "2026-04-24"
     },
-    "playCount": 10,
+    "playCount": 11,
     "weeksCount": 3,
     "intensity": 2,
     "maxState": 2,
@@ -159,8 +224,8 @@
       "one_and_done"
     ],
     "context": {
-      "totalPlaysInWindow": 458,
-      "uniqueTracksInWindow": 223,
+      "totalPlaysInWindow": 537,
+      "uniqueTracksInWindow": 245,
       "timeOfDayDistribution": {
         "0": 10,
         "1": 7,
@@ -180,7 +245,7 @@
         "15": 7,
         "16": 10,
         "17": 5,
-        "18": 8,
+        "18": 9,
         "19": 7,
         "20": 7,
         "21": 3,
@@ -225,15 +290,14 @@
     ],
     "insightTypes": [
       "burst",
-      "loyalty",
-      "one_and_done"
+      "loyalty"
     ],
     "context": {
       "totalPlaysInWindow": 289,
       "uniqueTracksInWindow": 169,
       "timeOfDayDistribution": {
         "0": 3,
-        "1": 0,
+        "1": 1,
         "2": 6,
         "3": 2,
         "4": 2,
@@ -319,9 +383,9 @@
         "13": 1,
         "14": 0,
         "15": 4,
-        "16": 0,
+        "16": 1,
         "17": 5,
-        "18": 1,
+        "18": 2,
         "19": 0,
         "20": 1,
         "21": 1,
@@ -332,7 +396,7 @@
     }
   },
   {
-    "id": "f32d6f2c0661327881a2b44eee30cad5",
+    "id": "1bb8d647b998b8a3a2a05264aca5f95e",
     "trackName": "HIGHS AND LOWS",
     "artist": "Kanye West",
     "album": "BULLY",
@@ -341,10 +405,10 @@
     "spotifyUrl": "https://open.spotify.com/track/565G1vHZu2xoxrnTyF06Qw",
     "dateRange": {
       "start": "2026-04-09",
-      "end": "2026-04-19"
+      "end": "2026-04-30"
     },
-    "playCount": 8,
-    "weeksCount": 2,
+    "playCount": 12,
+    "weeksCount": 4,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-04-18",
@@ -353,14 +417,19 @@
       {
         "date": "2026-04-18",
         "plays": 5
+      },
+      {
+        "date": "2026-04-30",
+        "plays": 2
       }
     ],
     "insightTypes": [
-      "burst"
+      "burst",
+      "one_and_done"
     ],
     "context": {
-      "totalPlaysInWindow": 394,
-      "uniqueTracksInWindow": 206,
+      "totalPlaysInWindow": 690,
+      "uniqueTracksInWindow": 288,
       "timeOfDayDistribution": {
         "0": 1,
         "1": 0,
@@ -379,8 +448,8 @@
         "14": 1,
         "15": 0,
         "16": 1,
-        "17": 0,
-        "18": 0,
+        "17": 2,
+        "18": 1,
         "19": 1,
         "20": 0,
         "21": 0,
@@ -415,8 +484,7 @@
       }
     ],
     "insightTypes": [
-      "burst",
-      "one_and_done"
+      "burst"
     ],
     "context": {
       "totalPlaysInWindow": 529,
@@ -439,7 +507,7 @@
         "14": 0,
         "15": 2,
         "16": 1,
-        "17": 1,
+        "17": 2,
         "18": 2,
         "19": 1,
         "20": 0,
@@ -502,7 +570,7 @@
         "18": 1,
         "19": 1,
         "20": 1,
-        "21": 0,
+        "21": 1,
         "22": 3,
         "23": 3
       },
@@ -538,15 +606,14 @@
       }
     ],
     "insightTypes": [
-      "burst",
-      "one_and_done"
+      "burst"
     ],
     "context": {
       "totalPlaysInWindow": 583,
       "uniqueTracksInWindow": 266,
       "timeOfDayDistribution": {
         "0": 1,
-        "1": 1,
+        "1": 2,
         "2": 0,
         "3": 1,
         "4": 0,
@@ -700,12 +767,12 @@
         "14": 2,
         "15": 0,
         "16": 1,
-        "17": 3,
+        "17": 4,
         "18": 0,
         "19": 1,
         "20": 0,
         "21": 1,
-        "22": 2,
+        "22": 3,
         "23": 0
       },
       "monthsActive": 2
@@ -772,7 +839,7 @@
         "15": 0,
         "16": 0,
         "17": 0,
-        "18": 1,
+        "18": 2,
         "19": 0,
         "20": 1,
         "21": 0,
@@ -843,7 +910,7 @@
         "19": 1,
         "20": 1,
         "21": 0,
-        "22": 0,
+        "22": 1,
         "23": 2
       },
       "monthsActive": 1
@@ -906,7 +973,7 @@
         "16": 4,
         "17": 0,
         "18": 2,
-        "19": 3,
+        "19": 4,
         "20": 2,
         "21": 1,
         "22": 1,
@@ -983,7 +1050,7 @@
     }
   },
   {
-    "id": "a16c77156e13c197151054b4de29740c",
+    "id": "228736a430452ba8adcd0e6195a96532",
     "trackName": "Fallen Star",
     "artist": "The Neighbourhood",
     "album": "Fallen Star",
@@ -993,10 +1060,10 @@
     "spotifyUrl": "https://open.spotify.com/track/60F6pgM6H6miNr5AmjxwjL",
     "dateRange": {
       "start": "2026-04-01",
-      "end": "2026-04-17"
+      "end": "2026-04-24"
     },
-    "playCount": 13,
-    "weeksCount": 3,
+    "playCount": 15,
+    "weeksCount": 4,
     "intensity": 2,
     "maxState": 2,
     "peakDay": "2026-04-01",
@@ -1018,11 +1085,12 @@
     "insightTypes": [
       "burst",
       "comeback",
-      "loyalty"
+      "loyalty",
+      "one_and_done"
     ],
     "context": {
-      "totalPlaysInWindow": 503,
-      "uniqueTracksInWindow": 242,
+      "totalPlaysInWindow": 751,
+      "uniqueTracksInWindow": 302,
       "timeOfDayDistribution": {
         "0": 4,
         "1": 2,
@@ -1042,7 +1110,7 @@
         "15": 4,
         "16": 2,
         "17": 2,
-        "18": 6,
+        "18": 7,
         "19": 0,
         "20": 1,
         "21": 1,
@@ -1105,7 +1173,7 @@
         "15": 0,
         "16": 2,
         "17": 1,
-        "18": 0,
+        "18": 1,
         "19": 2,
         "20": 0,
         "21": 0,
@@ -1543,12 +1611,12 @@
         "14": 2,
         "15": 0,
         "16": 1,
-        "17": 3,
+        "17": 4,
         "18": 0,
         "19": 1,
         "20": 0,
         "21": 1,
-        "22": 2,
+        "22": 3,
         "23": 0
       },
       "monthsActive": 2
@@ -1896,65 +1964,6 @@
     }
   },
   {
-    "id": "e3a1cc73bc01065635a5c46552364538",
-    "trackName": "Desire",
-    "artist": "Ian Asher",
-    "album": "Desire",
-    "trackUri": "spotify:track:4sMR8fuTzbUyzB0asxifV0",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021b63ef5d0e5bf964cf33cb9e",
-    "spotifyUrl": "https://open.spotify.com/track/4sMR8fuTzbUyzB0asxifV0",
-    "dateRange": {
-      "start": "2026-02-16",
-      "end": "2026-02-19"
-    },
-    "playCount": 6,
-    "weeksCount": 1,
-    "intensity": 3,
-    "maxState": 3,
-    "peakDay": "2026-02-18",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2026-02-18",
-        "plays": 3
-      }
-    ],
-    "insightTypes": [
-      "burst"
-    ],
-    "context": {
-      "totalPlaysInWindow": 256,
-      "uniqueTracksInWindow": 147,
-      "timeOfDayDistribution": {
-        "0": 0,
-        "1": 1,
-        "2": 0,
-        "3": 0,
-        "4": 2,
-        "5": 1,
-        "6": 1,
-        "7": 0,
-        "8": 0,
-        "9": 0,
-        "10": 1,
-        "11": 0,
-        "12": 0,
-        "13": 0,
-        "14": 0,
-        "15": 0,
-        "16": 1,
-        "17": 1,
-        "18": 0,
-        "19": 1,
-        "20": 1,
-        "21": 0,
-        "22": 0,
-        "23": 0
-      },
-      "monthsActive": 3
-    }
-  },
-  {
     "id": "b6780db06b2dd71fdfd753924fd4ae78",
     "trackName": "SHADOWS",
     "artist": "John Summit",
@@ -2086,6 +2095,65 @@
     }
   },
   {
+    "id": "e3a1cc73bc01065635a5c46552364538",
+    "trackName": "Desire",
+    "artist": "Ian Asher",
+    "album": "Desire",
+    "trackUri": "spotify:track:4sMR8fuTzbUyzB0asxifV0",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021b63ef5d0e5bf964cf33cb9e",
+    "spotifyUrl": "https://open.spotify.com/track/4sMR8fuTzbUyzB0asxifV0",
+    "dateRange": {
+      "start": "2026-02-16",
+      "end": "2026-02-19"
+    },
+    "playCount": 6,
+    "weeksCount": 1,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2026-02-18",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-02-18",
+        "plays": 3
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 256,
+      "uniqueTracksInWindow": 147,
+      "timeOfDayDistribution": {
+        "0": 0,
+        "1": 1,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "5": 1,
+        "6": 1,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 1,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 0,
+        "15": 0,
+        "16": 1,
+        "17": 1,
+        "18": 0,
+        "19": 1,
+        "20": 1,
+        "21": 0,
+        "22": 0,
+        "23": 0
+      },
+      "monthsActive": 3
+    }
+  },
+  {
     "id": "9341275fa49cdf6bf043856fc78ba09c",
     "trackName": "Often - Live",
     "artist": "The Weeknd",
@@ -2099,8 +2167,8 @@
     },
     "playCount": 6,
     "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2026-02-16",
     "peakDayPlays": 2,
     "hotDays": [
@@ -2187,7 +2255,7 @@
       "totalPlaysInWindow": 615,
       "uniqueTracksInWindow": 294,
       "timeOfDayDistribution": {
-        "0": 0,
+        "0": 1,
         "1": 3,
         "2": 4,
         "3": 0,
@@ -2212,7 +2280,7 @@
         "22": 3,
         "23": 2
       },
-      "monthsActive": 6
+      "monthsActive": 7
     }
   },
   {
@@ -2895,8 +2963,8 @@
         "16": 1,
         "17": 0,
         "18": 3,
-        "19": 0,
-        "20": 0,
+        "19": 1,
+        "20": 1,
         "21": 0,
         "22": 2,
         "23": 1
@@ -3098,7 +3166,7 @@
         "11": 0,
         "12": 0,
         "13": 0,
-        "14": 3,
+        "14": 4,
         "15": 1,
         "16": 0,
         "17": 0,
@@ -3158,7 +3226,7 @@
         "0": 1,
         "1": 3,
         "2": 2,
-        "3": 0,
+        "3": 1,
         "4": 0,
         "5": 1,
         "6": 0,
@@ -3170,7 +3238,7 @@
         "12": 0,
         "13": 1,
         "14": 1,
-        "15": 3,
+        "15": 4,
         "16": 0,
         "17": 1,
         "18": 2,
@@ -3376,7 +3444,7 @@
         "16": 0,
         "17": 0,
         "18": 3,
-        "19": 1,
+        "19": 2,
         "20": 0,
         "21": 0,
         "22": 0,
@@ -3544,7 +3612,7 @@
       "uniqueTracksInWindow": 311,
       "timeOfDayDistribution": {
         "0": 0,
-        "1": 1,
+        "1": 2,
         "2": 1,
         "3": 3,
         "4": 2,
@@ -4069,7 +4137,7 @@
       "timeOfDayDistribution": {
         "0": 5,
         "1": 5,
-        "2": 2,
+        "2": 3,
         "3": 2,
         "4": 0,
         "5": 0,
@@ -4081,7 +4149,7 @@
         "11": 1,
         "12": 1,
         "13": 0,
-        "14": 2,
+        "14": 3,
         "15": 3,
         "16": 3,
         "17": 3,
@@ -4954,7 +5022,7 @@
         "19": 2,
         "20": 2,
         "21": 0,
-        "22": 1,
+        "22": 2,
         "23": 2
       },
       "monthsActive": 6
@@ -5403,7 +5471,7 @@
         "17": 1,
         "18": 5,
         "19": 1,
-        "20": 0,
+        "20": 1,
         "21": 0,
         "22": 1,
         "23": 0
@@ -5656,7 +5724,7 @@
         "13": 1,
         "14": 1,
         "15": 0,
-        "16": 3,
+        "16": 4,
         "17": 4,
         "18": 3,
         "19": 4,
@@ -5719,7 +5787,7 @@
         "16": 1,
         "17": 4,
         "18": 2,
-        "19": 3,
+        "19": 4,
         "20": 1,
         "21": 1,
         "22": 0,
@@ -5990,7 +6058,7 @@
         "16": 1,
         "17": 4,
         "18": 2,
-        "19": 3,
+        "19": 4,
         "20": 1,
         "21": 1,
         "22": 0,
@@ -6068,7 +6136,7 @@
         "16": 4,
         "17": 0,
         "18": 2,
-        "19": 3,
+        "19": 4,
         "20": 2,
         "21": 1,
         "22": 1,
@@ -6200,7 +6268,7 @@
         "10": 0,
         "11": 1,
         "12": 4,
-        "13": 0,
+        "13": 1,
         "14": 3,
         "15": 2,
         "16": 0,
@@ -6212,7 +6280,7 @@
         "22": 0,
         "23": 0
       },
-      "monthsActive": 4
+      "monthsActive": 5
     }
   },
   {
@@ -6457,7 +6525,7 @@
         "15": 1,
         "16": 2,
         "17": 2,
-        "18": 4,
+        "18": 5,
         "19": 2,
         "20": 3,
         "21": 5,
@@ -6818,7 +6886,7 @@
         "11": 1,
         "12": 6,
         "13": 3,
-        "14": 5,
+        "14": 6,
         "15": 4,
         "16": 0,
         "17": 3,
@@ -7231,6 +7299,65 @@
     }
   },
   {
+    "id": "d5ba6211a4afb9fddb8b73905a92e971",
+    "trackName": "I'll Try Anything Once - Live From Electric Lady Studios for WRXP, New York",
+    "artist": "Julian Casablancas",
+    "album": "Live From Electric Lady Studios/WRXP New York",
+    "trackUri": "spotify:track:1k4OsQujxXPLij0ZsTFlMx",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02dff3c7e29f65bcb29f159386",
+    "spotifyUrl": "https://open.spotify.com/track/1k4OsQujxXPLij0ZsTFlMx",
+    "dateRange": {
+      "start": "2025-10-12",
+      "end": "2025-10-16"
+    },
+    "playCount": 5,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-10-12",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2025-10-12",
+        "plays": 3
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 249,
+      "uniqueTracksInWindow": 176,
+      "timeOfDayDistribution": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 1,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 4,
+        "13": 0,
+        "14": 2,
+        "15": 0,
+        "16": 1,
+        "17": 0,
+        "18": 0,
+        "19": 2,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 1
+      },
+      "monthsActive": 4
+    }
+  },
+  {
     "id": "51020bef7b3de65258e5972658082f40",
     "trackName": "Selfless",
     "artist": "The Strokes",
@@ -7294,7 +7421,7 @@
         "15": 7,
         "16": 10,
         "17": 5,
-        "18": 8,
+        "18": 9,
         "19": 7,
         "20": 7,
         "21": 3,
@@ -7646,69 +7773,6 @@
     }
   },
   {
-    "id": "58f7efa1a613240a85c1aa96fc767b89",
-    "trackName": "CHIHIRO",
-    "artist": "Billie Eilish",
-    "album": "HIT ME HARD AND SOFT",
-    "trackUri": "spotify:track:7BRD7x5pt8Lqa1eGYC4dzj",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0271d62ea7ea8a5be92d3c1f62",
-    "spotifyUrl": "https://open.spotify.com/track/7BRD7x5pt8Lqa1eGYC4dzj",
-    "dateRange": {
-      "start": "2025-09-28",
-      "end": "2025-10-05"
-    },
-    "playCount": 7,
-    "weeksCount": 2,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2025-09-28",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2025-09-28",
-        "plays": 3
-      },
-      {
-        "date": "2025-10-05",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst"
-    ],
-    "context": {
-      "totalPlaysInWindow": 444,
-      "uniqueTracksInWindow": 288,
-      "timeOfDayDistribution": {
-        "0": 2,
-        "1": 1,
-        "2": 1,
-        "3": 0,
-        "4": 1,
-        "5": 0,
-        "6": 1,
-        "7": 0,
-        "8": 0,
-        "9": 1,
-        "10": 0,
-        "11": 0,
-        "12": 2,
-        "13": 1,
-        "14": 1,
-        "15": 0,
-        "16": 0,
-        "17": 0,
-        "18": 1,
-        "19": 3,
-        "20": 0,
-        "21": 1,
-        "22": 2,
-        "23": 3
-      },
-      "monthsActive": 7
-    }
-  },
-  {
     "id": "f123aecb982bf864865bfd463da039ff",
     "trackName": "Dracula",
     "artist": "Tame Impala",
@@ -7775,7 +7839,7 @@
         "16": 3,
         "17": 1,
         "18": 2,
-        "19": 1,
+        "19": 2,
         "20": 4,
         "21": 4,
         "22": 0,
@@ -8115,7 +8179,7 @@
         "17": 1,
         "18": 5,
         "19": 1,
-        "20": 0,
+        "20": 1,
         "21": 0,
         "22": 1,
         "23": 0
@@ -8591,7 +8655,7 @@
         "4": 0,
         "5": 4,
         "6": 1,
-        "7": 3,
+        "7": 4,
         "8": 3,
         "9": 0,
         "10": 1,
@@ -8609,7 +8673,7 @@
         "22": 0,
         "23": 1
       },
-      "monthsActive": 7
+      "monthsActive": 8
     }
   },
   {
@@ -8889,7 +8953,7 @@
         "16": 7,
         "17": 6,
         "18": 4,
-        "19": 9,
+        "19": 10,
         "20": 7,
         "21": 4,
         "22": 3,
@@ -9535,7 +9599,7 @@
         "15": 7,
         "16": 10,
         "17": 5,
-        "18": 8,
+        "18": 9,
         "19": 7,
         "20": 7,
         "21": 3,
@@ -10397,7 +10461,7 @@
         "4": 2,
         "5": 2,
         "6": 1,
-        "7": 0,
+        "7": 1,
         "8": 1,
         "9": 0,
         "10": 1,
@@ -10532,7 +10596,7 @@
       "timeOfDayDistribution": {
         "0": 5,
         "1": 5,
-        "2": 2,
+        "2": 3,
         "3": 2,
         "4": 0,
         "5": 0,
@@ -10544,7 +10608,7 @@
         "11": 1,
         "12": 1,
         "13": 0,
-        "14": 2,
+        "14": 3,
         "15": 3,
         "16": 3,
         "17": 3,
@@ -11571,7 +11635,7 @@
         "15": 4,
         "16": 2,
         "17": 2,
-        "18": 6,
+        "18": 7,
         "19": 0,
         "20": 1,
         "21": 1,
@@ -12392,7 +12456,7 @@
         "16": 7,
         "17": 6,
         "18": 4,
-        "19": 9,
+        "19": 10,
         "20": 7,
         "21": 4,
         "22": 3,
@@ -12679,7 +12743,7 @@
         "11": 4,
         "12": 0,
         "13": 1,
-        "14": 3,
+        "14": 4,
         "15": 3,
         "16": 3,
         "17": 3,
@@ -12959,7 +13023,7 @@
         "16": 7,
         "17": 6,
         "18": 4,
-        "19": 9,
+        "19": 10,
         "20": 7,
         "21": 4,
         "22": 3,
@@ -13609,7 +13673,7 @@
         "0": 9,
         "1": 2,
         "2": 6,
-        "3": 5,
+        "3": 6,
         "4": 4,
         "5": 5,
         "6": 2,
@@ -13631,7 +13695,7 @@
         "22": 10,
         "23": 1
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
@@ -13757,12 +13821,12 @@
         "17": 1,
         "18": 2,
         "19": 1,
-        "20": 2,
+        "20": 3,
         "21": 6,
         "22": 3,
         "23": 5
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -14502,7 +14566,7 @@
         "16": 7,
         "17": 6,
         "18": 4,
-        "19": 9,
+        "19": 10,
         "20": 7,
         "21": 4,
         "22": 3,
@@ -14706,7 +14770,7 @@
         "17": 2,
         "18": 3,
         "19": 2,
-        "20": 1,
+        "20": 2,
         "21": 5,
         "22": 3,
         "23": 3
@@ -14776,12 +14840,12 @@
         "17": 1,
         "18": 2,
         "19": 1,
-        "20": 2,
+        "20": 3,
         "21": 6,
         "22": 3,
         "23": 5
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -16257,10 +16321,10 @@
         "19": 2,
         "20": 0,
         "21": 1,
-        "22": 3,
+        "22": 4,
         "23": 3
       },
-      "monthsActive": 8
+      "monthsActive": 9
     }
   },
   {
@@ -19351,7 +19415,7 @@
         "18": 12,
         "19": 11,
         "20": 10,
-        "21": 10,
+        "21": 11,
         "22": 10,
         "23": 7
       },
@@ -21426,6 +21490,76 @@
     }
   },
   {
+    "id": "7634daf185e588a0a413d48ce2706a87",
+    "trackName": "TELEKINESIS (feat. SZA & Future)",
+    "artist": "Travis Scott",
+    "album": "UTOPIA",
+    "trackUri": "spotify:track:1i9lZvlaDdWDPyXEE95aiq",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0204481c826dd292e5e4983b3f",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/1i9lZvlaDdWDPyXEE95aiq",
+    "dateRange": {
+      "start": "2023-11-13",
+      "end": "2023-12-09"
+    },
+    "playCount": 12,
+    "weeksCount": 4,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2023-11-13",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-11-13",
+        "plays": 2
+      },
+      {
+        "date": "2023-11-18",
+        "plays": 2
+      },
+      {
+        "date": "2023-11-20",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 656,
+      "uniqueTracksInWindow": 219,
+      "timeOfDayDistribution": {
+        "0": 9,
+        "1": 9,
+        "2": 4,
+        "3": 3,
+        "4": 1,
+        "5": 4,
+        "6": 2,
+        "7": 2,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 5,
+        "15": 4,
+        "16": 5,
+        "17": 5,
+        "18": 8,
+        "19": 3,
+        "20": 1,
+        "21": 6,
+        "22": 7,
+        "23": 5
+      },
+      "monthsActive": 23
+    }
+  },
+  {
     "id": "5fc086c21740204e98d7a9b6e4e79a41",
     "trackName": "24 Songs",
     "artist": "Shooter Akrami",
@@ -21487,76 +21621,6 @@
         "23": 1
       },
       "monthsActive": 2
-    }
-  },
-  {
-    "id": "7634daf185e588a0a413d48ce2706a87",
-    "trackName": "TELEKINESIS (feat. SZA & Future)",
-    "artist": "Travis Scott",
-    "album": "UTOPIA",
-    "trackUri": "spotify:track:1i9lZvlaDdWDPyXEE95aiq",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0204481c826dd292e5e4983b3f",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/1i9lZvlaDdWDPyXEE95aiq",
-    "dateRange": {
-      "start": "2023-11-13",
-      "end": "2023-12-09"
-    },
-    "playCount": 12,
-    "weeksCount": 4,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2023-11-13",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-11-13",
-        "plays": 2
-      },
-      {
-        "date": "2023-11-18",
-        "plays": 2
-      },
-      {
-        "date": "2023-11-20",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "comeback",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 656,
-      "uniqueTracksInWindow": 219,
-      "timeOfDayDistribution": {
-        "0": 9,
-        "1": 9,
-        "2": 4,
-        "3": 3,
-        "4": 1,
-        "5": 4,
-        "6": 2,
-        "7": 2,
-        "8": 0,
-        "9": 0,
-        "10": 0,
-        "11": 1,
-        "12": 1,
-        "13": 1,
-        "14": 5,
-        "15": 4,
-        "16": 5,
-        "17": 5,
-        "18": 8,
-        "19": 3,
-        "20": 1,
-        "21": 6,
-        "22": 7,
-        "23": 5
-      },
-      "monthsActive": 23
     }
   },
   {
@@ -21902,7 +21966,7 @@
         "18": 12,
         "19": 11,
         "20": 10,
-        "21": 10,
+        "21": 11,
         "22": 10,
         "23": 7
       },
@@ -21972,76 +22036,6 @@
     }
   },
   {
-    "id": "da35940da5bd6d7801fde1a65448ea6f",
-    "trackName": "No Pole",
-    "artist": "Don Toliver",
-    "album": "Love Sick",
-    "trackUri": "spotify:track:0eaVIYo2zeOaGJeqZ5TwYz",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02307323fa550564b0201b1d76",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/0eaVIYo2zeOaGJeqZ5TwYz",
-    "dateRange": {
-      "start": "2023-10-14",
-      "end": "2023-10-22"
-    },
-    "playCount": 9,
-    "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2023-10-14",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-10-14",
-        "plays": 2
-      },
-      {
-        "date": "2023-10-19",
-        "plays": 2
-      },
-      {
-        "date": "2023-10-22",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "comeback",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 173,
-      "uniqueTracksInWindow": 103,
-      "timeOfDayDistribution": {
-        "0": 6,
-        "1": 8,
-        "2": 5,
-        "3": 6,
-        "4": 4,
-        "5": 4,
-        "6": 4,
-        "7": 2,
-        "8": 1,
-        "9": 1,
-        "10": 0,
-        "11": 3,
-        "12": 4,
-        "13": 2,
-        "14": 6,
-        "15": 2,
-        "16": 4,
-        "17": 5,
-        "18": 2,
-        "19": 5,
-        "20": 4,
-        "21": 11,
-        "22": 6,
-        "23": 2
-      },
-      "monthsActive": 25
-    }
-  },
-  {
     "id": "2d0a423e303cf233e31ef0b5eb5b83e8",
     "trackName": "Around Me (feat. Don Toliver)",
     "artist": "Metro Boomin",
@@ -22096,11 +22090,81 @@
         "18": 12,
         "19": 11,
         "20": 10,
-        "21": 10,
+        "21": 11,
         "22": 10,
         "23": 7
       },
       "monthsActive": 30
+    }
+  },
+  {
+    "id": "da35940da5bd6d7801fde1a65448ea6f",
+    "trackName": "No Pole",
+    "artist": "Don Toliver",
+    "album": "Love Sick",
+    "trackUri": "spotify:track:0eaVIYo2zeOaGJeqZ5TwYz",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02307323fa550564b0201b1d76",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/0eaVIYo2zeOaGJeqZ5TwYz",
+    "dateRange": {
+      "start": "2023-10-14",
+      "end": "2023-10-22"
+    },
+    "playCount": 9,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2023-10-14",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-10-14",
+        "plays": 2
+      },
+      {
+        "date": "2023-10-19",
+        "plays": 2
+      },
+      {
+        "date": "2023-10-22",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 173,
+      "uniqueTracksInWindow": 103,
+      "timeOfDayDistribution": {
+        "0": 6,
+        "1": 8,
+        "2": 5,
+        "3": 6,
+        "4": 4,
+        "5": 4,
+        "6": 4,
+        "7": 2,
+        "8": 1,
+        "9": 1,
+        "10": 0,
+        "11": 3,
+        "12": 4,
+        "13": 2,
+        "14": 6,
+        "15": 2,
+        "16": 5,
+        "17": 5,
+        "18": 2,
+        "19": 5,
+        "20": 4,
+        "21": 11,
+        "22": 6,
+        "23": 2
+      },
+      "monthsActive": 26
     }
   },
   {
@@ -22350,8 +22414,8 @@
         "18": 11,
         "19": 16,
         "20": 8,
-        "21": 15,
-        "22": 15,
+        "21": 16,
+        "22": 16,
         "23": 12
       },
       "monthsActive": 39
@@ -22963,8 +23027,8 @@
     },
     "playCount": 13,
     "weeksCount": 4,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2023-09-14",
     "peakDayPlays": 2,
     "hotDays": [
@@ -23010,7 +23074,7 @@
         "13": 2,
         "14": 6,
         "15": 2,
-        "16": 4,
+        "16": 5,
         "17": 5,
         "18": 2,
         "19": 5,
@@ -23019,7 +23083,7 @@
         "22": 6,
         "23": 2
       },
-      "monthsActive": 25
+      "monthsActive": 26
     }
   },
   {
@@ -23570,8 +23634,8 @@
     },
     "playCount": 13,
     "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2023-08-15",
     "peakDayPlays": 2,
     "hotDays": [
@@ -24214,7 +24278,7 @@
         "18": 12,
         "19": 11,
         "20": 10,
-        "21": 10,
+        "21": 11,
         "22": 10,
         "23": 7
       },
@@ -24287,7 +24351,7 @@
         "13": 4,
         "14": 5,
         "15": 4,
-        "16": 3,
+        "16": 4,
         "17": 2,
         "18": 5,
         "19": 6,
@@ -24296,7 +24360,7 @@
         "22": 8,
         "23": 7
       },
-      "monthsActive": 24
+      "monthsActive": 25
     }
   },
   {
@@ -24375,6 +24439,80 @@
         "23": 6
       },
       "monthsActive": 19
+    }
+  },
+  {
+    "id": "59d957ab5ff6b9663fe0234fadce7a9c",
+    "trackName": "TELEKINESIS (feat. SZA & Future)",
+    "artist": "Travis Scott",
+    "album": "UTOPIA",
+    "trackUri": "spotify:track:1i9lZvlaDdWDPyXEE95aiq",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0204481c826dd292e5e4983b3f",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/1i9lZvlaDdWDPyXEE95aiq",
+    "dateRange": {
+      "start": "2023-07-31",
+      "end": "2023-08-06"
+    },
+    "playCount": 13,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2023-07-31",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2023-07-31",
+        "plays": 3
+      },
+      {
+        "date": "2023-08-01",
+        "plays": 3
+      },
+      {
+        "date": "2023-08-03",
+        "plays": 3
+      },
+      {
+        "date": "2023-08-04",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 327,
+      "uniqueTracksInWindow": 132,
+      "timeOfDayDistribution": {
+        "0": 9,
+        "1": 9,
+        "2": 4,
+        "3": 3,
+        "4": 1,
+        "5": 4,
+        "6": 2,
+        "7": 2,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 5,
+        "15": 4,
+        "16": 5,
+        "17": 5,
+        "18": 8,
+        "19": 3,
+        "20": 1,
+        "21": 6,
+        "22": 7,
+        "23": 5
+      },
+      "monthsActive": 23
     }
   },
   {
@@ -24703,7 +24841,7 @@
         "4": 7,
         "5": 1,
         "6": 2,
-        "7": 4,
+        "7": 5,
         "8": 0,
         "9": 1,
         "10": 3,
@@ -24713,11 +24851,11 @@
         "14": 11,
         "15": 8,
         "16": 7,
-        "17": 14,
+        "17": 15,
         "18": 13,
         "19": 13,
         "20": 8,
-        "21": 14,
+        "21": 15,
         "22": 15,
         "23": 23
       },
@@ -25021,80 +25159,6 @@
     }
   },
   {
-    "id": "59d957ab5ff6b9663fe0234fadce7a9c",
-    "trackName": "TELEKINESIS (feat. SZA & Future)",
-    "artist": "Travis Scott",
-    "album": "UTOPIA",
-    "trackUri": "spotify:track:1i9lZvlaDdWDPyXEE95aiq",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0204481c826dd292e5e4983b3f",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/1i9lZvlaDdWDPyXEE95aiq",
-    "dateRange": {
-      "start": "2023-07-31",
-      "end": "2023-08-06"
-    },
-    "playCount": 13,
-    "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2023-07-31",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2023-07-31",
-        "plays": 3
-      },
-      {
-        "date": "2023-08-01",
-        "plays": 3
-      },
-      {
-        "date": "2023-08-03",
-        "plays": 3
-      },
-      {
-        "date": "2023-08-04",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "comeback",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 327,
-      "uniqueTracksInWindow": 132,
-      "timeOfDayDistribution": {
-        "0": 9,
-        "1": 9,
-        "2": 4,
-        "3": 3,
-        "4": 1,
-        "5": 4,
-        "6": 2,
-        "7": 2,
-        "8": 0,
-        "9": 0,
-        "10": 0,
-        "11": 1,
-        "12": 1,
-        "13": 1,
-        "14": 5,
-        "15": 4,
-        "16": 5,
-        "17": 5,
-        "18": 8,
-        "19": 3,
-        "20": 1,
-        "21": 6,
-        "22": 7,
-        "23": 5
-      },
-      "monthsActive": 23
-    }
-  },
-  {
     "id": "9a70dbd4a9a3da547eef4fe790f6d1b3",
     "trackName": "MY EYES",
     "artist": "Travis Scott",
@@ -25369,7 +25433,7 @@
         "13": 4,
         "14": 5,
         "15": 4,
-        "16": 3,
+        "16": 4,
         "17": 2,
         "18": 5,
         "19": 6,
@@ -25378,7 +25442,7 @@
         "22": 8,
         "23": 7
       },
-      "monthsActive": 24
+      "monthsActive": 25
     }
   },
   {
@@ -27728,8 +27792,8 @@
         "18": 11,
         "19": 16,
         "20": 8,
-        "21": 15,
-        "22": 15,
+        "21": 16,
+        "22": 16,
         "23": 12
       },
       "monthsActive": 39
@@ -28110,7 +28174,7 @@
         "4": 7,
         "5": 1,
         "6": 2,
-        "7": 4,
+        "7": 5,
         "8": 0,
         "9": 1,
         "10": 3,
@@ -28120,11 +28184,11 @@
         "14": 11,
         "15": 8,
         "16": 7,
-        "17": 14,
+        "17": 15,
         "18": 13,
         "19": 13,
         "20": 8,
-        "21": 14,
+        "21": 15,
         "22": 15,
         "23": 23
       },
@@ -29063,7 +29127,7 @@
       "uniqueTracksInWindow": 209,
       "timeOfDayDistribution": {
         "0": 9,
-        "1": 9,
+        "1": 10,
         "2": 5,
         "3": 7,
         "4": 3,
@@ -29079,11 +29143,11 @@
         "14": 7,
         "15": 8,
         "16": 6,
-        "17": 5,
+        "17": 6,
         "18": 5,
         "19": 11,
         "20": 4,
-        "21": 6,
+        "21": 8,
         "22": 14,
         "23": 7
       },
@@ -29763,8 +29827,8 @@
         "18": 11,
         "19": 16,
         "20": 8,
-        "21": 15,
-        "22": 15,
+        "21": 16,
+        "22": 16,
         "23": 12
       },
       "monthsActive": 39
@@ -30507,7 +30571,7 @@
         "19": 2,
         "20": 8,
         "21": 10,
-        "22": 5,
+        "22": 6,
         "23": 3
       },
       "monthsActive": 21
@@ -30709,7 +30773,7 @@
         "11": 2,
         "12": 5,
         "13": 4,
-        "14": 5,
+        "14": 6,
         "15": 0,
         "16": 1,
         "17": 4,
@@ -30720,7 +30784,7 @@
         "22": 7,
         "23": 2
       },
-      "monthsActive": 20
+      "monthsActive": 21
     }
   },
   {
@@ -32725,7 +32789,7 @@
         "4": 7,
         "5": 1,
         "6": 2,
-        "7": 4,
+        "7": 5,
         "8": 0,
         "9": 1,
         "10": 3,
@@ -32735,11 +32799,11 @@
         "14": 11,
         "15": 8,
         "16": 7,
-        "17": 14,
+        "17": 15,
         "18": 13,
         "19": 13,
         "20": 8,
-        "21": 14,
+        "21": 15,
         "22": 15,
         "23": 23
       },
@@ -33085,8 +33149,8 @@
         "18": 11,
         "19": 16,
         "20": 8,
-        "21": 15,
-        "22": 15,
+        "21": 16,
+        "22": 16,
         "23": 12
       },
       "monthsActive": 39
@@ -33224,7 +33288,7 @@
         "19": 2,
         "20": 2,
         "21": 5,
-        "22": 4,
+        "22": 5,
         "23": 5
       },
       "monthsActive": 22

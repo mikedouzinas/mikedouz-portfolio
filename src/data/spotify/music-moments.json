@@ -1,6 +1,6 @@
 [
   {
-    "id": "57d15a61379c6073ac0bb38baf1547b3",
+    "id": "dfd4bf3b077ec4122cddfd4edc42b7ec",
     "trackName": "The Show Goes On",
     "artist": "Lupe Fiasco",
     "album": "Lasers",
@@ -9,9 +9,9 @@
     "spotifyUrl": "https://open.spotify.com/track/4NTWZqvfQTlOMitlVn6tew",
     "dateRange": {
       "start": "2026-04-23",
-      "end": "2026-04-23"
+      "end": "2026-04-26"
     },
-    "playCount": 9,
+    "playCount": 10,
     "weeksCount": 1,
     "intensity": 3,
     "maxState": 3,
@@ -25,7 +25,37 @@
     ]
   },
   {
-    "id": "af4b125c443f800d14c37d72d20f8ad2",
+    "id": "cb5b0e12a33418bbd4433344bc25f855",
+    "trackName": "Apocalypse Dreams",
+    "artist": "Tame Impala",
+    "album": "Lonerism",
+    "trackUri": "spotify:track:7qU7vhCPKhkDiJYGoboISc",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02370c12f82872c9cfaee80193",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/7qU7vhCPKhkDiJYGoboISc",
+    "dateRange": {
+      "start": "2026-04-20",
+      "end": "2026-04-24"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-04-22",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-04-22",
+        "plays": 2
+      },
+      {
+        "date": "2026-04-24",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "ecd09f053a7d73309076cbe993d5ec24",
     "trackName": "Back Home",
     "artist": "Yeat",
     "album": "ADL",
@@ -34,9 +64,9 @@
     "spotifyUrl": "https://open.spotify.com/track/40oYjPdjvFBCZH1Smsk46H",
     "dateRange": {
       "start": "2026-04-18",
-      "end": "2026-04-21"
+      "end": "2026-04-25"
     },
-    "playCount": 12,
+    "playCount": 13,
     "weeksCount": 2,
     "intensity": 3,
     "maxState": 3,
@@ -54,7 +84,7 @@
     ]
   },
   {
-    "id": "b9283e203b5d5cce914bb4cc82cf0e3c",
+    "id": "a1f4617420702fbbac2198dac145a627",
     "trackName": "Selfless",
     "artist": "The Strokes",
     "album": "The New Abnormal",
@@ -64,9 +94,9 @@
     "spotifyUrl": "https://open.spotify.com/track/2t0wwvR15fc3K1ey8OiOaN",
     "dateRange": {
       "start": "2026-04-10",
-      "end": "2026-04-21"
+      "end": "2026-04-24"
     },
-    "playCount": 10,
+    "playCount": 11,
     "weeksCount": 3,
     "intensity": 2,
     "maxState": 2,
@@ -155,7 +185,7 @@
     ]
   },
   {
-    "id": "f32d6f2c0661327881a2b44eee30cad5",
+    "id": "1bb8d647b998b8a3a2a05264aca5f95e",
     "trackName": "HIGHS AND LOWS",
     "artist": "Kanye West",
     "album": "BULLY",
@@ -164,10 +194,10 @@
     "spotifyUrl": "https://open.spotify.com/track/565G1vHZu2xoxrnTyF06Qw",
     "dateRange": {
       "start": "2026-04-09",
-      "end": "2026-04-19"
+      "end": "2026-04-30"
     },
-    "playCount": 8,
-    "weeksCount": 2,
+    "playCount": 12,
+    "weeksCount": 4,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-04-18",
@@ -176,6 +206,10 @@
       {
         "date": "2026-04-18",
         "plays": 5
+      },
+      {
+        "date": "2026-04-30",
+        "plays": 2
       }
     ]
   },
@@ -459,7 +493,7 @@
     ]
   },
   {
-    "id": "a16c77156e13c197151054b4de29740c",
+    "id": "228736a430452ba8adcd0e6195a96532",
     "trackName": "Fallen Star",
     "artist": "The Neighbourhood",
     "album": "Fallen Star",
@@ -469,10 +503,10 @@
     "spotifyUrl": "https://open.spotify.com/track/60F6pgM6H6miNr5AmjxwjL",
     "dateRange": {
       "start": "2026-04-01",
-      "end": "2026-04-17"
+      "end": "2026-04-24"
     },
-    "playCount": 13,
-    "weeksCount": 3,
+    "playCount": 15,
+    "weeksCount": 4,
     "intensity": 2,
     "maxState": 2,
     "peakDay": "2026-04-01",
@@ -885,31 +919,6 @@
     ]
   },
   {
-    "id": "e3a1cc73bc01065635a5c46552364538",
-    "trackName": "Desire",
-    "artist": "Ian Asher",
-    "album": "Desire",
-    "trackUri": "spotify:track:4sMR8fuTzbUyzB0asxifV0",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021b63ef5d0e5bf964cf33cb9e",
-    "spotifyUrl": "https://open.spotify.com/track/4sMR8fuTzbUyzB0asxifV0",
-    "dateRange": {
-      "start": "2026-02-16",
-      "end": "2026-02-19"
-    },
-    "playCount": 6,
-    "weeksCount": 1,
-    "intensity": 3,
-    "maxState": 3,
-    "peakDay": "2026-02-18",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2026-02-18",
-        "plays": 3
-      }
-    ]
-  },
-  {
     "id": "b6780db06b2dd71fdfd753924fd4ae78",
     "trackName": "SHADOWS",
     "artist": "John Summit",
@@ -973,6 +982,31 @@
     ]
   },
   {
+    "id": "e3a1cc73bc01065635a5c46552364538",
+    "trackName": "Desire",
+    "artist": "Ian Asher",
+    "album": "Desire",
+    "trackUri": "spotify:track:4sMR8fuTzbUyzB0asxifV0",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021b63ef5d0e5bf964cf33cb9e",
+    "spotifyUrl": "https://open.spotify.com/track/4sMR8fuTzbUyzB0asxifV0",
+    "dateRange": {
+      "start": "2026-02-16",
+      "end": "2026-02-19"
+    },
+    "playCount": 6,
+    "weeksCount": 1,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2026-02-18",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-02-18",
+        "plays": 3
+      }
+    ]
+  },
+  {
     "id": "9341275fa49cdf6bf043856fc78ba09c",
     "trackName": "Often - Live",
     "artist": "The Weeknd",
@@ -986,8 +1020,8 @@
     },
     "playCount": 6,
     "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2026-02-16",
     "peakDayPlays": 2,
     "hotDays": [
@@ -3471,6 +3505,31 @@
     ]
   },
   {
+    "id": "d5ba6211a4afb9fddb8b73905a92e971",
+    "trackName": "I'll Try Anything Once - Live From Electric Lady Studios for WRXP, New York",
+    "artist": "Julian Casablancas",
+    "album": "Live From Electric Lady Studios/WRXP New York",
+    "trackUri": "spotify:track:1k4OsQujxXPLij0ZsTFlMx",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02dff3c7e29f65bcb29f159386",
+    "spotifyUrl": "https://open.spotify.com/track/1k4OsQujxXPLij0ZsTFlMx",
+    "dateRange": {
+      "start": "2025-10-12",
+      "end": "2025-10-16"
+    },
+    "playCount": 5,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-10-12",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2025-10-12",
+        "plays": 3
+      }
+    ]
+  },
+  {
     "id": "51020bef7b3de65258e5972658082f40",
     "trackName": "Selfless",
     "artist": "The Strokes",
@@ -3673,35 +3732,6 @@
       },
       {
         "date": "2025-10-07",
-        "plays": 2
-      }
-    ]
-  },
-  {
-    "id": "58f7efa1a613240a85c1aa96fc767b89",
-    "trackName": "CHIHIRO",
-    "artist": "Billie Eilish",
-    "album": "HIT ME HARD AND SOFT",
-    "trackUri": "spotify:track:7BRD7x5pt8Lqa1eGYC4dzj",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0271d62ea7ea8a5be92d3c1f62",
-    "spotifyUrl": "https://open.spotify.com/track/7BRD7x5pt8Lqa1eGYC4dzj",
-    "dateRange": {
-      "start": "2025-09-28",
-      "end": "2025-10-05"
-    },
-    "playCount": 7,
-    "weeksCount": 2,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2025-09-28",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2025-09-28",
-        "plays": 3
-      },
-      {
-        "date": "2025-10-05",
         "plays": 2
       }
     ]
@@ -10431,6 +10461,40 @@
     ]
   },
   {
+    "id": "7634daf185e588a0a413d48ce2706a87",
+    "trackName": "TELEKINESIS (feat. SZA & Future)",
+    "artist": "Travis Scott",
+    "album": "UTOPIA",
+    "trackUri": "spotify:track:1i9lZvlaDdWDPyXEE95aiq",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0204481c826dd292e5e4983b3f",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/1i9lZvlaDdWDPyXEE95aiq",
+    "dateRange": {
+      "start": "2023-11-13",
+      "end": "2023-12-09"
+    },
+    "playCount": 12,
+    "weeksCount": 4,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2023-11-13",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-11-13",
+        "plays": 2
+      },
+      {
+        "date": "2023-11-18",
+        "plays": 2
+      },
+      {
+        "date": "2023-11-20",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "5fc086c21740204e98d7a9b6e4e79a41",
     "trackName": "24 Songs",
     "artist": "Shooter Akrami",
@@ -10456,40 +10520,6 @@
       },
       {
         "date": "2023-11-26",
-        "plays": 2
-      }
-    ]
-  },
-  {
-    "id": "7634daf185e588a0a413d48ce2706a87",
-    "trackName": "TELEKINESIS (feat. SZA & Future)",
-    "artist": "Travis Scott",
-    "album": "UTOPIA",
-    "trackUri": "spotify:track:1i9lZvlaDdWDPyXEE95aiq",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0204481c826dd292e5e4983b3f",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/1i9lZvlaDdWDPyXEE95aiq",
-    "dateRange": {
-      "start": "2023-11-13",
-      "end": "2023-12-09"
-    },
-    "playCount": 12,
-    "weeksCount": 4,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2023-11-13",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-11-13",
-        "plays": 2
-      },
-      {
-        "date": "2023-11-18",
-        "plays": 2
-      },
-      {
-        "date": "2023-11-20",
         "plays": 2
       }
     ]
@@ -10691,40 +10721,6 @@
     ]
   },
   {
-    "id": "da35940da5bd6d7801fde1a65448ea6f",
-    "trackName": "No Pole",
-    "artist": "Don Toliver",
-    "album": "Love Sick",
-    "trackUri": "spotify:track:0eaVIYo2zeOaGJeqZ5TwYz",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02307323fa550564b0201b1d76",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/0eaVIYo2zeOaGJeqZ5TwYz",
-    "dateRange": {
-      "start": "2023-10-14",
-      "end": "2023-10-22"
-    },
-    "playCount": 9,
-    "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2023-10-14",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-10-14",
-        "plays": 2
-      },
-      {
-        "date": "2023-10-19",
-        "plays": 2
-      },
-      {
-        "date": "2023-10-22",
-        "plays": 2
-      }
-    ]
-  },
-  {
     "id": "2d0a423e303cf233e31ef0b5eb5b83e8",
     "trackName": "Around Me (feat. Don Toliver)",
     "artist": "Metro Boomin",
@@ -10747,6 +10743,40 @@
       {
         "date": "2023-10-14",
         "plays": 3
+      }
+    ]
+  },
+  {
+    "id": "da35940da5bd6d7801fde1a65448ea6f",
+    "trackName": "No Pole",
+    "artist": "Don Toliver",
+    "album": "Love Sick",
+    "trackUri": "spotify:track:0eaVIYo2zeOaGJeqZ5TwYz",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02307323fa550564b0201b1d76",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/0eaVIYo2zeOaGJeqZ5TwYz",
+    "dateRange": {
+      "start": "2023-10-14",
+      "end": "2023-10-22"
+    },
+    "playCount": 9,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2023-10-14",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-10-14",
+        "plays": 2
+      },
+      {
+        "date": "2023-10-19",
+        "plays": 2
+      },
+      {
+        "date": "2023-10-22",
+        "plays": 2
       }
     ]
   },
@@ -11152,8 +11182,8 @@
     },
     "playCount": 13,
     "weeksCount": 4,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2023-09-14",
     "peakDayPlays": 2,
     "hotDays": [
@@ -11438,8 +11468,8 @@
     },
     "playCount": 13,
     "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2023-08-15",
     "peakDayPlays": 2,
     "hotDays": [
@@ -11816,6 +11846,44 @@
     ]
   },
   {
+    "id": "59d957ab5ff6b9663fe0234fadce7a9c",
+    "trackName": "TELEKINESIS (feat. SZA & Future)",
+    "artist": "Travis Scott",
+    "album": "UTOPIA",
+    "trackUri": "spotify:track:1i9lZvlaDdWDPyXEE95aiq",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0204481c826dd292e5e4983b3f",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/1i9lZvlaDdWDPyXEE95aiq",
+    "dateRange": {
+      "start": "2023-07-31",
+      "end": "2023-08-06"
+    },
+    "playCount": 13,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2023-07-31",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2023-07-31",
+        "plays": 3
+      },
+      {
+        "date": "2023-08-01",
+        "plays": 3
+      },
+      {
+        "date": "2023-08-03",
+        "plays": 3
+      },
+      {
+        "date": "2023-08-04",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "306cd995b42aecd0821d2ecb0667ec8b",
     "trackName": "HYAENA",
     "artist": "Travis Scott",
@@ -12129,44 +12197,6 @@
       {
         "date": "2023-08-02",
         "plays": 2
-      },
-      {
-        "date": "2023-08-04",
-        "plays": 2
-      }
-    ]
-  },
-  {
-    "id": "59d957ab5ff6b9663fe0234fadce7a9c",
-    "trackName": "TELEKINESIS (feat. SZA & Future)",
-    "artist": "Travis Scott",
-    "album": "UTOPIA",
-    "trackUri": "spotify:track:1i9lZvlaDdWDPyXEE95aiq",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0204481c826dd292e5e4983b3f",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/1i9lZvlaDdWDPyXEE95aiq",
-    "dateRange": {
-      "start": "2023-07-31",
-      "end": "2023-08-06"
-    },
-    "playCount": 13,
-    "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2023-07-31",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2023-07-31",
-        "plays": 3
-      },
-      {
-        "date": "2023-08-01",
-        "plays": 3
-      },
-      {
-        "date": "2023-08-03",
-        "plays": 3
       },
       {
         "date": "2023-08-04",
