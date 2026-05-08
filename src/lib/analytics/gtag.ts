@@ -85,6 +85,7 @@ export type IrisIntentType =
 export const trackIrisQuerySubmit = (params: {
   query_length: number;
   intent_type?: IrisIntentType;
+  client_query_id?: string;
 }): void => {
   trackEvent('iris_query_submit', params);
 };
@@ -97,6 +98,7 @@ export const trackIrisAnswerReceived = (params: {
   latency_ms: number;
   intent_type?: IrisIntentType;
   cached?: boolean;
+  client_query_id?: string;
 }): void => {
   trackEvent('iris_answer_received', params);
 };
@@ -226,4 +228,43 @@ export const trackAboutSheetOpen = (): void => {
  */
 export const trackSectionView = (section: 'about' | 'experience' | 'projects' | 'blogs'): void => {
   trackEvent('section_view', { section_name: section });
+};
+
+// ============================================================================
+// Blog ("the web") Events
+// ============================================================================
+
+/**
+ * Where the action was taken: a specific post page or the blog index.
+ * `slug` is the post slug when on a post page; undefined on the index.
+ */
+export interface BlogContext {
+  slug?: string;
+  source: 'post' | 'index';
+}
+
+export const trackBlogSubscribeOpen = (ctx: BlogContext): void => {
+  trackEvent('blog_subscribe_open', { ...ctx });
+};
+
+export const trackBlogSubscribeSubmit = (
+  ctx: BlogContext & { contact_method: 'email' | 'phone' }
+): void => {
+  trackEvent('blog_subscribe_submit', { ...ctx });
+};
+
+export const trackBlogSubscribeSuccess = (
+  ctx: BlogContext & { contact_method: 'email' | 'phone'; already_subscribed?: boolean }
+): void => {
+  trackEvent('blog_subscribe_success', { ...ctx });
+};
+
+export const trackBlogSummarizeClick = (ctx: BlogContext): void => {
+  trackEvent('blog_summarize_click', { ...ctx });
+};
+
+export const trackBlogLikeClick = (
+  ctx: BlogContext & { liked: boolean }
+): void => {
+  trackEvent('blog_like_click', { ...ctx });
 };

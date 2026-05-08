@@ -1159,6 +1159,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         let finalIntent = '';
         let capturedQuickActions: QuickAction[] = [];
         let streamCompleted = false;
+        let capturedClientQueryId: string | null = null;
 
         if (reader) {
           // Word-by-word reveal: tokens from Claude accumulate in a buffer,
@@ -1232,6 +1233,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
                   } else if (parsed.quickActions) {
                     capturedQuickActions = parsed.quickActions;
                   } else if (parsed.queryId) {
+                    capturedClientQueryId = parsed.queryId;
                     setCurrentQueryId(parsed.queryId);
                   } else if (parsed.contactForm) {
                     setPersistedDirective({
@@ -1272,6 +1274,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             answer_length: accumulatedAnswer.length,
             latency_ms: latency,
             intent_type: finalIntent as IrisIntentType | undefined,
+            client_query_id: capturedClientQueryId ?? undefined,
           });
 
           // IMPORTANT: Detect and persist directive from accumulatedAnswer BEFORE clearing answer

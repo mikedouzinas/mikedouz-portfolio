@@ -41,6 +41,7 @@ export interface QueryLog {
   cached: boolean
   session_id?: string
   user_agent?: string
+  client_query_id?: string
 }
 
 export interface QuickActionLog {

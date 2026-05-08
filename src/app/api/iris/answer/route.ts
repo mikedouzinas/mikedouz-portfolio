@@ -388,6 +388,7 @@ export async function POST(req: NextRequest) {
 
         if (cachedData?.answer) {
           const latencyMs = Date.now() - startTime;
+          const cachedClientQueryId = `claude_${Date.now()}_${Math.random().toString(36).substring(7)}`;
           logQuery({
             query,
             intent: cachedData.intent || 'general',
@@ -398,7 +399,8 @@ export async function POST(req: NextRequest) {
             latency_ms: latencyMs,
             cached: true,
             session_id: req.headers.get('x-session-id') || undefined,
-            user_agent: req.headers.get('user-agent') || undefined
+            user_agent: req.headers.get('user-agent') || undefined,
+            client_query_id: cachedClientQueryId
           }).catch(error => {
             console.warn('[Analytics] Failed to log cached query:', error);
           });
@@ -431,6 +433,7 @@ export async function POST(req: NextRequest) {
           const encoder = new TextEncoder();
           const readable = new ReadableStream({
             start(controller) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ queryId: cachedClientQueryId })}\n\n`));
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: cachedData!.answer, cached: true })}\n\n`));
 
               // Send contact form if cached
@@ -778,7 +781,8 @@ export async function POST(req: NextRequest) {
             latency_ms: latencyMs,
             cached: false,
             session_id: req.headers.get('x-session-id') || undefined,
-            user_agent: req.headers.get('user-agent') || undefined
+            user_agent: req.headers.get('user-agent') || undefined,
+            client_query_id: earlyQueryId
           }).catch(error => {
             console.warn('[Analytics] Failed to log query:', error);
             return null;

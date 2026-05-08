@@ -1,6 +1,7 @@
 'use client';
 
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
+import { trackBlogSummarizeClick } from '@/lib/analytics/gtag';
 
 interface SummarizeButtonProps {
   slug: string;
@@ -9,6 +10,7 @@ interface SummarizeButtonProps {
 
 export default function SummarizeButton({ slug, postTitle }: SummarizeButtonProps) {
   const handleClick = () => {
+    trackBlogSummarizeClick({ slug, source: 'post' });
     window.dispatchEvent(new CustomEvent('blog-iris-summarize', { detail: { slug, postTitle } }));
   };
 

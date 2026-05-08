@@ -2,6 +2,17 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  trackBlogSubscribeOpen,
+  trackBlogSubscribeSubmit,
+  trackBlogSubscribeSuccess,
+} from "@/lib/analytics/gtag";
+
+function getBlogContext(): { slug?: string; source: "post" | "index" } {
+  if (typeof window === "undefined") return { source: "index" };
+  const m = window.location.pathname.match(/^\/the-web\/([^/]+)\/?$/);
+  return m ? { slug: m[1], source: "post" } : { source: "index" };
+}
 
 type WidgetState =
   | "idle"
@@ -36,6 +47,9 @@ export default function SubscribeWidget() {
 
     setState("submitting");
     setErrorMsg("");
+    const ctx = getBlogContext();
+    const contactMethod: "email" | "phone" = hasAt ? "email" : "phone";
+    trackBlogSubscribeSubmit({ ...ctx, contact_method: contactMethod });
     try {
       const res = await fetch("/api/the-web/subscribe", {
         method: "POST",
@@ -53,11 +67,13 @@ export default function SubscribeWidget() {
 
       if (data.message === "already subscribed") {
         setState("already");
+        trackBlogSubscribeSuccess({ ...ctx, contact_method: contactMethod, already_subscribed: true });
       } else if (data.channel === "sms") {
         setSmsPhone(data.phone);
         setState("confirming-sms");
       } else {
         setState("success-email");
+        trackBlogSubscribeSuccess({ ...ctx, contact_method: "email" });
       }
     } catch {
       setState("error");
@@ -87,6 +103,7 @@ export default function SubscribeWidget() {
       }
 
       setState("success-sms");
+      trackBlogSubscribeSuccess({ ...getBlogContext(), contact_method: "phone" });
     } catch {
       setState("confirming-sms");
       setErrorMsg("couldn't reach the server. try again.");
@@ -111,6 +128,7 @@ export default function SubscribeWidget() {
       <button
         onClick={() => {
           if (open && isDone) reset();
+          if (!open) trackBlogSubscribeOpen(getBlogContext());
           setOpen((o) => !o);
         }}
         className="text-sm font-medium text-teal-400 hover:text-teal-300 transition-colors lowercase shrink-0"
