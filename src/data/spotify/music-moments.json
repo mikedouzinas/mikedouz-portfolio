@@ -1,5 +1,96 @@
 [
   {
+    "id": "3966d56b88ba02bd237d6a68afd31c28",
+    "trackName": "No Bad Vibes",
+    "artist": "Jazzy",
+    "album": "No Bad Vibes",
+    "trackUri": "spotify:track:0dgdDB39uUoC8WICmTE2U8",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02c195aebc0781b8aa9969398f",
+    "spotifyUrl": "https://open.spotify.com/track/0dgdDB39uUoC8WICmTE2U8",
+    "dateRange": {
+      "start": "2026-04-29",
+      "end": "2026-05-05"
+    },
+    "playCount": 6,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-05-01",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-05-01",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-05",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "53eea40e8a09233bd6a301d447a582df",
+    "trackName": "I Saw Your Face",
+    "artist": "Malcolm Todd",
+    "album": "I Saw Your Face",
+    "trackUri": "spotify:track:3cLBx0lEWPKSM99hx5RVcx",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021e0d253b26e17c0b059471dc",
+    "spotifyUrl": "https://open.spotify.com/track/3cLBx0lEWPKSM99hx5RVcx",
+    "dateRange": {
+      "start": "2026-04-28",
+      "end": "2026-05-08"
+    },
+    "playCount": 13,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-05-03",
+    "peakDayPlays": 5,
+    "hotDays": [
+      {
+        "date": "2026-05-03",
+        "plays": 5
+      },
+      {
+        "date": "2026-05-01",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-02",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-08",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "342943a796f52ff88cb4363f8402452b",
+    "trackName": "Earrings",
+    "artist": "Malcolm Todd",
+    "album": "Sweet Boy",
+    "trackUri": "spotify:track:0eAuGrXyGFYwur9ARUe7LJ",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e022c1f34ecc1929fb59908aad1",
+    "spotifyUrl": "https://open.spotify.com/track/0eAuGrXyGFYwur9ARUe7LJ",
+    "dateRange": {
+      "start": "2026-04-26",
+      "end": "2026-05-01"
+    },
+    "playCount": 5,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-04-26",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-04-26",
+        "plays": 3
+      }
+    ]
+  },
+  {
     "id": "dfd4bf3b077ec4122cddfd4edc42b7ec",
     "trackName": "The Show Goes On",
     "artist": "Lupe Fiasco",
@@ -55,7 +146,40 @@
     ]
   },
   {
-    "id": "ecd09f053a7d73309076cbe993d5ec24",
+    "id": "6a44dc2f905b1ff9c5d43fe8268b62ce",
+    "trackName": "Beaches",
+    "artist": "beabadoobee",
+    "album": "This Is How Tomorrow Moves",
+    "trackUri": "spotify:track:1a19jsjG2DvbN1fVJonKUU",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e027d9a2e7835a178df7b0153aa",
+    "spotifyUrl": "https://open.spotify.com/track/1a19jsjG2DvbN1fVJonKUU",
+    "dateRange": {
+      "start": "2026-04-20",
+      "end": "2026-05-08"
+    },
+    "playCount": 7,
+    "weeksCount": 3,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-04-20",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-04-20",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-01",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-07",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "67864241ca0f17693a3ed7b2b0d45ce1",
     "trackName": "Back Home",
     "artist": "Yeat",
     "album": "ADL",
@@ -64,10 +188,10 @@
     "spotifyUrl": "https://open.spotify.com/track/40oYjPdjvFBCZH1Smsk46H",
     "dateRange": {
       "start": "2026-04-18",
-      "end": "2026-04-25"
+      "end": "2026-05-03"
     },
-    "playCount": 13,
-    "weeksCount": 2,
+    "playCount": 16,
+    "weeksCount": 3,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-04-18",
@@ -185,7 +309,7 @@
     ]
   },
   {
-    "id": "1bb8d647b998b8a3a2a05264aca5f95e",
+    "id": "2ec1eea1a4fe06421d73d9b375c825b8",
     "trackName": "HIGHS AND LOWS",
     "artist": "Kanye West",
     "album": "BULLY",
@@ -194,9 +318,9 @@
     "spotifyUrl": "https://open.spotify.com/track/565G1vHZu2xoxrnTyF06Qw",
     "dateRange": {
       "start": "2026-04-09",
-      "end": "2026-04-30"
+      "end": "2026-05-03"
     },
-    "playCount": 12,
+    "playCount": 13,
     "weeksCount": 4,
     "intensity": 3,
     "maxState": 3,
@@ -214,7 +338,7 @@
     ]
   },
   {
-    "id": "ffa48fb7c299888c331bc204be991336",
+    "id": "895ccfe053e94a9ecb62c8644bb87372",
     "trackName": "Raindance (feat. Tems)",
     "artist": "Dave",
     "album": "The Boy Who Played the Harp",
@@ -223,10 +347,10 @@
     "spotifyUrl": "https://open.spotify.com/track/3oTuTpF1F3A7rEC6RKsMRz",
     "dateRange": {
       "start": "2026-04-08",
-      "end": "2026-04-21"
+      "end": "2026-05-03"
     },
-    "playCount": 10,
-    "weeksCount": 3,
+    "playCount": 12,
+    "weeksCount": 4,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-04-12",
@@ -264,7 +388,7 @@
     ]
   },
   {
-    "id": "8e818dc88cb83511b527db540f2bc057",
+    "id": "c7d77e7beedc0c2de991f47e7c7b189f",
     "trackName": "4:25",
     "artist": "Balu Brigada",
     "album": "Portal",
@@ -273,10 +397,10 @@
     "spotifyUrl": "https://open.spotify.com/track/2cjQAWtDFoWVWdXr0oKfef",
     "dateRange": {
       "start": "2026-04-06",
-      "end": "2026-04-21"
+      "end": "2026-05-01"
     },
-    "playCount": 10,
-    "weeksCount": 3,
+    "playCount": 12,
+    "weeksCount": 4,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-04-12",
@@ -507,8 +631,8 @@
     },
     "playCount": 15,
     "weeksCount": 4,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2026-04-01",
     "peakDayPlays": 3,
     "hotDays": [
@@ -5657,8 +5781,8 @@
     },
     "playCount": 13,
     "weeksCount": 4,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2025-06-26",
     "peakDayPlays": 2,
     "hotDays": [
@@ -10721,6 +10845,40 @@
     ]
   },
   {
+    "id": "da35940da5bd6d7801fde1a65448ea6f",
+    "trackName": "No Pole",
+    "artist": "Don Toliver",
+    "album": "Love Sick",
+    "trackUri": "spotify:track:0eaVIYo2zeOaGJeqZ5TwYz",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02307323fa550564b0201b1d76",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/0eaVIYo2zeOaGJeqZ5TwYz",
+    "dateRange": {
+      "start": "2023-10-14",
+      "end": "2023-10-22"
+    },
+    "playCount": 9,
+    "weeksCount": 2,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-10-14",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-10-14",
+        "plays": 2
+      },
+      {
+        "date": "2023-10-19",
+        "plays": 2
+      },
+      {
+        "date": "2023-10-22",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "2d0a423e303cf233e31ef0b5eb5b83e8",
     "trackName": "Around Me (feat. Don Toliver)",
     "artist": "Metro Boomin",
@@ -10743,40 +10901,6 @@
       {
         "date": "2023-10-14",
         "plays": 3
-      }
-    ]
-  },
-  {
-    "id": "da35940da5bd6d7801fde1a65448ea6f",
-    "trackName": "No Pole",
-    "artist": "Don Toliver",
-    "album": "Love Sick",
-    "trackUri": "spotify:track:0eaVIYo2zeOaGJeqZ5TwYz",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02307323fa550564b0201b1d76",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/0eaVIYo2zeOaGJeqZ5TwYz",
-    "dateRange": {
-      "start": "2023-10-14",
-      "end": "2023-10-22"
-    },
-    "playCount": 9,
-    "weeksCount": 2,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2023-10-14",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-10-14",
-        "plays": 2
-      },
-      {
-        "date": "2023-10-19",
-        "plays": 2
-      },
-      {
-        "date": "2023-10-22",
-        "plays": 2
       }
     ]
   },
@@ -11182,8 +11306,8 @@
     },
     "playCount": 13,
     "weeksCount": 4,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2023-09-14",
     "peakDayPlays": 2,
     "hotDays": [
