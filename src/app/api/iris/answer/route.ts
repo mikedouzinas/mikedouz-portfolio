@@ -5,6 +5,7 @@ import { type KBItem } from '@/lib/iris/schema';
 import Anthropic from '@anthropic-ai/sdk';
 import { config } from '@/lib/iris/config';
 import { logQuery, logQuickAction } from '@/lib/iris/analytics';
+import { buildVisitorEnrichment } from '@/lib/iris/visitorEnrichment';
 import { generateQuickActions } from '@/lib/iris/quickActions_v2';
 import { loadRankings } from '@/lib/iris/loadRankings';
 import type { Rankings } from '@/lib/iris/rankings';
@@ -271,6 +272,10 @@ ${kbContext}`;
 
 export async function POST(req: NextRequest) {
   const startTime = Date.now();
+  const visitorEnrichment = await buildVisitorEnrichment(req).catch(error => {
+    console.warn('[Answer API] Visitor enrichment failed:', error);
+    return {} as Awaited<ReturnType<typeof buildVisitorEnrichment>>;
+  });
 
   try {
     // ── Parse request body ──────────────────────────────────
@@ -400,7 +405,8 @@ export async function POST(req: NextRequest) {
             cached: true,
             session_id: req.headers.get('x-session-id') || undefined,
             user_agent: req.headers.get('user-agent') || undefined,
-            client_query_id: cachedClientQueryId
+            client_query_id: cachedClientQueryId,
+            ...visitorEnrichment,
           }).catch(error => {
             console.warn('[Analytics] Failed to log cached query:', error);
           });
@@ -782,7 +788,8 @@ export async function POST(req: NextRequest) {
             cached: false,
             session_id: req.headers.get('x-session-id') || undefined,
             user_agent: req.headers.get('user-agent') || undefined,
-            client_query_id: earlyQueryId
+            client_query_id: earlyQueryId,
+            ...visitorEnrichment,
           }).catch(error => {
             console.warn('[Analytics] Failed to log query:', error);
             return null;

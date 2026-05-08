@@ -42,6 +42,20 @@ export interface QueryLog {
   session_id?: string
   user_agent?: string
   client_query_id?: string
+
+  // Visitor enrichment (best-effort, server-side at log time)
+  referrer?: string
+  ip_hash?: string
+  org?: string
+  city?: string
+  region?: string
+  country?: string
+  timezone?: string
+  utm_source?: string
+  utm_medium?: string
+  utm_campaign?: string
+  utm_content?: string
+  utm_term?: string
 }
 
 export interface QuickActionLog {
