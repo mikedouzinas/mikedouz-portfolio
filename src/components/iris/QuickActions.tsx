@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { ArrowRight, MessageSquare, ExternalLink, Mail, Send, X } from 'lucide-react';
+import { ArrowRight, MessageSquare, ExternalLink, Mail, Send, X, BookOpen } from 'lucide-react';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
 import { getRandomLoadingConfig, getAnimationConfig, getRandomLoadingMessage, type LoadingConfig } from '@/lib/iris/loadingMessages';
 
@@ -12,7 +12,7 @@ export interface QuickAction {
   intent?: string;          // Skip re-classification
   filters?: Record<string, unknown>;  // Direct filter application
   link?: string;            // For contact_link type
-  linkType?: 'github' | 'linkedin' | 'email' | 'external' | 'demo' | 'company';  // Icon selection
+  linkType?: 'github' | 'linkedin' | 'email' | 'external' | 'demo' | 'company' | 'blog';  // Icon selection
 }
 
 interface QuickActionsProps {
@@ -365,6 +365,8 @@ export default function QuickActions({
           return <FaLinkedin className="w-3.5 h-3.5" />;
         case 'email':
           return <Mail className="w-3.5 h-3.5" />;
+        case 'blog':
+          return <BookOpen className="w-3.5 h-3.5" />;
         default:
           return <ExternalLink className="w-3.5 h-3.5" />;
       }
@@ -390,6 +392,9 @@ export default function QuickActions({
       }
       if (action.linkType === 'linkedin') {
         return 'from-blue-500 to-blue-600';
+      }
+      if (action.linkType === 'blog') {
+        return 'from-emerald-500 to-teal-600';
       }
       return 'from-cyan-500 to-blue-600';
     }

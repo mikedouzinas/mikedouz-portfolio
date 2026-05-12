@@ -289,7 +289,7 @@ export interface ActionTemplate {
 
 export interface ActionData {
   link?: string;
-  linkType?: 'github' | 'linkedin' | 'email' | 'external' | 'demo' | 'company';
+  linkType?: 'github' | 'linkedin' | 'email' | 'external' | 'demo' | 'company' | 'blog';
   query?: string;
   intent?: string;
   filters?: Record<string, unknown>;
@@ -570,13 +570,26 @@ export const ACTION_CONFIG: Record<string, ActionTemplate[]> = {
   blog: [
     {
       type: 'link',
-      label: (item) => (item as BlogT).url?.startsWith('/') ? 'Read Blog' : 'Read Article',
+      label: (item) => {
+        const b = item as BlogT;
+        if (!b.url) return 'Read';
+        if (b.url === '/the-web') return 'Read the blog';
+        if (b.url.startsWith('/the-web/')) {
+          const short = b.short_name || b.title || 'post';
+          return `Read '${short.length > 24 ? short.slice(0, 22) + '…' : short}'`;
+        }
+        return 'Read article';
+      },
       priority: 10,
-      condition: (item) => 'url' in item,
-      getData: (item) => ({
-        link: (item as BlogT).url,
-        linkType: 'external'
-      })
+      condition: (item) => 'url' in item && !!(item as BlogT).url,
+      getData: (item) => {
+        const b = item as BlogT;
+        const isInternalBlog = !!b.url && (b.url === '/the-web' || b.url.startsWith('/the-web/'));
+        return {
+          link: b.url,
+          linkType: isInternalBlog ? 'blog' : 'external',
+        };
+      },
     },
     {
       type: 'query',

@@ -10,6 +10,7 @@ import { generateQuickActions } from '@/lib/iris/quickActions_v2';
 import { loadRankings } from '@/lib/iris/loadRankings';
 import type { Rankings } from '@/lib/iris/rankings';
 import type { QuickAction } from '@/components/iris/QuickActions';
+import { buildActionSlate, formatSlateForPrompt, resolveSlateSelections, inferSlateIdsFromText, type SlateItem } from '@/lib/iris/actionSlate';
 
 // Import types from answer-utils modules
 import type { Intent, QueryFilter } from '@/lib/iris/answer-utils/types';
@@ -89,6 +90,22 @@ const FETCH_GITHUB_ACTIVITY_TOOL: Anthropic.Tool = {
   },
 };
 
+const SELECT_QUICK_ACTIONS_TOOL: Anthropic.Tool = {
+  name: 'select_quick_actions',
+  description: 'Pick 0-4 quick action buttons from the Quick Action Slate (provided in the system prompt) to attach alongside your reply. Choose actions that match what the user just asked about or what would naturally extend the conversation. You may pick multiple of the same kind if they reference different items (e.g., several GitHub buttons for distinct repos — labels are already disambiguated). "Message Mike" and "Ask a follow up..." are always shown by the system — don\'t worry about adding those. If no slate item is a good fit, pass an empty array.',
+  input_schema: {
+    type: 'object' as const,
+    required: ['ids'],
+    properties: {
+      ids: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'Slate ids to surface as buttons. Empty array if none are relevant.',
+      },
+    },
+  },
+};
+
 // ──────────────────────────────────────────────────────────────
 // KB context formatter
 // ──────────────────────────────────────────────────────────────
@@ -125,15 +142,13 @@ function formatKBForContext(items: KBItem[], rankings: Rankings, contactInfo: Re
 // System prompt builder
 // ──────────────────────────────────────────────────────────────
 
-function buildSystemPrompt(kbContext: string): string {
+function buildSystemPrompt(kbContext: string, slateContext: string): string {
   return `You are **Iris**, Mike's AI assistant. The user is CURRENTLY talking to you on mikeveson.com. Your job is to help visitors explore Mike's work, skills, projects, and writing using ONLY the knowledge base provided below. Be warm, concise, and useful.
 
 # Tool Usage (REQUIRED)
 - CRITICAL: You MUST ALWAYS produce a text response to the user. The text response IS your primary output. Tool calls are metadata alongside it.
-- You MUST also call the \`classify_response\` tool with every response. Write your text answer FIRST, then include the tool call.
-- Set \`matched_item_ids\` to the \`id\` fields of all KB items you mention or reference in your answer.
-- Set \`about_mike\` to true if the query is about Mike, his work, skills, projects, background, or anything in the KB. Set false only for clearly off-topic queries.
-- Set \`intent\` to the best classification: contact, filter_query, specific_item, personal, general, or github_activity.
+- You MUST call \`classify_response\` with every response. Set \`intent\`, \`matched_item_ids\` (all KB ids you mention), and \`about_mike\`.
+- **You MUST also call \`select_quick_actions\` with every response.** Pass an empty array if no slate items fit, but never skip the call. Whenever your response mentions a resource that has a slate item (the blog, GitHub, a specific post, a project's repo, a project's demo, etc.), you MUST pick that slate item's id. The user has no other way to navigate to it.
 - NEVER respond with only tool calls and no text. The user must always see a written response.
 - Call \`show_contact_form\` when you want to suggest the user message Mike directly (see "Contact vs Explore" section below).
 - Call \`fetch_github_activity\` ONLY when the user explicitly asks about recent updates/commits for a specific project.
@@ -196,40 +211,35 @@ Mike's work is pre-ranked using importance scores (0-100) to help you prioritize
 **How to Use (NEVER mention the numbers):**
 When users ask about "best" or "top" work, prioritize these highly-ranked items and explain WHY using concrete evidence from the knowledge base (metrics, technical complexity, real outcomes). Example: "HiLiTe stands out for its cutting-edge ML and computer vision work" NOT "HiLiTe ranks 77/100". Let the evidence speak for itself.
 
-# Contact Information & Linking Strategy
+# Linking — Quick Action Slate
 
-**CRITICAL: Never include raw URLs or links in your response text.**
+**CRITICAL: Never put raw URLs *or* paths in your response text.** This includes full URLs (\`https://...\`, \`mailto:...\`) AND site-relative paths (\`/the-web\`, \`/the-web/two-trees\`). They render as plain text — they are NOT clickable in the response body. Reference resources by name only ("the blog", "Mike's GitHub", "the Two Trees post") and put the link in a quick action button.
 
-All links (GitHub, LinkedIn, demo links, company websites) are automatically provided via quick action buttons that appear BELOW your answer. Your job is to reference that these resources exist without including the actual URLs. CRITICAL: When referencing buttons, links, or actions, ALWAYS say "below" — NEVER say "above." The buttons are rendered after your text, so they are always below.
+To attach quick action buttons to your reply, call the \`select_quick_actions\` tool with the ids of the slate items you want to surface. The slate is a precomputed list of every link and drill-down you may surface — see "## Quick Action Slate" below. Buttons render BELOW your text — when you reference one, always say "below," never "above."
 
-**Quick Actions System:**
-After you finish answering, the system automatically generates relevant quick action buttons based on the context:
-- Projects with GitHub repos → "GitHub" button appears
-- Work experiences → "LinkedIn" button appears
-- Projects with demos → "Live Demo" button appears
-- All responses → "Message Mike" and "Ask a follow up..." buttons
+**When to select a slate item:**
+- The user asks for a specific URL or resource → pick the matching \`link\` slate item.
+- You reference a specific blog post, project, GitHub repo, demo, or company → pick the matching slate item.
+- The user might naturally want to dig into something you mentioned → pick a \`drill_down\` slate item for it.
+- Conversation took a turn that newly points to a resource (e.g., user mid-convo asks "where's your blog?") → pick \`link_blog_index\` even if it didn't fit your first response in this thread.
 
-**How to Reference Links (Without Including URLs):**
+You may pick 0-4 ids. Multiple ids of the same kind are fine when they reference different items (e.g., several different GitHub repos — labels in the slate are already disambiguated). If no slate item is relevant, pass an empty array. **You cannot invent slate items** — only ids from the slate below are accepted; anything else is silently dropped.
 
-✅ **CORRECT - Reference without URL:**
-- "The code is on GitHub" (GitHub button will appear automatically)
-- "Connect with Mike on LinkedIn" (LinkedIn button will appear)
-- "There's a live demo you can check out" (Demo button will appear)
-- "You can see it on the company website" (Company button will appear)
+**Tone — reference buttons naturally, never with URLs:**
+✅ "I wrote a whole post on this — read it below."
+✅ "The code is on GitHub (button below)."
+✅ "You can browse all my writing on the blog, or jump to that specific post."
+❌ "Check it out: https://..." (DON'T include URLs)
+❌ "You can find it at /the-web" (DON'T include paths)
+❌ "Read 'Two Trees' at /the-web/two-trees" (DON'T include paths)
 
-❌ **INCORRECT - Never do this:**
-- "Check out the code: https://github.com/..." (DON'T include URLs!)
-- "Connect on LinkedIn: https://linkedin.com/..." (DON'T include URLs!)
-- "Visit: https://..." (DON'T include URLs!)
+**System-generated buttons:**
+On top of your \`select_quick_actions\` picks, the system always appends "Message Mike" and "Ask a follow up..." So you only need to pick the *content* buttons (links and drill-downs); the chat-control buttons are free.
 
-**Contact Methods:**
-When users need more information or want to connect:
-- Technical details not in context → "Message Mike for implementation details"
-- Professional networking → "Mike's LinkedIn profile is available" (button appears)
-- Code repositories → "The code is on GitHub" (button appears)
-- Collaboration/hiring → "Message Mike to discuss [topic]"
+## Quick Action Slate
+Each line is one selectable item with id, type, label (shown on the button), and a short preview of what it does. Pass the chosen \`id\` values to \`select_quick_actions\`.
 
-**Remember:** The quick actions system handles ALL linking. Just reference that resources exist, and the appropriate buttons will appear automatically.
+${slateContext}
 
 # Contact vs Explore (Tool-Based Contact)
 Only suggest contacting Mike (by calling \`show_contact_form\`) when one of these is true:
@@ -474,7 +484,9 @@ export async function POST(req: NextRequest) {
 
     // ── Build system prompt with full KB ─────────────────────
     const kbContext = formatKBForContext(allItems, rankings, contactInfoObj);
-    const systemPrompt = buildSystemPrompt(kbContext);
+    const slate: SlateItem[] = buildActionSlate(allItems, contactInfoObj, rankings);
+    const slateContext = formatSlateForPrompt(slate);
+    const systemPrompt = buildSystemPrompt(kbContext, slateContext);
 
     // ── Build messages array ────────────────────────────────
     const messages: Anthropic.MessageParam[] = [];
@@ -512,6 +524,7 @@ export async function POST(req: NextRequest) {
     let classifyResult: { intent: Intent; matched_item_ids: string[]; about_mike: boolean; filters?: QueryFilter } | null = null;
     let contactFormData: { reason: string; draft: string } | null = null;
     let _githubActivityRequest: { project_id: string } | null = null;
+    let selectedSlateIds: string[] = [];
 
     // Tool input buffering
     const toolInputBuffers: Record<number, { name: string; jsonStr: string }> = {};
@@ -549,6 +562,10 @@ export async function POST(req: NextRequest) {
                       contactFormData = input;
                     } else if (buf.name === 'fetch_github_activity') {
                       _githubActivityRequest = input;
+                    } else if (buf.name === 'select_quick_actions') {
+                      if (input && Array.isArray(input.ids)) {
+                        selectedSlateIds = input.ids.filter((v: unknown): v is string => typeof v === 'string');
+                      }
                     }
                   } catch (e) {
                     console.warn(`[Answer API] Failed to parse tool input for ${buf.name}:`, e);
@@ -558,20 +575,63 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          // ── First Claude call ───────────────────────────────────
-          const initialStream = anthropic.messages.stream({
-            model: config.models.chat,
-            max_tokens: config.chatSettings.maxTokens,
-            temperature: config.chatSettings.temperature,
-            system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
-            messages,
-            tools: [CLASSIFY_RESPONSE_TOOL, SHOW_CONTACT_FORM_TOOL, FETCH_GITHUB_ACTIVITY_TOOL],
-          });
+          // ── First Claude call (with retry on overloaded/rate-limit) ───
+          function isRetryableAnthropicError(err: unknown): boolean {
+            if (!err || typeof err !== 'object') return false;
+            const e = err as { status?: number; error?: { type?: string }; message?: string };
+            if (e.status === 529 || e.status === 429 || e.status === 503) return true;
+            const t = e.error?.type;
+            if (t === 'overloaded_error' || t === 'rate_limit_error' || t === 'api_error') return true;
+            const msg = String(e.message || '');
+            return /overloaded|rate.?limit|temporarily unavailable/i.test(msg);
+          }
 
-          await processStream(initialStream);
-
-          // Get the final message to check stop_reason
-          const finalMessage = await initialStream.finalMessage();
+          let initialStream: ReturnType<typeof anthropic.messages.stream> | null = null;
+          let finalMessage: Anthropic.Message | null = null;
+          // Try primary (sonnet) a few times; if still overloaded, fall back to haiku once.
+          const ATTEMPT_PLAN: Array<{ model: string; delayMs: number }> = [
+            { model: config.models.chat, delayMs: 0 },
+            { model: config.models.chat, delayMs: 600 },
+            { model: config.models.chat, delayMs: 1500 },
+            { model: 'claude-haiku-4-5', delayMs: 500 }, // overload fallback
+          ];
+          let lastErr: unknown = null;
+          for (let i = 0; i < ATTEMPT_PLAN.length; i++) {
+            const { model, delayMs } = ATTEMPT_PLAN[i];
+            if (delayMs > 0) await new Promise(r => setTimeout(r, delayMs));
+            try {
+              initialStream = anthropic.messages.stream({
+                model,
+                max_tokens: config.chatSettings.maxTokens,
+                temperature: config.chatSettings.temperature,
+                system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+                messages,
+                tools: [CLASSIFY_RESPONSE_TOOL, SHOW_CONTACT_FORM_TOOL, FETCH_GITHUB_ACTIVITY_TOOL, SELECT_QUICK_ACTIONS_TOOL],
+              });
+              await processStream(initialStream);
+              finalMessage = await initialStream.finalMessage();
+              lastErr = null;
+              if (model !== config.models.chat) {
+                console.warn(`[Answer API] Recovered using fallback model: ${model}`);
+              }
+              break;
+            } catch (err) {
+              lastErr = err;
+              const errInfo = (err as { error?: { type?: string }; status?: number; message?: string });
+              console.warn(`[Answer API] ${model} attempt ${i + 1}/${ATTEMPT_PLAN.length} failed: status=${errInfo?.status} type=${errInfo?.error?.type} msg=${String(errInfo?.message || '').slice(0, 200)}`);
+              if (!isRetryableAnthropicError(err) || i === ATTEMPT_PLAN.length - 1) {
+                throw err;
+              }
+              // Reset partial state captured during the failed attempt
+              fullAnswer = '';
+              classifyResult = null;
+              contactFormData = null;
+              _githubActivityRequest = null;
+              selectedSlateIds = [];
+              console.warn(`[Answer API] ${model} overloaded/rate-limited (attempt ${i + 1}/${ATTEMPT_PLAN.length}); will retry`);
+            }
+          }
+          if (lastErr || !finalMessage) throw lastErr || new Error('Failed to obtain Claude response');
 
           // ── Tool-use continuation loop ──────────────────────────
           // If Claude stopped because it called tools (no text yet),
@@ -605,7 +665,7 @@ export async function POST(req: NextRequest) {
               temperature: config.chatSettings.temperature,
               system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
               messages: continuationMessages,
-              tools: [CLASSIFY_RESPONSE_TOOL, SHOW_CONTACT_FORM_TOOL, FETCH_GITHUB_ACTIVITY_TOOL],
+              tools: [CLASSIFY_RESPONSE_TOOL, SHOW_CONTACT_FORM_TOOL, FETCH_GITHUB_ACTIVITY_TOOL, SELECT_QUICK_ACTIONS_TOOL],
             });
 
             await processStream(continuationStream);
@@ -651,7 +711,7 @@ export async function POST(req: NextRequest) {
                           ],
                         },
                       ],
-                      tools: [CLASSIFY_RESPONSE_TOOL, SHOW_CONTACT_FORM_TOOL, FETCH_GITHUB_ACTIVITY_TOOL],
+                      tools: [CLASSIFY_RESPONSE_TOOL, SHOW_CONTACT_FORM_TOOL, FETCH_GITHUB_ACTIVITY_TOOL, SELECT_QUICK_ACTIONS_TOOL],
                     });
 
                     for await (const event of activityStream) {
@@ -752,6 +812,64 @@ export async function POST(req: NextRequest) {
               visitedNodes,
             });
 
+            // Safety net: detect URL/path mentions in the answer and infer missing slate ids.
+            // This catches the case where Iris ignored the "no URLs in text" rule and also
+            // forgot to call select_quick_actions. Without this, the user sees a path in text
+            // but no clickable button.
+            const pickedSet = new Set(selectedSlateIds);
+            const inferredIds = inferSlateIdsFromText(fullAnswer, slate, pickedSet, matchedItemIds);
+            if (inferredIds.length > 0) {
+              console.log(`[Iris slate] Inferred ${inferredIds.length} slate id(s) from text: ${inferredIds.join(', ')}`);
+              selectedSlateIds = [...selectedSlateIds, ...inferredIds];
+            }
+
+            // Merge in Iris-selected slate actions (resolved against the slate)
+            if (selectedSlateIds.length > 0) {
+              const irisSelected = resolveSlateSelections(selectedSlateIds, slate);
+              if (irisSelected.length > 0) {
+                // Dedup against template-generated actions by link / title_match
+                const seenLinks = new Set<string>(
+                  generatedQuickActions
+                    .filter(a => a.type === 'contact_link' && typeof a.link === 'string')
+                    .map(a => a.link!.trim().toLowerCase().replace(/\/+$/, ''))
+                );
+                const seenDrills = new Set<string>(
+                  generatedQuickActions
+                    .filter(a => a.type === 'specific' && a.filters?.title_match)
+                    .map(a => String(a.filters!.title_match).toLowerCase())
+                );
+                const survivors = irisSelected.filter(a => {
+                  if (a.type === 'contact_link' && a.link) {
+                    const k = a.link.trim().toLowerCase().replace(/\/+$/, '');
+                    if (seenLinks.has(k)) return false;
+                    seenLinks.add(k);
+                  } else if (a.type === 'specific' && a.filters?.title_match) {
+                    const k = String(a.filters.title_match).toLowerCase();
+                    if (seenDrills.has(k)) return false;
+                    seenDrills.add(k);
+                  }
+                  return true;
+                });
+                // Prepend Iris-selected so they appear first
+                generatedQuickActions = [...survivors, ...generatedQuickActions];
+                console.log(`[Iris slate] Merged ${survivors.length} Iris-selected action(s) from ${selectedSlateIds.length} picked ids`);
+              }
+            }
+
+            // Final cap: at most 6 buttons total. Always preserve the chat-control buttons
+            // (custom_input + message_mike) at the end so users can keep talking / contact Mike.
+            const MAX_FINAL = 6;
+            if (generatedQuickActions.length > MAX_FINAL) {
+              const controlActions = generatedQuickActions.filter(
+                a => a.type === 'custom_input' || a.type === 'message_mike'
+              );
+              const contentActions = generatedQuickActions.filter(
+                a => a.type !== 'custom_input' && a.type !== 'message_mike'
+              );
+              const room = Math.max(0, MAX_FINAL - controlActions.length);
+              generatedQuickActions = [...contentActions.slice(0, room), ...controlActions];
+            }
+
             if (generatedQuickActions.length > 0) {
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ quickActions: generatedQuickActions })}\n\n`));
 
@@ -844,9 +962,23 @@ export async function POST(req: NextRequest) {
           console.error('[Answer API] Stream error:', error);
           // Try to send error to client
           try {
+            const errStr = error instanceof Error ? error.message : String(error);
+            const errObj = error as { status?: number; error?: { type?: string } } | null;
+            const isOverloaded =
+              errObj?.status === 529 ||
+              errObj?.error?.type === 'overloaded_error' ||
+              /overloaded/i.test(errStr);
+            const isRateLimit =
+              errObj?.status === 429 ||
+              errObj?.error?.type === 'rate_limit_error' ||
+              /rate.?limit/i.test(errStr);
             const errorMsg = error instanceof Error && error.message.includes('timed out')
               ? 'Your request timed out. Please try again.'
-              : 'I encountered an error while generating a response.';
+              : isOverloaded
+                ? "I'm getting a lot of traffic right now — give me a moment and try again."
+                : isRateLimit
+                  ? "I've been hit with a lot of requests — try again in a few seconds."
+                  : 'I encountered an error while generating a response.';
             controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: errorMsg })}\n\n`));
             controller.enqueue(encoder.encode('data: [DONE]\n\n'));
             controller.close();

@@ -59,10 +59,11 @@ function generateContactActions(): QuickAction[] {
  */
 function templateToAction(
   template: ReturnType<typeof getActionsForItem>[0],
-  data: ActionData
+  data: ActionData,
+  item: KBItem
 ): QuickAction | null {
   const label = typeof template.label === 'function'
-    ? template.label({} as KBItem)  // Already computed in template.getData
+    ? template.label(item)
     : template.label;
 
   switch (template.type) {
@@ -174,7 +175,7 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
       if (!template.getData) continue;
 
       const data = template.getData(mainItem, rankings, context.allItems);
-      const action = templateToAction(template, data);
+      const action = templateToAction(template, data, mainItem);
 
       if (action) {
         actions.push(action);
@@ -215,7 +216,7 @@ export function generateQuickActions(context: ActionContext): QuickAction[] {
 
       // Professional note: Pass allItems to enable ID-to-title lookups in action labels
       const data = template.getData(sortedItems[0], rankings, context.allItems);
-      const action = templateToAction(template, data);
+      const action = templateToAction(template, data, sortedItems[0]);
 
       // Professional comment: Skip actions for items that have already been visited
       // This prevents suggesting the same item again (e.g., Parsons after clicking Parsons)
