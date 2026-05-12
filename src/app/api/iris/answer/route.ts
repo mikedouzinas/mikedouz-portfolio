@@ -856,6 +856,27 @@ export async function POST(req: NextRequest) {
               }
             }
 
+            // Dedup against current items: don't suggest drilling into an item we're already viewing
+            // or one the user has already drilled through. "Current" = anything Iris matched this turn,
+            // anything we drilled into from a previous click (presetFilters.title_match), or any node
+            // the client has tracked as visited.
+            const currentItems = new Set<string>();
+            for (const id of matchedItemIds) currentItems.add(id.toLowerCase());
+            for (const id of (visitedNodes as string[])) {
+              if (typeof id === 'string') currentItems.add(id.toLowerCase());
+            }
+            if (presetFilters?.title_match) currentItems.add(String(presetFilters.title_match).toLowerCase());
+            const beforeDedup = generatedQuickActions.length;
+            generatedQuickActions = generatedQuickActions.filter(a => {
+              if (a.type !== 'specific') return true;
+              const tm = a.filters?.title_match;
+              if (!tm) return true;
+              return !currentItems.has(String(tm).toLowerCase());
+            });
+            if (generatedQuickActions.length !== beforeDedup) {
+              console.log(`[Quick Actions] Dropped ${beforeDedup - generatedQuickActions.length} drill-down(s) targeting current items: [${[...currentItems].join(', ')}]`);
+            }
+
             // Final cap: at most 6 buttons total. Always preserve the chat-control buttons
             // (custom_input + message_mike) at the end so users can keep talking / contact Mike.
             const MAX_FINAL = 6;

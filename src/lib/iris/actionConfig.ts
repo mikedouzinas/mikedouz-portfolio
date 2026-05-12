@@ -997,7 +997,9 @@ export function getActionsForList(
           // Describe what we're showing and what we should say for each item type
           query: queryText,
           intent: isBio ? 'personal' : 'specific_item',
-          filters: isBio ? undefined : { title_match: item.id }
+          // Always include title_match so the merge-time dedup can drop drill-downs
+          // that target an item we've already covered this turn.
+          filters: { title_match: item.id }
         })
       });
     }
