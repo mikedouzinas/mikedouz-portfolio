@@ -183,6 +183,22 @@ export function buildActionSlate(
       continue;
     }
 
+    // Class links: course url
+    if (item.kind === 'class') {
+      const c = item as KBItem & { links?: Record<string, string> };
+      const links = (c.links || {}) as Record<string, string>;
+      if (links.url) {
+        pushLink({
+          id: `link_${item.id}_url`,
+          label: `${quoteIfNeeded(shortName)} course`,
+          link: links.url,
+          linkType: 'external',
+          preview: `class info: ${shortName}`,
+        });
+      }
+      continue;
+    }
+
     // Experience links: linkedin, company
     if (item.kind === 'experience') {
       const e = item as ExperienceT;

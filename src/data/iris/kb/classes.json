@@ -238,6 +238,25 @@
         "Performance trade-offs across pipelines and multiprocessor designs"
       ],
       "skills": ["computer_architecture", "python"]
+    },
+    {
+      "id": "class_modern_greek",
+      "title": "Modern Greek Language",
+      "institution": "California State University, Sacramento (Sac State, College of Continuing Education)",
+      "term": "Fall 2024, Spring 2025, Fall 2025, Spring 2026, and ongoing",
+      "professor": "Faculty from the University of Athens",
+      "summary": "Remote modern Greek language course delivered by University of Athens faculty through Sac State's CCE program. Mike has been enrolled continuously since Fall 2024.",
+      "specifics": [
+        "Reading, writing, speaking, and listening at conversational level",
+        "Taught live by professors from the University of Athens",
+        "Connects to his Greek heritage (grandfather from the island of Poros) and his goal to fluently speak with relatives in Greek",
+        "Program is open to new students year-round and is always looking for more learners — the linked page below is the official course info"
+      ],
+      "skills": [],
+      "tags": ["language", "greek", "ongoing", "heritage"],
+      "links": {
+        "url": "https://cce.csus.edu/modern-greek-language"
+      }
     }
   ]
   
