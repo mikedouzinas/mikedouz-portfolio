@@ -204,10 +204,12 @@ Mike's work is pre-ranked using importance scores (0-100) to help you prioritize
 - **Recency** (lowest weight): Quality and complexity matter more than timing
 
 **Top-Ranked Items (Use for Prioritization):**
-- **Mike's current work (LEAD with these for "best", "most impressive", "what is he building", "what defines him" questions):** The Olympus Project (founder role), Apollo Terminal, Iris Mobile, The Lantern, mikeveson.com (this site you're on), Apollo x freewrite. These are what Mike is doing NOW, and they're the truest reflection of who he is.
-- **Pre-Olympus technical work (use as evidence of capability, NOT as the defining work):** HiLiTe (ML/CV sophistication), Knight Life (4.9★ with 80%+ of school as daily users), Euros, Momentum. These show Mike can ship; they are not who he is.
-- **Experiences:** The Olympus Project (Founder, ongoing) is his current primary role. Then Google (incoming SWE Intern Summer 2026), VesselsValue, Veson 2024, Lilie, Parsons, Veson Mobile.
+- **Current ambition — The Olympus Project:** Mike's primary focus right now. Channels: Apollo Terminal, Iris Mobile, The Lantern, mikeveson.com (the site you're on), Apollo x freewrite. Lead here for "what is Mike building," "what's next," or "what's he excited about."
+- **Shipping track record — substantial prior work:** HiLiTe (ML/CV sophistication for a high school project), Knight Life (4.9★ iOS app with 80%+ of his school as daily users), Euros, Momentum. Real shipping experience that built the capability behind Olympus. Surface these on questions about "best work," "what he's shipped," or "evidence of skill."
+- **Experiences (reverse chrono):** Olympus founder (ongoing), Google (incoming Summer 2026 SWE), Parsons (Air Force infra, C#/.NET), Veson Nautical (document AI automation, return offer), VesselsValue (NLP/ML data work), Lilie (Rice startup ecosystem, full-stack + product), Veson Mobile (early iOS, 2021-2023, high school).
 - **Skills:** Ranked by evidence breadth, complexity, and usage.
+
+**Balance — when describing Mike broadly:** For open-ended questions ("tell me about Mike," "what does Mike do," "who is this person"), give a rounded picture: Rice CS junior building toward The Olympus Project (his current main ambition), with substantial industry experience (Veson Nautical, Parsons, VesselsValue, Lilie, incoming Google) and a real track record of shipping (HiLiTe, Knight Life). Don't reduce him to one thing. Olympus is what he's most excited about; his past work is real and shaped how he approaches it now.
 
 **How to Use (NEVER mention the numbers):**
 When users ask about "best" or "top" work, prioritize these highly-ranked items and explain WHY using concrete evidence from the knowledge base (metrics, technical complexity, real outcomes). Example: "HiLiTe stands out for its cutting-edge ML and computer vision work" NOT "HiLiTe ranks 77/100". Let the evidence speak for itself.
@@ -833,7 +835,7 @@ export async function POST(req: NextRequest) {
                 const seenLinks = new Set<string>(
                   generatedQuickActions
                     .filter(a => a.type === 'contact_link' && typeof a.link === 'string')
-                    .map(a => a.link!.trim().toLowerCase().replace(/\/+$/, ''))
+                    .map(a => a.link!.trim().toLowerCase().replace(/^mailto:/, '').replace(/\/+$/, ''))
                 );
                 const seenDrills = new Set<string>(
                   generatedQuickActions
@@ -842,7 +844,7 @@ export async function POST(req: NextRequest) {
                 );
                 const survivors = irisSelected.filter(a => {
                   if (a.type === 'contact_link' && a.link) {
-                    const k = a.link.trim().toLowerCase().replace(/\/+$/, '');
+                    const k = a.link.trim().toLowerCase().replace(/^mailto:/, '').replace(/\/+$/, '');
                     if (seenLinks.has(k)) return false;
                     seenLinks.add(k);
                   } else if (a.type === 'specific' && a.filters?.title_match) {

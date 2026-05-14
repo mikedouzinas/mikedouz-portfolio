@@ -149,7 +149,7 @@ export function computeProjectImportance(project: ProjectT): number {
   // gets ranked above pre-Olympus dev work. The ranking formula favors ML complexity,
   // which under-weights writing, philosophy, and AI-product work that defines current Mike.
   const isOlympusWork = (project.tags || []).some(t => t.toLowerCase() === 'olympus');
-  const olympusBoost = isOlympusWork ? 45 : 0;
+  const olympusBoost = isOlympusWork ? 25 : 0;
   return Math.min(baseScore + olympusBoost, 100);
 }
 
@@ -189,7 +189,7 @@ export function computeExperienceImportance(exp: ExperienceT): number {
   const isOngoing = !exp.dates.end;
   const isFounder = /founder|founding|creator/i.test(exp.role);
   const isCurrentTag = (exp.tags || []).some(t => t.toLowerCase() === 'current');
-  const currentRoleBoost = (isOngoing || isFounder || isCurrentTag) ? 40 : 0;
+  const currentRoleBoost = (isOngoing || isFounder || isCurrentTag) ? 25 : 0;
   return Math.min(baseScore + currentRoleBoost, 100);
 }
 
