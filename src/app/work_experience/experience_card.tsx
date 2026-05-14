@@ -75,25 +75,41 @@ export default function ExperienceCard({ item }: ExperienceCardProps) {
             </div>
           </div>
           <div className="mb-2 text-sm flex items-center gap-2">
-            <a
-              href={item.companyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {item.company === "Google" ? (
-                <Image
-                  src="/google-logo.png"
-                  alt="Google"
-                  width={54}
-                  height={18}
-                  className="inline-block align-middle"
-                />
-              ) : (
-                item.company
-              )}
-            </a>
+            {item.companyUrl ? (
+              <a
+                href={item.companyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {item.company === "Google" ? (
+                  <Image
+                    src="/google-logo.png"
+                    alt="Google"
+                    width={54}
+                    height={18}
+                    className="inline-block align-middle"
+                  />
+                ) : (
+                  item.company
+                )}
+              </a>
+            ) : (
+              <span className="text-gray-700 dark:text-gray-300">
+                {item.company === "Google" ? (
+                  <Image
+                    src="/google-logo.png"
+                    alt="Google"
+                    width={54}
+                    height={18}
+                    className="inline-block align-middle"
+                  />
+                ) : (
+                  item.company
+                )}
+              </span>
+            )}
             {item.isIncoming && (
               <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gradient-to-r from-green-100 to-emerald-200 text-green-800 dark:from-green-900 dark:to-emerald-800 dark:text-green-300">
                 Incoming

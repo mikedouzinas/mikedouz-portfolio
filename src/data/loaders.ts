@@ -33,7 +33,7 @@ export interface Project {
   title: string;
   shortTitle?: string;  // Optional condensed title for mobile/reduced screen layouts
   description: string;
-  githubLink: string;
+  githubLink?: string;
   projectLink?: string;
   skills?: string[];
 }
@@ -48,7 +48,7 @@ export interface WorkExperience {
   company: string;
   period: string;
   description: string;
-  companyUrl: string;
+  companyUrl?: string;
   skills: string[];
   isIncoming: boolean;  // True if start date is in the future
   /** Map of text snippets to hover card IDs for inline hover triggers */
