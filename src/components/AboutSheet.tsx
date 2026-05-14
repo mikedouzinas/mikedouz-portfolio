@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
-import { SiCalendly } from 'react-icons/si';
+import { SiGooglemeet } from 'react-icons/si';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
 import AboutContent from './AboutContent';
 
@@ -96,7 +96,7 @@ export default function AboutSheet({ open, onClose }: AboutSheetProps) {
     },
     {
       label: 'Schedule',
-      icon: <SiCalendly size={20} />,
+      icon: <SiGooglemeet size={20} />,
       href: 'https://calendar.app.google/2yzE7E52xmUSj3EP6',
       external: true,
     },

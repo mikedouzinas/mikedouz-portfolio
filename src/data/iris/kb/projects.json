@@ -1,5 +1,258 @@
 [
   {
+    "id": "proj_apollo_freewrite",
+    "title": "Apollo x freewrite",
+    "aliases": [
+      "apollo freewrite",
+      "freewrite",
+      "writing system",
+      "apollo x freewrite"
+    ],
+    "summary": "A fork of freewrite by Farza, a minimalist writing platform with a timer, ambient video, and distraction-free UI, extended with Apollo, my personal knowledge layer. Turns a single writing session into a complete thinking environment.",
+    "specifics": [
+      "Built on top of freewrite by Farza (farzaa/freewrite), a writing tool designed to get thoughts out fast, with a timer, ambient video background, and a minimal UI that gets out of your way.",
+      "Added an in-platform AI chat using the forked Claude Code repository, so you can think and converse without leaving the writing environment.",
+      "Added an AI processor that connects to a vault of the user's choosing. Defaults to an LLM wiki-style connector that ingests and organizes what you write.",
+      "Added a Process button that sends the session directly to the vault via Claude Code. No steps between writing something and having it captured where it belongs.",
+      "Supports multiple sessions open simultaneously. Different topics stay genuinely separate, with each processed independently into the vault.",
+      "The result is a single environment for freewriting, AI conversation, and filing."
+    ],
+    "skills": [
+      "ai_integration",
+      "writing",
+      "swift",
+      "product_management"
+    ],
+    "tech_stack": [
+      "Swift",
+      "Claude Code (forked)",
+      "Anthropic API"
+    ],
+    "tags": [
+      "Writing",
+      "AI",
+      "Olympus"
+    ],
+    "links": {
+      "github": "https://github.com/mikedouzinas/apollo",
+      "image": "/ApolloFreewrite.png"
+    },
+    "dates": {
+      "start": "2026-01"
+    }
+  },
+  {
+    "id": "proj_iris_mobile",
+    "title": "Iris Mobile",
+    "aliases": [
+      "iris",
+      "iris app",
+      "iris mobile",
+      "thinking partner app"
+    ],
+    "summary": "A native iOS thinking partner that connects to my Apollo vault on the go. Voice-first via Wispr Flow. Same intelligence as Apollo Terminal, just in my pocket.",
+    "specifics": [
+      "Native SwiftUI iOS app, designed voice-first. Compatible with Wispr Flow (text input box, type or speak, not press-to-speak).",
+      "PARA-structured sidebar: Projects, Areas, Resources. Reads from the same Obsidian vault as Apollo Terminal, so context follows me everywhere.",
+      "Two response modes: Quick Mode (immediate Claude API response, working today) and Deep Mode (multi-LLM deliberation via Apollo backend, in development).",
+      "Chat interface with message bubbles and conversation history. Apollo knows which PARA context I'm working in and responds accordingly.",
+      "Built as a Swift port of Claude Code, so the same agent and tool patterns from the terminal work natively on iOS.",
+      "Background audio support and push notifications for Apollo-generated insights are in progress.",
+      "Named after the Greek messenger goddess who's universally accessible. Iris is meant to be everywhere (terminal, mobile, web); the mobile app is the most-accessible version. The Iris on this site is the same universal assistant pointed outward, to help visitors get to know me."
+    ],
+    "skills": [
+      "swift",
+      "ai_integration",
+      "typescript",
+      "product_management"
+    ],
+    "tech_stack": [
+      "Swift",
+      "SwiftUI",
+      "Claude Code (forked)",
+      "Anthropic API"
+    ],
+    "architecture": "Native iOS app over a forked Claude Code core. Connects to the same vault Apollo Terminal uses. Voice-first input via Wispr Flow.",
+    "tags": [
+      "iOS",
+      "AI",
+      "Mobile",
+      "Olympus"
+    ],
+    "links": {
+      "image": "/IrisMobile.png"
+    },
+    "dates": {
+      "start": "2025-12"
+    }
+  },
+  {
+    "id": "proj_apollo",
+    "title": "Apollo Terminal",
+    "aliases": [
+      "apollo",
+      "apollo terminal",
+      "apollo vault",
+      "the vault",
+      "claudesidian"
+    ],
+    "summary": "The system I use and build everything from. A claudesidian-style vault (built on the open-source claudesidian project by Noah Brier / Alephic) that combines Claude Code with careful prompting to help me learn and know myself, organize everything in my life, and get almost all of my work done. Public on GitHub for anyone else to use. Continuously improves as I use it.",
+    "specifics": [
+      "Built on claudesidian by Noah Brier at Alephic (github.com/heyitsnoah/claudesidian). Apollo is my personalized fork plus added structure for The Olympus Project.",
+      "Single Obsidian vault holds everything: classes, philosophy, relationships, self-observations, drafts, project plans. Claude Code reads, writes, and routes inside it via prompting.",
+      "Solves the AI context problem: every conversation has the full picture of my life, not just what I said in the last five minutes. I can bring up things I might not say to anyone and get unbiased, understanding advice within the full context of who I am.",
+      "Self-maintaining CLAUDE.md: the config grows with the vault. When Claude creates a file I'll need again, it adds the path. When I ask about something repeatedly, it suggests a shortcut.",
+      "Daily and weekly reviews, ingest pipelines for outside material, and a research-assistant pattern that turns conversations into compounding knowledge.",
+      "Public on GitHub at mikedouzinas/apollo-vault. Designed to install in one shell command and onboard via /init-bootstrap, which builds the CLAUDE.md interactively by learning how the user actually works.",
+      "Core intelligence layer of The Olympus Project. Iris (this site, the iOS app, the terminal) is the access layer; Apollo is what's underneath.",
+      "Continuously improves: I notice patterns I want to handle better, add them as skills or hooks, and the next iteration is smarter."
+    ],
+    "skills": [
+      "typescript",
+      "ai_integration",
+      "product_management",
+      "writing"
+    ],
+    "tech_stack": [
+      "TypeScript",
+      "Claude Code",
+      "Anthropic Claude API",
+      "Obsidian"
+    ],
+    "architecture": "Markdown vault, Claude Code search and routing, multi-agent dialectic engine, persistent Truth Store. Apollo is the intelligence layer; Iris (web, mobile, terminal) is the access layer.",
+    "tags": [
+      "AI",
+      "Philosophy",
+      "Olympus",
+      "Personal Infrastructure"
+    ],
+    "links": {
+      "github": "https://github.com/mikedouzinas/apollo-vault",
+      "image": "/Apollo.png"
+    },
+    "dates": {
+      "start": "2025-09"
+    }
+  },
+  {
+    "id": "proj_lantern",
+    "title": "The Lantern",
+    "aliases": [
+      "lantern",
+      "the lantern",
+      "principles",
+      "life rules",
+      "handbook",
+      "mike veson handbook"
+    ],
+    "summary": "A book I'm continuously adding to that names the things people in their late teens through mid-thirties are actually facing: relationships, social patterns, decision-making, traps that lead to unhappiness. Two halves: Rules (things to do or not do) and Theories (names for patterns worth recognizing). Inspired by How I Met Your Mother. Currently on Volume 2 published with Volume 3 in progress (kept intentionally small for now: distributed to about 20 people whose feedback shapes the next edition).",
+    "specifics": [
+      "Inspired by How I Met Your Mother and all the unspoken rules of life, from the bro code to the front porch test. Written informally for roughly the 16 to 35 range, the rough span where most of these patterns get learned the hard way.",
+      "Structure: two sections. Rules are things to do or not do based on lessons learned (Nothing Good Happens After 2 AM, The Front Porch Test). Theories are names for patterns and situations worth recognizing (Marshall Syndrome, The Sparkling Water Theory).",
+      "Released as distinct numbered volumes rather than incremental updates. Each volume is its own piece, written from scratch. Nothing stays in its original form across volumes. The intentional design: I can look back across editions and see how my own thinking has actually changed over time.",
+      "Currently on Volume 2 published, Volume 3 in progress. I've actually changed my opinion on a lot of what was in earlier volumes, and tracking that evolution has been one of the most useful parts of the project for me. The new edition is being guided by what I'd revise.",
+      "Distributed to over 20 friends across the world. They read it, share it, and give me feedback on what should change or be added. The feedback loop is what keeps it growing. It is meant to evolve.",
+      "Sample Rules: Nothing Good Happens After 2 AM (don't make big decisions in compromised states). The Front Porch Test (can you see yourself sitting on a porch with this person decades from now?). The Closed Case (when a situation is settled, accept and move on). The Platinum Rule (don't hook up with someone you see every day). Proportional Celebration (your reaction should match the outcome, not the idea of what it could become).",
+      "Sample Theories: Marshall Syndrome (the post-long-relationship phase where you drag your guy friends to brunch and farmers' markets). The Sparkling Water Theory (how good or bad something feels is shaped entirely by what you're used to and what you're comparing against). The Sunk Cost Theory (staying because of years invested, not because it's actually right). Dobler/Dahmer (a big romantic gesture works only if both people are into each other; otherwise it reads as serial-killer crazy). Givers, Takers, Users, and Matchers (Adam Grant's framework for who to keep close and who to cut).",
+      "First project of The Olympus Project and a more formalized, publishable companion to my List of Important Things, scoped specifically to the young person experience."
+    ],
+    "skills": [
+      "writing"
+    ],
+    "tech_stack": [],
+    "tags": [
+      "Writing",
+      "Philosophy",
+      "Olympus",
+      "Book"
+    ],
+    "links": {
+      "image": "/Lantern.png"
+    },
+    "dates": {
+      "start": "2025-08"
+    }
+  },
+  {
+    "id": "proj_portfolio",
+    "title": "mikeveson.com",
+    "summary": "A living personal site with Iris AI assistant, AI voice reading, a Spotify music timeline, a blog with inline Iris interactions, per-post soundtracks, and deep mode with hidden content. More than a portfolio.",
+    "aliases": [
+      "Iris",
+      "Iris assistant",
+      "mikeveson.com",
+      "the web",
+      "Mike's blog",
+      "portfolio"
+    ],
+    "specifics": [
+      "Iris AI Assistant: Named after the Greek messenger goddess. Powered by Claude Sonnet 4.6 with the full knowledge base passed in a prompt-cached system prompt \u2014 no embeddings or semantic search. Intent classification happens via a Claude tool call in a single API request. Config-driven quick actions suggest related items based on complexity, impact, and recency scores. Structured knowledge base with 851 skills, filters, and personal context. Iris now opens directly to the center console \u2014 no highlight-then-expand friction. Iris can also generate full summaries, TL;DRs, and draft comments or direct messages from any blog post.",
+      "The Web (Blog): Full blog system at /the-web with Supabase backend, full-text search, tag filtering, markdown rendering, spider-web hover reveal pattern. Green glass-type design consistent across Spotify and audio components. Per-post theming with custom accent colors.",
+      "AI Voice Reading: Every post on the blog reads back in a voice trained on Mike's voice using ElevenLabs. Supports Safari background audio on iPhone \u2014 leave the app and it keeps playing like a podcast player.",
+      "Per-Post Music Soundtrack: When Mike publishes a post, the site automatically curates the Spotify tracks he listened to while writing it and surfaces them alongside the post. Readers can get into his headspace through the music that accompanied the thinking.",
+      "Home Page Advertisement System: When a new blog post drops, an advertisement card fires automatically on the home page following the same visual design language as the rest of the site. Green design with webbed background.",
+      "New Logo: Designed with a graphic designer \u2014 a planet between two webs, in the same green as the site. Built for visual consistency across the blog and audio components.",
+      "Blog Iris Interactions: Readers can highlight any text on a blog post and open an Iris-powered conversation bubble. Iris responds using the post content and optional author context documents. Readers can then have Iris draft a comment or a direct message to Mike, making the writing feel like a conversation rather than a broadcast.",
+      "Spotify Music Timeline: Kleinberg burst detection algorithm on 4 years of Spotify listening data (53K+ plays). Identifies songs with abnormal replay frequency in compressed timeframes. Glassmorphic sidebar panel with progressive collapse, hover glow effect, and an expandable full timeline with month grouping and audio previews.",
+      "Deep Mode: Hidden layer triggered by clicking the profile photo. Reveals in-progress projects, blueprints, and the Spotify timeline. Animated green-blue border bars on viewport edges, profile ring gradient animation. Content sections fade in with staggered delays.",
+      "Ask Mike Inbox: Contact system where Iris can draft messages on behalf of visitors. Smart contact field auto-detects email vs phone. Honeypot spam detection, rate limiting, rich HTML email notifications via Resend.",
+      "Interactive UI: Global mouse glow effects, contained card glows with per-section colors, hover cards with rich previews, dark mode throughout, mobile-responsive with sheet-based navigation.",
+      "Production infrastructure: Redis caching (1hr TTL), IP-based rate limiting, Supabase PostgreSQL with RLS, Vercel deployment with cron jobs for Spotify data refresh, pre-computed importance rankings at build time."
+    ],
+    "skills": [
+      "api_integration",
+      "product_management",
+      "typescript",
+      "react",
+      "nextjs",
+      "tailwind_css",
+      "framer_motion",
+      "supabase",
+      "redis",
+      "nlp",
+      "machine_learning",
+      "writing",
+      "data_structures",
+      "signal_processing",
+      "sse",
+      "swift",
+      "voice_synthesis"
+    ],
+    "tech_stack": [
+      "Next.js 15",
+      "React 19",
+      "TypeScript",
+      "Tailwind CSS",
+      "Framer Motion",
+      "Anthropic Claude API (claude-sonnet-4-6)",
+      "ElevenLabs",
+      "Supabase",
+      "Upstash Redis",
+      "Resend",
+      "Twilio",
+      "Spotify API",
+      "Web Audio API"
+    ],
+    "architecture": "Next.js 15 App Router with server/client component split. Iris: full KB serialized into a prompt-cached system prompt, single-pass Claude Sonnet 4.6 call with tool-based intent classification and streaming response. Blog: Supabase-backed with full-text search, inline Iris conversations, and AI voice via ElevenLabs. Spotify: offline Kleinberg analysis + per-post soundtrack curation. Deep mode: React Context + localStorage persistence.",
+    "tags": [
+      "Web",
+      "AI",
+      "Full-Stack",
+      "Iris",
+      "Blog",
+      "Music",
+      "Voice"
+    ],
+    "links": {
+      "github": "https://github.com/mikedouzinas/mikedouz-portfolio",
+      "live": "https://mikeveson.com",
+      "image": "/Portfolio.png"
+    },
+    "dates": {
+      "start": "2025-02"
+    }
+  },
+  {
     "id": "proj_hilite",
     "title": "HiLiTe",
     "summary": "A machine learning pipeline that turns full-length soccer matches into highlight reels with AI-generated commentary in minutes.",
@@ -13,10 +266,30 @@
       "Built an interactive Streamlit demo for testing and showcasing the system",
       "Combined computer vision, NLP, and deep learning into one end-to-end pipeline"
     ],
-    "skills": ["python", "opencv", "pytorch", "computer_vision", "deep_learning", "machine_learning", "sentence_transformers", "nlp", "streamlit"],
-    "tech_stack": ["Python", "OpenCV", "PyTorch", "Vision–Language methods"],
-    "architecture": "Video ingestion → moment scoring → vision features → (VLM-based) narration → timeline assembly/export",
-    "tags": ["AI", "Computer Vision", "Multimodal", "Sports Analytics"],
+    "skills": [
+      "python",
+      "opencv",
+      "pytorch",
+      "computer_vision",
+      "deep_learning",
+      "machine_learning",
+      "sentence_transformers",
+      "nlp",
+      "streamlit"
+    ],
+    "tech_stack": [
+      "Python",
+      "OpenCV",
+      "PyTorch",
+      "Vision\u2013Language methods"
+    ],
+    "architecture": "Video ingestion \u2192 moment scoring \u2192 vision features \u2192 (VLM-based) narration \u2192 timeline assembly/export",
+    "tags": [
+      "AI",
+      "Computer Vision",
+      "Multimodal",
+      "Sports Analytics"
+    ],
     "links": {
       "github": "https://github.com/mikedouzinas/HiLiTe.git",
       "demo": "https://drive.google.com/drive/folders/1RbYaJtlQUq2LSUwuK25WHB8cJdrdIkr8?usp=sharing",
@@ -28,42 +301,14 @@
     }
   },
   {
-    "id": "proj_portfolio",
-    "title": "mikeveson.com",
-    "summary": "A living personal site with Iris AI assistant, AI voice reading, a Spotify music timeline, a blog with inline Iris interactions, per-post soundtracks, and deep mode with hidden content. More than a portfolio.",
-    "aliases": ["Iris", "Iris assistant", "mikeveson.com", "the web", "Mike's blog", "portfolio"],
-    "specifics": [
-      "Iris AI Assistant: Named after the Greek messenger goddess. Powered by Claude Sonnet 4.6 with the full knowledge base passed in a prompt-cached system prompt — no embeddings or semantic search. Intent classification happens via a Claude tool call in a single API request. Config-driven quick actions suggest related items based on complexity, impact, and recency scores. Structured knowledge base with 851 skills, filters, and personal context. Iris now opens directly to the center console — no highlight-then-expand friction. Iris can also generate full summaries, TL;DRs, and draft comments or direct messages from any blog post.",
-      "The Web (Blog): Full blog system at /the-web with Supabase backend, full-text search, tag filtering, markdown rendering, spider-web hover reveal pattern. Green glass-type design consistent across Spotify and audio components. Per-post theming with custom accent colors.",
-      "AI Voice Reading: Every post on the blog reads back in a voice trained on Mike's voice using ElevenLabs. Supports Safari background audio on iPhone — leave the app and it keeps playing like a podcast player.",
-      "Per-Post Music Soundtrack: When Mike publishes a post, the site automatically curates the Spotify tracks he listened to while writing it and surfaces them alongside the post. Readers can get into his headspace through the music that accompanied the thinking.",
-      "Home Page Advertisement System: When a new blog post drops, an advertisement card fires automatically on the home page following the same visual design language as the rest of the site. Green design with webbed background.",
-      "New Logo: Designed with a graphic designer — a planet between two webs, in the same green as the site. Built for visual consistency across the blog and audio components.",
-      "Blog Iris Interactions: Readers can highlight any text on a blog post and open an Iris-powered conversation bubble. Iris responds using the post content and optional author context documents. Readers can then have Iris draft a comment or a direct message to Mike, making the writing feel like a conversation rather than a broadcast.",
-      "Spotify Music Timeline: Kleinberg burst detection algorithm on 4 years of Spotify listening data (53K+ plays). Identifies songs with abnormal replay frequency in compressed timeframes. Glassmorphic sidebar panel with progressive collapse, hover glow effect, and an expandable full timeline with month grouping and audio previews.",
-      "Deep Mode: Hidden layer triggered by clicking the profile photo. Reveals in-progress projects, blueprints, and the Spotify timeline. Animated green-blue border bars on viewport edges, profile ring gradient animation. Content sections fade in with staggered delays.",
-      "Ask Mike Inbox: Contact system where Iris can draft messages on behalf of visitors. Smart contact field auto-detects email vs phone. Honeypot spam detection, rate limiting, rich HTML email notifications via Resend.",
-      "Interactive UI: Global mouse glow effects, contained card glows with per-section colors, hover cards with rich previews, dark mode throughout, mobile-responsive with sheet-based navigation.",
-      "Production infrastructure: Redis caching (1hr TTL), IP-based rate limiting, Supabase PostgreSQL with RLS, Vercel deployment with cron jobs for Spotify data refresh, pre-computed importance rankings at build time."
-    ],
-    "skills": ["api_integration", "product_management", "typescript", "react", "nextjs", "tailwind_css", "framer_motion", "supabase", "redis", "nlp", "machine_learning", "writing", "data_structures", "signal_processing", "sse", "swift", "voice_synthesis"],
-    "tech_stack": ["Next.js 15", "React 19", "TypeScript", "Tailwind CSS", "Framer Motion", "Anthropic Claude API (claude-sonnet-4-6)", "ElevenLabs", "Supabase", "Upstash Redis", "Resend", "Twilio", "Spotify API", "Web Audio API"],
-    "architecture": "Next.js 15 App Router with server/client component split. Iris: full KB serialized into a prompt-cached system prompt, single-pass Claude Sonnet 4.6 call with tool-based intent classification and streaming response. Blog: Supabase-backed with full-text search, inline Iris conversations, and AI voice via ElevenLabs. Spotify: offline Kleinberg analysis + per-post soundtrack curation. Deep mode: React Context + localStorage persistence.",
-    "tags": ["Web", "AI", "Full-Stack", "Iris", "Blog", "Music", "Voice"],
-    "links": {
-      "github": "https://github.com/mikedouzinas/mikedouz-portfolio",
-      "live": "https://mikeveson.com",
-      "image": "/Portfolio.png"
-    },
-    "dates": {
-      "start": "2025-02"
-    }
-  },
-  {
     "id": "proj_euros",
     "title": "Euro Predictor",
     "summary": "Predicted Euro 2024 outcomes by scraping data and training ML models. Reached top 3% in UEFA's prediction game.",
-    "aliases": ["Euros", "UEFA European Football Championship", "euro 2024"],
+    "aliases": [
+      "Euros",
+      "UEFA European Football Championship",
+      "euro 2024"
+    ],
     "specifics": [
       "My friends and I were competing with one another about the UEFA European Football Championship in 2024, so I built this to help me out.",
       "Built web scrapers to collect fixtures, team stats, and historical form data",
@@ -73,10 +318,28 @@
       "Ran error analysis and calibration to understand where the model was breaking down",
       "Top 3% finish validated the approach against thousands of other predictors (and won my fantasy league)"
     ],
-    "skills": ["python", "pandas", "numpy", "scikit_learn", "data_mining", "model_evaluation", "machine_learning", "statistics"],
-    "tech_stack": ["Python", "Pandas", "NumPy", "scikit-learn"],
-    "architecture": "Scraper → feature store (CSV/Parquet) → model training (RF) → inference/evaluation notebooks",
-    "tags": ["ML", "Sports Analytics", "Classical ML"],
+    "skills": [
+      "python",
+      "pandas",
+      "numpy",
+      "scikit_learn",
+      "data_mining",
+      "model_evaluation",
+      "machine_learning",
+      "statistics"
+    ],
+    "tech_stack": [
+      "Python",
+      "Pandas",
+      "NumPy",
+      "scikit-learn"
+    ],
+    "architecture": "Scraper \u2192 feature store (CSV/Parquet) \u2192 model training (RF) \u2192 inference/evaluation notebooks",
+    "tags": [
+      "ML",
+      "Sports Analytics",
+      "Classical ML"
+    ],
     "links": {
       "github": "https://github.com/mikedouzinas/euros-predictor",
       "image": "/Euros.png"
@@ -98,10 +361,24 @@
       "Built entirely in SwiftUI with AVFoundation for audio capture",
       "Ran TestFlight feedback cycles and iterated based on what users actually needed"
     ],
-    "skills": ["nlp", "ai_integration", "product_management", "swift", "api_integration"],
-    "tech_stack": ["SwiftUI", "AVFoundation", "OpenAI API"],
-    "architecture": "Audio capture → ASR → intent (LLM) → action execution → TTS playback; reactive state with SwiftUI",
-    "tags": ["iOS", "Voice", "Assistant"],
+    "skills": [
+      "nlp",
+      "ai_integration",
+      "product_management",
+      "swift",
+      "api_integration"
+    ],
+    "tech_stack": [
+      "SwiftUI",
+      "AVFoundation",
+      "OpenAI API"
+    ],
+    "architecture": "Audio capture \u2192 ASR \u2192 intent (LLM) \u2192 action execution \u2192 TTS playback; reactive state with SwiftUI",
+    "tags": [
+      "iOS",
+      "Voice",
+      "Assistant"
+    ],
     "links": {
       "github": "https://github.com/mikedouzinas/momentum",
       "image": "/Momentum.png"
@@ -126,10 +403,22 @@
       "Became widely adopted across the school and maintained a 4.9 star rating",
       "Created and taught a Knight Life team (Calavrian LLC) to work in Swift and take over from me after I left; app is still used and updated with over 80% of the school as daily active users"
     ],
-    "skills": ["swift", "firebase", "product_management", "leadership", "api_integration"],
-    "tech_stack": ["Swift", "Firebase"],
+    "skills": [
+      "swift",
+      "firebase",
+      "product_management",
+      "leadership",
+      "api_integration"
+    ],
+    "tech_stack": [
+      "Swift",
+      "Firebase"
+    ],
     "architecture": "Native iOS app with Firebase backend for sync/messaging; notification scheduling and offline-first caching",
-    "tags": ["iOS", "Product"],
+    "tags": [
+      "iOS",
+      "Product"
+    ],
     "links": {
       "github": "https://github.com/mikedouzinas/BBN-Knight-Life",
       "app_store": "https://apps.apple.com/us/app/bb-ns-knight-life/id1585503654",
@@ -138,105 +427,6 @@
     "dates": {
       "start": "2021-09",
       "end": "2023-06"
-    }
-  },
-  {
-    "id": "proj_apollo",
-    "title": "Apollo Terminal",
-    "aliases": ["apollo", "apollo terminal", "dialectic engine", "the vault", "apollo vault"],
-    "summary": "Apollo is the AI that helps me know myself. I use an Obsidian vault for everything from classwork to writing my philosophy book, and Apollo searches for the relevant context when I bring something up. The advantage is I can bring up things I might not be comfortable discussing with anyone in my life and get unbiased, understanding advice within the full context of my life.",
-    "specifics": [
-      "Solves the AI context problem: using Claude Code, Apollo searches my vault for relevant context so every conversation has the full picture of my life, not just what I said in the last five minutes.",
-      "I use markdown files for everything. Classes, philosophy, relationships, self-observations. It's crucial to understand my classwork within the context of my life and it helps me ideate so much more.",
-      "Built-in features: dialectic engine (multi-agent philosophical reasoning), weekly synthesis, self-updating prompting to help the user the most.",
-      "Available on GitHub for anyone to use. I'm very cautious about how much autonomy to give AI systems, which is why it's completely opt-in.",
-      "The dialectic engine runs four agents in sequence: Proposer, Challenger, Arbiter, Axiom Checker. Builds a persistent Truth Store of verified beliefs.",
-      "Background processing: daily vault scans, weekly pattern analysis. Apollo doesn't just wait for questions.",
-      "Core product of The Olympus Project. Iris (the assistant interface, including the one you're talking to on this site) is the access layer; Apollo is the intelligence."
-    ],
-    "skills": ["typescript", "ai_integration", "product_management", "writing"],
-    "tech_stack": ["TypeScript", "Claude Code", "Anthropic Claude API", "Obsidian"],
-    "architecture": "Markdown vault, Claude Code search and routing, multi-agent dialectic engine, persistent Truth Store. Apollo is the intelligence layer; Iris (web, mobile, terminal) is the access layer.",
-    "tags": ["AI", "Philosophy", "Olympus", "Personal Infrastructure"],
-    "links": {
-      "github": "https://github.com/mikedouzinas/apollo-vault",
-      "image": "/Apollo.png"
-    },
-    "dates": {
-      "start": "2025-09"
-    }
-  },
-  {
-    "id": "proj_iris_mobile",
-    "title": "Iris Mobile",
-    "aliases": ["iris", "iris app", "iris mobile", "thinking partner app"],
-    "summary": "A native iOS thinking partner that connects to my Apollo vault on the go. If I have an idea on a walk or want to check my notes anywhere, it's there. Same intelligence as Apollo Terminal, just in my pocket.",
-    "specifics": [
-      "SwiftUI mobile app connected to the same Apollo vault structure. Everything in my Obsidian vault accessible on the go.",
-      "Named after the Greek messenger goddess who's universally accessible to message. Fitting because Iris is meant to be everywhere: terminal, mobile, web, voice.",
-      "I use it with Wispr Flow because voice-first has been the best way to get my thoughts out as fast as possible no matter where I am.",
-      "Not a chatbot, not a companion. A thinking partner that knows your patterns and challenges your assumptions.",
-      "The Iris on mikeveson.com is another form of the same universal assistant. This one helps others get to know me. The Apollo vault is what keeps the site KB updated.",
-      "Built as a Swift port of Claude Code, with background audio support for vault files."
-    ],
-    "skills": ["swift", "ai_integration", "typescript", "product_management"],
-    "tech_stack": ["Swift", "SwiftUI", "Claude Code (forked)", "Anthropic API"],
-    "architecture": "Native iOS app over a forked Claude Code core. Connects to the same vault Apollo Terminal uses. Voice-first input via Wispr Flow.",
-    "tags": ["iOS", "AI", "Mobile", "Olympus"],
-    "links": {
-      "image": "/IrisMobile.png"
-    },
-    "dates": {
-      "start": "2025-12"
-    }
-  },
-  {
-    "id": "proj_apollo_freewrite",
-    "title": "Apollo x freewrite",
-    "aliases": ["apollo freewrite", "freewrite", "writing system", "apollo x freewrite"],
-    "summary": "A fork of freewrite by Farza, a minimalist writing platform with a timer, ambient video, and distraction-free UI, extended with Apollo, my personal knowledge layer. Turns a single writing session into a complete thinking environment.",
-    "specifics": [
-      "Built on top of freewrite by Farza (farzaa/freewrite), a writing tool designed to get thoughts out fast, with a timer, ambient video background, and a minimal UI that gets out of your way.",
-      "Added an in-platform AI chat using the forked Claude Code repository, so you can think and converse without leaving the writing environment.",
-      "Added an AI processor that connects to a vault of the user's choosing. Defaults to an LLM wiki-style connector that ingests and organizes what you write.",
-      "Added a Process button that sends the session directly to the vault via Claude Code. No steps between writing something and having it captured where it belongs.",
-      "Supports multiple sessions open simultaneously. Different topics stay genuinely separate, with each processed independently into the vault.",
-      "The result is a single environment for freewriting, AI conversation, and filing."
-    ],
-    "skills": ["ai_integration", "writing", "swift", "product_management"],
-    "tech_stack": ["Swift", "Claude Code (forked)", "Anthropic API"],
-    "tags": ["Writing", "AI", "Olympus"],
-    "links": {
-      "github": "https://github.com/mikedouzinas/apollo",
-      "image": "/ApolloFreewrite.png"
-    },
-    "dates": {
-      "start": "2026-01"
-    }
-  },
-  {
-    "id": "proj_lantern",
-    "title": "The Lantern",
-    "aliases": ["lantern", "the lantern", "principles", "life rules", "handbook", "mike veson handbook"],
-    "summary": "A living book that names the things people in their late teens through mid-thirties are actually facing: relationships, social patterns, decision-making, traps that lead to unhappiness. Two halves: Rules (things to do or not do, based on lessons learned) and Theories (names for situations and patterns worth being aware of, for your own sake). Inspired by How I Met Your Mother. Not meant to be taken too seriously: it's a guide, not a law. Currently on Volume 2 published, with Volume 3 in progress.",
-    "specifics": [
-      "Inspired by How I Met Your Mother and all the unspoken rules of life, from the bro code to the front porch test. Written informally for roughly the 16 to 35 range, the rough span where most of these patterns get learned the hard way.",
-      "Structure: two sections. Rules are things to do or not do based on lessons learned (Nothing Good Happens After 2 AM, The Front Porch Test). Theories are names for patterns and situations worth recognizing (Marshall Syndrome, The Sparkling Water Theory).",
-      "Released as distinct numbered volumes rather than incremental updates. Each volume is its own piece, written from scratch. Nothing stays in its original form across volumes. The intentional design: I can look back across editions and see how my own thinking has actually changed over time.",
-      "Currently on Volume 2 published, Volume 3 in progress. I've actually changed my opinion on a lot of what was in earlier volumes, and tracking that evolution has been one of the most useful parts of the project for me. The new edition is being guided by what I'd revise.",
-      "Distributed to over 20 friends across the world. They read it, share it, and give me feedback on what should change or be added. The feedback loop is what keeps it growing. It is meant to evolve.",
-      "Sample Rules: Nothing Good Happens After 2 AM (don't make big decisions in compromised states). The Front Porch Test (can you see yourself sitting on a porch with this person decades from now?). The Closed Case (when a situation is settled, accept and move on). The Platinum Rule (don't hook up with someone you see every day). Proportional Celebration (your reaction should match the outcome, not the idea of what it could become).",
-      "Sample Theories: Marshall Syndrome (the post-long-relationship phase where you drag your guy friends to brunch and farmers' markets). The Sparkling Water Theory (how good or bad something feels is shaped entirely by what you're used to and what you're comparing against). The Sunk Cost Theory (staying because of years invested, not because it's actually right). Dobler/Dahmer (a big romantic gesture works only if both people are into each other; otherwise it reads as serial-killer crazy). Givers, Takers, Users, and Matchers (Adam Grant's framework for who to keep close and who to cut).",
-      "First project of The Olympus Project and a more formalized, publishable companion to my List of Important Things, scoped specifically to the young person experience."
-    ],
-    "skills": ["writing"],
-    "tech_stack": [],
-    "tags": ["Writing", "Philosophy", "Olympus", "Book"],
-    "links": {
-      "image": "/Lantern.png"
-    },
-    "dates": {
-      "start": "2025-08"
     }
   }
 ]

@@ -143,7 +143,14 @@ export function computeProjectImportance(project: ProjectT): number {
 
   // Normalize to 0-100
   // Max possible: 60 + 25 + 10 + 12 + 12 + 12 + 5 + 25 + 10 + 10 = 181
-  return Math.min(Math.round((rawScore / 181) * 100), 100);
+  const baseScore = Math.min(Math.round((rawScore / 181) * 100), 100);
+
+  // Olympus boost: current work (Apollo, Iris Mobile, Apollo x freewrite, Lantern, etc.)
+  // gets ranked above pre-Olympus dev work. The ranking formula favors ML complexity,
+  // which under-weights writing, philosophy, and AI-product work that defines current Mike.
+  const isOlympusWork = (project.tags || []).some(t => t.toLowerCase() === 'olympus');
+  const olympusBoost = isOlympusWork ? 45 : 0;
+  return Math.min(baseScore + olympusBoost, 100);
 }
 
 /**
@@ -174,7 +181,16 @@ export function computeExperienceImportance(exp: ExperienceT): number {
 
   // Normalize to 0-100
   // Max possible: 50 + 15 + 25 + 15 + 30 = 135
-  return Math.min(Math.round((rawScore / 135) * 100), 100);
+  const baseScore = Math.min(Math.round((rawScore / 135) * 100), 100);
+
+  // Ongoing / founder boost: current roles (no end date, "Founder", or tagged "current")
+  // should rank above completed past experiences regardless of how they score on the
+  // internship-oriented dimensions (return offers, quantified outcomes, etc.).
+  const isOngoing = !exp.dates.end;
+  const isFounder = /founder|founding|creator/i.test(exp.role);
+  const isCurrentTag = (exp.tags || []).some(t => t.toLowerCase() === 'current');
+  const currentRoleBoost = (isOngoing || isFounder || isCurrentTag) ? 40 : 0;
+  return Math.min(baseScore + currentRoleBoost, 100);
 }
 
 /**

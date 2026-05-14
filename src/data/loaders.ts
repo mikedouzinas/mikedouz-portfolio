@@ -173,18 +173,33 @@ function formatDateRange(dates: { start: string; end?: string }): string {
   const startMonth = startDate.toLocaleString("en-US", { month: "short", timeZone: "UTC" }).toUpperCase();
   const startYear = startDate.getUTCFullYear();
 
+  // Compute year-month values for range comparisons
+  const now = new Date();
+  const nowYearMonth = now.getFullYear() * 12 + now.getMonth();
+  const startYearMonth = startDate.getUTCFullYear() * 12 + startDate.getUTCMonth();
+  const isStarted = startYearMonth <= nowYearMonth;
+
   if (dates.end) {
     const endDate = new Date(dates.end + "-01");
     const endMonth = endDate.toLocaleString("en-US", { month: "short", timeZone: "UTC" }).toUpperCase();
     const endYear = endDate.getUTCFullYear();
-    
+    const endYearMonth = endDate.getUTCFullYear() * 12 + endDate.getUTCMonth();
+
+    // If we're currently within the start/end window (started but end month is still
+    // in the future), show "PRESENT" instead of the end month. Once we reach the end
+    // month itself, switch to the final form.
+    const isOngoing = isStarted && endYearMonth > nowYearMonth;
+    if (isOngoing) {
+      return `${startMonth} ${startYear} - PRESENT`;
+    }
+
     // If same year, show "MAY - AUG 2024", otherwise "MAY 2024 - AUG 2025"
     if (startYear === endYear) {
       return `${startMonth} - ${endMonth} ${startYear}`;
     }
     return `${startMonth} ${startYear} - ${endMonth} ${endYear}`;
   }
-  
+
   // No end date means it's current/ongoing
   return `${startMonth} ${startYear} - PRESENT`;
 }

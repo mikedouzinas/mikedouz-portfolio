@@ -32,6 +32,42 @@
     ]
   },
   {
+    "id": "exp_olympus_founder",
+    "company": "The Olympus Project",
+    "role": "Founder",
+    "aliases": [
+      "olympus",
+      "project olympus",
+      "the olympus project",
+      "founder"
+    ],
+    "dates": {
+      "start": "2025-10"
+    },
+    "summary": "Building a project dedicated to helping people flourish by translating the pursuit of self-knowledge across every medium that can reach them. Technology in the service of human flourishing, not human attention in the service of technology.",
+    "specifics": [
+      "Core belief: flourishing comes from knowing yourself. Not from a checklist, not from prescribed categories, but from the ongoing work of self-examination. Olympus exists to help people do that work and translate what it reveals across mediums that reach different people.",
+      "Method: indirect transmission. Show patterns so vividly that people recognize themselves, discover the insight, and change from internal conviction. Not lectures. Not prescriptions. Recognition.",
+      "Current channels: Apollo (AI for self-knowledge, the core product), Iris (universal access layer across terminal, mobile, and web), The Web (blog and public writing), The Lantern (life principles for 16 to 35 year olds), a movie trilogy in development, The Tree of Human Flourishing (philosophy book), List of Important Things.",
+      "Collaboration model: I'm the researcher, thinker, connector, and producer. Each channel is best executed through collaboration with people and companies best positioned to make it excellent. The goal is to work WITH Anthropic for AI, WITH a studio for film, not to build everything in-house.",
+      "Business structure intention: B Corp or Public Benefit Corporation. Mission-protected. I never want to have to choose between my mission and profit."
+    ],
+    "skills": [
+      "product_management",
+      "leadership",
+      "writing",
+      "ai_integration"
+    ],
+    "links": {},
+    "tags": [
+      "founder",
+      "ai",
+      "philosophy",
+      "olympus",
+      "current"
+    ]
+  },
+  {
     "id": "exp_parsons_2025",
     "company": "Parsons",
     "role": "Software Engineer Intern",
@@ -66,44 +102,6 @@
       "data-integration",
       "analytics",
       "gov"
-    ]
-  },
-  {
-    "id": "exp_lilie_2024",
-    "company": "Liu Idea Lab for Innovation & Entrepreneurship (Rice)",
-    "role": "Software Engineer in Residence",
-    "dates": {
-      "start": "2024-02",
-      "end": "2024-11"
-    },
-    "summary": "Embedded in Rice's startup ecosystem doing user research, prototyping, and helping shape what the entrepreneurship program could become.",
-    "aliases": [
-      "Lilie",
-      "Liu Idea Lab",
-      "Rice Lilie"
-    ],
-    "specifics": [
-      "Conducted 40+ interviews with student founders and faculty to identify gaps in the program",
-      "Met weekly with 30+ startup teams to understand their technical and operational challenges",
-      "Took the entrepreneurship classes myself to understand the student experience firsthand",
-      "Built full stack prototypes in React, TypeScript, and Supabase for course management and venture tracking tools",
-      "Collaborated with professors to design software-focused entrepreneurship coursework",
-      "Provided insights to faculty on curriculum improvements based on what I was hearing from teams"
-    ],
-    "skills": [
-      "typescript",
-      "react",
-      "supabase",
-      "product_management"
-    ],
-    "links": {
-      "company": "https://entrepreneurship.rice.edu/"
-    },
-    "tags": [
-      "platform",
-      "product",
-      "full-stack",
-      "edtech"
     ]
   },
   {
@@ -188,6 +186,44 @@
     ]
   },
   {
+    "id": "exp_lilie_2024",
+    "company": "Liu Idea Lab for Innovation & Entrepreneurship (Rice)",
+    "role": "Software Engineer in Residence",
+    "dates": {
+      "start": "2024-02",
+      "end": "2024-11"
+    },
+    "summary": "Embedded in Rice's startup ecosystem doing user research, prototyping, and helping shape what the entrepreneurship program could become.",
+    "aliases": [
+      "Lilie",
+      "Liu Idea Lab",
+      "Rice Lilie"
+    ],
+    "specifics": [
+      "Conducted 40+ interviews with student founders and faculty to identify gaps in the program",
+      "Met weekly with 30+ startup teams to understand their technical and operational challenges",
+      "Took the entrepreneurship classes myself to understand the student experience firsthand",
+      "Built full stack prototypes in React, TypeScript, and Supabase for course management and venture tracking tools",
+      "Collaborated with professors to design software-focused entrepreneurship coursework",
+      "Provided insights to faculty on curriculum improvements based on what I was hearing from teams"
+    ],
+    "skills": [
+      "typescript",
+      "react",
+      "supabase",
+      "product_management"
+    ],
+    "links": {
+      "company": "https://entrepreneurship.rice.edu/"
+    },
+    "tags": [
+      "platform",
+      "product",
+      "full-stack",
+      "edtech"
+    ]
+  },
+  {
     "id": "exp_veson_mobile_2021_2023",
     "company": "Veson Nautical",
     "role": "Software Development Intern (Mobile)",
@@ -222,42 +258,6 @@
       "ios",
       "mobile",
       "enterprise"
-    ]
-  },
-  {
-    "id": "exp_olympus_founder",
-    "company": "The Olympus Project",
-    "role": "Founder",
-    "aliases": [
-      "olympus",
-      "project olympus",
-      "the olympus project",
-      "founder"
-    ],
-    "dates": {
-      "start": "2025-10"
-    },
-    "summary": "Building a project dedicated to helping people flourish by translating the pursuit of self-knowledge across every medium that can reach them. Technology in the service of human flourishing, not human attention in the service of technology.",
-    "specifics": [
-      "Core belief: flourishing comes from knowing yourself. Not from a checklist, not from prescribed categories, but from the ongoing work of self-examination. Olympus exists to help people do that work and translate what it reveals across mediums that reach different people.",
-      "Method: indirect transmission. Show patterns so vividly that people recognize themselves, discover the insight, and change from internal conviction. Not lectures. Not prescriptions. Recognition.",
-      "Current channels: Apollo (AI for self-knowledge, the core product), Iris (universal access layer across terminal, mobile, and web), The Web (blog and public writing), The Lantern (life principles for 16 to 35 year olds), a movie trilogy in development, The Tree of Human Flourishing (philosophy book), List of Important Things.",
-      "Collaboration model: I'm the researcher, thinker, connector, and producer. Each channel is best executed through collaboration with people and companies best positioned to make it excellent. The goal is to work WITH Anthropic for AI, WITH a studio for film, not to build everything in-house.",
-      "Business structure intention: B Corp or Public Benefit Corporation. Mission-protected. I never want to have to choose between my mission and profit."
-    ],
-    "skills": [
-      "product_management",
-      "leadership",
-      "writing",
-      "ai_integration"
-    ],
-    "links": {},
-    "tags": [
-      "founder",
-      "ai",
-      "philosophy",
-      "olympus",
-      "current"
     ]
   }
 ]

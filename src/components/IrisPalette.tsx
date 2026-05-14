@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { useDeepMode } from './DeepModeContext';
-import { SiCalendly } from 'react-icons/si';
+import { SiGooglemeet } from 'react-icons/si';
 import { getSignalSummary } from '@/lib/iris/signals';
 import { useRouter } from 'next/navigation';
 import {
@@ -301,7 +301,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               } else if (isGitHub) {
                 iconElement = <FaGithub className="w-3.5 h-3.5 inline mr-1.5" />;
               } else if (isCalendar) {
-                iconElement = <SiCalendly className="w-3.5 h-3.5 inline mr-1.5" />;
+                iconElement = <SiGooglemeet className="w-3.5 h-3.5 inline mr-1.5" />;
               } else {
                 iconElement = <ExternalLink className="w-3 h-3 inline ml-1" />;
               }
