@@ -96,14 +96,14 @@
       "the vault",
       "claudesidian"
     ],
-    "summary": "The system I use and build everything from. A claudesidian-style vault (built on the open-source claudesidian project by Noah Brier / Alephic) that combines Claude Code with careful prompting to help me learn and know myself, organize everything in my life, and get almost all of my work done. Public on GitHub for anyone else to use. Continuously improves as I use it.",
+    "summary": "The system I use and build everything from. A claudesidian-style vault (built on the open-source claudesidian project by Noah Brier / Alephic) that combines Claude Code with careful prompting to help me learn and know myself, organize everything in my life, and remove the frictional barriers to getting things done. Continuously improves as I use it. Public to download if you want to try!",
     "specifics": [
       "Built on claudesidian by Noah Brier at Alephic (github.com/heyitsnoah/claudesidian). Apollo is my personalized fork plus added structure for The Olympus Project.",
       "Single Obsidian vault holds everything: classes, philosophy, relationships, self-observations, drafts, project plans. Claude Code reads, writes, and routes inside it via prompting.",
       "Solves the AI context problem: every conversation has the full picture of my life, not just what I said in the last five minutes. I can bring up things I might not say to anyone and get unbiased, understanding advice within the full context of who I am.",
       "Self-maintaining CLAUDE.md: the config grows with the vault. When Claude creates a file I'll need again, it adds the path. When I ask about something repeatedly, it suggests a shortcut.",
       "Daily and weekly reviews, ingest pipelines for outside material, and a research-assistant pattern that turns conversations into compounding knowledge.",
-      "Public on GitHub at mikedouzinas/apollo-vault. Designed to install in one shell command and onboard via /init-bootstrap, which builds the CLAUDE.md interactively by learning how the user actually works.",
+      "Public on GitHub at mikedouzinas/apollo-vault. Designed to install in one shell command and onboard via /init-bootstrap, which builds the CLAUDE.md interactively by learning how the user works.",
       "Core intelligence layer of The Olympus Project. Iris (this site, the iOS app, the terminal) is the access layer; Apollo is what's underneath.",
       "Continuously improves: I notice patterns I want to handle better, add them as skills or hooks, and the next iteration is smarter."
     ],
@@ -145,16 +145,17 @@
       "handbook",
       "mike veson handbook"
     ],
-    "summary": "A book I'm continuously adding to that names the things people in their late teens through mid-thirties are actually facing: relationships, social patterns, decision-making, traps that lead to unhappiness. Two halves: Rules (things to do or not do) and Theories (names for patterns worth recognizing). Inspired by How I Met Your Mother. Currently on Volume 2 published with Volume 3 in progress (kept intentionally small for now: distributed to about 20 people whose feedback shapes the next edition).",
+    "summary": "A book inspired by How I Met Your Mother that names the patterns people face from their late teens to mid-thirties: relationships, decisions, traps. Split into Rules and Theories. Volume 2 published, Volume 3 in progress; distributed to ~20 readers whose feedback shapes each edition.",
     "specifics": [
       "Inspired by How I Met Your Mother and all the unspoken rules of life, from the bro code to the front porch test. Written informally for roughly the 16 to 35 range, the rough span where most of these patterns get learned the hard way.",
       "Structure: two sections. Rules are things to do or not do based on lessons learned (Nothing Good Happens After 2 AM, The Front Porch Test). Theories are names for patterns and situations worth recognizing (Marshall Syndrome, The Sparkling Water Theory).",
-      "Released as distinct numbered volumes rather than incremental updates. Each volume is its own piece, written from scratch. Nothing stays in its original form across volumes. The intentional design: I can look back across editions and see how my own thinking has actually changed over time.",
-      "Currently on Volume 2 published, Volume 3 in progress. I've actually changed my opinion on a lot of what was in earlier volumes, and tracking that evolution has been one of the most useful parts of the project for me. The new edition is being guided by what I'd revise.",
+      "Released as distinct numbered volumes rather than incremental updates. Each volume is its own piece, written from scratch. Nothing stays in its original form across volumes. The intentional design: I can look back across editions and see how my own thinking has changed over time.",
+      "Currently on Volume 2 published, Volume 3 in progress. I've changed my opinion on a lot of what was in earlier volumes, and tracking that evolution has been one of the most useful parts of the project for me. The new edition is being guided by what I'd revise.",
       "Distributed to over 20 friends across the world. They read it, share it, and give me feedback on what should change or be added. The feedback loop is what keeps it growing. It is meant to evolve.",
       "Sample Rules: Nothing Good Happens After 2 AM (don't make big decisions in compromised states). The Front Porch Test (can you see yourself sitting on a porch with this person decades from now?). The Closed Case (when a situation is settled, accept and move on). The Platinum Rule (don't hook up with someone you see every day). Proportional Celebration (your reaction should match the outcome, not the idea of what it could become).",
       "Sample Theories: Marshall Syndrome (the post-long-relationship phase where you drag your guy friends to brunch and farmers' markets). The Sparkling Water Theory (how good or bad something feels is shaped entirely by what you're used to and what you're comparing against). The Sunk Cost Theory (staying because of years invested, not because it's actually right). Dobler/Dahmer (a big romantic gesture works only if both people are into each other; otherwise it reads as serial-killer crazy). Givers, Takers, Users, and Matchers (Adam Grant's framework for who to keep close and who to cut).",
-      "First project of The Olympus Project and a more formalized, publishable companion to my List of Important Things, scoped specifically to the young person experience."
+      "First project of The Olympus Project, scoped specifically to the young person experience.",
+      "While Mike isn't selling this, if you send him a message he's happy to send a copy to anyone who requests it."
     ],
     "skills": [
       "writing"
@@ -312,7 +313,7 @@
     "specifics": [
       "My friends and I were competing with one another about the UEFA European Football Championship in 2024, so I built this to help me out.",
       "Built web scrapers to collect fixtures, team stats, and historical form data",
-      "Engineered features using Pandas and NumPy to capture what actually predicted match outcomes",
+      "Engineered features using Pandas and NumPy to capture what predicted match outcomes",
       "Trained Random Forest classifiers with cross-validation and hyperparameter tuning",
       "Produced expected goals style predictions and discrete scoreline forecasts",
       "Ran error analysis and calibration to understand where the model was breaking down",
@@ -359,7 +360,7 @@
       "Implemented low latency text to speech with interruption handling so the app feels responsive",
       "Designed the UX around privacy and minimal friction",
       "Built entirely in SwiftUI with AVFoundation for audio capture",
-      "Ran TestFlight feedback cycles and iterated based on what users actually needed"
+      "Ran TestFlight feedback cycles and iterated based on what users needed"
     ],
     "skills": [
       "nlp",

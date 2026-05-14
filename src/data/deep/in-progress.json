@@ -4,7 +4,7 @@
     "title": "Rankd",
     "section": "projects",
     "status": "paused",
-    "summary": "I hate that on Beli I have to rank a steakhouse against my favorite pizza place. It's not about how good the restaurant is, it's about what my favorite foods are and how they rank against other items in their category. Rankd lets you rate individual restaurants and foods within their categories so we get more contextual rankings that actually help you find places.",
+    "summary": "I hate that on Beli I have to rank a steakhouse against my favorite pizza place. It's not about how good the restaurant is, it's about what my favorite foods are and how they rank against other items in their category. Rankd lets you rate individual restaurants and foods within their categories so we get more contextual rankings that help you find places.",
     "specifics": [
       "Rate foods within their category, not across categories. Comparing pizza to sushi is meaningless. Rankings emerge from food ratings.",
       "I'm planning on expanding this beyond food eventually.",
@@ -20,7 +20,7 @@
     "title": "Caliber",
     "section": "projects",
     "status": "paused",
-    "summary": "I'm a massive FC Barcelona fan and a software guy, so I'm always complaining about how current stats are used to compare players. A dribble past the best defender in the league is different from one past the worst, and a dribble into five players versus open space is completely different. I've designed a full architecture for a more contextual ranking system so I can actually tell people why Lamine Yamal is better than Michael Olise.",
+    "summary": "I'm a massive FC Barcelona fan and a software guy, so I'm always complaining about how current stats are used to compare players. A dribble past the best defender in the league is different from one past the worst, and a dribble into five players versus open space is completely different. I've designed a full architecture for a more contextual ranking system so I can tell people why Lamine Yamal is better than Michael Olise.",
     "specifics": [
       "The idea: PageRank-style weighting where every action is measured against the opponent's tier, not just counted raw. Context is everything.",
       "Cross-league calibration via Champions League match overlaps so you can compare players across leagues fairly.",
@@ -111,7 +111,7 @@
     "title": "The Green Room",
     "section": "blueprints",
     "status": "vision",
-    "summary": "My environment is super important for being creative and having ideas, so I'm designing the Green Room: a space of things that help me be creative. Since I move around a lot, I try to create a Green Room wherever I'm staying with specific things that remind me of myself and help me think. Even having a couch matters because I tend to have more creative ideas lying down, which there's actually research on.",
+    "summary": "My environment is super important for being creative and having ideas, so I'm designing the Green Room: a space of things that help me be creative. Since I move around a lot, I try to create a Green Room wherever I'm staying with specific things that remind me of myself and help me think. Even having a couch matters because I tend to have more creative ideas lying down, which there's research on.",
     "specifics": [
       "The purpose is creativity and depth. I spend time in shallow social modes that drain my thinking frequency, and the Green Room is where that gets restored.",
       "I try to create a version of it wherever I'm staying. Specific items that remind me of myself, that put me in a creative headspace.",

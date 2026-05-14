@@ -3,15 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #f9fafb; /* gray-50 to match header */
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #111827; /* gray-900 */
-    --foreground: #ededed;
-  }
+  --background: #111827; /* gray-900, site is dark-only */
+  --foreground: #ededed;
 }
 
 html,

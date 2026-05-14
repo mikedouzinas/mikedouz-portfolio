@@ -48,7 +48,7 @@ function generateContactActions(): QuickAction[] {
     {
       type: 'contact_link',
       label: 'Email',
-      link: 'mike@douzinas.com',
+      link: 'mailto:mike@douzinas.com',
       linkType: 'email',
     },
   ];

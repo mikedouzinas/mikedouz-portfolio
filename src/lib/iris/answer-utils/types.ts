@@ -10,7 +10,7 @@ export type Intent =
   | 'contact'          // Fast-path for contact information (no LLM needed)
   | 'filter_query'     // Structured filtering (e.g., "Python projects", "2025 work", "ML classes")
   | 'specific_item'    // Query about a specific item (e.g., "tell me about HiLiTe")
-  | 'personal'         // Personal/family questions (stories, values, interests, education, bio/headline)
+  | 'personal'         // Personal/family questions (stories, values, interests, education, bio)
   | 'github_activity'  // Fetch recent GitHub commits for a repository
   | 'general';         // Catch-all semantic search for everything else
 

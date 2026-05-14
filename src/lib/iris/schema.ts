@@ -19,7 +19,6 @@ export const Id = z.string().min(1) // stable, unique
 
 export const Profile = z.object({
   name: z.string().min(1),
-  headline: z.string().min(1),
   bio: z.string().min(1),
   
   // Meta information previously in meta.json (now merged into profile)
@@ -223,12 +222,11 @@ export const Education = EducationBase.extend({
 })
 export type EducationT = z.infer<typeof Education>
 
-/** ---------- Bio (from profile.bio + headline + meta fields) ---------- */
+/** ---------- Bio (from profile.bio + meta fields) ---------- */
 
 const BioBase = z.object({
   id: Id,
   name: z.string().min(1),
-  headline: z.string().min(1),
   bio: z.string().min(1),
   // Include meta fields so they're available for retrieval
   // This ensures Iris can answer questions about work authorization, location, availability, and languages

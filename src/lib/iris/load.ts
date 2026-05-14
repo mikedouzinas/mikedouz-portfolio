@@ -125,15 +125,10 @@ export async function loadEducation(): Promise<EducationT[]> {
 }
 
 export async function loadBio(): Promise<BioT[]> {
-  // Extract bio info from profile (name, headline, bio text, and meta fields)
-  // This makes core profile information searchable for queries like "what's mike's headline?"
-  // Meta fields (work_authorization, location, availability, language_proficiency) are now included
-  // so Iris can answer questions about work eligibility, location, and language skills
   const profile = await loadProfile()
   return [{
     id: 'bio_profile',
     name: profile.name,
-    headline: profile.headline,
     bio: profile.bio,
     work_authorization: profile.work_authorization,
     location: profile.location,

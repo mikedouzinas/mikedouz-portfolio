@@ -68,7 +68,7 @@ export function formatSingleDoc(
     }
   } else if ('name' in doc && doc.name) {
     displayName = doc.name;
-  } else if ('headline' in doc && doc.headline) {
+  } else if ('bio' in doc && doc.bio && doc.kind === 'bio') {
     displayName = `Bio`;
   } else {
     displayName = doc.id || 'Unknown';
@@ -100,11 +100,8 @@ export function formatSingleDoc(
   } else if ('why' in doc && doc.why) {
     parts.push(`${doc.why}`);
     parts.push('');
-  } else if ('headline' in doc && doc.headline) {
-    parts.push(`**Headline:** ${doc.headline}`);
-    if ('bio' in doc && doc.bio) {
-      parts.push(doc.bio);
-    }
+  } else if ('bio' in doc && doc.bio && doc.kind === 'bio') {
+    parts.push(doc.bio);
     if ('name' in doc && doc.name) {
       parts.push(`**Name:** ${doc.name}`);
     }

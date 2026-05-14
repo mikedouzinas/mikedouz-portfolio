@@ -62,7 +62,7 @@ export function buildActionSlate(
 
   type LinkType = NonNullable<QuickAction['linkType']>;
   function pushLink(args: { id: string; label: string; link: string; linkType: LinkType; preview?: string }) {
-    const norm = args.link.trim().toLowerCase().replace(/\/+$/, '');
+    const norm = args.link.trim().toLowerCase().replace(/^mailto:/, '').replace(/\/+$/, '');
     if (seenLinks.has(norm)) return;
     seenLinks.add(norm);
     slate.push({
