@@ -22,6 +22,8 @@ export interface Blog {
   imageUrl: string;
   date: string;
   link: string;
+  /** Raw publish date for sorting (YYYY-MM-DD or full ISO). */
+  publishedDate: string;
 }
 
 /**
@@ -219,6 +221,7 @@ export const blogs: Blog[] = blogsData.blog_posts.map((post, index) => ({
   imageUrl: (post as any).image || "/blog1.png",
   date: post.published_date.includes("2026") ? `est. ${new Date(post.published_date).getFullYear()}` : new Date(post.published_date).getFullYear().toString(),
   link: post.url,
+  publishedDate: post.published_date,
 }));
 
 /**
