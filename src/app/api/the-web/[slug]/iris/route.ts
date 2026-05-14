@@ -23,7 +23,14 @@ const RequestSchema = z.object({
 
 // Claude for conversation (quality matters), GPT-4o-mini for drafts (just formatting)
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
+let openaiClient: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (!openaiClient) {
+    openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openaiClient;
+}
 
 export async function POST(
   request: NextRequest,
@@ -143,7 +150,7 @@ export async function POST(
   ];
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: 'gpt-4o-mini',
       messages: draftMessages,
       temperature: 0.7,

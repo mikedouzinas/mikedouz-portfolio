@@ -59,16 +59,18 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             {/* Action buttons: hidden on desktop idle, fade in on hover; always visible on mobile */}
             <div className="flex items-center gap-2 flex-shrink-0 mb-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-[50ms]">
               <AskIrisButton item={project} type="project" />
-              <a
-                href={project.githubLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-block hover:scale-105 transition-all duration-200 ease-out"
-              >
-                <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
-              </a>
+              {project.githubLink && (
+                <a
+                  href={project.githubLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-block hover:scale-105 transition-all duration-200 ease-out"
+                >
+                  <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
+                </a>
+              )}
               {project.projectLink && project.projectLink.length > 0 && (
                 <a
                   href={project.projectLink}
