@@ -1,6 +1,7 @@
 "use client";
-import React from "react";  
+import React from "react";
 import Image from "next/image";
+import { ExternalLink } from "lucide-react";
 import { Blog } from "@/data/loaders";
 import BaseCard from "@/components/base_card";
 import AskIrisButton from "@/components/AskIrisButton";
@@ -10,8 +11,9 @@ interface BlogCardProps {
 }
 
 export default function BlogCard({ blog }: BlogCardProps) {
+  const isExternal = !blog.link.startsWith("/");
   return (
-    <BaseCard 
+    <BaseCard
       href={blog.link}
       glowColor="45, 212, 191"  // Teal glow for blogs (the web)
       glowIntensity={0.3}
@@ -31,15 +33,26 @@ export default function BlogCard({ blog }: BlogCardProps) {
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {blog.date}
             </p>
-            {/* Action button: hidden on desktop idle, fade in on hover; always visible on mobile */}
-            <div className="flex-shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-[50ms]">
-              <AskIrisButton item={blog} type="blog" />
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-[50ms]">
+                <AskIrisButton item={blog} type="blog" />
+              </div>
+              <a
+                href={blog.link}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                aria-label={`Open ${blog.title}`}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-block hover:scale-110 transition-transform duration-200 ease-out"
+              >
+                <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
+              </a>
             </div>
           </div>
           <a
             href={blog.link}
-            target={blog.link.startsWith("/") ? undefined : "_blank"}
-            rel={blog.link.startsWith("/") ? undefined : "noopener noreferrer"}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
             onClick={(e) => e.stopPropagation()}
             className="text-lg font-semibold text-gray-900 dark:text-gray-200 group-hover:text-blue-800 dark:group-hover:text-blue-300 hover:underline block"
           >

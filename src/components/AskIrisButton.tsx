@@ -61,10 +61,10 @@ export default function AskIrisButton({ item, type, className = '' }: AskIrisBut
         opacity-75 hover:opacity-100
         ${className}
       `}
-      aria-label={`See details for ${item.title}`}
+      aria-label={`Ask Iris about ${item.title}`}
     >
       <Sparkles className="w-3 h-3" />
-      <span>See Details</span>
+      <span>Ask Iris</span>
     </button>
   );
 }

@@ -5,6 +5,7 @@ import About from './about/about_section';
 import ExperienceCard from './work_experience/experience_card';
 import ProjectCard from './projects/project_card';
 import BlogCard from './blogs/blog_card';
+import TheWebCard from './blogs/the_web_card';
 import MouseGlow from '@/components/mouse_glow';
 import HeaderMobile from '@/components/HeaderMobile';
 import AboutSheet from '@/components/AboutSheet';
@@ -45,9 +46,21 @@ function HomeContent() {
     <ProjectCard key={proj.id} project={proj} />
   ));
 
-  const blogCards = blogs.map((blog) => (
-    <BlogCard key={blog.id} blog={blog} />
-  ));
+  // Group blogs: The Web umbrella + its posts render as one composite card.
+  // External blogs (e.g., Rice Discovery) render as standalone BlogCards.
+  const webUmbrella = blogs.find((b) => b.link === '/the-web');
+  const webPosts = blogs.filter((b) => b.link.startsWith('/the-web/'));
+  const externalBlogs = blogs.filter((b) => !b.link.startsWith('/'));
+
+  const mediaItems: React.ReactNode[] = [];
+  if (webUmbrella) {
+    mediaItems.push(
+      <TheWebCard key="the-web" umbrella={webUmbrella} posts={webPosts} />
+    );
+  }
+  externalBlogs.forEach((blog) => {
+    mediaItems.push(<BlogCard key={blog.id} blog={blog} />);
+  });
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
@@ -175,13 +188,13 @@ function HomeContent() {
               <div className="md:hidden">
                 <ExpandableSection
                   title="Media"
-                  items={blogCards}
+                  items={mediaItems}
                   initialCount={2}
                 />
               </div>
               <div className="hidden md:block">
                 <div className="max-w-3xl mx-auto space-y-6">
-                  {blogCards}
+                  {mediaItems}
                 </div>
               </div>
             </div>

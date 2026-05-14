@@ -56,9 +56,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 project.title
               )}
             </h3>
-            {/* Action buttons: hidden on desktop idle, fade in on hover; always visible on mobile */}
-            <div className="flex items-center gap-2 flex-shrink-0 mb-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-[50ms]">
-              <AskIrisButton item={project} type="project" />
+            {/* Action group: link arrows (GitHub / External) always visible so users
+                know where the card navigates. Ask Iris button fades in on hover on desktop. */}
+            <div className="flex items-center gap-2 flex-shrink-0 mb-1">
+              <div className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-[50ms]">
+                <AskIrisButton item={project} type="project" />
+              </div>
               {project.githubLink && (
                 <a
                   href={project.githubLink}
@@ -66,7 +69,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                   rel="noopener noreferrer"
                   aria-label="GitHub"
                   onClick={(e) => e.stopPropagation()}
-                  className="inline-block hover:scale-105 transition-all duration-200 ease-out"
+                  className="inline-block hover:scale-110 transition-transform duration-200 ease-out"
                 >
                   <FaGithub className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
                 </a>
@@ -78,7 +81,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                   rel="noopener noreferrer"
                   aria-label="Live Project"
                   onClick={(e) => e.stopPropagation()}
-                  className="inline-block hover:scale-105 transition-all duration-200 ease-out"
+                  className="inline-block hover:scale-110 transition-transform duration-200 ease-out"
                 >
                   <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
                 </a>
