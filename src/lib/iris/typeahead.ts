@@ -69,11 +69,11 @@ export function suggest(query: string, limit = 6): Item[] {
  */
 export function getDefaultSuggestions(): string[] {
   return [
-    "What projects have you worked on?",
-    "Tell me about your experience",
-    "What technologies do you know?",
-    "How can I contact you?",
-    "What's your latest work?",
-    "Machine learning projects",
+    "What is The Olympus Project?",
+    "What is Apollo?",
+    "What's Mike writing about lately?",
+    "What's Mike's best work?",
+    "How can I contact Mike?",
+    "Why is Mike building Olympus?",
   ];
 }

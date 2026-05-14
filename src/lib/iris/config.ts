@@ -32,7 +32,7 @@ export const config = {
   },
   
   // Placeholder URLs (to be replaced with real endpoints)
-  availabilityUrl: 'https://fantastical.app/mikeveson/mikeveson-meeting',
+  availabilityUrl: 'https://calendar.app.google/2yzE7E52xmUSj3EP6',
   
   // Performance budgets
   typeaheadMaxMs: 16,               // Local typeahead must respond under 16ms

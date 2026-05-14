@@ -15,6 +15,46 @@
       "related_projects": ["project_olympus"]
     },
     {
+      "title": "How Do I Not Feel This?",
+      "url": "/the-web/how-do-i-not-feel-this",
+      "published_date": "April 19, 2026",
+      "description": "On the question almost everyone asks but very few sit with. Not 'how do I not feel this?' but 'why am I feeling this?' On silencers, catharsis, and the difference between reckoning and rebranding.",
+      "context": "Personal companion to Mike's PHIL 150 philosophy paper of the same title. Traces his own 2025 collapse: multiple structures of identity falling apart at once, the forced reflection after an ankle sprain made every avoidance strategy physically unavailable, and the realization that self-knowledge is harder than it seems because most people don't actually want it. The post introduces a three-phase framework (pre-catharsis, at-catharsis, post-catharsis) and identifies the design gap in self-knowledge tools, including Apollo: they assume the user has already crossed the threshold of wanting to examine themselves. This is why Mike thinks Apollo works for people who've already done the will-to-look work, but doesn't reach the people who most need self-knowledge.",
+      "summary": "Mike's most personal piece, written from one year out of a 2025 collapse he didn't initially want to look at. He argues the default human question is 'how do I not feel this?' (embodied, relief-seeking) and the question that actually changes you is 'why am I feeling this?' (slower, reflective, understanding-seeking). The post traces why almost everyone lives inside the first question and what it costs: silencers (achievement, busyness, social activity that prevent you from noticing examination is missing), the horrible-person fear (avoidance is protective, not indifferent; the sick feeling is evidence against being horrible), and the rebranding trap (catharsis without genuine recognition produces the most comfortable available story, which looks like recovery). Connects directly to the Olympus/Apollo design problem: every self-knowledge tool assumes the user wants to examine themselves, but most people who need self-knowledge most haven't reached that point. The closing line: 'the pursuit itself is the answer to the question.'",
+      "class": null,
+      "related_class": null,
+      "related_experiences": ["exp_olympus_founder"],
+      "related_projects": ["proj_apollo"],
+      "tags": ["philosophy", "flourishing", "personal", "self-knowledge"]
+    },
+    {
+      "title": "Our Unwavering Loyalty to the Wrong Thing",
+      "short_name": "Means-End Confusion",
+      "url": "/the-web/means-end-confusion",
+      "published_date": "April 5, 2026",
+      "description": "On confusing the container with what's inside it. Why we keep doing things long after the joy they were supposed to produce is gone.",
+      "context": "Uses Mike's own evolution with soccer as the through-line. He loved playing soccer for the joy it produced (freedom, presence, running without thinking, connection). Over years of competitive play, the practice survived but the joy disappeared: he was playing for recognition, for outcomes, for the version of himself other people validated. The post generalizes the pattern: when we lose track of the ends that originally drew us to something, we end up unwaveringly loyal to the means. This is how lives get spent on activities that no longer serve their original purpose.",
+      "summary": "A philosophical examination of means-end confusion using soccer as the central example. Mike loved soccer because of what it produced: joy, freedom, presence, connection, health. Not for the sport itself. But as he got better and more competitive, the activity outlived the joy: he was playing for outcomes, recognition, validation. The post argues this pattern is everywhere. When the joy or original purpose disappears from an activity, we don't usually notice. We just keep doing the activity. The container (the practice) gets confused with what was inside it (the actual flourishing it produced). The corrective is intuition and self-examination: noticing when the thing you do is no longer giving you what made it worth doing.",
+      "class": null,
+      "related_class": null,
+      "related_experiences": ["exp_olympus_founder"],
+      "related_projects": [],
+      "tags": ["philosophy", "flourishing", "competition", "soccer"]
+    },
+    {
+      "title": "AI Companions and Self-Deception",
+      "url": "/the-web/ai-companions-and-self-deception",
+      "published_date": "March 10, 2026",
+      "description": "The wrong question about AI companions is whether they can replace real relationships. The right one is whether you are honest with yourself about what you are actually getting from them.",
+      "context": "Mike's first major essay on The Web. Introduces the 'silencers' concept that recurs throughout his later writing. Argues that the standard debate (are AI companions good or bad?) is the wrong frame. The actual issue: AI removes the friction that makes hard conversations hard, which is sometimes the point (catharsis benefits) and sometimes the problem (you bypass the work of being seen by another person). The piece also introduces Mike's view that we exist as slightly different characters within each relationship, built over hundreds of interactions, and AI is the first thing that lets you talk outside of all of them at once. That can be freeing or it can be self-deception. The difference is honesty about which one is happening.",
+      "summary": "Mike argues the popular debate about AI companions (good or bad? can they replace real relationships?) misses the point. The real question is: what are you actually getting from your AI usage, and are you honest about it? He notes that humans exist as slightly different characters in each relationship, built over hundreds of interactions, and that breaking out of those characters with friends is socially risky. AI removes that friction entirely: no judgment, no social consequences. That can be valuable (a space to articulate what you can't say elsewhere) or it can be a silencer (a way to avoid the work of being known by another person). The piece introduces the 'silencers' concept that recurs through Mike's later writing: anything that prevents you from noticing that self-examination is missing.",
+      "class": null,
+      "related_class": null,
+      "related_experiences": ["exp_olympus_founder"],
+      "related_projects": ["proj_apollo"],
+      "tags": ["ethics", "technology", "philosophy", "relationships"]
+    },
+    {
       "title": "What Are You Going to Do With Your Life?",
       "short_name": "Life Inspiration Blog",
       "url": "https://discovery.blogs.rice.edu/what-are-you-going-to-do-with-your-life/",

@@ -1,94 +1,5 @@
 [
   {
-    "id": "project-olympus",
-    "title": "Founder",
-    "section": "experience",
-    "status": "building",
-    "role": "Founder",
-    "company": "The Olympus Project",
-    "period": "Est. OCT 2025",
-    "summary": "A project dedicated to helping people flourish by translating the pursuit of self-knowledge across every medium that can reach them. Technology in the service of human flourishing, not human attention in the service of technology.",
-    "specifics": [
-      "Core belief: flourishing comes from knowing yourself. Not from a checklist, not from prescribed categories, but from the ongoing work of self-examination. Olympus exists to help people do that work and translate what it reveals across mediums that reach different people.",
-      "Method: indirect transmission. Show patterns so vividly that people recognize themselves, discover the insight, and change from internal conviction. Not lectures. Not prescriptions. Recognition. Same mechanism Greek myths used for millennia.",
-      "Current channels: Apollo (AI for self-knowledge, core product), Iris (universal access layer), The Web (blog/public writing), The Lantern (life principles for 16-35 year olds), Calliope (movie trilogy), The Tree of Human Flourishing (philosophy book), List of Important Things.",
-      "Collaboration model: Mike is the researcher, thinker, connector, producer. Each channel is best executed through collaboration with people and companies best positioned to make it excellent. The goal is to work WITH Anthropic for AI, WITH a studio for film, not to build everything in-house.",
-      "Business structure intention: B Corp or Public Benefit Corporation. Mission-protected. 'I never want to have to choose between my mission and profit.'"
-    ],
-    "aliases": ["olympus", "project olympus", "founder", "the olympus project"],
-    "connections": ["iris-mobile", "apollo", "calliope-screenplay", "tree", "lantern", "important-things"],
-    "tags": ["ai", "philosophy", "eudaimonia"]
-  },
-  {
-    "id": "iris-mobile",
-    "title": "Iris Mobile",
-    "section": "projects",
-    "status": "building",
-    "parent": "The Olympus Project",
-    "summary": "I made Iris as my universal assistant accessible anywhere. Iris Mobile lets me access Apollo on my phone for vault stuff and AI help. If I have an idea on the go or just want to check my grocery list, it's all there. It replaces keeping things in fifty places like Apple Notes, Google Drive, and Word.",
-    "specifics": [
-      "SwiftUI mobile app connected to the same structure as Apollo Terminal. Everything in my Obsidian vault accessible on the go.",
-      "I use it with Wispr Flow because voice-first has been the best way to get my thoughts out as fast as possible no matter where I am. That's the whole purpose of Iris.",
-      "Named after the Greek messenger goddess who's universally accessible to message. Fitting because Iris is meant to be everywhere.",
-      "The system on mikeveson.com is also Iris. It's another form of the same universal assistant, this time to help others know about me. The vault in Apollo is what keeps the site updated.",
-      "Not a chatbot, not a companion. A thinking partner that knows your patterns and challenges your assumptions.",
-      "Always-on backend via NanoClaw: Docker containers accessible through Telegram and terminal even when the app isn't open."
-    ],
-    "aliases": ["iris", "thinking partner", "iris app"],
-    "connections": ["apollo", "tree", "project-olympus"],
-    "skills": ["swift", "swiftui", "typescript", "claude-sdk"],
-    "tags": ["ai", "mobile", "voice"]
-  },
-  {
-    "id": "apollo",
-    "title": "Apollo Terminal",
-    "section": "projects",
-    "status": "building",
-    "parent": "The Olympus Project",
-    "summary": "Apollo is the AI that helps me know myself. I use an Obsidian vault synced across my devices for everything from classwork to writing my philosophy book, and Apollo searches for the relevant context when I bring something up. The advantage is I can bring up things I might not even be comfortable discussing with anyone in my life and get unbiased, understanding advice within the full context of my life.",
-    "specifics": [
-      "Solves the AI context problem: using Claude Code, Apollo searches my vault for relevant context so every conversation has the full picture of my life, not just what I said in the last five minutes.",
-      "I use markdown files for everything. Classes, philosophy, relationships, self-observations. It's crucial to understand my classwork within the context of my life and it helps me ideate so much more.",
-      "Built-in features: dialectic engine (multi-agent philosophical reasoning), weekly synthesis, self-updating prompting to help the user the most.",
-      "Available on GitHub for anyone to use. I'm very cautious about how much autonomy to give AI systems, which is why it's completely opt-in. I prefer it over systems like OpenClaw.",
-      "Secure, never buggy, and consistent at helping me know myself and my patterns better.",
-      "Not meant to replace friends or therapists. It acts as a beneficiary to promote your life with those real people, which no AI system can replace.",
-      "The dialectic engine runs four agents in sequence: Proposer, Challenger, Arbiter, Axiom Checker. Builds a persistent Truth Store of verified beliefs.",
-      "Background processing: daily vault scans, weekly pattern analysis. Apollo doesn't just wait for questions."
-    ],
-    "aliases": ["apollo", "apollo terminal", "dialectic engine"],
-    "connections": ["iris-mobile", "tree", "project-olympus"],
-    "skills": ["typescript", "claude-sdk", "multi-agent"],
-    "tags": ["ai", "philosophy", "infrastructure"],
-    "links": {
-      "github": "https://github.com/mikedouzinas/apollo-vault"
-    }
-  },
-  {
-    "id": "apollo-freewrite",
-    "title": "Apollo x freewrite",
-    "section": "projects",
-    "status": "building",
-    "parent": "The Olympus Project",
-    "summary": "A fork of freewrite by Farza — a minimalist writing platform with a timer, ambient video, and distraction-free UI — extended with Apollo, my personal knowledge layer. Turns a single writing session into a complete thinking environment.",
-    "specifics": [
-      "Built on top of freewrite by Farza (farzaa/freewrite) — a writing tool designed to get thoughts out fast, with a timer, ambient video background, and a minimal UI that gets out of your way",
-      "Added an in-platform AI chat using the forked Claude Code repository, so you can think and converse without leaving the writing environment",
-      "Added an AI processor that connects to a vault of the user's choosing — defaults to an LLM wiki-style connector that ingests and organizes what you write",
-      "Added a Process button that sends the session directly to the vault via Claude Code — no steps between writing something and having it captured where it belongs",
-      "Supports multiple sessions open simultaneously — different topics stay genuinely separate, with each processed independently into the vault",
-      "The result is a single environment for freewriting, AI conversation, and filing"
-    ],
-    "aliases": ["apollo freewrite", "apollo x freewrite", "freewrite", "writing system"],
-    "connections": ["apollo", "project-olympus"],
-    "skills": ["ai_integration", "writing"],
-    "tags": ["writing", "ai", "olympus"],
-    "links": {
-      "github": "https://github.com/mikedouzinas/apollo",
-      "source": "https://gist.github.com/rohitg00/2067ab416f7bbe447c1977edaaa681e2"
-    }
-  },
-  {
     "id": "rankd",
     "title": "Rankd",
     "section": "projects",
@@ -138,7 +49,7 @@
       "No voiceover, no narration. Soccer motif threads through every life as a barometer for well-being."
     ],
     "aliases": ["calliope", "movie trilogy", "screenplay", "movie script", "pursuit"],
-    "connections": ["iris-mobile", "tree", "project-olympus"],
+    "connections": ["tree", "project-olympus"],
     "tags": ["creative", "writing", "philosophy", "film"]
   },
   {
@@ -158,28 +69,8 @@
       "40+ research documents, 9 exploration pieces. The accumulated evidence IS the proof."
     ],
     "aliases": ["tree", "flourishing framework", "eudaimonia framework", "the tree"],
-    "connections": ["iris-mobile", "calliope-screenplay", "lantern", "project-olympus"],
+    "connections": ["calliope-screenplay", "project-olympus"],
     "tags": ["philosophy", "writing", "framework"]
-  },
-  {
-    "id": "lantern",
-    "title": "The Lantern",
-    "section": "media",
-    "status": "writing",
-    "parent": "The Olympus Project",
-    "summary": "I started writing The Lantern in August 2025, inspired by How I Met Your Mother and all the unspoken rules that exist in our lives from the bro code to the front porch test. It's 39 rules and 79 theories covering everything from relationship patterns to ways to escape traps that lead to unhappiness, aimed at the young person experience roughly 16 to 35. I've printed over 30 copies that I give to friends across the world and update with their feedback.",
-    "specifics": [
-      "It's the first project of the Olympus Project collection, written informally to help people who've gone through similar experiences in high school and college.",
-      "A more formalized version of my List of Important Things except more applicable to the young person experience.",
-      "39 rules (things to do or not do) and 79 theories (names for situations and patterns worth being aware of).",
-      "I've printed over 30 copies to date, given them to friends across the world, and update the book throughout the year with their feedback.",
-      "Rules include: Nothing Good Happens After 2 AM, The Front Porch Test, Never Drag it Out, The Platinum Rule, Proportional Celebration.",
-      "Theories include: Marshall Syndrome, The Proximity Effect, Dobler/Dahmer Theory, Relationship Gut, The Sparkling Water Theory.",
-      "One published deep article: The Skiing Rule (pushing your edge vs. going against your grain)."
-    ],
-    "aliases": ["lantern", "principles", "life rules", "handbook", "mike veson handbook"],
-    "connections": ["tree", "important-things", "project-olympus"],
-    "tags": ["philosophy", "writing", "personal"]
   },
   {
     "id": "important-things",
@@ -195,7 +86,7 @@
       "The Lantern is a more formalized, publishable version of this for a wider audience."
     ],
     "aliases": ["important things", "life lessons list"],
-    "connections": ["lantern"],
+    "connections": [],
     "tags": ["personal", "ongoing"]
   },
   {

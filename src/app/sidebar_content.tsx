@@ -158,7 +158,7 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                         <FaEnvelope size={24} />
                     </a>
                     <a
-                        href="https://fantastical.app/mikeveson/mikeveson-meeting"
+                        href="https://calendar.app.google/2yzE7E52xmUSj3EP6"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-gray-700 dark:text-gray-200 dark:hover:text-blue-500 hover:text-[#ff7f32] transition-transform duration-300 transform hover:scale-110"

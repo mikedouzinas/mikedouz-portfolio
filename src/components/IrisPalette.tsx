@@ -69,10 +69,10 @@ const SUGGESTIONS = [
       secondary: 'Draft a message to send directly',
     },
     {
-      id: 'hire',
+      id: 'olympus',
       icon: Lightbulb,
-      primary: 'Why should I hire Mike?',
-      secondary: 'Skills, impact, and what makes him stand out',
+      primary: 'What is The Olympus Project?',
+      secondary: "Mike's current work and the mission behind it",
     },
   ] as const;
 
@@ -293,7 +293,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
             if (isExternal && href) {
               const isLinkedIn = /linkedin\.com/i.test(href);
               const isGitHub = /github\.com/i.test(href);
-              const isCalendar = /calendly|fantastical|schedule/i.test(href);
+              const isCalendar = /calendly|fantastical|calendar\.app\.google|schedule/i.test(href);
 
               let iconElement;
               if (isLinkedIn) {

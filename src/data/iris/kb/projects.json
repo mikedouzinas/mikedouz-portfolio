@@ -139,5 +139,104 @@
       "start": "2021-09",
       "end": "2023-06"
     }
+  },
+  {
+    "id": "proj_apollo",
+    "title": "Apollo Terminal",
+    "aliases": ["apollo", "apollo terminal", "dialectic engine", "the vault", "apollo vault"],
+    "summary": "Apollo is the AI that helps me know myself. I use an Obsidian vault for everything from classwork to writing my philosophy book, and Apollo searches for the relevant context when I bring something up. The advantage is I can bring up things I might not be comfortable discussing with anyone in my life and get unbiased, understanding advice within the full context of my life.",
+    "specifics": [
+      "Solves the AI context problem: using Claude Code, Apollo searches my vault for relevant context so every conversation has the full picture of my life, not just what I said in the last five minutes.",
+      "I use markdown files for everything. Classes, philosophy, relationships, self-observations. It's crucial to understand my classwork within the context of my life and it helps me ideate so much more.",
+      "Built-in features: dialectic engine (multi-agent philosophical reasoning), weekly synthesis, self-updating prompting to help the user the most.",
+      "Available on GitHub for anyone to use. I'm very cautious about how much autonomy to give AI systems, which is why it's completely opt-in.",
+      "The dialectic engine runs four agents in sequence: Proposer, Challenger, Arbiter, Axiom Checker. Builds a persistent Truth Store of verified beliefs.",
+      "Background processing: daily vault scans, weekly pattern analysis. Apollo doesn't just wait for questions.",
+      "Core product of The Olympus Project. Iris (the assistant interface, including the one you're talking to on this site) is the access layer; Apollo is the intelligence."
+    ],
+    "skills": ["typescript", "ai_integration", "product_management", "writing"],
+    "tech_stack": ["TypeScript", "Claude Code", "Anthropic Claude API", "Obsidian"],
+    "architecture": "Markdown vault, Claude Code search and routing, multi-agent dialectic engine, persistent Truth Store. Apollo is the intelligence layer; Iris (web, mobile, terminal) is the access layer.",
+    "tags": ["AI", "Philosophy", "Olympus", "Personal Infrastructure"],
+    "links": {
+      "github": "https://github.com/mikedouzinas/apollo-vault",
+      "image": "/Apollo.png"
+    },
+    "dates": {
+      "start": "2025-09"
+    }
+  },
+  {
+    "id": "proj_iris_mobile",
+    "title": "Iris Mobile",
+    "aliases": ["iris", "iris app", "iris mobile", "thinking partner app"],
+    "summary": "A native iOS thinking partner that connects to my Apollo vault on the go. If I have an idea on a walk or want to check my notes anywhere, it's there. Same intelligence as Apollo Terminal, just in my pocket.",
+    "specifics": [
+      "SwiftUI mobile app connected to the same Apollo vault structure. Everything in my Obsidian vault accessible on the go.",
+      "Named after the Greek messenger goddess who's universally accessible to message. Fitting because Iris is meant to be everywhere: terminal, mobile, web, voice.",
+      "I use it with Wispr Flow because voice-first has been the best way to get my thoughts out as fast as possible no matter where I am.",
+      "Not a chatbot, not a companion. A thinking partner that knows your patterns and challenges your assumptions.",
+      "The Iris on mikeveson.com is another form of the same universal assistant. This one helps others get to know me. The Apollo vault is what keeps the site KB updated.",
+      "Built as a Swift port of Claude Code, with background audio support for vault files."
+    ],
+    "skills": ["swift", "ai_integration", "typescript", "product_management"],
+    "tech_stack": ["Swift", "SwiftUI", "Claude Code (forked)", "Anthropic API"],
+    "architecture": "Native iOS app over a forked Claude Code core. Connects to the same vault Apollo Terminal uses. Voice-first input via Wispr Flow.",
+    "tags": ["iOS", "AI", "Mobile", "Olympus"],
+    "links": {
+      "image": "/IrisMobile.png"
+    },
+    "dates": {
+      "start": "2025-12"
+    }
+  },
+  {
+    "id": "proj_apollo_freewrite",
+    "title": "Apollo x freewrite",
+    "aliases": ["apollo freewrite", "freewrite", "writing system", "apollo x freewrite"],
+    "summary": "A fork of freewrite by Farza, a minimalist writing platform with a timer, ambient video, and distraction-free UI, extended with Apollo, my personal knowledge layer. Turns a single writing session into a complete thinking environment.",
+    "specifics": [
+      "Built on top of freewrite by Farza (farzaa/freewrite), a writing tool designed to get thoughts out fast, with a timer, ambient video background, and a minimal UI that gets out of your way.",
+      "Added an in-platform AI chat using the forked Claude Code repository, so you can think and converse without leaving the writing environment.",
+      "Added an AI processor that connects to a vault of the user's choosing. Defaults to an LLM wiki-style connector that ingests and organizes what you write.",
+      "Added a Process button that sends the session directly to the vault via Claude Code. No steps between writing something and having it captured where it belongs.",
+      "Supports multiple sessions open simultaneously. Different topics stay genuinely separate, with each processed independently into the vault.",
+      "The result is a single environment for freewriting, AI conversation, and filing."
+    ],
+    "skills": ["ai_integration", "writing", "swift", "product_management"],
+    "tech_stack": ["Swift", "Claude Code (forked)", "Anthropic API"],
+    "tags": ["Writing", "AI", "Olympus"],
+    "links": {
+      "github": "https://github.com/mikedouzinas/apollo",
+      "image": "/ApolloFreewrite.png"
+    },
+    "dates": {
+      "start": "2026-01"
+    }
+  },
+  {
+    "id": "proj_lantern",
+    "title": "The Lantern",
+    "aliases": ["lantern", "the lantern", "principles", "life rules", "handbook", "mike veson handbook"],
+    "summary": "A living book that names the things people in their late teens through mid-thirties are actually facing: relationships, social patterns, decision-making, traps that lead to unhappiness. Two halves: Rules (things to do or not do, based on lessons learned) and Theories (names for situations and patterns worth being aware of, for your own sake). Inspired by How I Met Your Mother. Not meant to be taken too seriously: it's a guide, not a law. Currently on Volume 2 published, with Volume 3 in progress.",
+    "specifics": [
+      "Inspired by How I Met Your Mother and all the unspoken rules of life, from the bro code to the front porch test. Written informally for roughly the 16 to 35 range, the rough span where most of these patterns get learned the hard way.",
+      "Structure: two sections. Rules are things to do or not do based on lessons learned (Nothing Good Happens After 2 AM, The Front Porch Test). Theories are names for patterns and situations worth recognizing (Marshall Syndrome, The Sparkling Water Theory).",
+      "Released as distinct numbered volumes rather than incremental updates. Each volume is its own piece, written from scratch. Nothing stays in its original form across volumes. The intentional design: I can look back across editions and see how my own thinking has actually changed over time.",
+      "Currently on Volume 2 published, Volume 3 in progress. I've actually changed my opinion on a lot of what was in earlier volumes, and tracking that evolution has been one of the most useful parts of the project for me. The new edition is being guided by what I'd revise.",
+      "Distributed to over 20 friends across the world. They read it, share it, and give me feedback on what should change or be added. The feedback loop is what keeps it growing. It is meant to evolve.",
+      "Sample Rules: Nothing Good Happens After 2 AM (don't make big decisions in compromised states). The Front Porch Test (can you see yourself sitting on a porch with this person decades from now?). The Closed Case (when a situation is settled, accept and move on). The Platinum Rule (don't hook up with someone you see every day). Proportional Celebration (your reaction should match the outcome, not the idea of what it could become).",
+      "Sample Theories: Marshall Syndrome (the post-long-relationship phase where you drag your guy friends to brunch and farmers' markets). The Sparkling Water Theory (how good or bad something feels is shaped entirely by what you're used to and what you're comparing against). The Sunk Cost Theory (staying because of years invested, not because it's actually right). Dobler/Dahmer (a big romantic gesture works only if both people are into each other; otherwise it reads as serial-killer crazy). Givers, Takers, Users, and Matchers (Adam Grant's framework for who to keep close and who to cut).",
+      "First project of The Olympus Project and a more formalized, publishable companion to my List of Important Things, scoped specifically to the young person experience."
+    ],
+    "skills": ["writing"],
+    "tech_stack": [],
+    "tags": ["Writing", "Philosophy", "Olympus", "Book"],
+    "links": {
+      "image": "/Lantern.png"
+    },
+    "dates": {
+      "start": "2025-08"
+    }
   }
 ]

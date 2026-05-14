@@ -97,7 +97,7 @@ export default function AboutSheet({ open, onClose }: AboutSheetProps) {
     {
       label: 'Schedule',
       icon: <SiCalendly size={20} />,
-      href: 'https://fantastical.app/mikeveson/mikeveson-meeting',
+      href: 'https://calendar.app.google/2yzE7E52xmUSj3EP6',
       external: true,
     },
   ];
