@@ -44,13 +44,14 @@
     "dates": {
       "start": "2025-10"
     },
-    "summary": "Building a project dedicated to helping people flourish by translating the pursuit of self-knowledge across every medium that can reach them. Technology in the service of human flourishing, not human attention in the service of technology.",
+    "summary": "Building toward a Public Benefit Corporation dedicated to helping people flourish across every medium that can reach them. The mission is improving self-knowledge through technology, writing, film, and any other form that fits. The project also runs an ongoing research arm into flourishing itself, focused on the real-world barriers preventing self-knowledge in modern life and what it would take to address them at a societal scale.",
     "specifics": [
-      "Core belief: flourishing comes from knowing yourself. Not from a checklist, not from prescribed categories, but from the ongoing work of self-examination. Olympus exists to help people do that work and translate what it reveals across mediums that reach different people.",
-      "Method: indirect transmission. Show patterns so vividly that people recognize themselves, discover the insight, and change from internal conviction. Not lectures. Not prescriptions. Recognition.",
-      "Current channels: Apollo (AI for self-knowledge, the core product), Iris (universal access layer across terminal, mobile, and web), The Web (blog and public writing), The Lantern (life principles for 16 to 35 year olds), a movie trilogy in development, The Tree of Human Flourishing (philosophy book), List of Important Things.",
+      "Core thesis: flourishing comes from self-knowledge. Not from a checklist, not from prescribed categories, but from the ongoing work of self-examination. Olympus exists to help people do that work and to translate what it reveals across mediums that reach different people.",
+      "Method: indirect transmission. Show patterns so vividly that people recognize themselves, discover the insight, and change from internal conviction. Not lectures, not prescriptions. Recognition.",
+      "Channels (and growing): Apollo (AI for self-knowledge, the core product), Iris (universal access layer across terminal, mobile, and web), The Web (blog and public writing), The Lantern (life principles for 16 to 35 year olds), a movie trilogy in development, The Tree of Human Flourishing (philosophy book), List of Important Things.",
+      "Research arm: an ongoing investigation into the structural barriers that prevent self-knowledge in modern life. Silencers (achievement, busyness, social activity), the rebranding trap after catharsis, the design gap in current AI tools that assume the user already wants to examine themselves, the social cost of vulnerability. Findings feed directly into how each channel is built and how the work argues for change at the societal level.",
       "Collaboration model: I'm the researcher, thinker, connector, and producer. Each channel is best executed through collaboration with people and companies best positioned to make it excellent. The goal is to work WITH Anthropic for AI, WITH a studio for film, not to build everything in-house.",
-      "Business structure intention: B Corp or Public Benefit Corporation. Mission-protected. I never want to have to choose between my mission and profit."
+      "Structure: building toward a Public Benefit Corporation (or B Corp). Mission-protected so I never have to choose between mission and profit."
     ],
     "skills": [
       "product_management",
