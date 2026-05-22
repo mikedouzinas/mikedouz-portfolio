@@ -25,6 +25,35 @@
     ]
   },
   {
+    "id": "56a422482499820d2bf17cefe714461a",
+    "trackName": "E85",
+    "artist": "Don Toliver",
+    "album": "OCTANE",
+    "trackUri": "spotify:track:3B4cjvGlPvyBLNG3AzEgkZ",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0225c28f3c9fbdbab1a88dd619",
+    "spotifyUrl": "https://open.spotify.com/track/3B4cjvGlPvyBLNG3AzEgkZ",
+    "dateRange": {
+      "start": "2026-05-12",
+      "end": "2026-05-17"
+    },
+    "playCount": 7,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-05-17",
+    "peakDayPlays": 4,
+    "hotDays": [
+      {
+        "date": "2026-05-17",
+        "plays": 4
+      },
+      {
+        "date": "2026-05-12",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "f847d6cbe27ea327630b78d50452843a",
     "trackName": "Lights Burn Dimmer",
     "artist": "Fred again..",
@@ -47,6 +76,39 @@
       {
         "date": "2026-05-09",
         "plays": 12
+      }
+    ]
+  },
+  {
+    "id": "b5f3269c5180bb29089c8401a94ed341",
+    "trackName": "car crash",
+    "artist": "jigitz",
+    "album": "car crash",
+    "trackUri": "spotify:track:47z8JPQCgjtRcFqt1kUyoA",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021e7cafe58c1cea5c8003ad2b",
+    "spotifyUrl": "https://open.spotify.com/track/47z8JPQCgjtRcFqt1kUyoA",
+    "dateRange": {
+      "start": "2026-05-09",
+      "end": "2026-05-17"
+    },
+    "playCount": 8,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-05-10",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-05-10",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-11",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-17",
+        "plays": 2
       }
     ]
   },
@@ -84,7 +146,7 @@
     ]
   },
   {
-    "id": "0050814f53276838e025c7e0c1fd6f81",
+    "id": "ceaeffc0b89f4631ea9c832991bf728c",
     "trackName": "No Bad Vibes",
     "artist": "Jazzy",
     "album": "No Bad Vibes",
@@ -93,9 +155,9 @@
     "spotifyUrl": "https://open.spotify.com/track/0dgdDB39uUoC8WICmTE2U8",
     "dateRange": {
       "start": "2026-04-29",
-      "end": "2026-05-15"
+      "end": "2026-05-17"
     },
-    "playCount": 11,
+    "playCount": 12,
     "weeksCount": 3,
     "intensity": 3,
     "maxState": 3,
@@ -234,7 +296,7 @@
     ]
   },
   {
-    "id": "cff64548d38b951aa1b4287089050791",
+    "id": "da3496e53b3e5e29943509c14a777e2c",
     "trackName": "Beaches",
     "artist": "beabadoobee",
     "album": "This Is How Tomorrow Moves",
@@ -243,10 +305,10 @@
     "spotifyUrl": "https://open.spotify.com/track/1a19jsjG2DvbN1fVJonKUU",
     "dateRange": {
       "start": "2026-04-20",
-      "end": "2026-05-09"
+      "end": "2026-05-17"
     },
-    "playCount": 8,
-    "weeksCount": 3,
+    "playCount": 10,
+    "weeksCount": 4,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-04-20",
@@ -262,6 +324,43 @@
       },
       {
         "date": "2026-05-07",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "b2c40dc80d2bcc57cb3d4a7924196882",
+    "trackName": "I. The Worst Guys",
+    "artist": "Childish Gambino",
+    "album": "Because the Internet",
+    "trackUri": "spotify:track:0kErPGykp7EJo7L5fx8YjB",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
+    "spotifyUrl": "https://open.spotify.com/track/4jnctHRggVIvMgkru936fN",
+    "dateRange": {
+      "start": "2026-04-20",
+      "end": "2026-05-10"
+    },
+    "playCount": 12,
+    "weeksCount": 3,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2026-04-27",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-04-27",
+        "plays": 3
+      },
+      {
+        "date": "2026-04-26",
+        "plays": 2
+      },
+      {
+        "date": "2026-04-30",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-10",
         "plays": 2
       }
     ]
@@ -1009,8 +1108,8 @@
     },
     "playCount": 7,
     "weeksCount": 2,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2026-02-24",
     "peakDayPlays": 3,
     "hotDays": [
@@ -2067,8 +2166,8 @@
     },
     "playCount": 10,
     "weeksCount": 3,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-12-30",
     "peakDayPlays": 5,
     "hotDays": [
@@ -3440,43 +3539,6 @@
     ]
   },
   {
-    "id": "7431def8fbf7fa168682605d1dda4fa2",
-    "trackName": "Not My World",
-    "artist": "Tame Impala",
-    "album": "Deadbeat",
-    "trackUri": "spotify:track:12wDKbddX9bUYHd1Rl8gmu",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02208500450dcd0fd294d7bd3b",
-    "spotifyUrl": "https://open.spotify.com/track/12wDKbddX9bUYHd1Rl8gmu",
-    "dateRange": {
-      "start": "2025-10-17",
-      "end": "2025-10-23"
-    },
-    "playCount": 10,
-    "weeksCount": 2,
-    "intensity": 3,
-    "maxState": 3,
-    "peakDay": "2025-10-17",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2025-10-17",
-        "plays": 2
-      },
-      {
-        "date": "2025-10-18",
-        "plays": 2
-      },
-      {
-        "date": "2025-10-19",
-        "plays": 2
-      },
-      {
-        "date": "2025-10-20",
-        "plays": 2
-      }
-    ]
-  },
-  {
     "id": "d6de2b983bc93ba33eee9fffa4d4fd17",
     "trackName": "Piece Of Heaven",
     "artist": "Tame Impala",
@@ -3616,6 +3678,43 @@
       {
         "date": "2025-10-20",
         "plays": 3
+      }
+    ]
+  },
+  {
+    "id": "7431def8fbf7fa168682605d1dda4fa2",
+    "trackName": "Not My World",
+    "artist": "Tame Impala",
+    "album": "Deadbeat",
+    "trackUri": "spotify:track:12wDKbddX9bUYHd1Rl8gmu",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02208500450dcd0fd294d7bd3b",
+    "spotifyUrl": "https://open.spotify.com/track/12wDKbddX9bUYHd1Rl8gmu",
+    "dateRange": {
+      "start": "2025-10-17",
+      "end": "2025-10-23"
+    },
+    "playCount": 10,
+    "weeksCount": 2,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2025-10-17",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2025-10-17",
+        "plays": 2
+      },
+      {
+        "date": "2025-10-18",
+        "plays": 2
+      },
+      {
+        "date": "2025-10-19",
+        "plays": 2
+      },
+      {
+        "date": "2025-10-20",
+        "plays": 2
       }
     ]
   },
@@ -5691,8 +5790,8 @@
     },
     "playCount": 5,
     "weeksCount": 2,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-07-17",
     "peakDayPlays": 3,
     "hotDays": [
@@ -6874,35 +6973,6 @@
     ]
   },
   {
-    "id": "86d33162c8efba925cb1153a99ce7fb8",
-    "trackName": "International Love (feat. Chris Brown)",
-    "artist": "Pitbull",
-    "album": "Planet Pit (Deluxe Version)",
-    "trackUri": "spotify:track:62zFEHfAYl5kdHYOivj4BC",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021dc7483a9fcfce54822a2f19",
-    "spotifyUrl": "https://open.spotify.com/track/62zFEHfAYl5kdHYOivj4BC",
-    "dateRange": {
-      "start": "2025-04-21",
-      "end": "2025-04-25"
-    },
-    "playCount": 7,
-    "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2025-04-21",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2025-04-21",
-        "plays": 3
-      },
-      {
-        "date": "2025-04-22",
-        "plays": 2
-      }
-    ]
-  },
-  {
     "id": "07e7ed36695c3dcec3b93ca0b0e3cc87",
     "trackName": "Telescope",
     "artist": "Cage The Elephant",
@@ -7241,8 +7311,8 @@
     },
     "playCount": 11,
     "weeksCount": 2,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-04-10",
     "peakDayPlays": 5,
     "hotDays": [
