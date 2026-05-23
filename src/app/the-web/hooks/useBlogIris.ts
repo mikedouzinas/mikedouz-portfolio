@@ -28,6 +28,11 @@ export function useBlogIris(slug: string) {
   const abortRef = useRef<AbortController | null>(null);
   const revealTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const messagesRef = useRef<Message[]>([]);
+  const sessionIdRef = useRef<string>(
+    typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `bs_${Date.now()}_${Math.random().toString(36).slice(2)}`
+  );
 
   messagesRef.current = state.messages;
 
@@ -55,6 +60,7 @@ export function useBlogIris(slug: string) {
           passage,
           mode: 'conversation',
           history: messagesRef.current,
+          session_id: sessionIdRef.current,
         }),
         signal: abortRef.current.signal,
       });
@@ -161,6 +167,7 @@ export function useBlogIris(slug: string) {
           passage,
           mode: type === 'comment' ? 'draft_comment' : 'draft_message',
           history: messagesRef.current,
+          session_id: sessionIdRef.current,
         }),
       });
 

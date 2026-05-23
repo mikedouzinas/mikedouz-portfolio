@@ -10,6 +10,8 @@ import {
   getDraftMessagePrompt,
   truncateToTokens,
 } from '@/app/the-web/lib/blogIrisPrompt';
+import { logBlogIrisQuery } from '@/lib/iris/analytics';
+import { buildVisitorEnrichment } from '@/lib/iris/visitorEnrichment';
 
 const RequestSchema = z.object({
   message: z.string().min(1).max(2000),
@@ -19,6 +21,7 @@ const RequestSchema = z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string(),
   })).max(20).optional().default([]),
+  session_id: z.string().max(64).optional(),
 });
 
 // Claude for conversation (quality matters), GPT-4o-mini for drafts (just formatting)
@@ -69,7 +72,10 @@ export async function POST(
     return Response.json({ error: 'Post not found' }, { status: 404 });
   }
 
-  const { message, passage, mode, history } = body;
+  const { message, passage, mode, history, session_id } = body;
+  const startTime = Date.now();
+  const visitorEnrichment = await buildVisitorEnrichment(request).catch(() => ({}));
+  const turnIndex = history.filter((h) => h.role === 'user').length;
 
   // Build context with token budgets
   const postBody = truncateToTokens(post.body, 3000);
@@ -108,17 +114,34 @@ export async function POST(
     const encoder = new TextEncoder();
     const readable = new ReadableStream({
       async start(controller) {
+        let fullAnswer = '';
+        let streamErrored = false;
         try {
           for await (const chunk of stream) {
             if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+              fullAnswer += chunk.delta.text;
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: chunk.delta.text })}\n\n`));
             }
           }
           controller.enqueue(encoder.encode('data: [DONE]\n\n'));
         } catch {
+          streamErrored = true;
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Stream error' })}\n\n`));
         } finally {
           controller.close();
+          logBlogIrisQuery({
+            slug,
+            mode: 'conversation',
+            passage,
+            message,
+            answer_text: streamErrored ? undefined : fullAnswer,
+            answer_length: fullAnswer.length,
+            turn_index: turnIndex,
+            latency_ms: Date.now() - startTime,
+            session_id,
+            user_agent: userAgent,
+            ...visitorEnrichment,
+          }).catch(() => {});
         }
       },
     });
@@ -158,8 +181,34 @@ export async function POST(
     });
 
     const draft = completion.choices[0]?.message?.content?.trim() || message;
+    logBlogIrisQuery({
+      slug,
+      mode,
+      passage,
+      message,
+      answer_text: draft,
+      answer_length: draft.length,
+      turn_index: turnIndex,
+      latency_ms: Date.now() - startTime,
+      session_id,
+      user_agent: userAgent,
+      ...visitorEnrichment,
+    }).catch(() => {});
     return Response.json({ draft });
   } catch {
+    logBlogIrisQuery({
+      slug,
+      mode,
+      passage,
+      message,
+      answer_text: undefined,
+      answer_length: 0,
+      turn_index: turnIndex,
+      latency_ms: Date.now() - startTime,
+      session_id,
+      user_agent: userAgent,
+      ...visitorEnrichment,
+    }).catch(() => {});
     // Fallback: use reader's own message
     return Response.json({ draft: message });
   }

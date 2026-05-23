@@ -37,6 +37,7 @@ export interface QueryLog {
   results_count: number
   context_items?: Array<{ type: string; title: string; score?: number }>
   answer_length: number
+  answer_text?: string
   latency_ms: number
   cached: boolean
   session_id?: string
@@ -88,6 +89,54 @@ export async function logQuery(data: QueryLog): Promise<string | null> {
   } catch (error) {
     console.warn('[Analytics] Query logging error:', error)
     return null
+  }
+}
+
+export interface BlogIrisQueryLog {
+  slug: string
+  mode: 'conversation' | 'draft_comment' | 'draft_message'
+  passage?: string
+  message: string
+  answer_text?: string
+  answer_length?: number
+  turn_index?: number
+  latency_ms: number
+  session_id?: string
+  user_agent?: string
+
+  referrer?: string
+  ip_hash?: string
+  org?: string
+  city?: string
+  region?: string
+  country?: string
+  timezone?: string
+  utm_source?: string
+  utm_medium?: string
+  utm_campaign?: string
+  utm_content?: string
+  utm_term?: string
+}
+
+/**
+ * Log a single blog-Iris turn (one user message + assistant response or draft).
+ * Non-blocking.
+ */
+export async function logBlogIrisQuery(data: BlogIrisQueryLog): Promise<void> {
+  const supabase = getSupabase()
+  if (!supabase) return
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
+      .from('blog_iris_queries')
+      .insert([data])
+
+    if (error) {
+      console.warn('[Analytics] Failed to log blog Iris turn:', error.message)
+    }
+  } catch (error) {
+    console.warn('[Analytics] Blog Iris logging error:', error)
   }
 }
 

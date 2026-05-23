@@ -416,6 +416,7 @@ export async function POST(req: NextRequest) {
             results_count: cachedData.matchedItemIds?.length || 0,
             context_items: undefined,
             answer_length: cachedData.answer.length,
+            answer_text: cachedData.answer,
             latency_ms: latencyMs,
             cached: true,
             session_id: req.headers.get('x-session-id') || undefined,
@@ -928,6 +929,7 @@ export async function POST(req: NextRequest) {
               score: r.score
             })),
             answer_length: fullAnswer.length,
+            answer_text: fullAnswer,
             latency_ms: latencyMs,
             cached: false,
             session_id: req.headers.get('x-session-id') || undefined,
