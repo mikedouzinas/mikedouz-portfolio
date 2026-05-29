@@ -1,5 +1,191 @@
 [
   {
+    "id": "dad279e8c5678068940ef45ec987ff49",
+    "trackName": "Quevedo: Bzrp Music Sessions, Vol. 52/66",
+    "artist": "Bizarrap",
+    "album": "Quevedo: Bzrp Music Sessions, Vol. 52/66",
+    "trackUri": "spotify:track:2tTmW7RDtMQtBk7m2rYeSw",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02946f1ea32cc7681e7a86e9ca",
+    "spotifyUrl": "https://open.spotify.com/track/2tTmW7RDtMQtBk7m2rYeSw",
+    "dateRange": {
+      "start": "2026-05-26",
+      "end": "2026-05-28"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-05-27",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-05-27",
+        "plays": 3
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 139,
+      "uniqueTracksInWindow": 114,
+      "timeOfDayDistribution": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 1,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 1,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 1,
+        "22": 0,
+        "23": 0
+      },
+      "monthsActive": 1
+    }
+  },
+  {
+    "id": "5b858b729e15a283b9e938402e52957f",
+    "trackName": "Plot Twist",
+    "artist": "Drake",
+    "album": "ICEMAN",
+    "trackUri": "spotify:track:3cLCA9LSb6UiOeNvTZoaav",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02fe9d3ab9adb1d3b59835b81c",
+    "spotifyUrl": "https://open.spotify.com/track/3cLCA9LSb6UiOeNvTZoaav",
+    "dateRange": {
+      "start": "2026-05-21",
+      "end": "2026-05-24"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-05-22",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-05-22",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-24",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 126,
+      "uniqueTracksInWindow": 112,
+      "timeOfDayDistribution": {
+        "0": 1,
+        "1": 2,
+        "2": 1,
+        "3": 0,
+        "4": 1,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 1,
+        "15": 0,
+        "16": 0,
+        "17": 0,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 0
+      },
+      "monthsActive": 1
+    }
+  },
+  {
+    "id": "28af1bb3486eb3f02b0f06b6bfedfe9d",
+    "trackName": "National Treasures",
+    "artist": "Drake",
+    "album": "ICEMAN",
+    "trackUri": "spotify:track:393OFJFZKIIv66JmJcNm9D",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02fe9d3ab9adb1d3b59835b81c",
+    "spotifyUrl": "https://open.spotify.com/track/393OFJFZKIIv66JmJcNm9D",
+    "dateRange": {
+      "start": "2026-05-15",
+      "end": "2026-05-21"
+    },
+    "playCount": 5,
+    "weeksCount": 2,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2026-05-15",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-05-15",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-21",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 191,
+      "uniqueTracksInWindow": 153,
+      "timeOfDayDistribution": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 1,
+        "14": 0,
+        "15": 1,
+        "16": 0,
+        "17": 0,
+        "18": 1,
+        "19": 0,
+        "20": 0,
+        "21": 1,
+        "22": 0,
+        "23": 1
+      },
+      "monthsActive": 1
+    }
+  },
+  {
     "id": "58b95facb56451403efda2aa43518205",
     "trackName": "Never Recover (Lil Baby & Gunna, Drake)",
     "artist": "Lil Baby",
@@ -89,14 +275,13 @@
     ],
     "insightTypes": [
       "burst",
-      "comeback",
-      "one_and_done"
+      "comeback"
     ],
     "context": {
       "totalPlaysInWindow": 186,
       "uniqueTracksInWindow": 124,
       "timeOfDayDistribution": {
-        "0": 7,
+        "0": 8,
         "1": 3,
         "2": 2,
         "3": 1,
@@ -179,7 +364,7 @@
         "19": 0,
         "20": 3,
         "21": 2,
-        "22": 0,
+        "22": 1,
         "23": 2
       },
       "monthsActive": 4
@@ -218,8 +403,7 @@
       }
     ],
     "insightTypes": [
-      "burst",
-      "one_and_done"
+      "burst"
     ],
     "context": {
       "totalPlaysInWindow": 284,
@@ -239,7 +423,7 @@
         "11": 0,
         "12": 0,
         "13": 0,
-        "14": 1,
+        "14": 2,
         "15": 1,
         "16": 0,
         "17": 0,
@@ -286,8 +470,7 @@
       }
     ],
     "insightTypes": [
-      "burst",
-      "one_and_done"
+      "burst"
     ],
     "context": {
       "totalPlaysInWindow": 272,
@@ -307,7 +490,7 @@
         "11": 0,
         "12": 0,
         "13": 1,
-        "14": 1,
+        "14": 2,
         "15": 0,
         "16": 1,
         "17": 2,
@@ -354,8 +537,7 @@
       }
     ],
     "insightTypes": [
-      "burst",
-      "one_and_done"
+      "burst"
     ],
     "context": {
       "totalPlaysInWindow": 491,
@@ -374,7 +556,7 @@
         "10": 0,
         "11": 0,
         "12": 0,
-        "13": 0,
+        "13": 1,
         "14": 1,
         "15": 3,
         "16": 0,
@@ -474,8 +656,8 @@
     },
     "playCount": 5,
     "weeksCount": 2,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2026-04-26",
     "peakDayPlays": 3,
     "hotDays": [
@@ -485,8 +667,7 @@
       }
     ],
     "insightTypes": [
-      "burst",
-      "one_and_done"
+      "burst"
     ],
     "context": {
       "totalPlaysInWindow": 131,
@@ -509,7 +690,7 @@
         "14": 2,
         "15": 0,
         "16": 0,
-        "17": 1,
+        "17": 2,
         "18": 2,
         "19": 0,
         "20": 1,
@@ -574,7 +755,7 @@
         "20": 0,
         "21": 1,
         "22": 2,
-        "23": 0
+        "23": 1
       },
       "monthsActive": 2
     }
@@ -617,7 +798,7 @@
       "totalPlaysInWindow": 179,
       "uniqueTracksInWindow": 130,
       "timeOfDayDistribution": {
-        "0": 3,
+        "0": 4,
         "1": 2,
         "2": 4,
         "3": 3,
@@ -678,8 +859,7 @@
       }
     ],
     "insightTypes": [
-      "burst",
-      "one_and_done"
+      "burst"
     ],
     "context": {
       "totalPlaysInWindow": 756,
@@ -706,7 +886,7 @@
         "18": 0,
         "19": 0,
         "20": 4,
-        "21": 0,
+        "21": 1,
         "22": 1,
         "23": 0
       },
@@ -756,7 +936,7 @@
       "totalPlaysInWindow": 546,
       "uniqueTracksInWindow": 271,
       "timeOfDayDistribution": {
-        "0": 0,
+        "0": 1,
         "1": 3,
         "2": 1,
         "3": 2,
@@ -770,7 +950,7 @@
         "11": 0,
         "12": 0,
         "13": 0,
-        "14": 0,
+        "14": 1,
         "15": 1,
         "16": 0,
         "17": 0,
@@ -893,7 +1073,7 @@
         "0": 10,
         "1": 7,
         "2": 9,
-        "3": 2,
+        "3": 3,
         "4": 4,
         "5": 0,
         "6": 0,
@@ -977,14 +1157,14 @@
         "15": 3,
         "16": 5,
         "17": 1,
-        "18": 4,
+        "18": 5,
         "19": 1,
         "20": 5,
         "21": 5,
         "22": 3,
         "23": 6
       },
-      "monthsActive": 19
+      "monthsActive": 20
     }
   },
   {
@@ -1052,8 +1232,8 @@
         "19": 1,
         "20": 1,
         "21": 1,
-        "22": 2,
-        "23": 5
+        "22": 3,
+        "23": 6
       },
       "monthsActive": 3
     }
@@ -1147,8 +1327,7 @@
       }
     ],
     "insightTypes": [
-      "burst",
-      "one_and_done"
+      "burst"
     ],
     "context": {
       "totalPlaysInWindow": 821,
@@ -1171,7 +1350,7 @@
         "14": 0,
         "15": 2,
         "16": 1,
-        "17": 2,
+        "17": 3,
         "18": 2,
         "19": 2,
         "20": 0,
@@ -1436,7 +1615,7 @@
         "18": 0,
         "19": 2,
         "20": 1,
-        "21": 1,
+        "21": 2,
         "22": 3,
         "23": 0
       },
@@ -1569,14 +1748,14 @@
         "13": 0,
         "14": 2,
         "15": 0,
-        "16": 0,
+        "16": 1,
         "17": 1,
         "18": 0,
         "19": 1,
         "20": 2,
         "21": 0,
         "22": 2,
-        "23": 2
+        "23": 3
       },
       "monthsActive": 2
     }
@@ -1619,7 +1798,7 @@
       "totalPlaysInWindow": 207,
       "uniqueTracksInWindow": 124,
       "timeOfDayDistribution": {
-        "0": 3,
+        "0": 4,
         "1": 2,
         "2": 4,
         "3": 3,
@@ -1729,8 +1908,8 @@
     },
     "playCount": 15,
     "weeksCount": 4,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2026-04-01",
     "peakDayPlays": 3,
     "hotDays": [
@@ -1770,11 +1949,11 @@
         "11": 4,
         "12": 4,
         "13": 1,
-        "14": 2,
+        "14": 3,
         "15": 4,
         "16": 2,
         "17": 2,
-        "18": 7,
+        "18": 8,
         "19": 1,
         "20": 2,
         "21": 1,
@@ -2220,7 +2399,7 @@
         "18": 0,
         "19": 2,
         "20": 1,
-        "21": 1,
+        "21": 2,
         "22": 3,
         "23": 0
       },
@@ -2322,7 +2501,7 @@
       "totalPlaysInWindow": 323,
       "uniqueTracksInWindow": 225,
       "timeOfDayDistribution": {
-        "0": 7,
+        "0": 8,
         "1": 3,
         "2": 2,
         "3": 1,
@@ -2685,7 +2864,7 @@
         "19": 0,
         "20": 3,
         "21": 2,
-        "22": 0,
+        "22": 1,
         "23": 2
       },
       "monthsActive": 4
@@ -3552,7 +3731,7 @@
         "20": 0,
         "21": 1,
         "22": 2,
-        "23": 7
+        "23": 8
       },
       "monthsActive": 5
     }
@@ -3605,7 +3784,7 @@
       "totalPlaysInWindow": 1135,
       "uniqueTracksInWindow": 425,
       "timeOfDayDistribution": {
-        "0": 7,
+        "0": 8,
         "1": 3,
         "2": 2,
         "3": 1,
@@ -4342,7 +4521,7 @@
         "0": 0,
         "1": 2,
         "2": 1,
-        "3": 3,
+        "3": 4,
         "4": 2,
         "5": 1,
         "6": 0,
@@ -5013,7 +5192,7 @@
         "0": 2,
         "1": 2,
         "2": 1,
-        "3": 0,
+        "3": 1,
         "4": 2,
         "5": 2,
         "6": 1,
@@ -6498,7 +6677,7 @@
       "uniqueTracksInWindow": 168,
       "timeOfDayDistribution": {
         "0": 1,
-        "1": 3,
+        "1": 4,
         "2": 1,
         "3": 0,
         "4": 1,
@@ -6575,7 +6754,7 @@
         "11": 1,
         "12": 0,
         "13": 2,
-        "14": 4,
+        "14": 5,
         "15": 4,
         "16": 2,
         "17": 2,
@@ -6769,7 +6948,7 @@
       "uniqueTracksInWindow": 128,
       "timeOfDayDistribution": {
         "0": 1,
-        "1": 3,
+        "1": 4,
         "2": 1,
         "3": 0,
         "4": 1,
@@ -6846,7 +7025,7 @@
       "totalPlaysInWindow": 1296,
       "uniqueTracksInWindow": 537,
       "timeOfDayDistribution": {
-        "0": 3,
+        "0": 4,
         "1": 2,
         "2": 4,
         "3": 3,
@@ -6872,73 +7051,6 @@
         "23": 2
       },
       "monthsActive": 11
-    }
-  },
-  {
-    "id": "9a36ba2771db2ecb50af020573647799",
-    "trackName": "So Cold",
-    "artist": "Balu Brigada",
-    "album": "So Cold",
-    "trackUri": "spotify:track:297PYWIVLP38C1a92ND8Kv",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021fc8017bbf246da18b953789",
-    "spotifyUrl": "https://open.spotify.com/track/2SGyf0hCuB81F85cHXuRjl",
-    "dateRange": {
-      "start": "2025-10-27",
-      "end": "2025-11-01"
-    },
-    "playCount": 7,
-    "weeksCount": 1,
-    "intensity": 3,
-    "maxState": 3,
-    "peakDay": "2025-10-27",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2025-10-27",
-        "plays": 2
-      },
-      {
-        "date": "2025-10-30",
-        "plays": 2
-      },
-      {
-        "date": "2025-10-31",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst"
-    ],
-    "context": {
-      "totalPlaysInWindow": 341,
-      "uniqueTracksInWindow": 231,
-      "timeOfDayDistribution": {
-        "0": 2,
-        "1": 1,
-        "2": 0,
-        "3": 2,
-        "4": 0,
-        "5": 1,
-        "6": 1,
-        "7": 0,
-        "8": 0,
-        "9": 0,
-        "10": 1,
-        "11": 2,
-        "12": 3,
-        "13": 2,
-        "14": 2,
-        "15": 5,
-        "16": 1,
-        "17": 2,
-        "18": 4,
-        "19": 1,
-        "20": 1,
-        "21": 3,
-        "22": 0,
-        "23": 2
-      },
-      "monthsActive": 8
     }
   },
   {
@@ -7010,6 +7122,73 @@
         "23": 0
       },
       "monthsActive": 6
+    }
+  },
+  {
+    "id": "9a36ba2771db2ecb50af020573647799",
+    "trackName": "So Cold",
+    "artist": "Balu Brigada",
+    "album": "So Cold",
+    "trackUri": "spotify:track:297PYWIVLP38C1a92ND8Kv",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021fc8017bbf246da18b953789",
+    "spotifyUrl": "https://open.spotify.com/track/2SGyf0hCuB81F85cHXuRjl",
+    "dateRange": {
+      "start": "2025-10-27",
+      "end": "2025-11-01"
+    },
+    "playCount": 7,
+    "weeksCount": 1,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2025-10-27",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2025-10-27",
+        "plays": 2
+      },
+      {
+        "date": "2025-10-30",
+        "plays": 2
+      },
+      {
+        "date": "2025-10-31",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 341,
+      "uniqueTracksInWindow": 231,
+      "timeOfDayDistribution": {
+        "0": 2,
+        "1": 2,
+        "2": 0,
+        "3": 2,
+        "4": 0,
+        "5": 1,
+        "6": 1,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 1,
+        "11": 2,
+        "12": 3,
+        "13": 2,
+        "14": 2,
+        "15": 5,
+        "16": 1,
+        "17": 2,
+        "18": 4,
+        "19": 1,
+        "20": 1,
+        "21": 3,
+        "22": 0,
+        "23": 2
+      },
+      "monthsActive": 9
     }
   },
   {
@@ -7533,7 +7712,7 @@
         "0": 1,
         "1": 0,
         "2": 2,
-        "3": 2,
+        "3": 3,
         "4": 1,
         "5": 2,
         "6": 3,
@@ -7544,7 +7723,7 @@
         "11": 1,
         "12": 6,
         "13": 3,
-        "14": 7,
+        "14": 8,
         "15": 4,
         "16": 0,
         "17": 3,
@@ -8135,7 +8314,7 @@
         "0": 10,
         "1": 7,
         "2": 9,
-        "3": 2,
+        "3": 3,
         "4": 4,
         "5": 0,
         "6": 0,
@@ -8417,7 +8596,7 @@
         "13": 1,
         "14": 2,
         "15": 2,
-        "16": 2,
+        "16": 3,
         "17": 1,
         "18": 5,
         "19": 1,
@@ -8550,7 +8729,7 @@
       "totalPlaysInWindow": 1506,
       "uniqueTracksInWindow": 542,
       "timeOfDayDistribution": {
-        "0": 3,
+        "0": 4,
         "1": 1,
         "2": 0,
         "3": 1,
@@ -8572,7 +8751,7 @@
         "19": 2,
         "20": 6,
         "21": 4,
-        "22": 0,
+        "22": 1,
         "23": 3
       },
       "monthsActive": 9
@@ -8954,7 +9133,7 @@
       "totalPlaysInWindow": 649,
       "uniqueTracksInWindow": 262,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 3,
         "1": 2,
         "2": 0,
         "3": 1,
@@ -9080,7 +9259,7 @@
       "totalPlaysInWindow": 649,
       "uniqueTracksInWindow": 262,
       "timeOfDayDistribution": {
-        "0": 3,
+        "0": 4,
         "1": 1,
         "2": 3,
         "3": 2,
@@ -9094,7 +9273,7 @@
         "11": 1,
         "12": 0,
         "13": 1,
-        "14": 0,
+        "14": 1,
         "15": 1,
         "16": 2,
         "17": 3,
@@ -9598,7 +9777,7 @@
         "0": 0,
         "1": 2,
         "2": 1,
-        "3": 0,
+        "3": 1,
         "4": 1,
         "5": 1,
         "6": 2,
@@ -9620,7 +9799,7 @@
         "22": 7,
         "23": 1
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -9683,14 +9862,14 @@
         "15": 3,
         "16": 7,
         "17": 6,
-        "18": 4,
+        "18": 5,
         "19": 10,
         "20": 7,
         "21": 4,
         "22": 3,
         "23": 5
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -10315,7 +10494,7 @@
         "0": 10,
         "1": 7,
         "2": 9,
-        "3": 2,
+        "3": 3,
         "4": 4,
         "5": 0,
         "6": 0,
@@ -10524,7 +10703,7 @@
         "0": 2,
         "1": 4,
         "2": 1,
-        "3": 3,
+        "3": 4,
         "4": 2,
         "5": 1,
         "6": 0,
@@ -10546,7 +10725,7 @@
         "22": 0,
         "23": 3
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -10713,7 +10892,7 @@
       "totalPlaysInWindow": 542,
       "uniqueTracksInWindow": 240,
       "timeOfDayDistribution": {
-        "0": 3,
+        "0": 4,
         "1": 1,
         "2": 3,
         "3": 2,
@@ -10727,7 +10906,7 @@
         "11": 1,
         "12": 0,
         "13": 1,
-        "14": 0,
+        "14": 1,
         "15": 1,
         "16": 2,
         "17": 3,
@@ -10784,7 +10963,7 @@
         "1": 1,
         "2": 4,
         "3": 0,
-        "4": 2,
+        "4": 3,
         "5": 0,
         "6": 1,
         "7": 0,
@@ -10805,7 +10984,7 @@
         "22": 0,
         "23": 0
       },
-      "monthsActive": 8
+      "monthsActive": 9
     }
   },
   {
@@ -10933,10 +11112,10 @@
         "19": 1,
         "20": 1,
         "21": 0,
-        "22": 1,
+        "22": 2,
         "23": 0
       },
-      "monthsActive": 8
+      "monthsActive": 9
     }
   },
   {
@@ -10984,7 +11163,7 @@
         "3": 3,
         "4": 0,
         "5": 0,
-        "6": 0,
+        "6": 1,
         "7": 0,
         "8": 1,
         "9": 3,
@@ -11003,7 +11182,7 @@
         "22": 1,
         "23": 4
       },
-      "monthsActive": 7
+      "monthsActive": 8
     }
   },
   {
@@ -11127,7 +11306,7 @@
       "totalPlaysInWindow": 669,
       "uniqueTracksInWindow": 266,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 3,
         "1": 2,
         "2": 0,
         "3": 1,
@@ -11189,7 +11368,7 @@
         "0": 1,
         "1": 2,
         "2": 1,
-        "3": 0,
+        "3": 1,
         "4": 2,
         "5": 2,
         "6": 1,
@@ -11211,7 +11390,7 @@
         "22": 1,
         "23": 5
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -11403,7 +11582,7 @@
       "totalPlaysInWindow": 1719,
       "uniqueTracksInWindow": 533,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 3,
         "1": 3,
         "2": 2,
         "3": 0,
@@ -11424,7 +11603,7 @@
         "18": 3,
         "19": 5,
         "20": 4,
-        "21": 8,
+        "21": 9,
         "22": 3,
         "23": 5
       },
@@ -11628,7 +11807,7 @@
         "0": 0,
         "1": 2,
         "2": 1,
-        "3": 0,
+        "3": 1,
         "4": 1,
         "5": 1,
         "6": 2,
@@ -11650,7 +11829,7 @@
         "22": 7,
         "23": 1
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -12231,7 +12410,7 @@
         "14": 1,
         "15": 0,
         "16": 3,
-        "17": 0,
+        "17": 1,
         "18": 0,
         "19": 2,
         "20": 0,
@@ -12322,8 +12501,8 @@
     },
     "playCount": 13,
     "weeksCount": 4,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2025-06-26",
     "peakDayPlays": 2,
     "hotDays": [
@@ -12363,11 +12542,11 @@
         "11": 4,
         "12": 4,
         "13": 1,
-        "14": 2,
+        "14": 3,
         "15": 4,
         "16": 2,
         "17": 2,
-        "18": 7,
+        "18": 8,
         "19": 1,
         "20": 2,
         "21": 1,
@@ -12491,7 +12670,7 @@
         "14": 5,
         "15": 2,
         "16": 6,
-        "17": 5,
+        "17": 6,
         "18": 1,
         "19": 3,
         "20": 5,
@@ -12499,7 +12678,7 @@
         "22": 4,
         "23": 2
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -13113,7 +13292,7 @@
         "19": 0,
         "20": 1,
         "21": 2,
-        "22": 0,
+        "22": 1,
         "23": 4
       },
       "monthsActive": 11
@@ -13187,14 +13366,14 @@
         "15": 3,
         "16": 7,
         "17": 6,
-        "18": 4,
+        "18": 5,
         "19": 10,
         "20": 7,
         "21": 4,
         "22": 3,
         "23": 5
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -13754,14 +13933,14 @@
         "15": 3,
         "16": 7,
         "17": 6,
-        "18": 4,
+        "18": 5,
         "19": 10,
         "20": 7,
         "21": 4,
         "22": 3,
         "23": 5
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -13823,7 +14002,7 @@
         "14": 5,
         "15": 2,
         "16": 6,
-        "17": 5,
+        "17": 6,
         "18": 1,
         "19": 3,
         "20": 5,
@@ -13831,7 +14010,7 @@
         "22": 4,
         "23": 2
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -13949,7 +14128,7 @@
         "14": 5,
         "15": 2,
         "16": 6,
-        "17": 5,
+        "17": 6,
         "18": 1,
         "19": 3,
         "20": 5,
@@ -13957,7 +14136,7 @@
         "22": 4,
         "23": 2
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -14422,7 +14601,7 @@
         "11": 2,
         "12": 3,
         "13": 2,
-        "14": 5,
+        "14": 6,
         "15": 4,
         "16": 5,
         "17": 1,
@@ -14430,7 +14609,7 @@
         "19": 1,
         "20": 1,
         "21": 3,
-        "22": 3,
+        "22": 4,
         "23": 7
       },
       "monthsActive": 14
@@ -14473,10 +14652,10 @@
         "0": 3,
         "1": 3,
         "2": 5,
-        "3": 3,
+        "3": 4,
         "4": 2,
         "5": 1,
-        "6": 1,
+        "6": 2,
         "7": 1,
         "8": 1,
         "9": 0,
@@ -14484,7 +14663,7 @@
         "11": 1,
         "12": 4,
         "13": 8,
-        "14": 4,
+        "14": 5,
         "15": 6,
         "16": 4,
         "17": 1,
@@ -15234,14 +15413,14 @@
         "15": 3,
         "16": 7,
         "17": 6,
-        "18": 4,
+        "18": 5,
         "19": 10,
         "20": 7,
         "21": 4,
         "22": 3,
         "23": 5
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -15492,10 +15671,10 @@
         "0": 3,
         "1": 3,
         "2": 5,
-        "3": 3,
+        "3": 4,
         "4": 2,
         "5": 1,
-        "6": 1,
+        "6": 2,
         "7": 1,
         "8": 1,
         "9": 0,
@@ -15503,7 +15682,7 @@
         "11": 1,
         "12": 4,
         "13": 8,
-        "14": 4,
+        "14": 5,
         "15": 6,
         "16": 4,
         "17": 1,
@@ -16065,9 +16244,9 @@
         "20": 2,
         "21": 2,
         "22": 4,
-        "23": 0
+        "23": 1
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -16169,7 +16348,7 @@
       "totalPlaysInWindow": 151,
       "uniqueTracksInWindow": 84,
       "timeOfDayDistribution": {
-        "0": 5,
+        "0": 6,
         "1": 1,
         "2": 4,
         "3": 4,
@@ -19610,7 +19789,7 @@
         "15": 5,
         "16": 1,
         "17": 2,
-        "18": 2,
+        "18": 3,
         "19": 1,
         "20": 1,
         "21": 2,
@@ -20000,7 +20179,7 @@
       "totalPlaysInWindow": 464,
       "uniqueTracksInWindow": 218,
       "timeOfDayDistribution": {
-        "0": 16,
+        "0": 17,
         "1": 24,
         "2": 15,
         "3": 9,
@@ -20016,9 +20195,9 @@
         "13": 6,
         "14": 9,
         "15": 9,
-        "16": 7,
+        "16": 8,
         "17": 14,
-        "18": 12,
+        "18": 13,
         "19": 11,
         "20": 11,
         "21": 11,
@@ -20906,14 +21085,14 @@
         "15": 3,
         "16": 1,
         "17": 1,
-        "18": 1,
+        "18": 2,
         "19": 0,
         "20": 1,
         "21": 3,
         "22": 3,
         "23": 0
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -21173,7 +21352,7 @@
       "totalPlaysInWindow": 456,
       "uniqueTracksInWindow": 215,
       "timeOfDayDistribution": {
-        "0": 2,
+        "0": 3,
         "1": 2,
         "2": 1,
         "3": 2,
@@ -21198,7 +21377,7 @@
         "22": 3,
         "23": 2
       },
-      "monthsActive": 23
+      "monthsActive": 24
     }
   },
   {
@@ -22005,7 +22184,7 @@
         "12": 1,
         "13": 8,
         "14": 1,
-        "15": 7,
+        "15": 8,
         "16": 4,
         "17": 3,
         "18": 3,
@@ -22552,7 +22731,7 @@
       "totalPlaysInWindow": 1229,
       "uniqueTracksInWindow": 316,
       "timeOfDayDistribution": {
-        "0": 16,
+        "0": 17,
         "1": 24,
         "2": 15,
         "3": 9,
@@ -22568,9 +22747,9 @@
         "13": 6,
         "14": 9,
         "15": 9,
-        "16": 7,
+        "16": 8,
         "17": 14,
-        "18": 12,
+        "18": 13,
         "19": 11,
         "20": 11,
         "21": 11,
@@ -22699,7 +22878,7 @@
         "12": 4,
         "13": 2,
         "14": 6,
-        "15": 2,
+        "15": 3,
         "16": 5,
         "17": 5,
         "18": 2,
@@ -22709,7 +22888,7 @@
         "22": 6,
         "23": 2
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
@@ -22746,7 +22925,7 @@
       "totalPlaysInWindow": 173,
       "uniqueTracksInWindow": 103,
       "timeOfDayDistribution": {
-        "0": 16,
+        "0": 17,
         "1": 24,
         "2": 15,
         "3": 9,
@@ -22762,9 +22941,9 @@
         "13": 6,
         "14": 9,
         "15": 9,
-        "16": 7,
+        "16": 8,
         "17": 14,
-        "18": 12,
+        "18": 13,
         "19": 11,
         "20": 11,
         "21": 11,
@@ -22877,7 +23056,7 @@
         "1": 5,
         "2": 6,
         "3": 4,
-        "4": 6,
+        "4": 7,
         "5": 1,
         "6": 4,
         "7": 1,
@@ -22898,7 +23077,7 @@
         "22": 3,
         "23": 7
       },
-      "monthsActive": 25
+      "monthsActive": 26
     }
   },
   {
@@ -23680,7 +23859,7 @@
         "12": 4,
         "13": 2,
         "14": 6,
-        "15": 2,
+        "15": 3,
         "16": 5,
         "17": 5,
         "18": 2,
@@ -23690,7 +23869,7 @@
         "22": 6,
         "23": 2
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
@@ -24864,7 +25043,7 @@
       "totalPlaysInWindow": 720,
       "uniqueTracksInWindow": 260,
       "timeOfDayDistribution": {
-        "0": 16,
+        "0": 17,
         "1": 24,
         "2": 15,
         "3": 9,
@@ -24880,9 +25059,9 @@
         "13": 6,
         "14": 9,
         "15": 9,
-        "16": 7,
+        "16": 8,
         "17": 14,
-        "18": 12,
+        "18": 13,
         "19": 11,
         "20": 11,
         "21": 11,
@@ -27429,7 +27608,7 @@
         "1": 5,
         "2": 6,
         "3": 4,
-        "4": 6,
+        "4": 7,
         "5": 1,
         "6": 4,
         "7": 1,
@@ -27450,7 +27629,7 @@
         "22": 3,
         "23": 7
       },
-      "monthsActive": 25
+      "monthsActive": 26
     }
   },
   {
@@ -27627,7 +27806,7 @@
       "totalPlaysInWindow": 715,
       "uniqueTracksInWindow": 270,
       "timeOfDayDistribution": {
-        "0": 14,
+        "0": 15,
         "1": 11,
         "2": 10,
         "3": 5,
@@ -27641,7 +27820,7 @@
         "11": 2,
         "12": 5,
         "13": 6,
-        "14": 11,
+        "14": 12,
         "15": 3,
         "16": 6,
         "17": 7,
@@ -29445,7 +29624,7 @@
         "1": 5,
         "2": 6,
         "3": 4,
-        "4": 6,
+        "4": 7,
         "5": 1,
         "6": 4,
         "7": 1,
@@ -29466,7 +29645,7 @@
         "22": 3,
         "23": 7
       },
-      "monthsActive": 25
+      "monthsActive": 26
     }
   },
   {
@@ -29748,7 +29927,7 @@
         "12": 5,
         "13": 5,
         "14": 7,
-        "15": 8,
+        "15": 9,
         "16": 6,
         "17": 6,
         "18": 5,
@@ -29756,7 +29935,7 @@
         "20": 5,
         "21": 8,
         "22": 14,
-        "23": 7
+        "23": 8
       },
       "monthsActive": 35
     }
@@ -30842,6 +31021,71 @@
     }
   },
   {
+    "id": "6e77b4f2e6f1daa41ba1c5fb25b23a0a",
+    "trackName": "3005",
+    "artist": "Childish Gambino",
+    "album": "Because the Internet",
+    "trackUri": "spotify:track:5cc9Zbfp9u10sfJeKZ3h16",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/2X6b7zLdIxCejd6GqVcQ9M",
+    "dateRange": {
+      "start": "2023-02-27",
+      "end": "2023-03-05"
+    },
+    "playCount": 6,
+    "weeksCount": 1,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-02-28",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-02-28",
+        "plays": 2
+      },
+      {
+        "date": "2023-03-03",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 227,
+      "uniqueTracksInWindow": 98,
+      "timeOfDayDistribution": {
+        "0": 7,
+        "1": 2,
+        "2": 5,
+        "3": 3,
+        "4": 0,
+        "5": 3,
+        "6": 2,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 1,
+        "11": 0,
+        "12": 2,
+        "13": 6,
+        "14": 3,
+        "15": 1,
+        "16": 2,
+        "17": 3,
+        "18": 2,
+        "19": 2,
+        "20": 7,
+        "21": 7,
+        "22": 1,
+        "23": 4
+      },
+      "monthsActive": 25
+    }
+  },
+  {
     "id": "8e6e1cd44bc999f3abc3ea2958768fde",
     "trackName": "505",
     "artist": "Arctic Monkeys",
@@ -30912,71 +31156,6 @@
     }
   },
   {
-    "id": "6e77b4f2e6f1daa41ba1c5fb25b23a0a",
-    "trackName": "3005",
-    "artist": "Childish Gambino",
-    "album": "Because the Internet",
-    "trackUri": "spotify:track:5cc9Zbfp9u10sfJeKZ3h16",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/2X6b7zLdIxCejd6GqVcQ9M",
-    "dateRange": {
-      "start": "2023-02-27",
-      "end": "2023-03-05"
-    },
-    "playCount": 6,
-    "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2023-02-28",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-02-28",
-        "plays": 2
-      },
-      {
-        "date": "2023-03-03",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 227,
-      "uniqueTracksInWindow": 98,
-      "timeOfDayDistribution": {
-        "0": 7,
-        "1": 2,
-        "2": 5,
-        "3": 3,
-        "4": 0,
-        "5": 3,
-        "6": 2,
-        "7": 0,
-        "8": 0,
-        "9": 0,
-        "10": 1,
-        "11": 0,
-        "12": 2,
-        "13": 6,
-        "14": 3,
-        "15": 1,
-        "16": 2,
-        "17": 3,
-        "18": 2,
-        "19": 2,
-        "20": 7,
-        "21": 7,
-        "22": 1,
-        "23": 4
-      },
-      "monthsActive": 25
-    }
-  },
-  {
     "id": "09b34d0184833003aeaab44de63696d2",
     "trackName": "Alright",
     "artist": "Kendrick Lamar",
@@ -31026,7 +31205,7 @@
       "totalPlaysInWindow": 1064,
       "uniqueTracksInWindow": 254,
       "timeOfDayDistribution": {
-        "0": 6,
+        "0": 7,
         "1": 11,
         "2": 8,
         "3": 8,
@@ -31051,7 +31230,7 @@
         "22": 4,
         "23": 5
       },
-      "monthsActive": 27
+      "monthsActive": 28
     }
   },
   {
@@ -31509,7 +31688,7 @@
       "totalPlaysInWindow": 1847,
       "uniqueTracksInWindow": 314,
       "timeOfDayDistribution": {
-        "0": 14,
+        "0": 15,
         "1": 11,
         "2": 10,
         "3": 5,
@@ -31523,7 +31702,7 @@
         "11": 2,
         "12": 5,
         "13": 6,
-        "14": 11,
+        "14": 12,
         "15": 3,
         "16": 6,
         "17": 7,
@@ -31707,7 +31886,7 @@
         "0": 3,
         "1": 2,
         "2": 5,
-        "3": 3,
+        "3": 4,
         "4": 1,
         "5": 0,
         "6": 0,
@@ -31729,7 +31908,7 @@
         "22": 2,
         "23": 0
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -31922,14 +32101,14 @@
         "15": 4,
         "16": 1,
         "17": 4,
-        "18": 4,
+        "18": 5,
         "19": 8,
         "20": 6,
         "21": 8,
         "22": 7,
         "23": 7
       },
-      "monthsActive": 25
+      "monthsActive": 26
     }
   },
   {
@@ -33246,7 +33425,7 @@
       "totalPlaysInWindow": 591,
       "uniqueTracksInWindow": 171,
       "timeOfDayDistribution": {
-        "0": 6,
+        "0": 7,
         "1": 11,
         "2": 8,
         "3": 8,
@@ -33271,7 +33450,7 @@
         "22": 4,
         "23": 5
       },
-      "monthsActive": 27
+      "monthsActive": 28
     }
   },
   {
@@ -33998,7 +34177,7 @@
       "totalPlaysInWindow": 127,
       "uniqueTracksInWindow": 72,
       "timeOfDayDistribution": {
-        "0": 14,
+        "0": 15,
         "1": 11,
         "2": 10,
         "3": 5,
@@ -34012,7 +34191,7 @@
         "11": 2,
         "12": 5,
         "13": 6,
-        "14": 11,
+        "14": 12,
         "15": 3,
         "16": 6,
         "17": 7,
@@ -34296,14 +34475,14 @@
         "15": 4,
         "16": 1,
         "17": 4,
-        "18": 4,
+        "18": 5,
         "19": 8,
         "20": 6,
         "21": 8,
         "22": 7,
         "23": 7
       },
-      "monthsActive": 25
+      "monthsActive": 26
     }
   },
   {
@@ -34346,7 +34525,7 @@
         "0": 3,
         "1": 2,
         "2": 5,
-        "3": 3,
+        "3": 4,
         "4": 1,
         "5": 0,
         "6": 0,
@@ -34368,7 +34547,7 @@
         "22": 2,
         "23": 0
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
