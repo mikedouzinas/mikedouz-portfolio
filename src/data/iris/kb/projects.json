@@ -63,7 +63,6 @@
     "skills": [
       "swift",
       "ai_integration",
-      "typescript",
       "product_management"
     ],
     "tech_stack": [
@@ -108,16 +107,16 @@
       "Continuously improves: I notice patterns I want to handle better, add them as skills or hooks, and the next iteration is smarter."
     ],
     "skills": [
-      "typescript",
       "ai_integration",
       "product_management",
       "writing"
     ],
     "tech_stack": [
-      "TypeScript",
       "Claude Code",
       "Anthropic Claude API",
-      "Obsidian"
+      "Obsidian",
+      "Markdown",
+      "MCP (Model Context Protocol)"
     ],
     "architecture": "Markdown vault, Claude Code search and routing, multi-agent dialectic engine, persistent Truth Store. Apollo is the intelligence layer; Iris (web, mobile, terminal) is the access layer.",
     "tags": [
@@ -220,7 +219,7 @@
       "voice_synthesis"
     ],
     "tech_stack": [
-      "Next.js 15",
+      "Next.js 16",
       "React 19",
       "TypeScript",
       "Tailwind CSS",
@@ -234,7 +233,7 @@
       "Spotify API",
       "Web Audio API"
     ],
-    "architecture": "Next.js 15 App Router with server/client component split. Iris: full KB serialized into a prompt-cached system prompt, single-pass Claude Sonnet 4.6 call with tool-based intent classification and streaming response. Blog: Supabase-backed with full-text search, inline Iris conversations, and AI voice via ElevenLabs. Spotify: offline Kleinberg analysis + per-post soundtrack curation. Deep mode: React Context + localStorage persistence.",
+    "architecture": "Next.js 16 App Router with server/client component split. Iris: full KB serialized into a prompt-cached system prompt, single-pass Claude Sonnet 4.6 call with tool-based intent classification and streaming response. Blog: Supabase-backed with full-text search, inline Iris conversations, and AI voice via ElevenLabs. Spotify: offline Kleinberg analysis + per-post soundtrack curation. Deep mode: React Context + localStorage persistence.",
     "tags": [
       "Web",
       "AI",
