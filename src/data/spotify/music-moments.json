@@ -1,6 +1,60 @@
 [
   {
-    "id": "dad279e8c5678068940ef45ec987ff49",
+    "id": "156b3ce0307342f1e9d976ca6886fe28",
+    "trackName": "Plot Twist",
+    "artist": "Drake",
+    "album": "ICEMAN",
+    "trackUri": "spotify:track:3cLCA9LSb6UiOeNvTZoaav",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02fe9d3ab9adb1d3b59835b81c",
+    "spotifyUrl": "https://open.spotify.com/track/3cLCA9LSb6UiOeNvTZoaav",
+    "dateRange": {
+      "start": "2026-06-01",
+      "end": "2026-06-04"
+    },
+    "playCount": 6,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-06-01",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-06-01",
+        "plays": 3
+      },
+      {
+        "date": "2026-06-04",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "6d30181f31c328c96cc956ad500c75b3",
+    "trackName": "Human",
+    "artist": "The Killers",
+    "album": "Day & Age (Bonus Tracks)",
+    "trackUri": "spotify:track:1sTsuZTdANkiFd7T34H3nb",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02a43cd43ef4f3b2d5413b17f9",
+    "spotifyUrl": "https://open.spotify.com/track/1sTsuZTdANkiFd7T34H3nb",
+    "dateRange": {
+      "start": "2026-06-01",
+      "end": "2026-06-03"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-06-01",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-06-01",
+        "plays": 3
+      }
+    ]
+  },
+  {
+    "id": "07f7ee56ef2e310b99b7bdcb15101e3b",
     "trackName": "Quevedo: Bzrp Music Sessions, Vol. 52/66",
     "artist": "Bizarrap",
     "album": "Quevedo: Bzrp Music Sessions, Vol. 52/66",
@@ -9,10 +63,10 @@
     "spotifyUrl": "https://open.spotify.com/track/2tTmW7RDtMQtBk7m2rYeSw",
     "dateRange": {
       "start": "2026-05-26",
-      "end": "2026-05-28"
+      "end": "2026-06-03"
     },
-    "playCount": 5,
-    "weeksCount": 1,
+    "playCount": 8,
+    "weeksCount": 2,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-05-27",
@@ -21,6 +75,10 @@
       {
         "date": "2026-05-27",
         "plays": 3
+      },
+      {
+        "date": "2026-06-02",
+        "plays": 2
       }
     ]
   },
@@ -54,7 +112,7 @@
     ]
   },
   {
-    "id": "28af1bb3486eb3f02b0f06b6bfedfe9d",
+    "id": "85029b986edc010e9a8c2de46b11553d",
     "trackName": "National Treasures",
     "artist": "Drake",
     "album": "ICEMAN",
@@ -63,12 +121,12 @@
     "spotifyUrl": "https://open.spotify.com/track/393OFJFZKIIv66JmJcNm9D",
     "dateRange": {
       "start": "2026-05-15",
-      "end": "2026-05-21"
+      "end": "2026-05-29"
     },
-    "playCount": 5,
-    "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
+    "playCount": 8,
+    "weeksCount": 3,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2026-05-15",
     "peakDayPlays": 2,
     "hotDays": [
@@ -78,6 +136,10 @@
       },
       {
         "date": "2026-05-21",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-29",
         "plays": 2
       }
     ]
@@ -349,6 +411,43 @@
     ]
   },
   {
+    "id": "b2c40dc80d2bcc57cb3d4a7924196882",
+    "trackName": "I. The Worst Guys",
+    "artist": "Childish Gambino",
+    "album": "Because the Internet",
+    "trackUri": "spotify:track:0kErPGykp7EJo7L5fx8YjB",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
+    "spotifyUrl": "https://open.spotify.com/track/4jnctHRggVIvMgkru936fN",
+    "dateRange": {
+      "start": "2026-04-20",
+      "end": "2026-05-10"
+    },
+    "playCount": 12,
+    "weeksCount": 3,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-04-27",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-04-27",
+        "plays": 3
+      },
+      {
+        "date": "2026-04-26",
+        "plays": 2
+      },
+      {
+        "date": "2026-04-30",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-10",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "cb5b0e12a33418bbd4433344bc25f855",
     "trackName": "Apocalypse Dreams",
     "artist": "Tame Impala",
@@ -407,43 +506,6 @@
       },
       {
         "date": "2026-05-07",
-        "plays": 2
-      }
-    ]
-  },
-  {
-    "id": "b2c40dc80d2bcc57cb3d4a7924196882",
-    "trackName": "I. The Worst Guys",
-    "artist": "Childish Gambino",
-    "album": "Because the Internet",
-    "trackUri": "spotify:track:0kErPGykp7EJo7L5fx8YjB",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
-    "spotifyUrl": "https://open.spotify.com/track/4jnctHRggVIvMgkru936fN",
-    "dateRange": {
-      "start": "2026-04-20",
-      "end": "2026-05-10"
-    },
-    "playCount": 12,
-    "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2026-04-27",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2026-04-27",
-        "plays": 3
-      },
-      {
-        "date": "2026-04-26",
-        "plays": 2
-      },
-      {
-        "date": "2026-04-30",
-        "plays": 2
-      },
-      {
-        "date": "2026-05-10",
         "plays": 2
       }
     ]
@@ -1384,31 +1446,6 @@
     ]
   },
   {
-    "id": "7983c8e5542b7f517853e230de9b21ba",
-    "trackName": "Victory Lap",
-    "artist": "Fred again..",
-    "album": "Victory Lap",
-    "trackUri": "spotify:track:1lbNgoJ5iMrMluCyhI4OQP",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02bf705b821b031cefe91d7b90",
-    "spotifyUrl": "https://open.spotify.com/track/1lbNgoJ5iMrMluCyhI4OQP",
-    "dateRange": {
-      "start": "2026-02-16",
-      "end": "2026-02-17"
-    },
-    "playCount": 5,
-    "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2026-02-16",
-    "peakDayPlays": 4,
-    "hotDays": [
-      {
-        "date": "2026-02-16",
-        "plays": 4
-      }
-    ]
-  },
-  {
     "id": "e3a1cc73bc01065635a5c46552364538",
     "trackName": "Desire",
     "artist": "Ian Asher",
@@ -1430,6 +1467,31 @@
       {
         "date": "2026-02-18",
         "plays": 3
+      }
+    ]
+  },
+  {
+    "id": "7983c8e5542b7f517853e230de9b21ba",
+    "trackName": "Victory Lap",
+    "artist": "Fred again..",
+    "album": "Victory Lap",
+    "trackUri": "spotify:track:1lbNgoJ5iMrMluCyhI4OQP",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02bf705b821b031cefe91d7b90",
+    "spotifyUrl": "https://open.spotify.com/track/1lbNgoJ5iMrMluCyhI4OQP",
+    "dateRange": {
+      "start": "2026-02-16",
+      "end": "2026-02-17"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-02-16",
+    "peakDayPlays": 4,
+    "hotDays": [
+      {
+        "date": "2026-02-16",
+        "plays": 4
       }
     ]
   },
@@ -1577,8 +1639,8 @@
     },
     "playCount": 7,
     "weeksCount": 2,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2026-02-07",
     "peakDayPlays": 2,
     "hotDays": [
@@ -4164,6 +4226,35 @@
     ]
   },
   {
+    "id": "58f7efa1a613240a85c1aa96fc767b89",
+    "trackName": "CHIHIRO",
+    "artist": "Billie Eilish",
+    "album": "HIT ME HARD AND SOFT",
+    "trackUri": "spotify:track:7BRD7x5pt8Lqa1eGYC4dzj",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0271d62ea7ea8a5be92d3c1f62",
+    "spotifyUrl": "https://open.spotify.com/track/7BRD7x5pt8Lqa1eGYC4dzj",
+    "dateRange": {
+      "start": "2025-09-28",
+      "end": "2025-10-05"
+    },
+    "playCount": 7,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-09-28",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2025-09-28",
+        "plays": 3
+      },
+      {
+        "date": "2025-10-05",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "f123aecb982bf864865bfd463da039ff",
     "trackName": "Dracula",
     "artist": "Tame Impala",
@@ -5840,8 +5931,8 @@
     },
     "playCount": 13,
     "weeksCount": 3,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-07-10",
     "peakDayPlays": 4,
     "hotDays": [
@@ -7145,35 +7236,6 @@
     ]
   },
   {
-    "id": "443aafe8cd9e86398e074f6c2b43a4e9",
-    "trackName": "Sunday Morning",
-    "artist": "Maroon 5",
-    "album": "Songs About Jane: 10th Anniversary Edition",
-    "trackUri": "spotify:track:5qII2n90lVdPDcgXEEVHNy",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0292f2d790c6a97b195f66d51e",
-    "spotifyUrl": "https://open.spotify.com/track/5qII2n90lVdPDcgXEEVHNy",
-    "dateRange": {
-      "start": "2025-04-16",
-      "end": "2025-04-24"
-    },
-    "playCount": 7,
-    "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2025-04-16",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2025-04-16",
-        "plays": 2
-      },
-      {
-        "date": "2025-04-18",
-        "plays": 2
-      }
-    ]
-  },
-  {
     "id": "c87f9e936ad956393bb8c114743a11e5",
     "trackName": "Iris",
     "artist": "The Goo Goo Dolls",
@@ -7846,6 +7908,35 @@
       {
         "date": "2025-01-31",
         "plays": 5
+      }
+    ]
+  },
+  {
+    "id": "10169d3a534662f162421f1cbdb53855",
+    "trackName": "Cry For Me",
+    "artist": "The Weeknd",
+    "album": "Hurry Up Tomorrow",
+    "trackUri": "spotify:track:3AWDeHLc88XogCaCnZQLVI",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02982320da137d0de34410df61",
+    "spotifyUrl": "https://open.spotify.com/track/3AWDeHLc88XogCaCnZQLVI",
+    "dateRange": {
+      "start": "2025-01-31",
+      "end": "2025-02-08"
+    },
+    "playCount": 5,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-01-31",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2025-01-31",
+        "plays": 3
+      },
+      {
+        "date": "2025-02-08",
+        "plays": 2
       }
     ]
   },
@@ -15076,36 +15167,6 @@
     ]
   },
   {
-    "id": "6e77b4f2e6f1daa41ba1c5fb25b23a0a",
-    "trackName": "3005",
-    "artist": "Childish Gambino",
-    "album": "Because the Internet",
-    "trackUri": "spotify:track:5cc9Zbfp9u10sfJeKZ3h16",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/2X6b7zLdIxCejd6GqVcQ9M",
-    "dateRange": {
-      "start": "2023-02-27",
-      "end": "2023-03-05"
-    },
-    "playCount": 6,
-    "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2023-02-28",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-02-28",
-        "plays": 2
-      },
-      {
-        "date": "2023-03-03",
-        "plays": 2
-      }
-    ]
-  },
-  {
     "id": "8e6e1cd44bc999f3abc3ea2958768fde",
     "trackName": "505",
     "artist": "Arctic Monkeys",
@@ -15135,6 +15196,36 @@
       },
       {
         "date": "2023-03-11",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "6e77b4f2e6f1daa41ba1c5fb25b23a0a",
+    "trackName": "3005",
+    "artist": "Childish Gambino",
+    "album": "Because the Internet",
+    "trackUri": "spotify:track:5cc9Zbfp9u10sfJeKZ3h16",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/2X6b7zLdIxCejd6GqVcQ9M",
+    "dateRange": {
+      "start": "2023-02-27",
+      "end": "2023-03-05"
+    },
+    "playCount": 6,
+    "weeksCount": 1,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2023-02-28",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-02-28",
+        "plays": 2
+      },
+      {
+        "date": "2023-03-03",
         "plays": 2
       }
     ]

@@ -1,25 +1,90 @@
 [
   {
-    "id": "dad279e8c5678068940ef45ec987ff49",
-    "trackName": "Quevedo: Bzrp Music Sessions, Vol. 52/66",
-    "artist": "Bizarrap",
-    "album": "Quevedo: Bzrp Music Sessions, Vol. 52/66",
-    "trackUri": "spotify:track:2tTmW7RDtMQtBk7m2rYeSw",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02946f1ea32cc7681e7a86e9ca",
-    "spotifyUrl": "https://open.spotify.com/track/2tTmW7RDtMQtBk7m2rYeSw",
+    "id": "156b3ce0307342f1e9d976ca6886fe28",
+    "trackName": "Plot Twist",
+    "artist": "Drake",
+    "album": "ICEMAN",
+    "trackUri": "spotify:track:3cLCA9LSb6UiOeNvTZoaav",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02fe9d3ab9adb1d3b59835b81c",
+    "spotifyUrl": "https://open.spotify.com/track/3cLCA9LSb6UiOeNvTZoaav",
     "dateRange": {
-      "start": "2026-05-26",
-      "end": "2026-05-28"
+      "start": "2026-06-01",
+      "end": "2026-06-04"
+    },
+    "playCount": 6,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-06-01",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-06-01",
+        "plays": 3
+      },
+      {
+        "date": "2026-06-04",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 120,
+      "uniqueTracksInWindow": 95,
+      "timeOfDayDistribution": {
+        "0": 1,
+        "1": 2,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 1,
+        "15": 1,
+        "16": 1,
+        "17": 2,
+        "18": 1,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 1,
+        "23": 0
+      },
+      "monthsActive": 2
+    }
+  },
+  {
+    "id": "6d30181f31c328c96cc956ad500c75b3",
+    "trackName": "Human",
+    "artist": "The Killers",
+    "album": "Day & Age (Bonus Tracks)",
+    "trackUri": "spotify:track:1sTsuZTdANkiFd7T34H3nb",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02a43cd43ef4f3b2d5413b17f9",
+    "spotifyUrl": "https://open.spotify.com/track/1sTsuZTdANkiFd7T34H3nb",
+    "dateRange": {
+      "start": "2026-06-01",
+      "end": "2026-06-03"
     },
     "playCount": 5,
     "weeksCount": 1,
     "intensity": 3,
     "maxState": 3,
-    "peakDay": "2026-05-27",
+    "peakDay": "2026-06-01",
     "peakDayPlays": 3,
     "hotDays": [
       {
-        "date": "2026-05-27",
+        "date": "2026-06-01",
         "plays": 3
       }
     ],
@@ -28,8 +93,72 @@
       "one_and_done"
     ],
     "context": {
-      "totalPlaysInWindow": 139,
-      "uniqueTracksInWindow": 114,
+      "totalPlaysInWindow": 80,
+      "uniqueTracksInWindow": 67,
+      "timeOfDayDistribution": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "4": 2,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 1,
+        "15": 0,
+        "16": 0,
+        "17": 1,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 0
+      },
+      "monthsActive": 1
+    }
+  },
+  {
+    "id": "07f7ee56ef2e310b99b7bdcb15101e3b",
+    "trackName": "Quevedo: Bzrp Music Sessions, Vol. 52/66",
+    "artist": "Bizarrap",
+    "album": "Quevedo: Bzrp Music Sessions, Vol. 52/66",
+    "trackUri": "spotify:track:2tTmW7RDtMQtBk7m2rYeSw",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02946f1ea32cc7681e7a86e9ca",
+    "spotifyUrl": "https://open.spotify.com/track/2tTmW7RDtMQtBk7m2rYeSw",
+    "dateRange": {
+      "start": "2026-05-26",
+      "end": "2026-06-03"
+    },
+    "playCount": 8,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-05-27",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-05-27",
+        "plays": 3
+      },
+      {
+        "date": "2026-06-02",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 292,
+      "uniqueTracksInWindow": 212,
       "timeOfDayDistribution": {
         "0": 1,
         "1": 0,
@@ -46,17 +175,17 @@
         "12": 0,
         "13": 1,
         "14": 0,
-        "15": 0,
+        "15": 2,
         "16": 0,
         "17": 1,
         "18": 0,
         "19": 0,
         "20": 0,
         "21": 1,
-        "22": 0,
+        "22": 1,
         "23": 0
       },
-      "monthsActive": 1
+      "monthsActive": 2
     }
   },
   {
@@ -88,7 +217,8 @@
       }
     ],
     "insightTypes": [
-      "burst"
+      "burst",
+      "comeback"
     ],
     "context": {
       "totalPlaysInWindow": 126,
@@ -97,7 +227,7 @@
         "0": 1,
         "1": 2,
         "2": 1,
-        "3": 0,
+        "3": 1,
         "4": 1,
         "5": 0,
         "6": 0,
@@ -109,21 +239,21 @@
         "12": 0,
         "13": 0,
         "14": 1,
-        "15": 0,
-        "16": 0,
-        "17": 0,
-        "18": 0,
+        "15": 1,
+        "16": 1,
+        "17": 2,
+        "18": 1,
         "19": 0,
         "20": 0,
         "21": 0,
-        "22": 0,
+        "22": 1,
         "23": 0
       },
-      "monthsActive": 1
+      "monthsActive": 2
     }
   },
   {
-    "id": "28af1bb3486eb3f02b0f06b6bfedfe9d",
+    "id": "85029b986edc010e9a8c2de46b11553d",
     "trackName": "National Treasures",
     "artist": "Drake",
     "album": "ICEMAN",
@@ -132,12 +262,12 @@
     "spotifyUrl": "https://open.spotify.com/track/393OFJFZKIIv66JmJcNm9D",
     "dateRange": {
       "start": "2026-05-15",
-      "end": "2026-05-21"
+      "end": "2026-05-29"
     },
-    "playCount": 5,
-    "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
+    "playCount": 8,
+    "weeksCount": 3,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2026-05-15",
     "peakDayPlays": 2,
     "hotDays": [
@@ -148,14 +278,18 @@
       {
         "date": "2026-05-21",
         "plays": 2
+      },
+      {
+        "date": "2026-05-29",
+        "plays": 2
       }
     ],
     "insightTypes": [
       "burst"
     ],
     "context": {
-      "totalPlaysInWindow": 191,
-      "uniqueTracksInWindow": 153,
+      "totalPlaysInWindow": 500,
+      "uniqueTracksInWindow": 335,
       "timeOfDayDistribution": {
         "0": 1,
         "1": 0,
@@ -172,17 +306,17 @@
         "12": 0,
         "13": 1,
         "14": 0,
-        "15": 1,
-        "16": 0,
+        "15": 2,
+        "16": 1,
         "17": 0,
         "18": 1,
         "19": 0,
         "20": 0,
-        "21": 1,
+        "21": 2,
         "22": 0,
         "23": 1
       },
-      "monthsActive": 1
+      "monthsActive": 2
     }
   },
   {
@@ -282,7 +416,7 @@
       "uniqueTracksInWindow": 124,
       "timeOfDayDistribution": {
         "0": 8,
-        "1": 3,
+        "1": 4,
         "2": 2,
         "3": 1,
         "4": 2,
@@ -295,7 +429,7 @@
         "11": 0,
         "12": 0,
         "13": 2,
-        "14": 2,
+        "14": 3,
         "15": 3,
         "16": 0,
         "17": 1,
@@ -306,7 +440,7 @@
         "22": 3,
         "23": 6
       },
-      "monthsActive": 5
+      "monthsActive": 6
     }
   },
   {
@@ -360,7 +494,7 @@
         "15": 2,
         "16": 0,
         "17": 0,
-        "18": 3,
+        "18": 4,
         "19": 0,
         "20": 3,
         "21": 2,
@@ -492,7 +626,7 @@
         "13": 1,
         "14": 2,
         "15": 0,
-        "16": 1,
+        "16": 2,
         "17": 2,
         "18": 0,
         "19": 2,
@@ -636,10 +770,10 @@
         "19": 1,
         "20": 1,
         "21": 1,
-        "22": 2,
+        "22": 3,
         "23": 1
       },
-      "monthsActive": 2
+      "monthsActive": 3
     }
   },
   {
@@ -758,6 +892,77 @@
         "23": 1
       },
       "monthsActive": 2
+    }
+  },
+  {
+    "id": "b2c40dc80d2bcc57cb3d4a7924196882",
+    "trackName": "I. The Worst Guys",
+    "artist": "Childish Gambino",
+    "album": "Because the Internet",
+    "trackUri": "spotify:track:0kErPGykp7EJo7L5fx8YjB",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
+    "spotifyUrl": "https://open.spotify.com/track/4jnctHRggVIvMgkru936fN",
+    "dateRange": {
+      "start": "2026-04-20",
+      "end": "2026-05-10"
+    },
+    "playCount": 12,
+    "weeksCount": 3,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-04-27",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-04-27",
+        "plays": 3
+      },
+      {
+        "date": "2026-04-26",
+        "plays": 2
+      },
+      {
+        "date": "2026-04-30",
+        "plays": 2
+      },
+      {
+        "date": "2026-05-10",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 546,
+      "uniqueTracksInWindow": 271,
+      "timeOfDayDistribution": {
+        "0": 1,
+        "1": 3,
+        "2": 1,
+        "3": 3,
+        "4": 2,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 1,
+        "15": 1,
+        "16": 1,
+        "17": 0,
+        "18": 3,
+        "19": 1,
+        "20": 1,
+        "21": 1,
+        "22": 1,
+        "23": 3
+      },
+      "monthsActive": 5
     }
   },
   {
@@ -882,7 +1087,7 @@
         "14": 0,
         "15": 0,
         "16": 1,
-        "17": 1,
+        "17": 2,
         "18": 0,
         "19": 0,
         "20": 4,
@@ -891,77 +1096,6 @@
         "23": 0
       },
       "monthsActive": 2
-    }
-  },
-  {
-    "id": "b2c40dc80d2bcc57cb3d4a7924196882",
-    "trackName": "I. The Worst Guys",
-    "artist": "Childish Gambino",
-    "album": "Because the Internet",
-    "trackUri": "spotify:track:0kErPGykp7EJo7L5fx8YjB",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
-    "spotifyUrl": "https://open.spotify.com/track/4jnctHRggVIvMgkru936fN",
-    "dateRange": {
-      "start": "2026-04-20",
-      "end": "2026-05-10"
-    },
-    "playCount": 12,
-    "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2026-04-27",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2026-04-27",
-        "plays": 3
-      },
-      {
-        "date": "2026-04-26",
-        "plays": 2
-      },
-      {
-        "date": "2026-04-30",
-        "plays": 2
-      },
-      {
-        "date": "2026-05-10",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst"
-    ],
-    "context": {
-      "totalPlaysInWindow": 546,
-      "uniqueTracksInWindow": 271,
-      "timeOfDayDistribution": {
-        "0": 1,
-        "1": 3,
-        "2": 1,
-        "3": 2,
-        "4": 1,
-        "5": 0,
-        "6": 0,
-        "7": 0,
-        "8": 0,
-        "9": 0,
-        "10": 0,
-        "11": 0,
-        "12": 0,
-        "13": 0,
-        "14": 1,
-        "15": 1,
-        "16": 0,
-        "17": 0,
-        "18": 3,
-        "19": 1,
-        "20": 1,
-        "21": 1,
-        "22": 1,
-        "23": 3
-      },
-      "monthsActive": 4
     }
   },
   {
@@ -1020,7 +1154,7 @@
         "13": 1,
         "14": 1,
         "15": 0,
-        "16": 1,
+        "16": 2,
         "17": 1,
         "18": 0,
         "19": 4,
@@ -1349,7 +1483,7 @@
         "13": 0,
         "14": 0,
         "15": 2,
-        "16": 1,
+        "16": 2,
         "17": 3,
         "18": 2,
         "19": 2,
@@ -1413,11 +1547,11 @@
         "18": 1,
         "19": 1,
         "20": 1,
-        "21": 1,
+        "21": 2,
         "22": 3,
         "23": 3
       },
-      "monthsActive": 7
+      "monthsActive": 8
     }
   },
   {
@@ -1616,10 +1750,10 @@
         "19": 2,
         "20": 1,
         "21": 2,
-        "22": 3,
+        "22": 4,
         "23": 0
       },
-      "monthsActive": 3
+      "monthsActive": 4
     }
   },
   {
@@ -1869,7 +2003,7 @@
         "1": 1,
         "2": 3,
         "3": 2,
-        "4": 0,
+        "4": 1,
         "5": 0,
         "6": 0,
         "7": 0,
@@ -1883,14 +2017,14 @@
         "15": 0,
         "16": 1,
         "17": 0,
-        "18": 1,
+        "18": 2,
         "19": 0,
         "20": 0,
         "21": 0,
         "22": 0,
         "23": 1
       },
-      "monthsActive": 2
+      "monthsActive": 4
     }
   },
   {
@@ -2014,7 +2148,7 @@
         "13": 2,
         "14": 0,
         "15": 0,
-        "16": 2,
+        "16": 3,
         "17": 1,
         "18": 1,
         "19": 2,
@@ -2023,7 +2157,7 @@
         "22": 2,
         "23": 1
       },
-      "monthsActive": 2
+      "monthsActive": 3
     }
   },
   {
@@ -2400,10 +2534,10 @@
         "19": 2,
         "20": 1,
         "21": 2,
-        "22": 3,
+        "22": 4,
         "23": 0
       },
-      "monthsActive": 3
+      "monthsActive": 4
     }
   },
   {
@@ -2502,7 +2636,7 @@
       "uniqueTracksInWindow": 225,
       "timeOfDayDistribution": {
         "0": 8,
-        "1": 3,
+        "1": 4,
         "2": 2,
         "3": 1,
         "4": 2,
@@ -2515,7 +2649,7 @@
         "11": 0,
         "12": 0,
         "13": 2,
-        "14": 2,
+        "14": 3,
         "15": 3,
         "16": 0,
         "17": 1,
@@ -2526,7 +2660,7 @@
         "22": 3,
         "23": 6
       },
-      "monthsActive": 5
+      "monthsActive": 6
     }
   },
   {
@@ -2638,7 +2772,7 @@
         "12": 1,
         "13": 2,
         "14": 1,
-        "15": 1,
+        "15": 2,
         "16": 1,
         "17": 0,
         "18": 2,
@@ -2648,7 +2782,7 @@
         "22": 1,
         "23": 3
       },
-      "monthsActive": 7
+      "monthsActive": 8
     }
   },
   {
@@ -2860,7 +2994,7 @@
         "15": 2,
         "16": 0,
         "17": 0,
-        "18": 3,
+        "18": 4,
         "19": 0,
         "20": 3,
         "21": 2,
@@ -2932,73 +3066,14 @@
         "15": 1,
         "16": 0,
         "17": 0,
-        "18": 0,
+        "18": 1,
         "19": 1,
         "20": 2,
         "21": 1,
         "22": 2,
         "23": 3
       },
-      "monthsActive": 3
-    }
-  },
-  {
-    "id": "7983c8e5542b7f517853e230de9b21ba",
-    "trackName": "Victory Lap",
-    "artist": "Fred again..",
-    "album": "Victory Lap",
-    "trackUri": "spotify:track:1lbNgoJ5iMrMluCyhI4OQP",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02bf705b821b031cefe91d7b90",
-    "spotifyUrl": "https://open.spotify.com/track/1lbNgoJ5iMrMluCyhI4OQP",
-    "dateRange": {
-      "start": "2026-02-16",
-      "end": "2026-02-17"
-    },
-    "playCount": 5,
-    "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2026-02-16",
-    "peakDayPlays": 4,
-    "hotDays": [
-      {
-        "date": "2026-02-16",
-        "plays": 4
-      }
-    ],
-    "insightTypes": [
-      "burst"
-    ],
-    "context": {
-      "totalPlaysInWindow": 128,
-      "uniqueTracksInWindow": 87,
-      "timeOfDayDistribution": {
-        "0": 0,
-        "1": 0,
-        "2": 0,
-        "3": 4,
-        "4": 0,
-        "5": 0,
-        "6": 0,
-        "7": 0,
-        "8": 0,
-        "9": 0,
-        "10": 0,
-        "11": 0,
-        "12": 0,
-        "13": 1,
-        "14": 1,
-        "15": 0,
-        "16": 0,
-        "17": 0,
-        "18": 0,
-        "19": 0,
-        "20": 0,
-        "21": 1,
-        "22": 1,
-        "23": 2
-      },
-      "monthsActive": 3
+      "monthsActive": 4
     }
   },
   {
@@ -3058,6 +3133,65 @@
         "23": 0
       },
       "monthsActive": 4
+    }
+  },
+  {
+    "id": "7983c8e5542b7f517853e230de9b21ba",
+    "trackName": "Victory Lap",
+    "artist": "Fred again..",
+    "album": "Victory Lap",
+    "trackUri": "spotify:track:1lbNgoJ5iMrMluCyhI4OQP",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02bf705b821b031cefe91d7b90",
+    "spotifyUrl": "https://open.spotify.com/track/1lbNgoJ5iMrMluCyhI4OQP",
+    "dateRange": {
+      "start": "2026-02-16",
+      "end": "2026-02-17"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2026-02-16",
+    "peakDayPlays": 4,
+    "hotDays": [
+      {
+        "date": "2026-02-16",
+        "plays": 4
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 128,
+      "uniqueTracksInWindow": 87,
+      "timeOfDayDistribution": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 4,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 1,
+        "14": 2,
+        "15": 0,
+        "16": 0,
+        "17": 0,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 2,
+        "22": 1,
+        "23": 2
+      },
+      "monthsActive": 5
     }
   },
   {
@@ -3341,8 +3475,8 @@
     },
     "playCount": 7,
     "weeksCount": 2,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2026-02-07",
     "peakDayPlays": 2,
     "hotDays": [
@@ -3385,13 +3519,13 @@
         "16": 2,
         "17": 0,
         "18": 4,
-        "19": 1,
+        "19": 2,
         "20": 2,
         "21": 1,
         "22": 0,
         "23": 1
       },
-      "monthsActive": 6
+      "monthsActive": 7
     }
   },
   {
@@ -3443,7 +3577,7 @@
         "11": 0,
         "12": 0,
         "13": 1,
-        "14": 1,
+        "14": 2,
         "15": 3,
         "16": 2,
         "17": 0,
@@ -3454,7 +3588,7 @@
         "22": 0,
         "23": 0
       },
-      "monthsActive": 3
+      "monthsActive": 4
     }
   },
   {
@@ -3785,7 +3919,7 @@
       "uniqueTracksInWindow": 425,
       "timeOfDayDistribution": {
         "0": 8,
-        "1": 3,
+        "1": 4,
         "2": 2,
         "3": 1,
         "4": 2,
@@ -3798,7 +3932,7 @@
         "11": 0,
         "12": 0,
         "13": 2,
-        "14": 2,
+        "14": 3,
         "15": 3,
         "16": 0,
         "17": 1,
@@ -3809,7 +3943,7 @@
         "22": 3,
         "23": 6
       },
-      "monthsActive": 5
+      "monthsActive": 6
     }
   },
   {
@@ -4148,14 +4282,14 @@
         "15": 4,
         "16": 0,
         "17": 1,
-        "18": 2,
+        "18": 3,
         "19": 1,
         "20": 1,
         "21": 0,
         "22": 0,
         "23": 3
       },
-      "monthsActive": 4
+      "monthsActive": 5
     }
   },
   {
@@ -4791,7 +4925,7 @@
         "0": 6,
         "1": 5,
         "2": 1,
-        "3": 2,
+        "3": 3,
         "4": 4,
         "5": 3,
         "6": 0,
@@ -4813,7 +4947,7 @@
         "22": 2,
         "23": 8
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -5204,7 +5338,7 @@
         "12": 1,
         "13": 2,
         "14": 1,
-        "15": 1,
+        "15": 2,
         "16": 3,
         "17": 2,
         "18": 3,
@@ -5723,14 +5857,14 @@
         "15": 3,
         "16": 1,
         "17": 1,
-        "18": 1,
+        "18": 2,
         "19": 0,
         "20": 0,
         "21": 2,
         "22": 0,
         "23": 4
       },
-      "monthsActive": 3
+      "monthsActive": 4
     }
   },
   {
@@ -7438,9 +7572,9 @@
         "20": 4,
         "21": 5,
         "22": 1,
-        "23": 4
+        "23": 5
       },
-      "monthsActive": 8
+      "monthsActive": 9
     }
   },
   {
@@ -7710,9 +7844,9 @@
       "uniqueTracksInWindow": 406,
       "timeOfDayDistribution": {
         "0": 1,
-        "1": 0,
+        "1": 1,
         "2": 2,
-        "3": 3,
+        "3": 4,
         "4": 1,
         "5": 2,
         "6": 3,
@@ -7734,7 +7868,7 @@
         "22": 1,
         "23": 2
       },
-      "monthsActive": 7
+      "monthsActive": 8
     }
   },
   {
@@ -7997,9 +8131,9 @@
         "20": 6,
         "21": 5,
         "22": 4,
-        "23": 6
+        "23": 8
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -8438,7 +8572,7 @@
         "1": 3,
         "2": 3,
         "3": 2,
-        "4": 0,
+        "4": 1,
         "5": 0,
         "6": 0,
         "7": 1,
@@ -8459,7 +8593,7 @@
         "22": 0,
         "23": 0
       },
-      "monthsActive": 5
+      "monthsActive": 6
     }
   },
   {
@@ -8678,6 +8812,69 @@
         "23": 0
       },
       "monthsActive": 7
+    }
+  },
+  {
+    "id": "58f7efa1a613240a85c1aa96fc767b89",
+    "trackName": "CHIHIRO",
+    "artist": "Billie Eilish",
+    "album": "HIT ME HARD AND SOFT",
+    "trackUri": "spotify:track:7BRD7x5pt8Lqa1eGYC4dzj",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0271d62ea7ea8a5be92d3c1f62",
+    "spotifyUrl": "https://open.spotify.com/track/7BRD7x5pt8Lqa1eGYC4dzj",
+    "dateRange": {
+      "start": "2025-09-28",
+      "end": "2025-10-05"
+    },
+    "playCount": 7,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-09-28",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2025-09-28",
+        "plays": 3
+      },
+      {
+        "date": "2025-10-05",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 444,
+      "uniqueTracksInWindow": 288,
+      "timeOfDayDistribution": {
+        "0": 2,
+        "1": 1,
+        "2": 1,
+        "3": 0,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 0,
+        "9": 1,
+        "10": 0,
+        "11": 0,
+        "12": 2,
+        "13": 1,
+        "14": 1,
+        "15": 0,
+        "16": 0,
+        "17": 0,
+        "18": 2,
+        "19": 3,
+        "20": 0,
+        "21": 1,
+        "22": 2,
+        "23": 3
+      },
+      "monthsActive": 8
     }
   },
   {
@@ -9262,7 +9459,7 @@
         "0": 4,
         "1": 1,
         "2": 3,
-        "3": 2,
+        "3": 3,
         "4": 4,
         "5": 0,
         "6": 1,
@@ -9284,7 +9481,7 @@
         "22": 3,
         "23": 1
       },
-      "monthsActive": 8
+      "monthsActive": 9
     }
   },
   {
@@ -9427,7 +9624,7 @@
         "13": 1,
         "14": 7,
         "15": 6,
-        "16": 2,
+        "16": 3,
         "17": 4,
         "18": 4,
         "19": 1,
@@ -9436,7 +9633,7 @@
         "22": 1,
         "23": 1
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -9574,7 +9771,7 @@
         "13": 2,
         "14": 3,
         "15": 2,
-        "16": 2,
+        "16": 3,
         "17": 2,
         "18": 6,
         "19": 3,
@@ -9583,7 +9780,7 @@
         "22": 0,
         "23": 1
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -9858,7 +10055,7 @@
         "11": 2,
         "12": 9,
         "13": 6,
-        "14": 5,
+        "14": 6,
         "15": 3,
         "16": 7,
         "17": 6,
@@ -10060,7 +10257,7 @@
         "1": 0,
         "2": 3,
         "3": 1,
-        "4": 1,
+        "4": 2,
         "5": 0,
         "6": 3,
         "7": 4,
@@ -10081,7 +10278,7 @@
         "22": 5,
         "23": 0
       },
-      "monthsActive": 6
+      "monthsActive": 7
     }
   },
   {
@@ -10431,7 +10628,7 @@
         "11": 5,
         "12": 4,
         "13": 4,
-        "14": 0,
+        "14": 1,
         "15": 6,
         "16": 5,
         "17": 3,
@@ -10442,7 +10639,7 @@
         "22": 1,
         "23": 4
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -10895,7 +11092,7 @@
         "0": 4,
         "1": 1,
         "2": 3,
-        "3": 2,
+        "3": 3,
         "4": 4,
         "5": 0,
         "6": 1,
@@ -10917,7 +11114,7 @@
         "22": 3,
         "23": 1
       },
-      "monthsActive": 8
+      "monthsActive": 9
     }
   },
   {
@@ -10961,7 +11158,7 @@
       "timeOfDayDistribution": {
         "0": 1,
         "1": 1,
-        "2": 4,
+        "2": 5,
         "3": 0,
         "4": 3,
         "5": 0,
@@ -10984,7 +11181,7 @@
         "22": 0,
         "23": 0
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -11179,7 +11376,7 @@
         "19": 3,
         "20": 3,
         "21": 0,
-        "22": 1,
+        "22": 2,
         "23": 4
       },
       "monthsActive": 8
@@ -11435,7 +11632,8 @@
       }
     ],
     "insightTypes": [
-      "burst"
+      "burst",
+      "loyalty"
     ],
     "context": {
       "totalPlaysInWindow": 1164,
@@ -11443,7 +11641,7 @@
       "timeOfDayDistribution": {
         "0": 2,
         "1": 3,
-        "2": 2,
+        "2": 3,
         "3": 2,
         "4": 0,
         "5": 1,
@@ -11457,7 +11655,7 @@
         "13": 0,
         "14": 1,
         "15": 4,
-        "16": 2,
+        "16": 3,
         "17": 1,
         "18": 3,
         "19": 4,
@@ -11466,7 +11664,7 @@
         "22": 4,
         "23": 8
       },
-      "monthsActive": 10
+      "monthsActive": 12
     }
   },
   {
@@ -11583,9 +11781,9 @@
       "uniqueTracksInWindow": 533,
       "timeOfDayDistribution": {
         "0": 3,
-        "1": 3,
+        "1": 4,
         "2": 2,
-        "3": 0,
+        "3": 1,
         "4": 1,
         "5": 1,
         "6": 0,
@@ -11598,7 +11796,7 @@
         "13": 4,
         "14": 3,
         "15": 3,
-        "16": 1,
+        "16": 2,
         "17": 2,
         "18": 3,
         "19": 5,
@@ -11607,7 +11805,7 @@
         "22": 3,
         "23": 5
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -11673,7 +11871,7 @@
         "11": 1,
         "12": 3,
         "13": 4,
-        "14": 5,
+        "14": 6,
         "15": 1,
         "16": 4,
         "17": 1,
@@ -11682,9 +11880,9 @@
         "20": 3,
         "21": 3,
         "22": 8,
-        "23": 5
+        "23": 6
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -11870,7 +12068,8 @@
       }
     ],
     "insightTypes": [
-      "burst"
+      "burst",
+      "loyalty"
     ],
     "context": {
       "totalPlaysInWindow": 1826,
@@ -11889,7 +12088,7 @@
         "10": 0,
         "11": 1,
         "12": 3,
-        "13": 4,
+        "13": 5,
         "14": 3,
         "15": 2,
         "16": 3,
@@ -11901,7 +12100,7 @@
         "22": 5,
         "23": 1
       },
-      "monthsActive": 8
+      "monthsActive": 9
     }
   },
   {
@@ -11983,8 +12182,8 @@
     },
     "playCount": 13,
     "weeksCount": 3,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-07-10",
     "peakDayPlays": 4,
     "hotDays": [
@@ -12022,7 +12221,7 @@
         "11": 1,
         "12": 1,
         "13": 0,
-        "14": 0,
+        "14": 1,
         "15": 2,
         "16": 0,
         "17": 1,
@@ -12033,7 +12232,7 @@
         "22": 1,
         "23": 1
       },
-      "monthsActive": 6
+      "monthsActive": 7
     }
   },
   {
@@ -12286,13 +12485,13 @@
         "16": 3,
         "17": 1,
         "18": 3,
-        "19": 3,
+        "19": 4,
         "20": 3,
         "21": 3,
         "22": 2,
         "23": 3
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -12754,9 +12953,9 @@
         "20": 6,
         "21": 5,
         "22": 4,
-        "23": 6
+        "23": 8
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -12950,7 +13149,7 @@
         "1": 2,
         "2": 5,
         "3": 0,
-        "4": 0,
+        "4": 1,
         "5": 0,
         "6": 0,
         "7": 0,
@@ -12971,7 +13170,7 @@
         "22": 0,
         "23": 1
       },
-      "monthsActive": 9
+      "monthsActive": 10
     }
   },
   {
@@ -13157,7 +13356,7 @@
         "11": 1,
         "12": 0,
         "13": 2,
-        "14": 3,
+        "14": 4,
         "15": 4,
         "16": 0,
         "17": 2,
@@ -13168,7 +13367,7 @@
         "22": 6,
         "23": 2
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -13293,9 +13492,9 @@
         "20": 1,
         "21": 2,
         "22": 1,
-        "23": 4
+        "23": 5
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -13362,7 +13561,7 @@
         "11": 2,
         "12": 9,
         "13": 6,
-        "14": 5,
+        "14": 6,
         "15": 3,
         "16": 7,
         "17": 6,
@@ -13506,7 +13705,7 @@
         "0": 6,
         "1": 5,
         "2": 1,
-        "3": 2,
+        "3": 3,
         "4": 4,
         "5": 3,
         "6": 0,
@@ -13528,7 +13727,7 @@
         "22": 2,
         "23": 8
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -13644,7 +13843,7 @@
         "1": 1,
         "2": 1,
         "3": 1,
-        "4": 3,
+        "4": 4,
         "5": 1,
         "6": 0,
         "7": 1,
@@ -13665,7 +13864,7 @@
         "22": 5,
         "23": 6
       },
-      "monthsActive": 14
+      "monthsActive": 15
     }
   },
   {
@@ -13929,7 +14128,7 @@
         "11": 2,
         "12": 9,
         "13": 6,
-        "14": 5,
+        "14": 6,
         "15": 3,
         "16": 7,
         "17": 6,
@@ -14346,9 +14545,9 @@
         "20": 5,
         "21": 2,
         "22": 7,
-        "23": 5
+        "23": 6
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -14675,69 +14874,6 @@
         "23": 5
       },
       "monthsActive": 14
-    }
-  },
-  {
-    "id": "443aafe8cd9e86398e074f6c2b43a4e9",
-    "trackName": "Sunday Morning",
-    "artist": "Maroon 5",
-    "album": "Songs About Jane: 10th Anniversary Edition",
-    "trackUri": "spotify:track:5qII2n90lVdPDcgXEEVHNy",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0292f2d790c6a97b195f66d51e",
-    "spotifyUrl": "https://open.spotify.com/track/5qII2n90lVdPDcgXEEVHNy",
-    "dateRange": {
-      "start": "2025-04-16",
-      "end": "2025-04-24"
-    },
-    "playCount": 7,
-    "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2025-04-16",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2025-04-16",
-        "plays": 2
-      },
-      {
-        "date": "2025-04-18",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst"
-    ],
-    "context": {
-      "totalPlaysInWindow": 478,
-      "uniqueTracksInWindow": 266,
-      "timeOfDayDistribution": {
-        "0": 1,
-        "1": 1,
-        "2": 0,
-        "3": 0,
-        "4": 0,
-        "5": 0,
-        "6": 0,
-        "7": 0,
-        "8": 0,
-        "9": 0,
-        "10": 0,
-        "11": 0,
-        "12": 0,
-        "13": 0,
-        "14": 0,
-        "15": 1,
-        "16": 2,
-        "17": 1,
-        "18": 3,
-        "19": 1,
-        "20": 0,
-        "21": 0,
-        "22": 1,
-        "23": 3
-      },
-      "monthsActive": 4
     }
   },
   {
@@ -15409,7 +15545,7 @@
         "11": 2,
         "12": 9,
         "13": 6,
-        "14": 5,
+        "14": 6,
         "15": 3,
         "16": 7,
         "17": 6,
@@ -15544,9 +15680,9 @@
         "20": 3,
         "21": 5,
         "22": 1,
-        "23": 1
+        "23": 2
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -15612,7 +15748,7 @@
         "11": 3,
         "12": 5,
         "13": 2,
-        "14": 1,
+        "14": 2,
         "15": 7,
         "16": 12,
         "17": 2,
@@ -15623,7 +15759,7 @@
         "22": 3,
         "23": 3
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -15823,7 +15959,7 @@
         "11": 1,
         "12": 0,
         "13": 2,
-        "14": 3,
+        "14": 4,
         "15": 4,
         "16": 0,
         "17": 2,
@@ -15834,7 +15970,7 @@
         "22": 6,
         "23": 2
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -16111,6 +16247,69 @@
     }
   },
   {
+    "id": "10169d3a534662f162421f1cbdb53855",
+    "trackName": "Cry For Me",
+    "artist": "The Weeknd",
+    "album": "Hurry Up Tomorrow",
+    "trackUri": "spotify:track:3AWDeHLc88XogCaCnZQLVI",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02982320da137d0de34410df61",
+    "spotifyUrl": "https://open.spotify.com/track/3AWDeHLc88XogCaCnZQLVI",
+    "dateRange": {
+      "start": "2025-01-31",
+      "end": "2025-02-08"
+    },
+    "playCount": 5,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-01-31",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2025-01-31",
+        "plays": 3
+      },
+      {
+        "date": "2025-02-08",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 186,
+      "uniqueTracksInWindow": 80,
+      "timeOfDayDistribution": {
+        "0": 1,
+        "1": 1,
+        "2": 0,
+        "3": 0,
+        "4": 1,
+        "5": 2,
+        "6": 1,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 1,
+        "11": 0,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 2,
+        "16": 1,
+        "17": 3,
+        "18": 0,
+        "19": 2,
+        "20": 1,
+        "21": 2,
+        "22": 1,
+        "23": 0
+      },
+      "monthsActive": 10
+    }
+  },
+  {
     "id": "e2eec7a5ac635802b9b59f84960977b5",
     "trackName": "Qué Pasaría...",
     "artist": "Rauw Alejandro",
@@ -16297,7 +16496,7 @@
         "10": 0,
         "11": 0,
         "12": 0,
-        "13": 3,
+        "13": 4,
         "14": 2,
         "15": 2,
         "16": 2,
@@ -16309,7 +16508,7 @@
         "22": 1,
         "23": 0
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -17493,10 +17692,10 @@
         "10": 0,
         "11": 1,
         "12": 1,
-        "13": 0,
+        "13": 1,
         "14": 3,
         "15": 3,
-        "16": 8,
+        "16": 9,
         "17": 1,
         "18": 6,
         "19": 6,
@@ -17505,7 +17704,7 @@
         "22": 6,
         "23": 1
       },
-      "monthsActive": 15
+      "monthsActive": 16
     }
   },
   {
@@ -17964,10 +18163,10 @@
         "10": 0,
         "11": 1,
         "12": 1,
-        "13": 0,
+        "13": 1,
         "14": 3,
         "15": 3,
-        "16": 8,
+        "16": 9,
         "17": 1,
         "18": 6,
         "19": 6,
@@ -17976,7 +18175,7 @@
         "22": 6,
         "23": 1
       },
-      "monthsActive": 15
+      "monthsActive": 16
     }
   },
   {
@@ -20051,14 +20250,14 @@
         "15": 6,
         "16": 1,
         "17": 1,
-        "18": 1,
+        "18": 2,
         "19": 0,
         "20": 1,
         "21": 0,
         "22": 1,
         "23": 3
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -20182,7 +20381,7 @@
         "0": 17,
         "1": 24,
         "2": 15,
-        "3": 9,
+        "3": 10,
         "4": 16,
         "5": 6,
         "6": 3,
@@ -20194,8 +20393,8 @@
         "12": 4,
         "13": 6,
         "14": 9,
-        "15": 9,
-        "16": 8,
+        "15": 10,
+        "16": 9,
         "17": 14,
         "18": 13,
         "19": 11,
@@ -20204,7 +20403,7 @@
         "22": 10,
         "23": 8
       },
-      "monthsActive": 31
+      "monthsActive": 32
     }
   },
   {
@@ -21511,7 +21710,7 @@
         "13": 7,
         "14": 6,
         "15": 6,
-        "16": 3,
+        "16": 4,
         "17": 3,
         "18": 5,
         "19": 5,
@@ -21520,7 +21719,7 @@
         "22": 7,
         "23": 4
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
@@ -22464,7 +22663,7 @@
         "10": 0,
         "11": 1,
         "12": 1,
-        "13": 1,
+        "13": 2,
         "14": 4,
         "15": 6,
         "16": 4,
@@ -22476,7 +22675,7 @@
         "22": 5,
         "23": 6
       },
-      "monthsActive": 23
+      "monthsActive": 24
     }
   },
   {
@@ -22734,7 +22933,7 @@
         "0": 17,
         "1": 24,
         "2": 15,
-        "3": 9,
+        "3": 10,
         "4": 16,
         "5": 6,
         "6": 3,
@@ -22746,8 +22945,8 @@
         "12": 4,
         "13": 6,
         "14": 9,
-        "15": 9,
-        "16": 8,
+        "15": 10,
+        "16": 9,
         "17": 14,
         "18": 13,
         "19": 11,
@@ -22756,7 +22955,7 @@
         "22": 10,
         "23": 8
       },
-      "monthsActive": 31
+      "monthsActive": 32
     }
   },
   {
@@ -22928,7 +23127,7 @@
         "0": 17,
         "1": 24,
         "2": 15,
-        "3": 9,
+        "3": 10,
         "4": 16,
         "5": 6,
         "6": 3,
@@ -22940,8 +23139,8 @@
         "12": 4,
         "13": 6,
         "14": 9,
-        "15": 9,
-        "16": 8,
+        "15": 10,
+        "16": 9,
         "17": 14,
         "18": 13,
         "19": 11,
@@ -22950,7 +23149,7 @@
         "22": 10,
         "23": 8
       },
-      "monthsActive": 31
+      "monthsActive": 32
     }
   },
   {
@@ -23182,7 +23381,7 @@
         "0": 11,
         "1": 12,
         "2": 17,
-        "3": 12,
+        "3": 13,
         "4": 6,
         "5": 4,
         "6": 5,
@@ -23204,7 +23403,7 @@
         "22": 17,
         "23": 13
       },
-      "monthsActive": 40
+      "monthsActive": 41
     }
   },
   {
@@ -23998,13 +24197,13 @@
         "16": 3,
         "17": 0,
         "18": 3,
-        "19": 3,
+        "19": 4,
         "20": 3,
         "21": 2,
         "22": 2,
         "23": 5
       },
-      "monthsActive": 16
+      "monthsActive": 17
     }
   },
   {
@@ -24918,13 +25117,13 @@
         "16": 5,
         "17": 6,
         "18": 10,
-        "19": 7,
+        "19": 8,
         "20": 6,
         "21": 7,
         "22": 6,
         "23": 11
       },
-      "monthsActive": 30
+      "monthsActive": 31
     }
   },
   {
@@ -24984,13 +25183,13 @@
         "16": 3,
         "17": 0,
         "18": 3,
-        "19": 3,
+        "19": 4,
         "20": 3,
         "21": 2,
         "22": 2,
         "23": 5
       },
-      "monthsActive": 16
+      "monthsActive": 17
     }
   },
   {
@@ -25046,7 +25245,7 @@
         "0": 17,
         "1": 24,
         "2": 15,
-        "3": 9,
+        "3": 10,
         "4": 16,
         "5": 6,
         "6": 3,
@@ -25058,8 +25257,8 @@
         "12": 4,
         "13": 6,
         "14": 9,
-        "15": 9,
-        "16": 8,
+        "15": 10,
+        "16": 9,
         "17": 14,
         "18": 13,
         "19": 11,
@@ -25068,7 +25267,7 @@
         "22": 10,
         "23": 8
       },
-      "monthsActive": 31
+      "monthsActive": 32
     }
   },
   {
@@ -25212,7 +25411,7 @@
         "10": 1,
         "11": 2,
         "12": 2,
-        "13": 4,
+        "13": 5,
         "14": 2,
         "15": 6,
         "16": 6,
@@ -25224,7 +25423,7 @@
         "22": 11,
         "23": 6
       },
-      "monthsActive": 19
+      "monthsActive": 20
     }
   },
   {
@@ -26081,7 +26280,7 @@
         "10": 0,
         "11": 1,
         "12": 1,
-        "13": 1,
+        "13": 2,
         "14": 4,
         "15": 6,
         "16": 4,
@@ -26093,7 +26292,7 @@
         "22": 5,
         "23": 6
       },
-      "monthsActive": 23
+      "monthsActive": 24
     }
   },
   {
@@ -26147,7 +26346,7 @@
         "11": 1,
         "12": 2,
         "13": 3,
-        "14": 5,
+        "14": 6,
         "15": 6,
         "16": 2,
         "17": 3,
@@ -26158,7 +26357,7 @@
         "22": 1,
         "23": 3
       },
-      "monthsActive": 26
+      "monthsActive": 27
     }
   },
   {
@@ -26476,14 +26675,14 @@
         "15": 5,
         "16": 5,
         "17": 5,
-        "18": 3,
+        "18": 4,
         "19": 5,
         "20": 3,
         "21": 7,
         "22": 4,
         "23": 3
       },
-      "monthsActive": 30
+      "monthsActive": 31
     }
   },
   {
@@ -27410,7 +27609,7 @@
         "10": 1,
         "11": 2,
         "12": 2,
-        "13": 4,
+        "13": 5,
         "14": 2,
         "15": 6,
         "16": 6,
@@ -27422,7 +27621,7 @@
         "22": 11,
         "23": 6
       },
-      "monthsActive": 19
+      "monthsActive": 20
     }
   },
   {
@@ -28560,7 +28759,7 @@
         "0": 11,
         "1": 12,
         "2": 17,
-        "3": 12,
+        "3": 13,
         "4": 6,
         "5": 4,
         "6": 5,
@@ -28582,7 +28781,7 @@
         "22": 17,
         "23": 13
       },
-      "monthsActive": 40
+      "monthsActive": 41
     }
   },
   {
@@ -29788,13 +29987,13 @@
         "16": 5,
         "17": 6,
         "18": 10,
-        "19": 7,
+        "19": 8,
         "20": 6,
         "21": 7,
         "22": 6,
         "23": 11
       },
-      "monthsActive": 30
+      "monthsActive": 31
     }
   },
   {
@@ -29996,14 +30195,14 @@
         "15": 8,
         "16": 5,
         "17": 2,
-        "18": 5,
+        "18": 6,
         "19": 7,
         "20": 7,
         "21": 7,
         "22": 3,
         "23": 6
       },
-      "monthsActive": 32
+      "monthsActive": 33
     }
   },
   {
@@ -30595,7 +30794,7 @@
         "0": 11,
         "1": 12,
         "2": 17,
-        "3": 12,
+        "3": 13,
         "4": 6,
         "5": 4,
         "6": 5,
@@ -30617,7 +30816,7 @@
         "22": 17,
         "23": 13
       },
-      "monthsActive": 40
+      "monthsActive": 41
     }
   },
   {
@@ -30996,7 +31195,7 @@
         "1": 8,
         "2": 7,
         "3": 3,
-        "4": 2,
+        "4": 3,
         "5": 3,
         "6": 3,
         "7": 1,
@@ -31017,72 +31216,7 @@
         "22": 4,
         "23": 8
       },
-      "monthsActive": 27
-    }
-  },
-  {
-    "id": "6e77b4f2e6f1daa41ba1c5fb25b23a0a",
-    "trackName": "3005",
-    "artist": "Childish Gambino",
-    "album": "Because the Internet",
-    "trackUri": "spotify:track:5cc9Zbfp9u10sfJeKZ3h16",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/2X6b7zLdIxCejd6GqVcQ9M",
-    "dateRange": {
-      "start": "2023-02-27",
-      "end": "2023-03-05"
-    },
-    "playCount": 6,
-    "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2023-02-28",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-02-28",
-        "plays": 2
-      },
-      {
-        "date": "2023-03-03",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 227,
-      "uniqueTracksInWindow": 98,
-      "timeOfDayDistribution": {
-        "0": 7,
-        "1": 2,
-        "2": 5,
-        "3": 3,
-        "4": 0,
-        "5": 3,
-        "6": 2,
-        "7": 0,
-        "8": 0,
-        "9": 0,
-        "10": 1,
-        "11": 0,
-        "12": 2,
-        "13": 6,
-        "14": 3,
-        "15": 1,
-        "16": 2,
-        "17": 3,
-        "18": 2,
-        "19": 2,
-        "20": 7,
-        "21": 7,
-        "22": 1,
-        "23": 4
-      },
-      "monthsActive": 25
+      "monthsActive": 28
     }
   },
   {
@@ -31153,6 +31287,71 @@
         "23": 9
       },
       "monthsActive": 34
+    }
+  },
+  {
+    "id": "6e77b4f2e6f1daa41ba1c5fb25b23a0a",
+    "trackName": "3005",
+    "artist": "Childish Gambino",
+    "album": "Because the Internet",
+    "trackUri": "spotify:track:5cc9Zbfp9u10sfJeKZ3h16",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/2X6b7zLdIxCejd6GqVcQ9M",
+    "dateRange": {
+      "start": "2023-02-27",
+      "end": "2023-03-05"
+    },
+    "playCount": 6,
+    "weeksCount": 1,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2023-02-28",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-02-28",
+        "plays": 2
+      },
+      {
+        "date": "2023-03-03",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 227,
+      "uniqueTracksInWindow": 98,
+      "timeOfDayDistribution": {
+        "0": 7,
+        "1": 2,
+        "2": 5,
+        "3": 3,
+        "4": 0,
+        "5": 3,
+        "6": 2,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 1,
+        "11": 0,
+        "12": 2,
+        "13": 6,
+        "14": 3,
+        "15": 1,
+        "16": 2,
+        "17": 3,
+        "18": 3,
+        "19": 2,
+        "20": 7,
+        "21": 7,
+        "22": 1,
+        "23": 4
+      },
+      "monthsActive": 26
     }
   },
   {
@@ -31772,14 +31971,14 @@
         "15": 8,
         "16": 5,
         "17": 2,
-        "18": 5,
+        "18": 6,
         "19": 7,
         "20": 7,
         "21": 7,
         "22": 3,
         "23": 6
       },
-      "monthsActive": 32
+      "monthsActive": 33
     }
   },
   {
@@ -32501,7 +32700,7 @@
         "14": 0,
         "15": 3,
         "16": 2,
-        "17": 3,
+        "17": 4,
         "18": 2,
         "19": 6,
         "20": 4,
@@ -32509,7 +32708,7 @@
         "22": 2,
         "23": 4
       },
-      "monthsActive": 24
+      "monthsActive": 25
     }
   },
   {
@@ -32631,7 +32830,7 @@
         "10": 1,
         "11": 2,
         "12": 1,
-        "13": 6,
+        "13": 7,
         "14": 3,
         "15": 6,
         "16": 2,
@@ -32643,7 +32842,7 @@
         "22": 10,
         "23": 12
       },
-      "monthsActive": 30
+      "monthsActive": 31
     }
   },
   {
@@ -32969,11 +33168,11 @@
         "18": 2,
         "19": 5,
         "20": 4,
-        "21": 1,
+        "21": 2,
         "22": 6,
         "23": 1
       },
-      "monthsActive": 15
+      "monthsActive": 16
     }
   },
   {
@@ -33297,7 +33496,7 @@
         "1": 8,
         "2": 10,
         "3": 7,
-        "4": 0,
+        "4": 1,
         "5": 1,
         "6": 1,
         "7": 0,
@@ -33318,7 +33517,7 @@
         "22": 4,
         "23": 11
       },
-      "monthsActive": 28
+      "monthsActive": 29
     }
   },
   {
@@ -33918,7 +34117,7 @@
         "0": 11,
         "1": 12,
         "2": 17,
-        "3": 12,
+        "3": 13,
         "4": 6,
         "5": 4,
         "6": 5,
@@ -33940,7 +34139,7 @@
         "22": 17,
         "23": 13
       },
-      "monthsActive": 40
+      "monthsActive": 41
     }
   },
   {
@@ -34938,14 +35137,14 @@
         "15": 8,
         "16": 5,
         "17": 2,
-        "18": 5,
+        "18": 6,
         "19": 7,
         "20": 7,
         "21": 7,
         "22": 3,
         "23": 6
       },
-      "monthsActive": 32
+      "monthsActive": 33
     }
   },
   {
