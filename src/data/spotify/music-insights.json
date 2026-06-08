@@ -253,7 +253,7 @@
     }
   },
   {
-    "id": "85029b986edc010e9a8c2de46b11553d",
+    "id": "f3efe32bfefd36fccd402b1a781a058e",
     "trackName": "National Treasures",
     "artist": "Drake",
     "album": "ICEMAN",
@@ -262,10 +262,10 @@
     "spotifyUrl": "https://open.spotify.com/track/393OFJFZKIIv66JmJcNm9D",
     "dateRange": {
       "start": "2026-05-15",
-      "end": "2026-05-29"
+      "end": "2026-06-05"
     },
-    "playCount": 8,
-    "weeksCount": 3,
+    "playCount": 10,
+    "weeksCount": 4,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-05-15",
@@ -285,11 +285,12 @@
       }
     ],
     "insightTypes": [
-      "burst"
+      "burst",
+      "one_and_done"
     ],
     "context": {
-      "totalPlaysInWindow": 500,
-      "uniqueTracksInWindow": 335,
+      "totalPlaysInWindow": 673,
+      "uniqueTracksInWindow": 399,
       "timeOfDayDistribution": {
         "0": 1,
         "1": 0,
@@ -305,7 +306,7 @@
         "11": 0,
         "12": 0,
         "13": 1,
-        "14": 0,
+        "14": 1,
         "15": 2,
         "16": 1,
         "17": 0,
@@ -557,7 +558,7 @@
         "11": 0,
         "12": 0,
         "13": 0,
-        "14": 2,
+        "14": 3,
         "15": 1,
         "16": 0,
         "17": 0,
@@ -566,9 +567,9 @@
         "20": 0,
         "21": 1,
         "22": 1,
-        "23": 1
+        "23": 2
       },
-      "monthsActive": 1
+      "monthsActive": 2
     }
   },
   {
@@ -691,7 +692,7 @@
         "11": 0,
         "12": 0,
         "13": 1,
-        "14": 1,
+        "14": 2,
         "15": 3,
         "16": 0,
         "17": 2,
@@ -702,7 +703,7 @@
         "22": 1,
         "23": 0
       },
-      "monthsActive": 2
+      "monthsActive": 3
     }
   },
   {
@@ -766,7 +767,7 @@
         "15": 1,
         "16": 0,
         "17": 0,
-        "18": 0,
+        "18": 1,
         "19": 1,
         "20": 1,
         "21": 1,
@@ -940,7 +941,7 @@
         "0": 1,
         "1": 3,
         "2": 1,
-        "3": 3,
+        "3": 4,
         "4": 2,
         "5": 0,
         "6": 0,
@@ -1138,7 +1139,7 @@
       "totalPlaysInWindow": 592,
       "uniqueTracksInWindow": 287,
       "timeOfDayDistribution": {
-        "0": 1,
+        "0": 2,
         "1": 15,
         "2": 4,
         "3": 0,
@@ -1163,7 +1164,7 @@
         "22": 4,
         "23": 0
       },
-      "monthsActive": 2
+      "monthsActive": 3
     }
   },
   {
@@ -1273,7 +1274,7 @@
       "totalPlaysInWindow": 289,
       "uniqueTracksInWindow": 169,
       "timeOfDayDistribution": {
-        "0": 3,
+        "0": 4,
         "1": 1,
         "2": 6,
         "3": 2,
@@ -1298,7 +1299,7 @@
         "22": 3,
         "23": 6
       },
-      "monthsActive": 20
+      "monthsActive": 21
     }
   },
   {
@@ -2481,6 +2482,65 @@
     }
   },
   {
+    "id": "4960b16888872414cdc51ad51b85ef81",
+    "trackName": "LO MISMO QUE YO",
+    "artist": "FloyyMenor",
+    "album": "MAN IN BLACK",
+    "trackUri": "spotify:track:4aYkPfTQAxMXkROC82KszZ",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02f5c42b348cf50ccd3e5965cf",
+    "spotifyUrl": "https://open.spotify.com/track/4aYkPfTQAxMXkROC82KszZ",
+    "dateRange": {
+      "start": "2026-03-04",
+      "end": "2026-03-06"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-03-06",
+    "peakDayPlays": 4,
+    "hotDays": [
+      {
+        "date": "2026-03-06",
+        "plays": 4
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 193,
+      "uniqueTracksInWindow": 147,
+      "timeOfDayDistribution": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 2,
+        "15": 1,
+        "16": 1,
+        "17": 1,
+        "18": 0,
+        "19": 0,
+        "20": 1,
+        "21": 1,
+        "22": 1,
+        "23": 0
+      },
+      "monthsActive": 3
+    }
+  },
+  {
     "id": "b952b24d00a1ac5b948a6d49e79a6985",
     "trackName": "BANSHEE",
     "artist": "FloyyMenor",
@@ -2538,65 +2598,6 @@
         "23": 0
       },
       "monthsActive": 4
-    }
-  },
-  {
-    "id": "4960b16888872414cdc51ad51b85ef81",
-    "trackName": "LO MISMO QUE YO",
-    "artist": "FloyyMenor",
-    "album": "MAN IN BLACK",
-    "trackUri": "spotify:track:4aYkPfTQAxMXkROC82KszZ",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02f5c42b348cf50ccd3e5965cf",
-    "spotifyUrl": "https://open.spotify.com/track/4aYkPfTQAxMXkROC82KszZ",
-    "dateRange": {
-      "start": "2026-03-04",
-      "end": "2026-03-06"
-    },
-    "playCount": 5,
-    "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2026-03-06",
-    "peakDayPlays": 4,
-    "hotDays": [
-      {
-        "date": "2026-03-06",
-        "plays": 4
-      }
-    ],
-    "insightTypes": [
-      "burst"
-    ],
-    "context": {
-      "totalPlaysInWindow": 193,
-      "uniqueTracksInWindow": 147,
-      "timeOfDayDistribution": {
-        "0": 0,
-        "1": 0,
-        "2": 1,
-        "3": 1,
-        "4": 1,
-        "5": 0,
-        "6": 0,
-        "7": 0,
-        "8": 0,
-        "9": 0,
-        "10": 0,
-        "11": 0,
-        "12": 0,
-        "13": 0,
-        "14": 2,
-        "15": 1,
-        "16": 1,
-        "17": 1,
-        "18": 0,
-        "19": 0,
-        "20": 1,
-        "21": 1,
-        "22": 1,
-        "23": 0
-      },
-      "monthsActive": 3
     }
   },
   {
@@ -2677,8 +2678,8 @@
     },
     "playCount": 7,
     "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2026-02-24",
     "peakDayPlays": 3,
     "hotDays": [
@@ -2839,7 +2840,7 @@
         "1": 1,
         "2": 5,
         "3": 4,
-        "4": 9,
+        "4": 12,
         "5": 1,
         "6": 0,
         "7": 0,
@@ -2860,7 +2861,7 @@
         "22": 4,
         "23": 6
       },
-      "monthsActive": 15
+      "monthsActive": 16
     }
   },
   {
@@ -3136,6 +3137,73 @@
     }
   },
   {
+    "id": "9341275fa49cdf6bf043856fc78ba09c",
+    "trackName": "Often - Live",
+    "artist": "The Weeknd",
+    "album": "Live At SoFi Stadium",
+    "trackUri": "spotify:track:3kdEGx81MR9ftxRbF3Zf84",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02308f9319a3d6f6737f43b3fc",
+    "spotifyUrl": "https://open.spotify.com/track/3kdEGx81MR9ftxRbF3Zf84",
+    "dateRange": {
+      "start": "2026-02-16",
+      "end": "2026-02-19"
+    },
+    "playCount": 6,
+    "weeksCount": 1,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2026-02-16",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-02-16",
+        "plays": 2
+      },
+      {
+        "date": "2026-02-18",
+        "plays": 2
+      },
+      {
+        "date": "2026-02-19",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 256,
+      "uniqueTracksInWindow": 147,
+      "timeOfDayDistribution": {
+        "0": 0,
+        "1": 1,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "5": 2,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 1,
+        "15": 0,
+        "16": 0,
+        "17": 0,
+        "18": 0,
+        "19": 2,
+        "20": 0,
+        "21": 0,
+        "22": 1,
+        "23": 0
+      },
+      "monthsActive": 2
+    }
+  },
+  {
     "id": "7983c8e5542b7f517853e230de9b21ba",
     "trackName": "Victory Lap",
     "artist": "Fred again..",
@@ -3192,73 +3260,6 @@
         "23": 2
       },
       "monthsActive": 5
-    }
-  },
-  {
-    "id": "9341275fa49cdf6bf043856fc78ba09c",
-    "trackName": "Often - Live",
-    "artist": "The Weeknd",
-    "album": "Live At SoFi Stadium",
-    "trackUri": "spotify:track:3kdEGx81MR9ftxRbF3Zf84",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02308f9319a3d6f6737f43b3fc",
-    "spotifyUrl": "https://open.spotify.com/track/3kdEGx81MR9ftxRbF3Zf84",
-    "dateRange": {
-      "start": "2026-02-16",
-      "end": "2026-02-19"
-    },
-    "playCount": 6,
-    "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2026-02-16",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2026-02-16",
-        "plays": 2
-      },
-      {
-        "date": "2026-02-18",
-        "plays": 2
-      },
-      {
-        "date": "2026-02-19",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst"
-    ],
-    "context": {
-      "totalPlaysInWindow": 256,
-      "uniqueTracksInWindow": 147,
-      "timeOfDayDistribution": {
-        "0": 0,
-        "1": 1,
-        "2": 0,
-        "3": 0,
-        "4": 2,
-        "5": 2,
-        "6": 0,
-        "7": 0,
-        "8": 0,
-        "9": 0,
-        "10": 0,
-        "11": 0,
-        "12": 0,
-        "13": 0,
-        "14": 1,
-        "15": 0,
-        "16": 0,
-        "17": 0,
-        "18": 0,
-        "19": 2,
-        "20": 0,
-        "21": 0,
-        "22": 1,
-        "23": 0
-      },
-      "monthsActive": 2
     }
   },
   {
@@ -3795,11 +3796,11 @@
         "18": 3,
         "19": 1,
         "20": 1,
-        "21": 3,
+        "21": 4,
         "22": 0,
         "23": 5
       },
-      "monthsActive": 5
+      "monthsActive": 6
     }
   },
   {
@@ -4266,7 +4267,7 @@
       "timeOfDayDistribution": {
         "0": 1,
         "1": 3,
-        "2": 2,
+        "2": 3,
         "3": 1,
         "4": 0,
         "5": 1,
@@ -4289,7 +4290,7 @@
         "22": 0,
         "23": 3
       },
-      "monthsActive": 5
+      "monthsActive": 6
     }
   },
   {
@@ -4675,9 +4676,9 @@
         "20": 2,
         "21": 4,
         "22": 2,
-        "23": 3
+        "23": 4
       },
-      "monthsActive": 7
+      "monthsActive": 8
     }
   },
   {
@@ -4793,7 +4794,7 @@
         "1": 1,
         "2": 5,
         "3": 4,
-        "4": 9,
+        "4": 12,
         "5": 1,
         "6": 0,
         "7": 0,
@@ -4814,7 +4815,7 @@
         "22": 4,
         "23": 6
       },
-      "monthsActive": 15
+      "monthsActive": 16
     }
   },
   {
@@ -5470,7 +5471,7 @@
         "13": 0,
         "14": 0,
         "15": 3,
-        "16": 4,
+        "16": 5,
         "17": 1,
         "18": 0,
         "19": 0,
@@ -5479,7 +5480,7 @@
         "22": 1,
         "23": 1
       },
-      "monthsActive": 4
+      "monthsActive": 5
     }
   },
   {
@@ -6220,8 +6221,8 @@
     },
     "playCount": 10,
     "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2025-12-04",
     "peakDayPlays": 2,
     "hotDays": [
@@ -6826,7 +6827,7 @@
         "13": 2,
         "14": 5,
         "15": 5,
-        "16": 1,
+        "16": 2,
         "17": 4,
         "18": 2,
         "19": 4,
@@ -6835,7 +6836,7 @@
         "22": 0,
         "23": 2
       },
-      "monthsActive": 6
+      "monthsActive": 7
     }
   },
   {
@@ -7097,7 +7098,7 @@
         "13": 2,
         "14": 5,
         "15": 5,
-        "16": 1,
+        "16": 2,
         "17": 4,
         "18": 2,
         "19": 4,
@@ -7106,7 +7107,7 @@
         "22": 0,
         "23": 2
       },
-      "monthsActive": 6
+      "monthsActive": 7
     }
   },
   {
@@ -7339,8 +7340,8 @@
     },
     "playCount": 7,
     "weeksCount": 3,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-11-08",
     "peakDayPlays": 2,
     "hotDays": [
@@ -9602,7 +9603,8 @@
       }
     ],
     "insightTypes": [
-      "burst"
+      "burst",
+      "loyalty"
     ],
     "context": {
       "totalPlaysInWindow": 572,
@@ -9625,7 +9627,7 @@
         "14": 7,
         "15": 6,
         "16": 3,
-        "17": 4,
+        "17": 5,
         "18": 4,
         "19": 1,
         "20": 2,
@@ -9682,7 +9684,7 @@
       "timeOfDayDistribution": {
         "0": 2,
         "1": 0,
-        "2": 1,
+        "2": 2,
         "3": 0,
         "4": 1,
         "5": 1,
@@ -9705,7 +9707,7 @@
         "22": 0,
         "23": 1
       },
-      "monthsActive": 8
+      "monthsActive": 9
     }
   },
   {
@@ -10055,7 +10057,7 @@
         "11": 2,
         "12": 9,
         "13": 6,
-        "14": 6,
+        "14": 7,
         "15": 3,
         "16": 7,
         "17": 6,
@@ -10066,7 +10068,7 @@
         "22": 3,
         "23": 5
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -10254,7 +10256,7 @@
       "uniqueTracksInWindow": 487,
       "timeOfDayDistribution": {
         "0": 0,
-        "1": 0,
+        "1": 1,
         "2": 3,
         "3": 1,
         "4": 2,
@@ -10615,7 +10617,7 @@
       "uniqueTracksInWindow": 200,
       "timeOfDayDistribution": {
         "0": 5,
-        "1": 3,
+        "1": 5,
         "2": 2,
         "3": 0,
         "4": 1,
@@ -10637,9 +10639,9 @@
         "20": 2,
         "21": 1,
         "22": 1,
-        "23": 4
+        "23": 5
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -12182,8 +12184,8 @@
     },
     "playCount": 13,
     "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2025-07-10",
     "peakDayPlays": 4,
     "hotDays": [
@@ -13147,7 +13149,7 @@
       "timeOfDayDistribution": {
         "0": 2,
         "1": 2,
-        "2": 5,
+        "2": 6,
         "3": 0,
         "4": 1,
         "5": 0,
@@ -13356,7 +13358,7 @@
         "11": 1,
         "12": 0,
         "13": 2,
-        "14": 4,
+        "14": 5,
         "15": 4,
         "16": 0,
         "17": 2,
@@ -13367,7 +13369,7 @@
         "22": 6,
         "23": 2
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -13561,7 +13563,7 @@
         "11": 2,
         "12": 9,
         "13": 6,
-        "14": 6,
+        "14": 7,
         "15": 3,
         "16": 7,
         "17": 6,
@@ -13572,7 +13574,7 @@
         "22": 3,
         "23": 5
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -14128,7 +14130,7 @@
         "11": 2,
         "12": 9,
         "13": 6,
-        "14": 6,
+        "14": 7,
         "15": 3,
         "16": 7,
         "17": 6,
@@ -14139,7 +14141,7 @@
         "22": 3,
         "23": 5
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -14352,8 +14354,8 @@
     },
     "playCount": 9,
     "weeksCount": 4,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2025-04-22",
     "peakDayPlays": 2,
     "hotDays": [
@@ -14800,7 +14802,7 @@
         "11": 2,
         "12": 3,
         "13": 2,
-        "14": 6,
+        "14": 7,
         "15": 4,
         "16": 5,
         "17": 1,
@@ -14809,9 +14811,9 @@
         "20": 1,
         "21": 3,
         "22": 4,
-        "23": 7
+        "23": 8
       },
-      "monthsActive": 14
+      "monthsActive": 15
     }
   },
   {
@@ -15545,7 +15547,7 @@
         "11": 2,
         "12": 9,
         "13": 6,
-        "14": 6,
+        "14": 7,
         "15": 3,
         "16": 7,
         "17": 6,
@@ -15556,7 +15558,7 @@
         "22": 3,
         "23": 5
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -15748,7 +15750,7 @@
         "11": 3,
         "12": 5,
         "13": 2,
-        "14": 2,
+        "14": 3,
         "15": 7,
         "16": 12,
         "17": 2,
@@ -15759,7 +15761,7 @@
         "22": 3,
         "23": 3
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -15959,7 +15961,7 @@
         "11": 1,
         "12": 0,
         "13": 2,
-        "14": 4,
+        "14": 5,
         "15": 4,
         "16": 0,
         "17": 2,
@@ -15970,7 +15972,7 @@
         "22": 6,
         "23": 2
       },
-      "monthsActive": 13
+      "monthsActive": 14
     }
   },
   {
@@ -16184,6 +16186,66 @@
         "23": 2
       },
       "monthsActive": 14
+    }
+  },
+  {
+    "id": "0779cb25d02f58489f051fd1222753c5",
+    "trackName": "Reflections Laughing",
+    "artist": "The Weeknd",
+    "album": "Hurry Up Tomorrow",
+    "trackUri": "spotify:track:2gyHr9WqZeMtzJOpWGuGo6",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02982320da137d0de34410df61",
+    "spotifyUrl": "https://open.spotify.com/track/2gyHr9WqZeMtzJOpWGuGo6",
+    "dateRange": {
+      "start": "2025-01-31",
+      "end": "2025-01-31"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2025-01-31",
+    "peakDayPlays": 5,
+    "hotDays": [
+      {
+        "date": "2025-01-31",
+        "plays": 5
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 72,
+      "uniqueTracksInWindow": 34,
+      "timeOfDayDistribution": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 1,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 0,
+        "15": 0,
+        "16": 2,
+        "17": 0,
+        "18": 1,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 1,
+        "23": 0
+      },
+      "monthsActive": 1
     }
   },
   {
@@ -16636,6 +16698,66 @@
         "23": 2
       },
       "monthsActive": 10
+    }
+  },
+  {
+    "id": "814f6348213f77b2e4a4c10612c97f46",
+    "trackName": "Rah Tah Tah",
+    "artist": "Tyler, The Creator",
+    "album": "CHROMAKOPIA",
+    "trackUri": "spotify:track:5RePVWy39tLpHH0WwXgBsK",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02084a94988541c2402615d014",
+    "spotifyUrl": "https://open.spotify.com/track/5RePVWy39tLpHH0WwXgBsK",
+    "dateRange": {
+      "start": "2024-11-24",
+      "end": "2024-11-30"
+    },
+    "playCount": 6,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2024-11-24",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2024-11-24",
+        "plays": 3
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 260,
+      "uniqueTracksInWindow": 174,
+      "timeOfDayDistribution": {
+        "0": 0,
+        "1": 1,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 1,
+        "18": 1,
+        "19": 1,
+        "20": 1,
+        "21": 0,
+        "22": 0,
+        "23": 2
+      },
+      "monthsActive": 1
     }
   },
   {
@@ -18264,8 +18386,8 @@
     },
     "playCount": 7,
     "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2024-06-14",
     "peakDayPlays": 3,
     "hotDays": [
@@ -18538,8 +18660,8 @@
     },
     "playCount": 11,
     "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2024-05-27",
     "peakDayPlays": 2,
     "hotDays": [
@@ -18799,8 +18921,8 @@
     },
     "playCount": 5,
     "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2024-05-18",
     "peakDayPlays": 2,
     "hotDays": [
@@ -19048,6 +19170,67 @@
     }
   },
   {
+    "id": "db96f3da807e81adba59f9e9abe02467",
+    "trackName": "Dark Beach (Deep Slowed)",
+    "artist": "Your Favs But Slowed",
+    "album": "Dark Beach (Deep Slowed)",
+    "trackUri": "spotify:track:5kTh3asJiFkhJWlJ2FsUQz",
+    "albumArtUrl": "",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/5kTh3asJiFkhJWlJ2FsUQz",
+    "dateRange": {
+      "start": "2024-05-06",
+      "end": "2024-05-06"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2024-05-06",
+    "peakDayPlays": 5,
+    "hotDays": [
+      {
+        "date": "2024-05-06",
+        "plays": 5
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 34,
+      "uniqueTracksInWindow": 28,
+      "timeOfDayDistribution": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 5,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 0,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 0
+      },
+      "monthsActive": 1
+    }
+  },
+  {
     "id": "a2399d0ba896fef1847eee3fec1e140b",
     "trackName": "Metaverse",
     "artist": "Cage The Elephant",
@@ -19062,8 +19245,8 @@
     },
     "playCount": 8,
     "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2024-05-04",
     "peakDayPlays": 7,
     "hotDays": [
@@ -20802,6 +20985,66 @@
         "20": 2,
         "21": 0,
         "22": 1,
+        "23": 0
+      },
+      "monthsActive": 1
+    }
+  },
+  {
+    "id": "58edaeadfb87f02055d2163e31f7967a",
+    "trackName": "NIGHTCRAWLER",
+    "artist": "Jacques B",
+    "album": "CACTUSWORLD",
+    "trackUri": "spotify:track:0ebjAYr94iWlfEUjtVmNXh",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e024bd6bdaf14fdcb06deef7fee",
+    "spotifyUrl": "https://open.spotify.com/track/0Nu5RfVHCePEbJltpUcKO3",
+    "dateRange": {
+      "start": "2024-02-05",
+      "end": "2024-02-09"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2024-02-05",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2024-02-05",
+        "plays": 3
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 136,
+      "uniqueTracksInWindow": 94,
+      "timeOfDayDistribution": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 1,
+        "13": 0,
+        "14": 1,
+        "15": 0,
+        "16": 1,
+        "17": 0,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
         "23": 0
       },
       "monthsActive": 1
@@ -23062,7 +23305,7 @@
       "totalPlaysInWindow": 173,
       "uniqueTracksInWindow": 103,
       "timeOfDayDistribution": {
-        "0": 6,
+        "0": 7,
         "1": 8,
         "2": 5,
         "3": 6,
@@ -23087,7 +23330,7 @@
         "22": 6,
         "23": 2
       },
-      "monthsActive": 27
+      "monthsActive": 28
     }
   },
   {
@@ -24043,7 +24286,7 @@
       "totalPlaysInWindow": 691,
       "uniqueTracksInWindow": 369,
       "timeOfDayDistribution": {
-        "0": 6,
+        "0": 7,
         "1": 8,
         "2": 5,
         "3": 6,
@@ -24068,7 +24311,7 @@
         "22": 6,
         "23": 2
       },
-      "monthsActive": 27
+      "monthsActive": 28
     }
   },
   {
@@ -28262,8 +28505,8 @@
     },
     "playCount": 7,
     "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2023-05-15",
     "peakDayPlays": 3,
     "hotDays": [
@@ -35209,6 +35452,66 @@
     }
   },
   {
+    "id": "17d185e58259c6c3f814e275e90d25bc",
+    "trackName": "It's Called: Freefall",
+    "artist": "Rainbow Kitten Surprise",
+    "album": "How to: Friend, Love, Freefall",
+    "trackUri": "spotify:track:474uVhyGgK5MtY9gMcDgGl",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e029529217e48fc8bab89c8a1f9",
+    "spotifyUrl": "https://open.spotify.com/track/474uVhyGgK5MtY9gMcDgGl",
+    "dateRange": {
+      "start": "2022-11-29",
+      "end": "2022-12-03"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2022-11-29",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2022-11-29",
+        "plays": 3
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 218,
+      "uniqueTracksInWindow": 162,
+      "timeOfDayDistribution": {
+        "0": 1,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 2,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 1,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 0
+      },
+      "monthsActive": 2
+    }
+  },
+  {
     "id": "11950dc90add9482df0a081016ece4a1",
     "trackName": "Runaway",
     "artist": "Kanye West",
@@ -35335,6 +35638,70 @@
         "23": 0
       },
       "monthsActive": 3
+    }
+  },
+  {
+    "id": "fe764c033da394cee73593cd56669890",
+    "trackName": "It's Still Rock and Roll to Me",
+    "artist": "Billy Joel",
+    "album": "Glass Houses",
+    "trackUri": "spotify:track:64UioB4Nmwgn2f4cbIpAkl",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02f753fddb6af9c9476ed02c9e",
+    "spotifyUrl": "https://open.spotify.com/track/64UioB4Nmwgn2f4cbIpAkl",
+    "dateRange": {
+      "start": "2022-03-19",
+      "end": "2022-03-26"
+    },
+    "playCount": 6,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2022-03-19",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2022-03-19",
+        "plays": 2
+      },
+      {
+        "date": "2022-03-25",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 224,
+      "uniqueTracksInWindow": 44,
+      "timeOfDayDistribution": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 1,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 1,
+        "15": 1,
+        "16": 0,
+        "17": 0,
+        "18": 0,
+        "19": 1,
+        "20": 0,
+        "21": 0,
+        "22": 1,
+        "23": 0
+      },
+      "monthsActive": 1
     }
   },
   {

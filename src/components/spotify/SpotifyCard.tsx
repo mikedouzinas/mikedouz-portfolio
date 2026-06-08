@@ -57,8 +57,8 @@ function formatTime(s: number): string {
 function formatDateRange(dateRange: { start: string; end: string }): string {
   const s = new Date(dateRange.start);
   const e = new Date(dateRange.end);
-  const sMonth = s.toLocaleString('default', { month: 'short' });
-  const eMonth = e.toLocaleString('default', { month: 'short' });
+  const sMonth = s.toLocaleString('default', { month: 'short', timeZone: 'UTC' });
+  const eMonth = e.toLocaleString('default', { month: 'short', timeZone: 'UTC' });
   const sDay = s.getUTCDate();
   const eDay = e.getUTCDate();
   const sYear = s.getUTCFullYear();

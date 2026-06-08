@@ -112,7 +112,7 @@
     ]
   },
   {
-    "id": "85029b986edc010e9a8c2de46b11553d",
+    "id": "f3efe32bfefd36fccd402b1a781a058e",
     "trackName": "National Treasures",
     "artist": "Drake",
     "album": "ICEMAN",
@@ -121,10 +121,10 @@
     "spotifyUrl": "https://open.spotify.com/track/393OFJFZKIIv66JmJcNm9D",
     "dateRange": {
       "start": "2026-05-15",
-      "end": "2026-05-29"
+      "end": "2026-06-05"
     },
-    "playCount": 8,
-    "weeksCount": 3,
+    "playCount": 10,
+    "weeksCount": 4,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-05-15",
@@ -1161,13 +1161,13 @@
     ]
   },
   {
-    "id": "b952b24d00a1ac5b948a6d49e79a6985",
-    "trackName": "BANSHEE",
+    "id": "4960b16888872414cdc51ad51b85ef81",
+    "trackName": "LO MISMO QUE YO",
     "artist": "FloyyMenor",
-    "album": "YTSQS",
-    "trackUri": "spotify:track:1mPPQLqgjZMs4liCUqMyq2",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02705e066a89178725f9c3f677",
-    "spotifyUrl": "https://open.spotify.com/track/1mPPQLqgjZMs4liCUqMyq2",
+    "album": "MAN IN BLACK",
+    "trackUri": "spotify:track:4aYkPfTQAxMXkROC82KszZ",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02f5c42b348cf50ccd3e5965cf",
+    "spotifyUrl": "https://open.spotify.com/track/4aYkPfTQAxMXkROC82KszZ",
     "dateRange": {
       "start": "2026-03-04",
       "end": "2026-03-06"
@@ -1186,21 +1186,21 @@
     ]
   },
   {
-    "id": "4960b16888872414cdc51ad51b85ef81",
-    "trackName": "LO MISMO QUE YO",
+    "id": "b952b24d00a1ac5b948a6d49e79a6985",
+    "trackName": "BANSHEE",
     "artist": "FloyyMenor",
-    "album": "MAN IN BLACK",
-    "trackUri": "spotify:track:4aYkPfTQAxMXkROC82KszZ",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02f5c42b348cf50ccd3e5965cf",
-    "spotifyUrl": "https://open.spotify.com/track/4aYkPfTQAxMXkROC82KszZ",
+    "album": "YTSQS",
+    "trackUri": "spotify:track:1mPPQLqgjZMs4liCUqMyq2",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02705e066a89178725f9c3f677",
+    "spotifyUrl": "https://open.spotify.com/track/1mPPQLqgjZMs4liCUqMyq2",
     "dateRange": {
       "start": "2026-03-04",
       "end": "2026-03-06"
     },
     "playCount": 5,
     "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2026-03-06",
     "peakDayPlays": 4,
     "hotDays": [
@@ -1253,8 +1253,8 @@
     },
     "playCount": 7,
     "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2026-02-24",
     "peakDayPlays": 3,
     "hotDays": [
@@ -1471,6 +1471,39 @@
     ]
   },
   {
+    "id": "9341275fa49cdf6bf043856fc78ba09c",
+    "trackName": "Often - Live",
+    "artist": "The Weeknd",
+    "album": "Live At SoFi Stadium",
+    "trackUri": "spotify:track:3kdEGx81MR9ftxRbF3Zf84",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02308f9319a3d6f6737f43b3fc",
+    "spotifyUrl": "https://open.spotify.com/track/3kdEGx81MR9ftxRbF3Zf84",
+    "dateRange": {
+      "start": "2026-02-16",
+      "end": "2026-02-19"
+    },
+    "playCount": 6,
+    "weeksCount": 1,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2026-02-16",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2026-02-16",
+        "plays": 2
+      },
+      {
+        "date": "2026-02-18",
+        "plays": 2
+      },
+      {
+        "date": "2026-02-19",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "7983c8e5542b7f517853e230de9b21ba",
     "trackName": "Victory Lap",
     "artist": "Fred again..",
@@ -1492,39 +1525,6 @@
       {
         "date": "2026-02-16",
         "plays": 4
-      }
-    ]
-  },
-  {
-    "id": "9341275fa49cdf6bf043856fc78ba09c",
-    "trackName": "Often - Live",
-    "artist": "The Weeknd",
-    "album": "Live At SoFi Stadium",
-    "trackUri": "spotify:track:3kdEGx81MR9ftxRbF3Zf84",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02308f9319a3d6f6737f43b3fc",
-    "spotifyUrl": "https://open.spotify.com/track/3kdEGx81MR9ftxRbF3Zf84",
-    "dateRange": {
-      "start": "2026-02-16",
-      "end": "2026-02-19"
-    },
-    "playCount": 6,
-    "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2026-02-16",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2026-02-16",
-        "plays": 2
-      },
-      {
-        "date": "2026-02-18",
-        "plays": 2
-      },
-      {
-        "date": "2026-02-19",
-        "plays": 2
       }
     ]
   },
@@ -2979,8 +2979,8 @@
     },
     "playCount": 10,
     "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2025-12-04",
     "peakDayPlays": 2,
     "hotDays": [
@@ -3511,8 +3511,8 @@
     },
     "playCount": 7,
     "weeksCount": 3,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-11-08",
     "peakDayPlays": 2,
     "hotDays": [
@@ -5931,8 +5931,8 @@
     },
     "playCount": 13,
     "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2025-07-10",
     "peakDayPlays": 4,
     "hotDays": [
@@ -6989,8 +6989,8 @@
     },
     "playCount": 9,
     "weeksCount": 4,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2025-04-22",
     "peakDayPlays": 2,
     "hotDays": [
@@ -7887,6 +7887,31 @@
     ]
   },
   {
+    "id": "0779cb25d02f58489f051fd1222753c5",
+    "trackName": "Reflections Laughing",
+    "artist": "The Weeknd",
+    "album": "Hurry Up Tomorrow",
+    "trackUri": "spotify:track:2gyHr9WqZeMtzJOpWGuGo6",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02982320da137d0de34410df61",
+    "spotifyUrl": "https://open.spotify.com/track/2gyHr9WqZeMtzJOpWGuGo6",
+    "dateRange": {
+      "start": "2025-01-31",
+      "end": "2025-01-31"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2025-01-31",
+    "peakDayPlays": 5,
+    "hotDays": [
+      {
+        "date": "2025-01-31",
+        "plays": 5
+      }
+    ]
+  },
+  {
     "id": "35ef8987c8aab3681a966e456bd52505",
     "trackName": "Take Me Back To LA",
     "artist": "The Weeknd",
@@ -8096,6 +8121,31 @@
       {
         "date": "2025-01-04",
         "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "814f6348213f77b2e4a4c10612c97f46",
+    "trackName": "Rah Tah Tah",
+    "artist": "Tyler, The Creator",
+    "album": "CHROMAKOPIA",
+    "trackUri": "spotify:track:5RePVWy39tLpHH0WwXgBsK",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02084a94988541c2402615d014",
+    "spotifyUrl": "https://open.spotify.com/track/5RePVWy39tLpHH0WwXgBsK",
+    "dateRange": {
+      "start": "2024-11-24",
+      "end": "2024-11-30"
+    },
+    "playCount": 6,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2024-11-24",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2024-11-24",
+        "plays": 3
       }
     ]
   },
@@ -8888,8 +8938,8 @@
     },
     "playCount": 7,
     "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2024-06-14",
     "peakDayPlays": 3,
     "hotDays": [
@@ -9023,8 +9073,8 @@
     },
     "playCount": 11,
     "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2024-05-27",
     "peakDayPlays": 2,
     "hotDays": [
@@ -9145,8 +9195,8 @@
     },
     "playCount": 5,
     "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2024-05-18",
     "peakDayPlays": 2,
     "hotDays": [
@@ -9254,6 +9304,32 @@
     ]
   },
   {
+    "id": "db96f3da807e81adba59f9e9abe02467",
+    "trackName": "Dark Beach (Deep Slowed)",
+    "artist": "Your Favs But Slowed",
+    "album": "Dark Beach (Deep Slowed)",
+    "trackUri": "spotify:track:5kTh3asJiFkhJWlJ2FsUQz",
+    "albumArtUrl": "",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/5kTh3asJiFkhJWlJ2FsUQz",
+    "dateRange": {
+      "start": "2024-05-06",
+      "end": "2024-05-06"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2024-05-06",
+    "peakDayPlays": 5,
+    "hotDays": [
+      {
+        "date": "2024-05-06",
+        "plays": 5
+      }
+    ]
+  },
+  {
     "id": "a2399d0ba896fef1847eee3fec1e140b",
     "trackName": "Metaverse",
     "artist": "Cage The Elephant",
@@ -9268,8 +9344,8 @@
     },
     "playCount": 8,
     "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2024-05-04",
     "peakDayPlays": 7,
     "hotDays": [
@@ -10100,6 +10176,31 @@
       {
         "date": "2024-02-15",
         "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "58edaeadfb87f02055d2163e31f7967a",
+    "trackName": "NIGHTCRAWLER",
+    "artist": "Jacques B",
+    "album": "CACTUSWORLD",
+    "trackUri": "spotify:track:0ebjAYr94iWlfEUjtVmNXh",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e024bd6bdaf14fdcb06deef7fee",
+    "spotifyUrl": "https://open.spotify.com/track/0Nu5RfVHCePEbJltpUcKO3",
+    "dateRange": {
+      "start": "2024-02-05",
+      "end": "2024-02-09"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2024-02-05",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2024-02-05",
+        "plays": 3
       }
     ]
   },
@@ -13726,8 +13827,8 @@
     },
     "playCount": 7,
     "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 3,
+    "maxState": 3,
     "peakDay": "2023-05-15",
     "peakDayPlays": 3,
     "hotDays": [
@@ -17073,6 +17174,31 @@
     ]
   },
   {
+    "id": "17d185e58259c6c3f814e275e90d25bc",
+    "trackName": "It's Called: Freefall",
+    "artist": "Rainbow Kitten Surprise",
+    "album": "How to: Friend, Love, Freefall",
+    "trackUri": "spotify:track:474uVhyGgK5MtY9gMcDgGl",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e029529217e48fc8bab89c8a1f9",
+    "spotifyUrl": "https://open.spotify.com/track/474uVhyGgK5MtY9gMcDgGl",
+    "dateRange": {
+      "start": "2022-11-29",
+      "end": "2022-12-03"
+    },
+    "playCount": 5,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2022-11-29",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2022-11-29",
+        "plays": 3
+      }
+    ]
+  },
+  {
     "id": "11950dc90add9482df0a081016ece4a1",
     "trackName": "Runaway",
     "artist": "Kanye West",
@@ -17127,6 +17253,35 @@
       },
       {
         "date": "2022-03-26",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "fe764c033da394cee73593cd56669890",
+    "trackName": "It's Still Rock and Roll to Me",
+    "artist": "Billy Joel",
+    "album": "Glass Houses",
+    "trackUri": "spotify:track:64UioB4Nmwgn2f4cbIpAkl",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02f753fddb6af9c9476ed02c9e",
+    "spotifyUrl": "https://open.spotify.com/track/64UioB4Nmwgn2f4cbIpAkl",
+    "dateRange": {
+      "start": "2022-03-19",
+      "end": "2022-03-26"
+    },
+    "playCount": 6,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2022-03-19",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2022-03-19",
+        "plays": 2
+      },
+      {
+        "date": "2022-03-25",
         "plays": 2
       }
     ]

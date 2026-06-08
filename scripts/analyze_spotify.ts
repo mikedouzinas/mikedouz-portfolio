@@ -161,15 +161,26 @@ async function main(): Promise<void> {
       if (idx !== undefined) weeklyCounts[idx] = count;
     }
 
-    // Trim leading/trailing zeros but keep CONTEXT_WEEKS of context on each
-    // side so Kleinberg has contrast for new songs with a single active week.
+    // Trim leading/trailing zeros, then re-pad the LEADING side with
+    // CONTEXT_WEEKS of zero-context so Kleinberg has baseline contrast for new
+    // songs with a single active week.
+    //
+    // The trailing side is intentionally NOT re-padded. Kleinberg's transition
+    // cost scales with log(T) (T = window length), so every trailing zero-week
+    // raises the cost of entering a burst. Crucially, how many trailing zeros a
+    // track receives depended on its position in the GLOBAL week index: a song
+    // whose last play was the most recent week got zero trailing padding, while
+    // the same song — once newer plays from OTHER tracks extended the timeline —
+    // got up to CONTEXT_WEEKS of trailing zeros, inflating T and silently
+    // suppressing an otherwise-identical single-week burst. Anchoring the window
+    // at the last active week makes detection depend only on the track's own
+    // listening pattern, independent of when the analysis is run.
     let lo = 0;
     let hi = weeklyCounts.length - 1;
     while (lo <= hi && weeklyCounts[lo] === 0) lo++;
     while (hi >= lo && weeklyCounts[hi] === 0) hi--;
     if (lo > hi) continue;
     lo = Math.max(0, lo - CONTEXT_WEEKS);
-    hi = Math.min(weeklyCounts.length - 1, hi + CONTEXT_WEEKS);
 
     const trimmedCounts = weeklyCounts.slice(lo, hi + 1);
 
