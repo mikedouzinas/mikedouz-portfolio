@@ -235,7 +235,7 @@ html {
   @keyframes iris-hud-in {
     0%   { opacity: 0; transform: scale(0.88); filter: blur(3px); }
     45%  { opacity: 1; filter: blur(0); }
-    68%  { transform: scale(1.016); }
+    68%  { transform: scale(1.008); }
     100% { opacity: 1; transform: scale(1); filter: blur(0); }
   }
 
