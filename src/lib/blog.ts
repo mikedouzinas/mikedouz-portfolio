@@ -17,6 +17,7 @@ export interface BlogPostTheme {
   header_style?: 'minimal' | 'cover-image' | 'full-bleed';
   background_mood?: string;
   custom_class?: string;
+  hide_listen?: boolean; // when true, hide the "listen to this post" bar/card on this post
 }
 
 export interface SoundtrackTrack {
@@ -95,7 +96,7 @@ export function calculateReadingTime(body: string): number {
  */
 export function generatePreview(body: string, maxLength = 200): string {
   const plain = body
-    .replace(/::(.*?)\|[^:]*?::/g, '$1')    // hover definitions (keep visible text)
+    .replace(/::([^|]+?)\|[\s\S]+?::/g, '$1') // hover definitions (keep visible text; defs may contain colons/URLs)
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')   // images
     .replace(/\[[^\]]*\]\([^)]*\)/g, (m) => {
       const text = m.match(/\[([^\]]*)\]/);

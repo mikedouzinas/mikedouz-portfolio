@@ -13,6 +13,7 @@ interface ListenFeatureProps {
   postBody: string;
   readingTime: number;
   coverImage: string | null;
+  hideListen?: boolean;
 }
 
 export default function ListenFeature({
@@ -21,6 +22,7 @@ export default function ListenFeature({
   postBody,
   readingTime,
   coverImage,
+  hideListen = false,
 }: ListenFeatureProps) {
   // Ref attached to the rendered post body. useAudioPlayer reads [data-para-idx]
   // elements from this container to build the paragraph list for TTS generation.
@@ -30,8 +32,12 @@ export default function ListenFeature({
 
   return (
     <>
-      <ListenBar player={player} postTitle={postTitle} />
-      <ListenCard player={player} readingTime={readingTime} />
+      {!hideListen && (
+        <>
+          <ListenBar player={player} postTitle={postTitle} />
+          <ListenCard player={player} readingTime={readingTime} />
+        </>
+      )}
       <PostBodyWithIris slug={slug} postTitle={postTitle}>
         <div ref={contentRef}>
           <MarkdownRenderer content={postBody} activeParagraphIndex={player.activeParagraphIndex} />

@@ -111,6 +111,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           postBody={post.body}
           readingTime={post.reading_time}
           coverImage={post.cover_image ?? null}
+          hideListen={post.theme?.hide_listen === true}
         />
 
         {/* Bottom subscribe */}
