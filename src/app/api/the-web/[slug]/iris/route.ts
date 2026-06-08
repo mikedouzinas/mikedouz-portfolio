@@ -24,6 +24,13 @@ const RequestSchema = z.object({
   session_id: z.string().max(64).optional(),
 });
 
+// Streaming Claude responses can take longer than Vercel's default function
+// timeout (~10–15s). Without this, production kills the function mid-stream and
+// the answer truncates with no error (works locally since dev has no limit).
+// Mirrors the main Iris route (src/app/api/iris/answer/route.ts).
+export const runtime = 'nodejs';
+export const maxDuration = 60; // Allow up to 60 seconds for execution (Vercel Pro)
+
 // Claude for conversation (quality matters), GPT-4o-mini for drafts (just formatting)
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
