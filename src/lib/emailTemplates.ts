@@ -19,7 +19,12 @@ export function confirmationEmail(confirmationToken: string): {
     html: `
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"></head>
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
+<style>:root{color-scheme:dark;supported-color-schemes:dark;}</style>
+</head>
 <body style="margin:0;padding:0;background-color:#111827;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;" bgcolor="#111827">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#111827;padding:40px 20px;" bgcolor="#111827">
     <tr>
@@ -84,7 +89,12 @@ export function newPostEmail(post: {
     html: `
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"></head>
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
+<style>:root{color-scheme:dark;supported-color-schemes:dark;}</style>
+</head>
 <body style="margin:0;padding:0;background-color:#111827;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;" bgcolor="#111827">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#111827;padding:40px 20px;" bgcolor="#111827">
     <tr>
