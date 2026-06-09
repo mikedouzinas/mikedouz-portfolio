@@ -99,12 +99,13 @@ export function CreateIssueForm({
         variant="solid"
         glowColor="234, 67, 53"
         glowIntensity={0.16}
-        className="border-white/30 bg-white/90 px-4 py-2 hover:bg-white"
+        className="border-white/20 bg-white/10 px-4 py-2 hover:bg-white/20"
       >
         {busy ? (
-          <span className="text-slate-600">Filing…</span>
+          <span className="text-white/70">Filing…</span>
         ) : (
-          <GoogleText text="File it" className="font-bold" />
+          // First "i" yellow, "l" red; the rest cycle the Google palette.
+          <GoogleText text="File it" className="font-bold" overrides={{ 1: '#FBBC05', 2: '#EA4335' }} />
         )}
       </Button>
     </form>
