@@ -6,6 +6,7 @@ import { useBlogIris } from '../hooks/useBlogIris';
 import BlogIrisConversation from './BlogIrisConversation';
 import BlogIrisActions from './BlogIrisActions';
 import BlogIrisDraft from './BlogIrisDraft';
+import { IrisBubble } from '@/components/iris/IrisBubble';
 
 interface TextSelection {
   text: string;
@@ -400,45 +401,16 @@ const BlogIrisBubble = forwardRef<HTMLDivElement, BlogIrisBubbleProps>(
 
     if (isMobile) {
       return (
-        <div
-          ref={bubbleEl}
-          className="iris-hud-enter fixed bottom-0 left-0 right-0 max-h-[85vh] z-50 rounded-t-2xl bg-teal-500/[0.08] border border-teal-400/[0.12] backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.3)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] overflow-y-auto"
-        >
-          <div className="relative">
-            <div className="relative">
-              <div className="flex justify-center mb-3">
-                <div className="w-8 h-1 rounded-full bg-white/20" />
-              </div>
-              {bubbleContent}
-            </div>
-          </div>
-        </div>
+        <IrisBubble ref={bubbleEl} mobile>
+          {bubbleContent}
+        </IrisBubble>
       );
     }
 
-    const glassClasses = `
-      bg-teal-500/[0.08] border border-teal-400/[0.12]
-      backdrop-blur-xl
-      rounded-2xl overflow-y-auto
-    `;
-
     return (
-      <>
-        <div
-          ref={bubbleEl}
-          data-has-contained-glow="true"
-          style={getDesktopStyle()}
-          className={`iris-hud-enter ${glassClasses} transition-[top,left,width,max-height,padding,box-shadow] duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
-            expanded
-              ? 'p-5 shadow-[0_0_80px_40px_rgba(0,0,0,0.35),0_4px_24px_rgba(0,0,0,0.25)]'
-              : 'p-3.5 shadow-[0_8px_48px_rgba(0,0,0,0.65),0_2px_12px_rgba(0,0,0,0.4)]'
-          }`}
-        >
-          <div className="relative">
-            {bubbleContent}
-          </div>
-        </div>
-      </>
+      <IrisBubble ref={bubbleEl} expanded={expanded} style={getDesktopStyle()}>
+        {bubbleContent}
+      </IrisBubble>
     );
   }
 );
