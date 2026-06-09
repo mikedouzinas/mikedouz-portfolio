@@ -5,6 +5,13 @@ process.env.DEV_SESSION_SECRET = 'test-secret-please-change-0123456789';
 
 async function main() {
   // Dynamic import after env is set — robust to ESM hoisting.
+  const { hashPassword, verifyPassword } = await import('../src/lib/dev/password');
+
+  const hash = hashPassword('hunter2');
+  assert.equal(verifyPassword('hunter2', hash), true, 'correct password verifies');
+  assert.equal(verifyPassword('wrong', hash), false, 'wrong password is rejected');
+  assert.equal(verifyPassword('hunter2', 'garbage'), false, 'malformed hash is rejected');
+
   const { signSession, verifySession } = await import('../src/lib/dev/session');
 
   const now = 1_700_000_000_000; // fixed clock (ms)
