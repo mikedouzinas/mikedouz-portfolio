@@ -15,6 +15,19 @@
       "related_projects": ["project_olympus"]
     },
     {
+      "title": "Human or Dancer",
+      "url": "/the-web/human-or-dancer",
+      "published_date": "June 8, 2026",
+      "description": "A dancer executes; a human expresses. The barrier AI is really lowering was never the barrier to making things — it's the barrier to knowing yourself. Now that execution is effortless, do we still bother to be human in what we make?",
+      "context": "A reaction piece written after reading Luay Nakhleh's (Rice Dean of Engineering and Computing) article 'Is AI Ruining Our Ability to Think? The Wrong Question to Ask,' which came out of a Rice gathering, 'Human Flourishing in the Age of AI,' co-organized by Rodrigo Ferreira, who taught Mike's computer ethics class. The title riffs on The Killers' 'Human' ('Are we human, or are we dancer?') and Hunter S. Thompson's line about raising 'a generation of dancers': human = self-knowing, self-directed, expressing; dancer = moving to a rhythm someone else set, the passive consumer. The emotional core is Knight Life, the scheduling app Mike built in high school for himself to make the world in his head real — not as an entrepreneur — which only spread because his sister Natalie told her friends.",
+      "summary": "Mike's central claim: there are three distinct struggles, and AI affects them differently. (1) The struggle to START — learning syntax, getting over the wall of not knowing how — is worth removing, and these tools remove it. (2) The struggle to CARVE — taking a rough vision and perfecting it until it's exactly what you saw — is the entire point and must never be skipped (the Kevin Parker reference: he made 'The Less I Know the Better' fast, then carved it for months). (3) The struggle to KNOW YOURSELF is the deepest and is Nakhleh's real answer: the struggle worth protecting was never learning Java loops, it was self-examination. So Mike is neither pro- nor anti-AI: he's for removing the start-struggle and keeping the carve and self-knowledge struggles. His film fear (he's seen Across the Spider-Verse five times) is not 'AI makes bad art' but that when the barrier to making drops to zero, people stop sitting with a vision long enough to perfect it. The conditional thesis: 'AI can be the most important piece in our journey toward flourishing' — only if it's pointed at self-knowledge, not consumption. The deferred, darker societal fear (who decides what gets built; consumption over self-knowledge) is named but intentionally left for a heavier future piece.",
+      "class": null,
+      "related_class": null,
+      "related_experiences": ["exp_olympus_founder"],
+      "related_projects": ["proj_apollo", "proj_knight_life"],
+      "tags": ["philosophy", "flourishing", "technology", "ai", "self-knowledge"]
+    },
+    {
       "title": "How Do I Not Feel This?",
       "url": "/the-web/how-do-i-not-feel-this",
       "published_date": "April 19, 2026",

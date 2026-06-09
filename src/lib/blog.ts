@@ -81,10 +81,12 @@ export interface CreateBlogPostInput {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const WORDS_PER_MINUTE = 200;
+// 238 wpm = average adult silent reading speed for English non-fiction
+// (Brysbaert 2019 meta-analysis). 200 wpm noticeably overestimated.
+const WORDS_PER_MINUTE = 238;
 
 /**
- * Estimate reading time in minutes (~200 wpm, minimum 1).
+ * Estimate reading time in minutes (~238 wpm, minimum 1).
  */
 export function calculateReadingTime(body: string): number {
   const words = body.trim().split(/\s+/).filter(Boolean).length;
