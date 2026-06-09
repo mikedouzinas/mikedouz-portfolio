@@ -100,6 +100,15 @@ server-side, so a visitor who navigates directly to `/dev` or curls
   stays server-only; mutations are same-origin behind a `SameSite=Strict` cookie
   (CSRF-safe).
 
+### Console visual style — "workpad"
+
+The `/dev` console sits on a **workpad / blueprint backdrop**: a faint engineering grid
+of thin vertical + horizontal lines (Iron-Man-workspace feel) — modern and restrained,
+not busy. Implemented as a pure-CSS layered grid (a coarse ~80px grid over a fine ~16px
+grid) in a low-opacity cyan on near-black. No animation, no heavy effects. Defined once
+as a `.dev-workpad` utility and applied to the console root (and optionally echoed on the
+portal modal backdrop).
+
 ### Secret trigger — desktop + mobile
 
 The trigger is cosmetic (security is the cookie/middleware above), but it must

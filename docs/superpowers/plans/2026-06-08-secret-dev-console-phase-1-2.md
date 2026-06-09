@@ -667,7 +667,25 @@ git commit -m "feat(dev-console): animated portal login (hover + long-press) mou
 ### Task 8: Authed console shell + end-to-end auth verification
 
 **Files:**
+- Modify: `src/styles/globals.css`
 - Create: `src/app/dev/page.tsx`
+
+- [ ] **Step 0: Add the "workpad" backdrop utility**
+
+Append to `src/styles/globals.css` a faint blueprint-grid utility (Iron-Man-workspace feel — modern, restrained, no animation). The `/dev` console root uses `dev-workpad` instead of a flat background:
+```css
+/* Dev console "workpad" backdrop — layered engineering grid, low-opacity cyan on near-black. */
+.dev-workpad {
+  background-color: #070b12;
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+    linear-gradient(rgba(56, 189, 248, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.025) 1px, transparent 1px);
+  background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+  background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
+}
+```
 
 - [ ] **Step 1: Implement a minimal authed shell**
 
@@ -687,7 +705,7 @@ export default function DevConsolePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 p-8 text-white">
+    <div className="min-h-screen dev-workpad p-8 text-white">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Dev Console</h1>
@@ -745,8 +763,8 @@ Open `http://localhost:3000`, hover the `·`, enter the password → lands on `/
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/app/dev/page.tsx
-git commit -m "feat(dev-console): authed console shell + logout"
+git add src/styles/globals.css src/app/dev/page.tsx
+git commit -m "feat(dev-console): workpad backdrop + authed console shell + logout"
 ```
 
 **PHASE 1 COMPLETE** — checkpoint: portal opens, password gates a server-enforced session, `/dev` is 404 without it, logout works, `npm run test:dev` is green.
@@ -1800,7 +1818,7 @@ export default function DevConsolePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 p-8 text-white">
+    <div className="min-h-screen dev-workpad p-8 text-white">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Dev Console</h1>
