@@ -3,10 +3,10 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { Check, CheckSquare, ChevronDown, Copy, Square } from 'lucide-react';
+import { Check, CheckSquare, ChevronDown, Copy, Pencil, Square } from 'lucide-react';
 import type { DevIssue, DevRepo, Priority, Size, Status } from '@/lib/dev/github';
 import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
-import { addSubtask, parseSubtasks, stripSubtasks, subtaskProgress, toggleSubtask } from '@/lib/dev/subtasks';
+import { addSubtask, parseSubtasks, setProse, stripSubtasks, subtaskProgress, toggleSubtask } from '@/lib/dev/subtasks';
 import { buildClaudePrompt } from '@/lib/dev/copy';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
@@ -36,6 +36,7 @@ type PatchBody = {
   status?: Status;
   size?: Size;
   state?: 'open' | 'closed';
+  title?: string;
   body?: string;
 };
 
@@ -120,6 +121,9 @@ function IssueCard({
   const [overflowVisible, setOverflowVisible] = useState(false);
   const [addText, setAddText] = useState('');
   const [copiedSub, setCopiedSub] = useState<number | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editBody, setEditBody] = useState('');
   const slotRef = useRef<HTMLDivElement>(null);
   const pr = PRIORITY_META[issue.priority ?? 'p3'];
   const size = issue.size ?? 'M';
@@ -166,6 +170,23 @@ function IssueCard({
     if (!t) return;
     onPatch(issue, { body: addSubtask(issue.body, t) });
     setAddText('');
+  }
+
+  function startEdit() {
+    setEditTitle(issue.title);
+    setEditBody(prose);
+    setEditing(true);
+  }
+
+  function saveEdit() {
+    const t = editTitle.trim();
+    if (!t) return;
+    const patch: PatchBody = {};
+    if (t !== issue.title) patch.title = t;
+    const newBody = setProse(issue.body, editBody);
+    if (newBody !== issue.body) patch.body = newBody;
+    if (patch.title || patch.body) onPatch(issue, patch); // reload remounts with fresh props
+    setEditing(false);
   }
 
   return (
@@ -229,10 +250,43 @@ function IssueCard({
 
         {showDetail && (
           <div className="px-4 pb-4" aria-hidden={!open}>
-            {prose && (
-              <div className="dev-markdown mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-sm leading-relaxed text-white/70">
-                <IssueBodyMarkdown>{prose}</IssueBodyMarkdown>
+            {editing ? (
+              <div className="mb-3 space-y-2">
+                <input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  placeholder="Title"
+                  className="w-full rounded-md border border-white/15 bg-white/[0.03] px-2.5 py-1.5 text-sm font-medium text-white outline-none focus:border-white/30"
+                />
+                <textarea
+                  value={editBody}
+                  onChange={(e) => setEditBody(e.target.value)}
+                  placeholder="Description (markdown supported)…"
+                  rows={4}
+                  className="w-full resize-y rounded-md border border-white/10 bg-white/[0.02] px-2.5 py-2 text-sm leading-relaxed text-white/85 outline-none placeholder:text-white/30 focus:border-white/25"
+                />
+                <div className="flex items-center gap-2">
+                  <Button variant="hatch" glowColor="52, 211, 153" onClick={saveEdit} className="text-xs text-emerald-300/85">
+                    <Check className="h-3.5 w-3.5" />
+                    Save
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    glowColor="148, 163, 184"
+                    onClick={() => setEditing(false)}
+                    className="text-xs text-white/60"
+                  >
+                    Cancel
+                  </Button>
+                  <span className="text-[11px] text-white/30">subtasks are edited below</span>
+                </div>
               </div>
+            ) : (
+              prose && (
+                <div className="dev-markdown mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-sm leading-relaxed text-white/70">
+                  <IssueBodyMarkdown>{prose}</IssueBodyMarkdown>
+                </div>
+              )
             )}
 
             <div className="mb-3">
@@ -307,6 +361,17 @@ function IssueCard({
                 onChange={(v) => onPatch(issue, { size: v as Size })}
               />
               <CopyForClaude issue={issue} />
+              {!editing && (
+                <Button
+                  variant="ghost"
+                  glowColor="148, 163, 184"
+                  onClick={startEdit}
+                  className="text-xs text-white/70"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Edit
+                </Button>
+              )}
               {closed ? (
                 <Button
                   variant="ghost"

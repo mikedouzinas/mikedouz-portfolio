@@ -41,6 +41,19 @@ export function stripSubtasks(body: string): string {
     .trim();
 }
 
+/**
+ * Replace the prose of a body while preserving its checklist verbatim (text +
+ * checked state + order). Lets the description be edited without touching the
+ * subtasks, which have their own UI. Prose sits above the checklist, matching
+ * how addSubtask groups them.
+ */
+export function setProse(body: string, prose: string): string {
+  const checklist = body.split('\n').filter((l) => LINE_RE.test(l));
+  const clean = prose.trim();
+  if (!checklist.length) return clean;
+  return clean ? `${clean}\n\n${checklist.join('\n')}` : checklist.join('\n');
+}
+
 /** Toggle the nth checklist item (by document order) and return the new body. */
 export function toggleSubtask(body: string, index: number, done: boolean): string {
   let i = 0;

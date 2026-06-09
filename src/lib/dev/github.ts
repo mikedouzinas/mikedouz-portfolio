@@ -288,6 +288,7 @@ export async function updateIssue(
     status?: Status;
     size?: Size;
     state?: 'open' | 'closed';
+    title?: string;
     body?: string;
   },
 ): Promise<void> {
@@ -305,6 +306,7 @@ export async function updateIssue(
     payload.labels = names;
   }
   if (patch.state) payload.state = patch.state;
+  if (typeof patch.title === 'string') payload.title = patch.title;
   if (typeof patch.body === 'string') payload.body = patch.body;
   if (Object.keys(payload).length === 0) return;
 

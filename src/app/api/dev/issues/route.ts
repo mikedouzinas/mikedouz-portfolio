@@ -78,6 +78,7 @@ const PatchSchema = z.object({
   status: STATUS.optional(),
   size: SIZE.optional(),
   state: z.enum(['open', 'closed']).optional(),
+  title: z.string().min(1).optional(),
   body: z.string().optional(),
 });
 
@@ -93,6 +94,7 @@ export async function PATCH(req: NextRequest) {
       status: parsed.data.status,
       size: parsed.data.size,
       state: parsed.data.state,
+      title: parsed.data.title,
       body: parsed.data.body,
     });
     return NextResponse.json({ ok: true });
