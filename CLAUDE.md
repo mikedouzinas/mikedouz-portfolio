@@ -21,6 +21,12 @@ No embeddings pipeline exists. Iris loads the full KB into a prompt-cached syste
 
 ---
 
+## Commit conventions
+
+**Keep commits feature-scoped — one logical change per commit.** Each commit should capture exactly one thing (a single feature, fix, or refactor) so the history reads as a clear list of what was done. Don't bundle unrelated changes into one commit; split them. When a task produces several distinct changes, make several commits. Subject line states the one thing the commit does.
+
+---
+
 ## Directory map
 
 ```
