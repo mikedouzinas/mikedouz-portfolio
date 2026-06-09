@@ -11,7 +11,7 @@ import { IrisChat } from '@/components/iris/IrisChat';
 import { useDogfiris } from './useDogfiris';
 
 const WIDTH = 440;
-const MAX_HEIGHT = 500;
+const MAX_HEIGHT = 420;
 
 function ActionRow({ action }: { action: DogfirisAction }) {
   const repoName = action.repo.split('/')[1] ?? action.repo;
