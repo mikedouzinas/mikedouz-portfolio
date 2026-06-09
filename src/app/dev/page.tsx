@@ -168,8 +168,7 @@ export default function DevConsolePage() {
       <DogfirisPanel
         open={composerOpen}
         onClose={() => setComposerOpen(false)}
-        repos={repos}
-        onCreated={loadIssues}
+        onApplied={loadIssues}
       />
     </div>
   );
