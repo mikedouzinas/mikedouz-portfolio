@@ -376,7 +376,7 @@ export function IssueList({
   }
 
   if (issues.length === 0) {
-    return <p className="text-white/50">No open items. Hit ＋ dogfiris (⌘K) to file one.</p>;
+    return <p className="text-white/50">No open items. Hit ＋ Cere (⌘K) to file one.</p>;
   }
 
   const card = (issue: DevIssue) => (

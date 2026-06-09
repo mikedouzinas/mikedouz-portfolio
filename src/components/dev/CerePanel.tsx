@@ -1,19 +1,19 @@
 'use client';
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { PawPrint, X } from 'lucide-react';
-import type { DogfirisAction } from '@/lib/dev/dogfiris';
+import { X } from 'lucide-react';
+import type { CereAction } from '@/lib/dev/cere';
 import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
-import { GoogleText } from '@/components/ui/GoogleText';
 import { Button } from '@/components/ui/Button';
+import { CereMark } from './CereMark';
 import { IrisBubble } from '@/components/iris/IrisBubble';
 import { IrisChat } from '@/components/iris/IrisChat';
-import { useDogfiris } from './useDogfiris';
+import { useCere } from './useCere';
 
 const WIDTH = 440;
 const MAX_HEIGHT = 420;
 
-function ActionRow({ action }: { action: DogfirisAction }) {
+function ActionRow({ action }: { action: CereAction }) {
   const repoName = action.repo.split('/')[1] ?? action.repo;
 
   if (action.kind === 'create') {
@@ -54,12 +54,12 @@ function ActionRow({ action }: { action: DogfirisAction }) {
 }
 
 /**
- * dogfiris — the conversational filer, as a floating glass bubble (same shell as
+ * Cere — the conversational filer, as a floating glass bubble (same shell as
  * the blog assistant). Describe tickets, it proposes create/update actions, you
  * confirm, and they're filed through the existing issues API. Opens via the
- * ＋ dogfiris button / ⌘K.
+ * ＋ Cere button / ⌘K.
  */
-export function DogfirisPanel({
+export function CerePanel({
   open,
   onClose,
   onApplied,
@@ -69,7 +69,7 @@ export function DogfirisPanel({
   onApplied: () => void;
 }) {
   const { messages, busy, applying, actions, warnings, send, confirm, discard, reset } =
-    useDogfiris(onApplied);
+    useCere(onApplied);
   const [isMobile, setIsMobile] = useState(false);
   const bubbleRef = useRef<HTMLDivElement>(null);
 
@@ -124,10 +124,7 @@ export function DogfirisPanel({
         style={{ height: isMobile ? undefined : MAX_HEIGHT - 40 }}
       >
         <div className="mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <PawPrint className="h-4 w-4 text-white/70" />
-            <GoogleText text="dogfiris" className="text-base font-bold tracking-[0.04em]" />
-          </div>
+          <CereMark size="md" />
           <button
             type="button"
             aria-label="Close"
@@ -144,7 +141,7 @@ export function DogfirisPanel({
             busy={busy}
             onSend={send}
             placeholder="Describe a ticket…"
-            busyLabel="dogfiris is thinking…"
+            busyLabel="Cere is thinking…"
             accent="52, 211, 153"
             sendVariant="harlequin"
             emptyHint={

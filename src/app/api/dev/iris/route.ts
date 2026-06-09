@@ -6,11 +6,11 @@ import { getHiddenRepos } from '@/lib/dev/hidden';
 import {
   CREATE_ISSUE_TOOL,
   UPDATE_ISSUE_TOOL,
-  DOGFIRIS_MODEL,
-  buildDogfirisSystem,
+  CERE_MODEL,
+  buildCereSystem,
   parseActions,
   resolveActionRepos,
-} from '@/lib/dev/dogfiris';
+} from '@/lib/dev/cere';
 
 // Claude tool-calling can outlast Vercel's default timeout; match the other
 // Iris routes. Middleware already gates /api/dev/* behind the session cookie.
@@ -40,10 +40,10 @@ export async function POST(req: NextRequest) {
     const issues = await listBoardIssues(repos.map((r) => r.slug));
 
     const res = await anthropic.messages.create({
-      model: DOGFIRIS_MODEL,
+      model: CERE_MODEL,
       max_tokens: 1500,
       system: [
-        { type: 'text', text: buildDogfirisSystem(repos, issues), cache_control: { type: 'ephemeral' } },
+        { type: 'text', text: buildCereSystem(repos, issues), cache_control: { type: 'ephemeral' } },
       ],
       tools: [CREATE_ISSUE_TOOL, UPDATE_ISSUE_TOOL],
       messages: [

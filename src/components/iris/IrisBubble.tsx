@@ -4,7 +4,7 @@ import { forwardRef, type CSSProperties, type ReactNode } from 'react';
 
 /**
  * The shared Iris "bubble" shell — the teal glass, hud-enter animation, rounded
- * panel used by the blog assistant and dogfiris. Purely presentational: the
+ * panel used by the blog assistant and Cere. Purely presentational: the
  * consumer owns positioning (`style`), open/close, and the content. Mobile
  * renders a bottom sheet with a drag handle; desktop a floating glass card.
  *

@@ -12,7 +12,7 @@ export interface IrisMessage {
  * Shared Iris conversation surface: a scrollable message list (markdown
  * assistant bubbles, plain user bubbles) plus an auto-growing composer. Theme
  * via `accent` (send button) and slot extra UI between the list and the
- * composer with `belowMessages`. Used by dogfiris and the blog assistant.
+ * composer with `belowMessages`. Used by Cere and the blog assistant.
  */
 export function IrisChat({
   messages,

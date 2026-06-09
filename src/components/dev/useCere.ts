@@ -1,19 +1,19 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
-import type { DogfirisAction } from '@/lib/dev/dogfiris';
+import type { CereAction } from '@/lib/dev/cere';
 import type { IrisMessage } from '@/components/iris/IrisChat';
 
-interface DogfirisState {
+interface CereState {
   messages: IrisMessage[];
   busy: boolean; // waiting on the planner
   applying: boolean; // executing confirmed actions
-  actions: DogfirisAction[]; // proposed, awaiting confirm
+  actions: CereAction[]; // proposed, awaiting confirm
   warnings: string[];
   error: string | null;
 }
 
-const EMPTY: DogfirisState = {
+const EMPTY: CereState = {
   messages: [],
   busy: false,
   applying: false,
@@ -22,7 +22,7 @@ const EMPTY: DogfirisState = {
   error: null,
 };
 
-function summarize(actions: DogfirisAction[]): string {
+function summarize(actions: CereAction[]): string {
   const creates = actions.filter((a) => a.kind === 'create').length;
   const updates = actions.length - creates;
   const parts: string[] = [];
@@ -32,14 +32,14 @@ function summarize(actions: DogfirisAction[]): string {
 }
 
 /**
- * dogfiris conversation state: sends to the planner (/api/dev/iris), holds the
+ * Cere conversation state: sends to the planner (/api/dev/iris), holds the
  * proposed actions for preview, and on confirm executes them through the
  * existing /api/dev/issues endpoints. `onApplied` refreshes the board.
  */
-export function useDogfiris(onApplied: () => void) {
-  const [state, setState] = useState<DogfirisState>(EMPTY);
+export function useCere(onApplied: () => void) {
+  const [state, setState] = useState<CereState>(EMPTY);
   const messagesRef = useRef<IrisMessage[]>([]);
-  const actionsRef = useRef<DogfirisAction[]>([]);
+  const actionsRef = useRef<CereAction[]>([]);
   messagesRef.current = state.messages;
   actionsRef.current = state.actions;
 
@@ -54,10 +54,13 @@ export function useDogfiris(onApplied: () => void) {
         body: JSON.stringify({ message, history }),
       });
       if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('Your dev session expired — reload /dev and log in again.');
+        }
         const e = await res.json().catch(() => null);
-        throw new Error(e?.error || 'dogfiris hit a problem. Try again.');
+        throw new Error(e?.error || 'Cere hit a problem. Try again.');
       }
-      const data = (await res.json()) as { reply: string; actions: DogfirisAction[]; warnings: string[] };
+      const data = (await res.json()) as { reply: string; actions: CereAction[]; warnings: string[] };
       const reply = data.reply || (data.actions.length ? summarize(data.actions) : '…');
       setState((s) => ({
         ...s,

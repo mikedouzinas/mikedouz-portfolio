@@ -1,6 +1,6 @@
 /**
  * Subtasks live as a GitHub markdown task list inside the issue body
- * (`- [ ]` / `- [x]`). Parsing/editing here keeps the board and dogfiris on the
+ * (`- [ ]` / `- [x]`). Parsing/editing here keeps the board and Cere on the
  * same representation, so AI- and hand-edited checklists stay interchangeable.
  */
 export interface Subtask {

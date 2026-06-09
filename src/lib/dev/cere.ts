@@ -1,5 +1,14 @@
 /**
- * dogfiris — THE HARLEQUIN's conversational filer.
+ * Cere — THE HARLEQUIN's conversational filer.
+ *
+ * The name is a four-layer joke:
+ *   1. Said aloud it sounds like "Siri" — and "Siri" is "Iris" backwards, so
+ *      Cere is the hidden twin of Mike's main assistant, Iris.
+ *   2. A clipped dev-tool abbreviation of Cerberus — the underworld hound that
+ *      fetches/guards (fitting for a GitHub-fetching, dogfooding tool).
+ *   3. It rings of "cerebrum" — the brain — for a heavily analytical dev agent.
+ *   4. It phonetically nods to Ceres (Demeter's Roman name), the goddess Iris
+ *      clashed with — a touch of theatrical rivalry for a secret page.
  *
  * This module is the *planner*: it turns a plain-language message into proposed
  * ticket mutations via Claude tool-calling. It deliberately does NOT execute
@@ -10,7 +19,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 import type { DevIssue, DevRepo, Priority, Size, Status } from './github';
 
-export const DOGFIRIS_MODEL = 'claude-sonnet-4-6';
+export const CERE_MODEL = 'claude-sonnet-4-6';
 
 const PRIORITY = z.enum(['p1', 'p2', 'p3', 'p4', 'p5']);
 const STATUS = z.enum(['todo', 'in progress']);
@@ -81,7 +90,7 @@ const UpdateInput = z.object({
 });
 
 /** Normalized, client-facing proposed mutations. */
-export type DogfirisAction =
+export type CereAction =
   | {
       kind: 'create';
       repo: string;
@@ -102,8 +111,8 @@ export type DogfirisAction =
       state?: 'open' | 'closed';
     };
 
-/** System prompt: who dogfiris is + the live board context to ground its calls. */
-export function buildDogfirisSystem(repos: DevRepo[], issues: DevIssue[]): string {
+/** System prompt: who Cere is + the live board context to ground its calls. */
+export function buildCereSystem(repos: DevRepo[], issues: DevIssue[]): string {
   const repoLines = repos.map((r) => `- ${r.slug} (${r.name})`).join('\n');
   const open = issues.filter((i) => i.state === 'open');
   const issueLines = open
@@ -113,7 +122,7 @@ export function buildDogfirisSystem(repos: DevRepo[], issues: DevIssue[]): strin
     )
     .join('\n');
 
-  return `You are dogfiris, the filing assistant for THE HARLEQUIN — Mike's private dev board, built on GitHub Issues.
+  return `You are Cere, the filing assistant for THE HARLEQUIN — Mike's private dev board, built on GitHub Issues.
 
 Mike talks to you in plain language and you propose ticket changes. You don't chat for its own sake: when he describes work, call create_issue to propose it (call it multiple times to file several tickets at once). When he asks to change, re-prioritize, resize, or close something, call update_issue. Always include one short plain-language sentence summarizing what you're proposing.
 
@@ -134,11 +143,11 @@ When Mike doesn't name a repo, default to ${repos[0]?.slug ?? '(none)'} (his por
 /** Parse Claude's response blocks into a reply + validated proposed actions. */
 export function parseActions(content: Anthropic.ContentBlock[]): {
   reply: string;
-  actions: DogfirisAction[];
+  actions: CereAction[];
   warnings: string[];
 } {
   let reply = '';
-  const actions: DogfirisAction[] = [];
+  const actions: CereAction[] = [];
   const warnings: string[] = [];
 
   for (const block of content) {
@@ -172,13 +181,13 @@ export function parseActions(content: Anthropic.ContentBlock[]): {
  * short name). Drops actions whose repo can't be matched, with a warning.
  */
 export function resolveActionRepos(
-  actions: DogfirisAction[],
+  actions: CereAction[],
   repos: DevRepo[],
-): { actions: DogfirisAction[]; warnings: string[] } {
+): { actions: CereAction[]; warnings: string[] } {
   const slugs = new Set(repos.map((r) => r.slug));
   const byName = new Map(repos.map((r) => [r.name.toLowerCase(), r.slug]));
   const warnings: string[] = [];
-  const out: DogfirisAction[] = [];
+  const out: CereAction[] = [];
 
   for (const a of actions) {
     let repo = a.repo;
