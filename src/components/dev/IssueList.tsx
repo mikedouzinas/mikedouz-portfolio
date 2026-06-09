@@ -32,6 +32,7 @@ function IssueCard({
   onPatch: (issue: DevIssue, body: PatchBody) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [showDetail, setShowDetail] = useState(false); // mounted through the close tween, then dropped
   const [dropUp, setDropUp] = useState(false);
   const slotRef = useRef<HTMLDivElement>(null);
   const pr = PRIORITY_META[issue.priority ?? 'p3'];
@@ -42,12 +43,17 @@ function IssueCard({
   // bottom row that would overflow past the workpad backdrop, so when there isn't
   // room below we anchor to the slot's bottom and grow upward instead.
   function toggle() {
-    if (!open && slotRef.current) {
-      const { top } = slotRef.current.getBoundingClientRect();
-      const ESTIMATED_EXPANDED = 380; // header + title + body + actions
-      setDropUp(window.innerHeight - top < ESTIMATED_EXPANDED);
+    if (!open) {
+      if (slotRef.current) {
+        const { top } = slotRef.current.getBoundingClientRect();
+        const ESTIMATED_EXPANDED = 380; // header + title + body + actions
+        setDropUp(window.innerHeight - top < ESTIMATED_EXPANDED);
+      }
+      setShowDetail(true);
+      setOpen(true);
+    } else {
+      setOpen(false); // keep the detail mounted so the collapse animates; drop it on complete
     }
-    setOpen((o) => !o);
   }
 
   return (
@@ -56,8 +62,9 @@ function IssueCard({
       <motion.div
         // framer animates the actual height (CSS can't tween to auto), so open/
         // close slide; background/border ease toward the Spotify-panel green.
-        // Detail is always mounted below so the collapse animates too — overflow
-        // clips it while collapsed. dropUp anchors the bottom row and grows up.
+        // The detail unmounts only once the collapse tween finishes, so the
+        // description never bleeds through the collapsed card. dropUp anchors the
+        // bottom row and grows up.
         initial={false}
         animate={{
           height: open ? 'auto' : 128,
@@ -65,11 +72,14 @@ function IssueCard({
           borderColor: open ? 'rgba(29, 185, 84, 0.40)' : 'rgba(255, 255, 255, 0.10)',
           scale: open ? 1.02 : 1,
         }}
-        transition={{ duration: 0.28, ease: 'easeOut' }}
+        transition={{ duration: 0.22, ease: 'easeOut' }}
+        onAnimationComplete={() => {
+          if (!open) setShowDetail(false);
+        }}
         style={{ transformOrigin: dropUp ? 'bottom' : 'top' }}
         className={`absolute inset-x-0 overflow-hidden rounded-xl border ${
           dropUp ? 'bottom-0' : 'top-0'
-        } ${open ? 'z-30 shadow-2xl shadow-black/60' : ''}`}
+        } ${showDetail ? 'z-30 shadow-2xl shadow-black/60' : ''}`}
       >
         <button onClick={toggle} className="block w-full p-4 text-left">
           <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
@@ -97,7 +107,8 @@ function IssueCard({
           )}
         </button>
 
-        <div className="px-4 pb-4" aria-hidden={!open}>
+        {showDetail && (
+          <div className="px-4 pb-4" aria-hidden={!open}>
             {issue.body && (
               <div className="mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-sm leading-relaxed text-white/70">
                 <p className="whitespace-pre-wrap">{issue.body}</p>
@@ -128,6 +139,7 @@ function IssueCard({
               </Button>
             </div>
           </div>
+        )}
       </motion.div>
     </div>
   );
