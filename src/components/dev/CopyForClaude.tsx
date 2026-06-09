@@ -13,9 +13,13 @@ export function CopyForClaude({ issue }: { issue: DevIssue }) {
       `(GitHub issue #${issue.number}, priority ${issue.priority ?? 'p3'}, status ${issue.status ?? 'todo'}).\n\n` +
       `${issue.title}\n\n${issue.body}\n\n` +
       `When complete, close issue #${issue.number}.`;
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Clipboard unavailable (non-secure context / denied) — no-op.
+    }
   }
 
   return (

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { DevIssue, DevRepo, Priority, Status } from '@/lib/dev/github';
 import { CopyForClaude } from './CopyForClaude';
 
@@ -15,6 +16,8 @@ export function IssueList({
   repos: DevRepo[];
   onChanged: () => void;
 }) {
+  const [error, setError] = useState('');
+
   function repoName(slug: string): string {
     return repos.find((r) => r.slug === slug)?.name ?? slug;
   }
@@ -23,12 +26,21 @@ export function IssueList({
     issue: DevIssue,
     body: { priority?: Priority; status?: Status; state?: 'open' | 'closed' },
   ) {
-    await fetch('/api/dev/issues', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ repo: issue.repo, number: issue.number, ...body }),
-    });
-    onChanged();
+    setError('');
+    try {
+      const res = await fetch('/api/dev/issues', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repo: issue.repo, number: issue.number, ...body }),
+      });
+      if (!res.ok) {
+        setError(`Couldn't update #${issue.number} — check the GitHub token's Issues write permission.`);
+        return;
+      }
+      onChanged();
+    } catch {
+      setError('Network error updating the issue.');
+    }
   }
 
   if (issues.length === 0) {
@@ -37,6 +49,7 @@ export function IssueList({
 
   return (
     <ul className="space-y-3">
+      {error && <li className="text-xs text-red-400">{error}</li>}
       {issues.map((issue) => (
         <li
           key={`${issue.repo}#${issue.number}`}

@@ -60,6 +60,7 @@ export default function DevConsolePage() {
       body: JSON.stringify({ repo: slug }),
     });
     await loadRepos();
+    await loadIssues();
   }
 
   async function logout() {
