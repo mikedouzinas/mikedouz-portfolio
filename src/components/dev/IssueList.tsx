@@ -57,8 +57,10 @@ function IssueCard({
   }
 
   return (
-    // Fixed-height slot keeps the grid uniform; the card lifts out of it on expand.
-    <div ref={slotRef} className="relative h-32">
+    // Fixed-height slot keeps the grid uniform; the card lifts out of it on
+    // expand. Lift the whole slot above sibling slots while active so the
+    // overflowing card never paints under the ticket below it.
+    <div ref={slotRef} className={`relative h-32 ${showDetail ? 'z-30' : ''}`}>
       <motion.div
         // framer animates the actual height (CSS can't tween to auto), so open/
         // close slide; background/border ease toward the Spotify-panel green.
@@ -79,7 +81,7 @@ function IssueCard({
         style={{ transformOrigin: dropUp ? 'bottom' : 'top' }}
         className={`absolute inset-x-0 overflow-hidden rounded-xl border ${
           dropUp ? 'bottom-0' : 'top-0'
-        } ${showDetail ? 'z-30 shadow-2xl shadow-black/60' : ''}`}
+        } ${showDetail ? 'shadow-2xl shadow-black/60' : ''}`}
       >
         <button onClick={toggle} className="block w-full p-4 text-left">
           <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
