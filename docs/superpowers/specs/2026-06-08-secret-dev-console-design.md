@@ -21,7 +21,8 @@ is immediately workable from a terminal via `gh` and the GitHub UI. Each item ca
 be **exported to Claude Code** with one click.
 
 ### Goals
-- File tasks with a **description + priority** (the Buganizer feel) for any of Mike's repos.
+- File tasks with a **description + priority + status** (the Buganizer feel) for any of Mike's repos.
+- **Auto-discover Mike's repos from GitHub** (no hardcoded list) with a per-repo view and a persisted hide toggle.
 - See/triage all items across repos in **one cross-repo board**.
 - **Export an item to Claude Code** in one click to actually work it.
 - A **mutable links launchpad** for the services behind each product.
@@ -31,7 +32,7 @@ be **exported to Claude Code** with one click.
 ### Non-goals (v1)
 - No agent auto-dispatch / job runner (the site can't run Claude Code). Export = copy-to-clipboard prompt.
 - No duplicate task database — GitHub Issues are the source of truth.
-- No GitHub Projects v2 / GraphQL. Priority is a `priority/*` **label** on the issue.
+- No GitHub Projects v2 / GraphQL. Priority and status are **labels** on the issue (`p1`–`p5`, `status: …`).
 - No TOTP/2FA in v1 (tracked as a future item; see Future Work).
 
 ---
@@ -41,7 +42,9 @@ be **exported to Claude Code** with one click.
 | Decision | Choice |
 |---|---|
 | Tracker backend | GitHub Issues per repo, one in-app cross-repo board |
-| Priority | `p5 … p1` labels |
+| Priority | `p1 … p5` labels (colored, ensured via API) |
+| Status | Minimal Kanban as colored labels: `status: todo` (gray) → `status: in progress` (amber); **Done = close the issue** (GitHub-native). No separate Done label. |
+| Repo discovery | Auto-pulled from GitHub (all repos Mike owns); **persisted per-repo hide** toggle (Supabase). No hardcoded repo list. |
 | Who works items | Mike + Claude Code agents |
 | Auth strength (v1) | Strong password only (hashed, rate-limited, signed cookie) |
 | Session lifetime | Session cookie (dies on browser close) + ~2h absolute expiry + ~30m idle timeout |
@@ -136,7 +139,15 @@ exist on both form factors since `hover` doesn't exist on touch.
 
 ### Data
 
-**GitHub Issues** — the task store. Priority = label (p1|p2|p3|p4|p5). Description = issue body. Repo = the issue's repo.
+**GitHub Issues** — the task store. Priority = label (`p1`–`p5`). Status = label (`status: todo`, `status: in progress`); **Done = closed issue**. Description = issue body. Repo = the issue's repo. Priority/status labels are **ensured with colors** via the API (idempotent) so they render consistently.
+
+**Repos** — discovered live from GitHub (`GET /user/repos`, cached); not stored. Each gets a deterministic accent color derived from its name.
+
+**Supabase — `dev_hidden_repos`** (Phase 2; the only Phase-2 DB):
+```
+dev_hidden_repos(repo_slug text primary key, hidden_at timestamptz default now())
+```
+Hidden repos are filtered out of the board but stay un-hideable from a "hidden" management list.
 
 **Supabase (Phase 3):**
 ```
@@ -176,6 +187,10 @@ The moment the board exists, seed it with the remaining work — the tool tracks
 - **⌘⇧J keyboard shortcut** to open the portal anywhere (`p3`; must not collide with ⌘K/Iris).
 - **Mobile secret trigger** — long-press / 5-tap portal modal (`p3`).
 - **Unify with existing admin** — fold the current `/admin/inbox` + comment-deletion controls into the dev console so there's one secured surface (`p3`; see Future Work).
+- **Shareable project links** — restricted, scoped link to let a specific person view (and maybe act on) a single repo's board, or the set of repos shared with them, without a full dev session (`p2`; see Future Work).
+- **README/TODO importer** — scan a repo's README + inline `TODO`s and file them as uniform issues. First target: **bbn-knight-life** (Mike's high-school app, full of scattered TODOs) — our first real test dataset (`p3`).
+- **Richer project content (KB)** — let projects carry **multiple images** and a **context-varying description** (different copy depending on where/how it's surfaced). Many mikeveson.com features are coming, so projects need more than one image + one blurb (`p2`).
+- **Claude skill to read the board** — a setup how-to in-app + a connection recipe so Claude (and dispatched subagents) can pull board items directly and act on them, not just receive copied prompts (`p2`).
 
 ### Seed links (per product)
 - **mikeveson.com**: Vercel, Supabase, Upstash Redis, Resend, Google Analytics, GoDaddy (DNS), Anthropic console, GitHub repo, live site, `/admin/inbox`.
@@ -203,4 +218,8 @@ The moment the board exists, seed it with the remaining work — the tool tracks
 - ⌘⇧J keyboard shortcut (P3, filed on the board).
 - **Mobile secret trigger** polish (long-press / 5-tap) — captured in the design above; filed on the board.
 - **Unify the admin surfaces (P3).** Fold today's `x-admin-key`-gated `/admin/inbox` and the comment-deletion controls under the dev-console session/middleware so there's one secured admin entry instead of two auth schemes. Migrate those API routes from header-key checks to the dev session cookie.
+- **Shareable project links (P2).** A scoped, signed share token (Supabase `dev_share_tokens`: token, repo_slug(s), access level, expiry) that grants a guest read/limited access to one project's board (or the set shared with them) at a public `/dev/share/<token>` route — bypassing the password but not the server checks. Lets Mike hand a collaborator visibility into a single repo's items.
+- **README/TODO importer (P3).** Parse a repo's README + inline `TODO`/`FIXME` markers into uniform issues. First run against **bbn-knight-life** as real seed data.
+- **Richer project KB (P2).** Extend the project schema so a project can hold multiple images and a context-varying description (the copy adapts to where it's shown). Driven by the volume of mikeveson.com features incoming. Touches `src/lib/iris/schema.ts` + `projects.json` + the project UI.
+- **Claude skill for the board (P2).** Ship a small skill + connection how-to so Claude and its subagents can read the dev-console board (the GitHub issues) directly and pick up work — closing the loop beyond copy-paste export. Likely a scoped read endpoint/token the skill calls.
 - File-based export queue the terminal auto-ingests (only if clipboard proves insufficient).

@@ -29,13 +29,16 @@
 - Modify `package.json` — add `jose` dep + `test:dev` script.
 
 **Phase 2 (board + export)**
-- Create `src/lib/dev/repos.ts` — allow-listed repo config.
-- Create `src/lib/dev/github.ts` — list/create/update issues across repos.
-- Create `src/app/api/dev/issues/route.ts` — `GET`/`POST`/`PATCH` (Node runtime).
-- Create `src/components/dev/CreateIssueForm.tsx` — file a new item.
-- Create `src/components/dev/IssueList.tsx` — cross-repo list, priority change, close.
+- Create `supabase/migrations/20260608000001_dev_hidden_repos.sql` — persisted repo-hide list.
+- Create `src/lib/dev/hidden.ts` — read/add/remove hidden repo slugs (Supabase service-role).
+- Create `src/lib/dev/github.ts` — discover repos; list/create/update issues; ensure colored `p1`–`p5` + `status:` labels; deterministic accent.
+- Create `src/app/api/dev/repos/route.ts` — `GET` discovered (minus hidden) + hidden list; `POST` hide; `DELETE` unhide (Node runtime).
+- Create `src/app/api/dev/issues/route.ts` — `GET`/`POST`/`PATCH` issues incl. priority + status (Node runtime).
+- Create `src/components/dev/RepoPicker.tsx` — repo filter chips + hide/unhide management.
+- Create `src/components/dev/CreateIssueForm.tsx` — file a new item (repo / priority / status).
+- Create `src/components/dev/IssueList.tsx` — cross-repo list; priority + status change; close (= Done); export.
 - Create `src/components/dev/CopyForClaude.tsx` — clipboard export.
-- Modify `src/app/dev/page.tsx` — render the board.
+- Modify `src/app/dev/page.tsx` — render the board with the repo picker.
 
 ---
 
@@ -752,66 +755,139 @@ git commit -m "feat(dev-console): authed console shell + logout"
 
 # PHASE 2 — Board + export
 
-### Task 9: Repo allow-list config
+### Task 9: Persisted repo-hide table + `hidden.ts`
 
 **Files:**
-- Create: `src/lib/dev/repos.ts`
+- Create: `supabase/migrations/20260608000001_dev_hidden_repos.sql`
+- Create: `src/lib/dev/hidden.ts`
 
-> NOTE: Confirm the exact GitHub slugs before relying on them. Defaults below assume `mikedouzinas/mikedouz-portfolio`, `mikedouzinas/apollo`, `mikedouzinas/iris-mobile`. Fix any that differ.
+- [ ] **Step 1: Write the migration**
 
-- [ ] **Step 1: Implement the config + allow-list**
+Create `supabase/migrations/20260608000001_dev_hidden_repos.sql`:
+```sql
+-- 20260608000001_dev_hidden_repos.sql
+-- Repos Mike has hidden from the secret dev-console board.
 
-Create `src/lib/dev/repos.ts`:
+create table if not exists public.dev_hidden_repos (
+  repo_slug text primary key,           -- "owner/name"
+  hidden_at timestamptz not null default now()
+);
+
+-- Row-Level Security on; accessed only via the SERVICE_ROLE key (bypasses RLS).
+alter table public.dev_hidden_repos enable row level security;
+
+comment on table public.dev_hidden_repos is 'Repos hidden from the secret dev-console board.';
+```
+
+- [ ] **Step 2: Apply the migration**
+
+Apply via the same path you use for other migrations (Supabase SQL editor, or `supabase db push` if linked). Verify the table exists:
+```bash
+# If using the Supabase CLI linked to the project:
+supabase db push
+```
+Expected: `dev_hidden_repos` created. (If you apply by hand in the dashboard, just paste the SQL.)
+
+- [ ] **Step 3: Implement `hidden.ts`**
+
+Create `src/lib/dev/hidden.ts`:
 ```ts
 /**
- * Repos surfaced on the dev-console board. The allow-list is a security
- * boundary: the issues API only ever talks to repos listed here.
+ * Persisted set of repos hidden from the dev-console board.
+ * Stored in Supabase (dev_hidden_repos), accessed via the service-role client.
  */
-export interface DevRepo {
-  slug: string; // "owner/name"
-  name: string; // display name
-  accent: string; // "R, G, B"
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+
+const TABLE = 'dev_hidden_repos';
+
+export async function getHiddenRepos(): Promise<string[]> {
+  const { data, error } = await getSupabaseAdmin().from(TABLE).select('repo_slug');
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((r) => r.repo_slug as string);
 }
 
-export const DEV_REPOS: DevRepo[] = [
-  { slug: 'mikedouzinas/mikedouz-portfolio', name: 'mikeveson.com', accent: '147, 197, 253' },
-  { slug: 'mikedouzinas/apollo', name: 'Apollo × freewrite', accent: '52, 211, 153' },
-  { slug: 'mikedouzinas/iris-mobile', name: 'Iris Mobile', accent: '168, 85, 247' },
-];
+export async function hideRepo(slug: string): Promise<void> {
+  const { error } = await getSupabaseAdmin().from(TABLE).upsert({ repo_slug: slug });
+  if (error) throw new Error(error.message);
+}
 
-const ALLOWED = new Set(DEV_REPOS.map((r) => r.slug));
-
-export function isAllowedRepo(slug: string): boolean {
-  return ALLOWED.has(slug);
+export async function unhideRepo(slug: string): Promise<void> {
+  const { error } = await getSupabaseAdmin().from(TABLE).delete().eq('repo_slug', slug);
+  if (error) throw new Error(error.message);
 }
 ```
 
-- [ ] **Step 2: Commit**
+- [ ] **Step 4: Type-check**
+
+Run:
+```bash
+npx tsc --noEmit
+```
+Expected: PASS.
+
+- [ ] **Step 5: Commit**
 
 ```bash
-git add src/lib/dev/repos.ts
-git commit -m "feat(dev-console): allow-listed repo config for the board"
+git add supabase/migrations/20260608000001_dev_hidden_repos.sql src/lib/dev/hidden.ts
+git commit -m "feat(dev-console): persisted repo-hide table + hidden.ts"
 ```
 
 ---
 
-### Task 10: GitHub issues library
+### Task 10: GitHub library — repo discovery, colored labels, issues
 
 **Files:**
 - Create: `src/lib/dev/github.ts`
 
-- [ ] **Step 1: Implement list/create/update**
+- [ ] **Step 1: Implement the library**
 
 Create `src/lib/dev/github.ts`:
 ```ts
 /**
- * GitHub Issues access for the dev-console board.
- * Priority is encoded as a label p1..p5. Uses GITHUB_TOKEN (server-only).
+ * GitHub access for the dev-console board.
+ * - Repos are DISCOVERED live (no hardcoded list); owned repos are the security boundary.
+ * - Priority = label p1..p5. Status = label "status: todo" | "status: in progress".
+ *   Done = a closed issue (no Done label).
+ * - Priority/status labels are ensured WITH COLORS (idempotent) per repo.
+ * Uses GITHUB_TOKEN (server-only).
  */
 const GH = 'https://api.github.com';
 
 export type Priority = 'p1' | 'p2' | 'p3' | 'p4' | 'p5';
+export type Status = 'todo' | 'in progress';
+
 const PRIORITY_RE = /^p[1-5]$/;
+const STATUS_RE = /^status:\s*(todo|in progress)$/i;
+const STATUS_LABEL: Record<Status, string> = {
+  todo: 'status: todo',
+  'in progress': 'status: in progress',
+};
+
+/** Label color definitions (hex, no #). */
+const LABEL_DEFS: { name: string; color: string }[] = [
+  { name: 'p1', color: 'b60205' }, // red — highest
+  { name: 'p2', color: 'd93f0b' }, // orange
+  { name: 'p3', color: 'fbca04' }, // yellow
+  { name: 'p4', color: '0e8a16' }, // green
+  { name: 'p5', color: 'c5def5' }, // light blue — lowest
+  { name: 'status: todo', color: 'ededed' }, // gray
+  { name: 'status: in progress', color: 'd4a72c' }, // amber
+];
+
+const ACCENTS = [
+  '147, 197, 253', '52, 211, 153', '168, 85, 247', '251, 146, 60',
+  '244, 114, 182', '45, 212, 191', '250, 204, 21', '129, 140, 248',
+];
+
+export interface DevRepo {
+  slug: string; // "owner/name"
+  name: string;
+  accent: string; // "R, G, B"
+  pushedAt: string;
+  archived: boolean;
+  fork: boolean;
+  private: boolean;
+}
 
 export interface DevIssue {
   repo: string;
@@ -819,6 +895,7 @@ export interface DevIssue {
   title: string;
   body: string;
   priority: Priority | null;
+  status: Status | null;
   state: 'open' | 'closed';
   url: string;
   updatedAt: string;
@@ -834,7 +911,21 @@ function ghHeaders(): Record<string, string> {
   };
 }
 
+function accentFor(slug: string): string {
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) >>> 0;
+  return ACCENTS[h % ACCENTS.length];
+}
+
 interface GhLabel { name: string }
+interface GhRepo {
+  full_name: string;
+  name: string;
+  pushed_at: string;
+  archived: boolean;
+  fork: boolean;
+  private: boolean;
+}
 interface GhIssue {
   number: number;
   title: string;
@@ -850,7 +941,82 @@ function priorityOf(labels: GhLabel[]): Priority | null {
   const hit = labels.map((l) => l.name).find((n) => PRIORITY_RE.test(n));
   return (hit as Priority) ?? null;
 }
+function statusOf(labels: GhLabel[]): Status | null {
+  for (const l of labels) {
+    const m = l.name.match(STATUS_RE);
+    if (m) return m[1].toLowerCase() as Status;
+  }
+  return null;
+}
 
+// ---- Repo discovery (cached) ----
+interface RepoCache { data: DevRepo[]; expiry: number }
+declare global {
+  // eslint-disable-next-line no-var
+  var __devRepoCache: RepoCache | undefined;
+}
+const REPO_TTL_MS = 10 * 60 * 1000;
+
+export async function listRepos(nowMs = Date.now()): Promise<DevRepo[]> {
+  const cache = globalThis.__devRepoCache;
+  if (cache && nowMs < cache.expiry) return cache.data;
+
+  const repos: DevRepo[] = [];
+  for (let page = 1; page <= 5; page++) {
+    const res = await fetch(
+      `${GH}/user/repos?per_page=100&page=${page}&affiliation=owner&sort=pushed`,
+      { headers: ghHeaders() },
+    );
+    if (!res.ok) throw new Error(`GitHub repos: ${res.status}`);
+    const arr = (await res.json()) as GhRepo[];
+    for (const r of arr) {
+      repos.push({
+        slug: r.full_name,
+        name: r.name,
+        accent: accentFor(r.full_name),
+        pushedAt: r.pushed_at,
+        archived: r.archived,
+        fork: r.fork,
+        private: r.private,
+      });
+    }
+    if (arr.length < 100) break;
+  }
+  globalThis.__devRepoCache = { data: repos, expiry: nowMs + REPO_TTL_MS };
+  return repos;
+}
+
+/** Security boundary: a repo is writable only if Mike owns it. */
+export async function isOwnedRepo(slug: string): Promise<boolean> {
+  return (await listRepos()).some((r) => r.slug === slug);
+}
+
+// ---- Labels (idempotent ensure with colors) ----
+const ensured = new Set<string>();
+
+async function ensureLabels(repo: string): Promise<void> {
+  if (ensured.has(repo)) return;
+  await Promise.all(
+    LABEL_DEFS.map(async (def) => {
+      const create = await fetch(`${GH}/repos/${repo}/labels`, {
+        method: 'POST',
+        headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: def.name, color: def.color }),
+      });
+      if (create.status === 422) {
+        // Already exists — sync its color.
+        await fetch(`${GH}/repos/${repo}/labels/${encodeURIComponent(def.name)}`, {
+          method: 'PATCH',
+          headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ color: def.color }),
+        });
+      }
+    }),
+  );
+  ensured.add(repo);
+}
+
+// ---- Issues ----
 export async function listIssues(
   repos: string[],
   state: 'open' | 'closed' | 'all' = 'open',
@@ -870,6 +1036,7 @@ export async function listIssues(
           title: i.title,
           body: i.body ?? '',
           priority: priorityOf(i.labels ?? []),
+          status: statusOf(i.labels ?? []),
           state: i.state,
           url: i.html_url,
           updatedAt: i.updated_at,
@@ -890,11 +1057,13 @@ export async function createIssue(
   title: string,
   body: string,
   priority: Priority,
+  status: Status,
 ): Promise<DevIssue> {
+  await ensureLabels(repo);
   const res = await fetch(`${GH}/repos/${repo}/issues`, {
     method: 'POST',
     headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, body, labels: [priority] }),
+    body: JSON.stringify({ title, body, labels: [priority, STATUS_LABEL[status]] }),
   });
   if (!res.ok) throw new Error(`GitHub create ${repo}: ${res.status} ${await res.text()}`);
   const i = (await res.json()) as GhIssue;
@@ -904,6 +1073,7 @@ export async function createIssue(
     title: i.title,
     body: i.body ?? '',
     priority,
+    status,
     state: i.state,
     url: i.html_url,
     updatedAt: i.updated_at,
@@ -913,17 +1083,19 @@ export async function createIssue(
 export async function updateIssue(
   repo: string,
   number: number,
-  patch: { priority?: Priority; state?: 'open' | 'closed' },
+  patch: { priority?: Priority; status?: Status; state?: 'open' | 'closed' },
 ): Promise<void> {
+  await ensureLabels(repo);
   const payload: Record<string, unknown> = {};
 
-  if (patch.priority) {
-    // Replace the existing p* label, keep everything else.
+  if (patch.priority || patch.status) {
     const cur = await fetch(`${GH}/repos/${repo}/issues/${number}`, { headers: ghHeaders() });
     if (!cur.ok) throw new Error(`GitHub get ${repo}#${number}: ${cur.status}`);
     const issue = (await cur.json()) as GhIssue;
-    const kept = (issue.labels ?? []).map((l) => l.name).filter((n) => !PRIORITY_RE.test(n));
-    payload.labels = [...kept, patch.priority];
+    let names = (issue.labels ?? []).map((l) => l.name);
+    if (patch.priority) names = names.filter((n) => !PRIORITY_RE.test(n)).concat(patch.priority);
+    if (patch.status) names = names.filter((n) => !STATUS_RE.test(n)).concat(STATUS_LABEL[patch.status]);
+    payload.labels = names;
   }
   if (patch.state) payload.state = patch.state;
   if (Object.keys(payload).length === 0) return;
@@ -949,28 +1121,122 @@ Expected: PASS.
 
 ```bash
 git add src/lib/dev/github.ts
-git commit -m "feat(dev-console): GitHub issues lib (list/create/update, priority labels)"
+git commit -m "feat(dev-console): GitHub lib — repo discovery, colored priority+status labels, issues"
 ```
 
 ---
 
-### Task 11: Issues API route
+### Task 11: Repos API (`/api/dev/repos`)
+
+**Files:**
+- Create: `src/app/api/dev/repos/route.ts`
+
+- [ ] **Step 1: Implement GET / POST / DELETE**
+
+Create `src/app/api/dev/repos/route.ts`:
+```ts
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { listRepos, isOwnedRepo } from '@/lib/dev/github';
+import { getHiddenRepos, hideRepo, unhideRepo } from '@/lib/dev/hidden';
+
+export const runtime = 'nodejs';
+
+/** GET → { repos: visible[], hidden: hidden[] } */
+export async function GET() {
+  try {
+    const [all, hidden] = await Promise.all([listRepos(), getHiddenRepos()]);
+    const hiddenSet = new Set(hidden);
+    return NextResponse.json({
+      repos: all.filter((r) => !hiddenSet.has(r.slug)),
+      hidden: all.filter((r) => hiddenSet.has(r.slug)),
+    });
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+  }
+}
+
+const RepoSchema = z.object({ repo: z.string() });
+
+/** POST { repo } → hide it. */
+export async function POST(req: NextRequest) {
+  const parsed = RepoSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) return NextResponse.json({ error: 'invalid body' }, { status: 400 });
+  if (!(await isOwnedRepo(parsed.data.repo))) {
+    return NextResponse.json({ error: 'repo not allowed' }, { status: 400 });
+  }
+  try {
+    await hideRepo(parsed.data.repo);
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+  }
+}
+
+/** DELETE { repo } → unhide it. */
+export async function DELETE(req: NextRequest) {
+  const parsed = RepoSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) return NextResponse.json({ error: 'invalid body' }, { status: 400 });
+  try {
+    await unhideRepo(parsed.data.repo);
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+  }
+}
+```
+
+- [ ] **Step 2: Verify with the session cookie**
+
+With `npm run dev` running and `/tmp/dev.jar` from Phase 1 (re-auth if expired):
+```bash
+# discover repos → 200 with { repos: [...], hidden: [] }
+curl -s -b /tmp/dev.jar "http://localhost:3000/api/dev/repos" | head -c 400; echo
+
+# hide one → 200, then it moves to the hidden list
+curl -s -b /tmp/dev.jar -X POST http://localhost:3000/api/dev/repos \
+  -H 'Content-Type: application/json' -d '{"repo":"mikedouzinas/mikedouz-portfolio"}'
+curl -s -b /tmp/dev.jar "http://localhost:3000/api/dev/repos" | grep -o '"hidden":\[[^]]*' | head -c 200; echo
+
+# unhide → 200
+curl -s -b /tmp/dev.jar -X DELETE http://localhost:3000/api/dev/repos \
+  -H 'Content-Type: application/json' -d '{"repo":"mikedouzinas/mikedouz-portfolio"}'
+```
+Expected: a repos array containing your repos; after POST the slug appears under `hidden`; after DELETE it's back. (Use a real slug from the first response.)
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add src/app/api/dev/repos/route.ts
+git commit -m "feat(dev-console): /api/dev/repos (discover + hide/unhide)"
+```
+
+---
+
+### Task 12: Issues API (`/api/dev/issues`)
 
 **Files:**
 - Create: `src/app/api/dev/issues/route.ts`
 
-- [ ] **Step 1: Implement GET/POST/PATCH with Zod + allow-list**
+- [ ] **Step 1: Implement GET / POST / PATCH (priority + status)**
 
 Create `src/app/api/dev/issues/route.ts`:
 ```ts
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { DEV_REPOS, isAllowedRepo } from '@/lib/dev/repos';
-import { listIssues, createIssue, updateIssue } from '@/lib/dev/github';
+import { listIssues, createIssue, updateIssue, listRepos, isOwnedRepo } from '@/lib/dev/github';
+import { getHiddenRepos } from '@/lib/dev/hidden';
 
 export const runtime = 'nodejs';
 
 const PRIORITY = z.enum(['p1', 'p2', 'p3', 'p4', 'p5']);
+const STATUS = z.enum(['todo', 'in progress']);
+
+async function visibleRepoSlugs(): Promise<string[]> {
+  const [all, hidden] = await Promise.all([listRepos(), getHiddenRepos()]);
+  const hiddenSet = new Set(hidden);
+  return all.filter((r) => !hiddenSet.has(r.slug)).map((r) => r.slug);
+}
 
 export async function GET(req: NextRequest) {
   const stateParam = req.nextUrl.searchParams.get('state') ?? 'open';
@@ -978,8 +1244,17 @@ export async function GET(req: NextRequest) {
     ? (stateParam as 'open' | 'closed' | 'all')
     : 'open';
   const repoParam = req.nextUrl.searchParams.get('repo');
-  const repos = repoParam && isAllowedRepo(repoParam) ? [repoParam] : DEV_REPOS.map((r) => r.slug);
+
   try {
+    let repos: string[];
+    if (repoParam) {
+      if (!(await isOwnedRepo(repoParam))) {
+        return NextResponse.json({ error: 'repo not allowed' }, { status: 400 });
+      }
+      repos = [repoParam];
+    } else {
+      repos = await visibleRepoSlugs();
+    }
     const issues = await listIssues(repos, state);
     return NextResponse.json({ issues });
   } catch (e) {
@@ -992,12 +1267,13 @@ const CreateSchema = z.object({
   title: z.string().min(1),
   body: z.string().default(''),
   priority: PRIORITY.default('p3'),
+  status: STATUS.default('todo'),
 });
 
 export async function POST(req: NextRequest) {
   const parsed = CreateSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'invalid body' }, { status: 400 });
-  if (!isAllowedRepo(parsed.data.repo)) {
+  if (!(await isOwnedRepo(parsed.data.repo))) {
     return NextResponse.json({ error: 'repo not allowed' }, { status: 400 });
   }
   try {
@@ -1006,6 +1282,7 @@ export async function POST(req: NextRequest) {
       parsed.data.title,
       parsed.data.body,
       parsed.data.priority,
+      parsed.data.status,
     );
     return NextResponse.json({ issue });
   } catch (e) {
@@ -1017,18 +1294,20 @@ const PatchSchema = z.object({
   repo: z.string(),
   number: z.number().int().positive(),
   priority: PRIORITY.optional(),
+  status: STATUS.optional(),
   state: z.enum(['open', 'closed']).optional(),
 });
 
 export async function PATCH(req: NextRequest) {
   const parsed = PatchSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'invalid body' }, { status: 400 });
-  if (!isAllowedRepo(parsed.data.repo)) {
+  if (!(await isOwnedRepo(parsed.data.repo))) {
     return NextResponse.json({ error: 'repo not allowed' }, { status: 400 });
   }
   try {
     await updateIssue(parsed.data.repo, parsed.data.number, {
       priority: parsed.data.priority,
+      status: parsed.data.status,
       state: parsed.data.state,
     });
     return NextResponse.json({ ok: true });
@@ -1040,32 +1319,36 @@ export async function PATCH(req: NextRequest) {
 
 - [ ] **Step 2: Verify with the session cookie**
 
-With `npm run dev` running and `/tmp/dev.jar` from Task 8 Step 3 (re-auth if expired):
+Use a real owned slug from Task 11's repos response (referred to below as `<repo>`):
 ```bash
-# list (empty array is fine) → 200
+# list across visible repos → 200
 curl -s -b /tmp/dev.jar -o /dev/null -w "%{http_code}\n" "http://localhost:3000/api/dev/issues?state=open"
 
-# create a test issue → 200, returns the issue
+# create with status → 200, returns issue with priority + status
 curl -s -b /tmp/dev.jar -X POST http://localhost:3000/api/dev/issues \
   -H 'Content-Type: application/json' \
-  -d '{"repo":"mikedouzinas/mikedouz-portfolio","title":"dev console smoke test","body":"delete me","priority":"p4"}'
+  -d '{"repo":"<repo>","title":"dev console smoke test","body":"delete me","priority":"p4","status":"todo"}'
+
+# move to in progress (use the returned number N) → 200
+curl -s -b /tmp/dev.jar -X PATCH http://localhost:3000/api/dev/issues \
+  -H 'Content-Type: application/json' -d '{"repo":"<repo>","number":N,"status":"in progress"}'
 
 # disallowed repo → 400
 curl -s -o /dev/null -w "%{http_code}\n" -b /tmp/dev.jar -X POST http://localhost:3000/api/dev/issues \
   -H 'Content-Type: application/json' -d '{"repo":"evil/repo","title":"x"}'
 ```
-Expected: `200`, a JSON issue with `"priority":"p4"`, then `400`. Close the smoke-test issue afterward (the UI in the next task can do it).
+Expected: `200`; a JSON issue with `"priority":"p4","status":"todo"`; `200` on the status patch; `400` for the disallowed repo. Close the smoke-test issue from the UI later.
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add src/app/api/dev/issues/route.ts
-git commit -m "feat(dev-console): /api/dev/issues GET/POST/PATCH with zod + repo allow-list"
+git commit -m "feat(dev-console): /api/dev/issues GET/POST/PATCH with priority + status + owned-repo guard"
 ```
 
 ---
 
-### Task 12: Copy-for-Claude export component
+### Task 13: Copy-for-Claude export component
 
 **Files:**
 - Create: `src/components/dev/CopyForClaude.tsx`
@@ -1086,7 +1369,7 @@ export function CopyForClaude({ issue }: { issue: DevIssue }) {
     const repoName = issue.repo.split('/')[1] ?? issue.repo;
     const text =
       `Work on this task in the ${repoName} repo ` +
-      `(GitHub issue #${issue.number}, priority ${issue.priority ?? 'p3'}).\n\n` +
+      `(GitHub issue #${issue.number}, priority ${issue.priority ?? 'p3'}, status ${issue.status ?? 'todo'}).\n\n` +
       `${issue.title}\n\n${issue.body}\n\n` +
       `When complete, close issue #${issue.number}.`;
     await navigator.clipboard.writeText(text);
@@ -1114,7 +1397,122 @@ git commit -m "feat(dev-console): Copy-for-Claude clipboard export"
 
 ---
 
-### Task 13: Board UI (create form + list) wired into `/dev`
+### Task 14: Repo picker (filter + hide/unhide)
+
+**Files:**
+- Create: `src/components/dev/RepoPicker.tsx`
+
+- [ ] **Step 1: Implement it (presentational; parent owns data)**
+
+Create `src/components/dev/RepoPicker.tsx`:
+```tsx
+'use client';
+
+import { useState } from 'react';
+import type { DevRepo } from '@/lib/dev/github';
+
+export function RepoPicker({
+  repos,
+  hidden,
+  selected,
+  onSelect,
+  onHide,
+  onUnhide,
+}: {
+  repos: DevRepo[];
+  hidden: DevRepo[];
+  selected: string | null; // null = All
+  onSelect: (slug: string | null) => void;
+  onHide: (slug: string) => void;
+  onUnhide: (slug: string) => void;
+}) {
+  const [managing, setManaging] = useState(false);
+
+  return (
+    <div className="mb-6">
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => onSelect(null)}
+          className={`rounded-full px-3 py-1 text-xs ${
+            selected === null ? 'bg-white/15 text-white' : 'bg-white/5 text-white/60'
+          }`}
+        >
+          All
+        </button>
+        {repos.map((r) => (
+          <button
+            key={r.slug}
+            onClick={() => onSelect(r.slug)}
+            className={`rounded-full px-3 py-1 text-xs ${
+              selected === r.slug ? 'text-white' : 'text-white/60'
+            }`}
+            style={{
+              backgroundColor:
+                selected === r.slug ? `rgba(${r.accent}, 0.25)` : 'rgba(255,255,255,0.05)',
+            }}
+          >
+            {r.name}
+          </button>
+        ))}
+        <button
+          onClick={() => setManaging((m) => !m)}
+          className="ml-auto rounded-md border border-white/10 px-2 py-1 text-xs text-white/50 hover:bg-white/5"
+        >
+          {managing ? 'Done' : 'Manage repos'}
+        </button>
+      </div>
+
+      {managing && (
+        <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-sm">
+          <p className="mb-2 text-white/50">Shown</p>
+          <ul className="mb-3 space-y-1">
+            {repos.map((r) => (
+              <li key={r.slug} className="flex items-center justify-between">
+                <span className="text-white/80">{r.name}</span>
+                <button
+                  onClick={() => onHide(r.slug)}
+                  className="text-xs text-white/50 hover:text-white"
+                >
+                  Hide
+                </button>
+              </li>
+            ))}
+          </ul>
+          {hidden.length > 0 && (
+            <>
+              <p className="mb-2 text-white/50">Hidden</p>
+              <ul className="space-y-1">
+                {hidden.map((r) => (
+                  <li key={r.slug} className="flex items-center justify-between">
+                    <span className="text-white/40">{r.name}</span>
+                    <button
+                      onClick={() => onUnhide(r.slug)}
+                      className="text-xs text-emerald-300/70 hover:text-emerald-300"
+                    >
+                      Unhide
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add src/components/dev/RepoPicker.tsx
+git commit -m "feat(dev-console): repo picker with filter + hide/unhide management"
+```
+
+---
+
+### Task 15: Board UI (create form + list) wired into `/dev`
 
 **Files:**
 - Create: `src/components/dev/CreateIssueForm.tsx`
@@ -1128,27 +1526,35 @@ Create `src/components/dev/CreateIssueForm.tsx`:
 'use client';
 
 import { useState } from 'react';
-import { DEV_REPOS } from '@/lib/dev/repos';
+import type { DevRepo, Priority, Status } from '@/lib/dev/github';
 
-const PRIORITIES = ['p1', 'p2', 'p3', 'p4', 'p5'] as const;
+const PRIORITIES: Priority[] = ['p1', 'p2', 'p3', 'p4', 'p5'];
+const STATUSES: Status[] = ['todo', 'in progress'];
 
-export function CreateIssueForm({ onCreated }: { onCreated: () => void }) {
-  const [repo, setRepo] = useState(DEV_REPOS[0].slug);
+export function CreateIssueForm({
+  repos,
+  onCreated,
+}: {
+  repos: DevRepo[];
+  onCreated: () => void;
+}) {
+  const [repo, setRepo] = useState(repos[0]?.slug ?? '');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
-  const [priority, setPriority] = useState<(typeof PRIORITIES)[number]>('p3');
+  const [priority, setPriority] = useState<Priority>('p3');
+  const [status, setStatus] = useState<Status>('todo');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || !repo) return;
     setBusy(true);
     setError('');
     const res = await fetch('/api/dev/issues', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ repo, title, body, priority }),
+      body: JSON.stringify({ repo, title, body, priority, status }),
     });
     setBusy(false);
     if (!res.ok) {
@@ -1158,6 +1564,7 @@ export function CreateIssueForm({ onCreated }: { onCreated: () => void }) {
     setTitle('');
     setBody('');
     setPriority('p3');
+    setStatus('todo');
     onCreated();
   }
 
@@ -1169,7 +1576,7 @@ export function CreateIssueForm({ onCreated }: { onCreated: () => void }) {
           onChange={(e) => setRepo(e.target.value)}
           className="rounded-md border border-white/15 bg-slate-900 px-2 py-1.5 text-sm"
         >
-          {DEV_REPOS.map((r) => (
+          {repos.map((r) => (
             <option key={r.slug} value={r.slug}>
               {r.name}
             </option>
@@ -1177,12 +1584,23 @@ export function CreateIssueForm({ onCreated }: { onCreated: () => void }) {
         </select>
         <select
           value={priority}
-          onChange={(e) => setPriority(e.target.value as (typeof PRIORITIES)[number])}
+          onChange={(e) => setPriority(e.target.value as Priority)}
           className="rounded-md border border-white/15 bg-slate-900 px-2 py-1.5 text-sm"
         >
           {PRIORITIES.map((p) => (
             <option key={p} value={p}>
               {p}
+            </option>
+          ))}
+        </select>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value as Status)}
+          className="rounded-md border border-white/15 bg-slate-900 px-2 py-1.5 text-sm"
+        >
+          {STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {s}
             </option>
           ))}
         </select>
@@ -1219,22 +1637,33 @@ Create `src/components/dev/IssueList.tsx`:
 ```tsx
 'use client';
 
-import type { DevIssue, Priority } from '@/lib/dev/github';
-import { DEV_REPOS } from '@/lib/dev/repos';
+import type { DevIssue, DevRepo, Priority, Status } from '@/lib/dev/github';
 import { CopyForClaude } from './CopyForClaude';
 
 const PRIORITIES: Priority[] = ['p1', 'p2', 'p3', 'p4', 'p5'];
+const STATUSES: Status[] = ['todo', 'in progress'];
 
-function repoName(slug: string): string {
-  return DEV_REPOS.find((r) => r.slug === slug)?.name ?? slug;
-}
+export function IssueList({
+  issues,
+  repos,
+  onChanged,
+}: {
+  issues: DevIssue[];
+  repos: DevRepo[];
+  onChanged: () => void;
+}) {
+  function repoName(slug: string): string {
+    return repos.find((r) => r.slug === slug)?.name ?? slug;
+  }
 
-export function IssueList({ issues, onChanged }: { issues: DevIssue[]; onChanged: () => void }) {
-  async function patch(issue: DevIssue, patch: { priority?: Priority; state?: 'open' | 'closed' }) {
+  async function patch(
+    issue: DevIssue,
+    body: { priority?: Priority; status?: Status; state?: 'open' | 'closed' },
+  ) {
     await fetch('/api/dev/issues', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ repo: issue.repo, number: issue.number, ...patch }),
+      body: JSON.stringify({ repo: issue.repo, number: issue.number, ...body }),
     });
     onChanged();
   }
@@ -1255,7 +1684,9 @@ export function IssueList({ issues, onChanged }: { issues: DevIssue[]; onChanged
             <span>#{issue.number}</span>
           </div>
           <p className="mb-2 font-medium text-white">{issue.title}</p>
-          {issue.body && <p className="mb-3 whitespace-pre-wrap text-sm text-white/60">{issue.body}</p>}
+          {issue.body && (
+            <p className="mb-3 whitespace-pre-wrap text-sm text-white/60">{issue.body}</p>
+          )}
           <div className="flex flex-wrap items-center gap-2">
             <select
               value={issue.priority ?? 'p3'}
@@ -1268,12 +1699,23 @@ export function IssueList({ issues, onChanged }: { issues: DevIssue[]; onChanged
                 </option>
               ))}
             </select>
+            <select
+              value={issue.status ?? 'todo'}
+              onChange={(e) => patch(issue, { status: e.target.value as Status })}
+              className="rounded-md border border-white/15 bg-slate-900 px-2 py-1 text-xs"
+            >
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
             <CopyForClaude issue={issue} />
             <button
               onClick={() => patch(issue, { state: 'closed' })}
-              className="rounded-md border border-white/15 px-2 py-1 text-xs text-white/70 hover:bg-white/5"
+              className="rounded-md border border-white/15 px-2 py-1 text-xs text-emerald-300/80 hover:bg-emerald-500/10"
             >
-              Close
+              Done
             </button>
           </div>
         </li>
@@ -1290,28 +1732,66 @@ Replace the entire contents of `src/app/dev/page.tsx` with:
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import type { DevIssue } from '@/lib/dev/github';
+import type { DevIssue, DevRepo } from '@/lib/dev/github';
+import { RepoPicker } from '@/components/dev/RepoPicker';
 import { CreateIssueForm } from '@/components/dev/CreateIssueForm';
 import { IssueList } from '@/components/dev/IssueList';
 
 export default function DevConsolePage() {
+  const [repos, setRepos] = useState<DevRepo[]>([]);
+  const [hidden, setHidden] = useState<DevRepo[]>([]);
   const [issues, setIssues] = useState<DevIssue[]>([]);
+  const [selected, setSelected] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const load = useCallback(async () => {
+  const loadRepos = useCallback(async () => {
+    const res = await fetch('/api/dev/repos');
+    if (res.ok) {
+      const data = (await res.json()) as { repos: DevRepo[]; hidden: DevRepo[] };
+      setRepos(data.repos);
+      setHidden(data.hidden);
+    }
+  }, []);
+
+  const loadIssues = useCallback(async () => {
     setLoading(true);
-    const res = await fetch('/api/dev/issues?state=open');
+    const url = selected
+      ? `/api/dev/issues?state=open&repo=${encodeURIComponent(selected)}`
+      : '/api/dev/issues?state=open';
+    const res = await fetch(url);
     if (res.ok) {
       const data = (await res.json()) as { issues: DevIssue[] };
       setIssues(data.issues);
     }
     setLoading(false);
-  }, []);
+  }, [selected]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    loadRepos();
+  }, [loadRepos]);
+  useEffect(() => {
+    loadIssues();
+  }, [loadIssues]);
+
+  async function hide(slug: string) {
+    await fetch('/api/dev/repos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repo: slug }),
+    });
+    if (selected === slug) setSelected(null);
+    await loadRepos();
+    await loadIssues();
+  }
+  async function unhide(slug: string) {
+    await fetch('/api/dev/repos', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repo: slug }),
+    });
+    await loadRepos();
+  }
 
   async function logout() {
     setLoggingOut(true);
@@ -1333,9 +1813,22 @@ export default function DevConsolePage() {
           </button>
         </div>
 
-        <CreateIssueForm onCreated={load} />
+        <RepoPicker
+          repos={repos}
+          hidden={hidden}
+          selected={selected}
+          onSelect={setSelected}
+          onHide={hide}
+          onUnhide={unhide}
+        />
 
-        {loading ? <p className="text-white/50">Loading…</p> : <IssueList issues={issues} onChanged={load} />}
+        {repos.length > 0 && <CreateIssueForm repos={repos} onCreated={loadIssues} />}
+
+        {loading ? (
+          <p className="text-white/50">Loading…</p>
+        ) : (
+          <IssueList issues={issues} repos={repos} onChanged={loadIssues} />
+        )}
       </div>
     </div>
   );
@@ -1344,36 +1837,40 @@ export default function DevConsolePage() {
 
 - [ ] **Step 4: Full board verification in the browser**
 
-With `npm run dev` running and authenticated (hover `·`, log in): on `/dev`, file a `p4` test item against mikeveson.com → it appears in the list. Change its priority dropdown → reorders/persists (reload to confirm). Click "Copy for Claude Code" → button shows "Copied ✓"; paste elsewhere to confirm the prompt format. Click "Close" → it disappears from the open list. Verify the same issue on GitHub.
+With `npm run dev` running and authenticated: on `/dev`, the repo picker shows your discovered repos. File a `p4` / `todo` item against one → it appears. Change its **status** dropdown to "in progress" and its **priority** → both persist (reload to confirm; check the colored labels on GitHub). Click "Done" → it closes and leaves the open list. "Manage repos" → hide a repo (it leaves the chips + filters), then unhide it (it returns). Reload the page → the hidden state persists. "Copy for Claude Code" → paste to confirm the prompt includes priority + status.
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add src/components/dev/CreateIssueForm.tsx src/components/dev/IssueList.tsx src/app/dev/page.tsx
-git commit -m "feat(dev-console): cross-repo board UI (create, prioritize, close, export)"
+git commit -m "feat(dev-console): board UI — repo filter, create, priority+status, Done, export"
 ```
 
 ---
 
-### Task 14: Dogfood the board + update the KB
+### Task 16: Dogfood the board + update the KB
 
 **Files:**
 - Modify: `src/data/iris/kb/projects.json` (the `proj_portfolio` entry)
 
 - [ ] **Step 1: File the remaining roadmap as board items**
 
-In the running console at `/dev`, file these against `mikedouzinas/mikedouz-portfolio` (per the spec's "Dogfood board items"):
-- `p2` — "Phase 3: dev-console links launchpad (Supabase dev_products + dev_links)"
-- `p3` — "Seed launchpad with per-product service links (Vercel, Supabase, Upstash, Resend, GA, GoDaddy, Anthropic, repos, App Store Connect)"
-- `p3` — "⌘⇧J shortcut to open the portal anywhere (must not collide with ⌘K/Iris)"
-- `p3` — "Mobile secret trigger polish: long-press / 5-tap portal modal"
-- `p3` — "Unify /admin/inbox + comment deletion under the dev-console session"
+In the running console at `/dev`, file these against your portfolio repo (per the spec's "Dogfood board items"), priority/status as noted:
+- `p2` / todo — "Phase 3: dev-console links launchpad (Supabase dev_products + dev_links)"
+- `p2` / todo — "Shareable project links — scoped guest link to one repo's board (dev_share_tokens)"
+- `p3` / todo — "Seed launchpad with per-product service links (Vercel, Supabase, Upstash, Resend, GA, GoDaddy, Anthropic, repos, App Store Connect)"
+- `p3` / todo — "⌘⇧J shortcut to open the portal anywhere (must not collide with ⌘K/Iris)"
+- `p3` / todo — "Mobile secret trigger polish: long-press / 5-tap portal modal"
+- `p3` / todo — "Unify /admin/inbox + comment deletion under the dev-console session"
+- `p3` / todo — "README/TODO importer → file scattered TODOs as issues; first run on bbn-knight-life"
+- `p2` / todo — "KB: projects support multiple images + context-varying descriptions"
+- `p2` / todo — "Claude skill to read the dev-console board (setup how-to + connection) so agents/subagents can pull items"
 
 - [ ] **Step 2: Update the `proj_portfolio` KB entry**
 
-Open `src/data/iris/kb/projects.json`, find the `proj_portfolio` entry, and add a sentence to its `specifics[]` array describing the new feature, e.g.:
+Open `src/data/iris/kb/projects.json`, find the `proj_portfolio` entry, and add a sentence to its `specifics[]` array, e.g.:
 ```json
-"Includes a hidden, password-protected dev console (secret portal login + server-enforced session) with a cross-repo GitHub Issues board for filing and prioritizing work across Mike's products."
+"Includes a hidden, password-protected dev console (secret portal login + server-enforced session) with a cross-repo GitHub Issues board — auto-discovers Mike's repos and tracks work with priority and status labels."
 ```
 Use skill IDs where applicable per KB conventions; do not emit raw URLs.
 
@@ -1383,22 +1880,20 @@ Run:
 ```bash
 npm run verify:kb && npm run kb:rebuild
 ```
-Expected: validation passes, typeahead + rankings rebuild without error.
+Expected: validation passes; typeahead + rankings rebuild without error.
 
 - [ ] **Step 4: Commit**
 
 ```bash
 git add src/data/iris/kb/projects.json
-git commit -m "docs(kb): note the dev console in proj_portfolio; dogfood roadmap filed on the board"
+git commit -m "docs(kb): note dev console in proj_portfolio; dogfood roadmap filed on the board"
 ```
 
-**PHASE 2 COMPLETE** — checkpoint: file/prioritize/close items across repos from `/dev`, export any item to Claude Code, KB knows about the feature, and the remaining roadmap now lives in the tool itself.
+**PHASE 2 COMPLETE** — checkpoint: repos auto-discover with persisted hide; file/prioritize/set-status/close items across repos from `/dev`; export to Claude Code; KB knows the feature; remaining roadmap (incl. the new future items) lives in the tool.
 
 ---
 
 ## Notes / follow-ups (not in this plan)
 - **`noindex` (spec hardening):** satisfied structurally — the middleware returns `404` to any request without a valid session cookie, so crawlers (which never have one) cannot see or index `/dev`. No robots meta needed (and `/dev/page.tsx` is a client component, which can't export `metadata` anyway).
-- **GitHub label colors:** applying `p1`–`p5` auto-creates gray labels. Pre-creating them with colors is a nice-to-have, filed separately if wanted.
-- **iris-mobile / apollo repo slugs:** confirm exact `owner/name` in `repos.ts` before filing items there.
-- **Phase 3 (links launchpad)** and the **admin unification (P3)** are tracked on the board, not in this plan.
-```
+- **Label auto-creation:** `ensureLabels()` upserts `p1`–`p5` + `status:` labels with colors on first create/update per repo (per process). Pre-warming all repos is unnecessary.
+- **Phase 3 (links launchpad)**, **shareable project links (P2)**, **README/TODO importer (P3)**, **multi-image + context-varying project descriptions (P2)**, **Claude skill to read the board (P2)**, and **admin unification (P3)** are tracked on the board, not in this plan.
