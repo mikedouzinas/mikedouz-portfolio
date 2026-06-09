@@ -14,6 +14,7 @@ import DeepModeBorder from '@/components/DeepModeBorder';
 import ExpandableSection from '@/components/ExpandableSection';
 import InProgressSection from '@/components/InProgressSection';
 import WebBanner from '@/components/WebBanner';
+import { DevPortal } from '@/components/dev/DevPortal';
 import { workExperiences, projects, blogs } from '@/data/loaders';
 
 
@@ -212,6 +213,11 @@ function HomeContent() {
           >
             <InProgressSection section="blueprints" title="Blueprints" visible={deepMode} />
           </section>
+
+          {/* Secret HARLEQUIN login — the last item in the list; minimal height so it's barely there */}
+          <div className="!mt-2 md:!mt-4">
+            <DevPortal />
+          </div>
         </main>
       </div>
 

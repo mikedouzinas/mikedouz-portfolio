@@ -54,7 +54,7 @@ export function DevPortal() {
   }
 
   return (
-    <div className="flex justify-center py-8">
+    <div className="flex justify-center py-1">
       <span
         aria-hidden
         onMouseEnter={openPortal}
