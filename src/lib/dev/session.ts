@@ -28,8 +28,8 @@ export const sessionCookieOptions = {
 
 function secretKey(): Uint8Array {
   const s = process.env.DEV_SESSION_SECRET;
-  if (!s || s.length < 16) {
-    throw new Error('DEV_SESSION_SECRET not configured (min 16 chars)');
+  if (!s || s.length < 32) {
+    throw new Error('DEV_SESSION_SECRET not configured (min 32 chars)');
   }
   return new TextEncoder().encode(s);
 }
@@ -55,13 +55,14 @@ export async function verifySession(token: string, nowMs: number): Promise<Verif
   try {
     const { payload } = await jwtVerify(token, secretKey(), {
       currentDate: new Date(nowMs), // use injected clock for exp validation
-    }); // throws on bad sig / past exp
+      requiredClaims: ['exp'],
+    }); // throws on bad sig / past exp / missing exp
     const nowS = Math.floor(nowMs / 1000);
     const lastSeen = typeof payload.lastSeen === 'number' ? payload.lastSeen : 0;
     if (nowS - lastSeen > IDLE_TTL_S) {
       return { valid: false };
     }
-    const exp = typeof payload.exp === 'number' ? payload.exp : nowS;
+    const exp = payload.exp as number;
     const refreshed = await new SignJWT({ lastSeen: nowS })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt(nowS)
