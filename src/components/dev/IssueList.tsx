@@ -78,6 +78,7 @@ function IssueCard({
   const [open, setOpen] = useState(false);
   const [showDetail, setShowDetail] = useState(false); // mounted through the close tween, then dropped
   const [dropUp, setDropUp] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [addText, setAddText] = useState('');
   const [copiedSub, setCopiedSub] = useState<number | null>(null);
   const slotRef = useRef<HTMLDivElement>(null);
@@ -130,25 +131,30 @@ function IssueCard({
     // Fixed-height slot keeps the grid/lane uniform; the card lifts out of it on
     // expand. Lift the whole slot above siblings while active so the overflowing
     // card never paints under the ticket below it.
-    <div ref={slotRef} className={`relative h-32 ${showDetail ? 'z-30' : ''}`}>
+    <div ref={slotRef} className={`relative h-32 ${showDetail || hovered ? 'z-30' : ''}`}>
       <motion.div
         // framer animates the actual height (CSS can't tween to auto), so open/
-        // close slide; background/border ease toward the Spotify-panel green.
+        // close slide. Collapsed, a hover previews the status tint + a slight
+        // lift — the same Spotify-style reaction as the buttons and the expand.
         initial={false}
         animate={{
           height: open ? 'auto' : 128,
-          backgroundColor: open ? tint.bg : '#0c1118',
-          borderColor: open ? tint.border : 'rgba(255, 255, 255, 0.10)',
-          scale: open ? 1.02 : 1,
+          backgroundColor: open || hovered ? tint.bg : '#0c1118',
+          borderColor: open || hovered ? tint.border : 'rgba(255, 255, 255, 0.10)',
+          scale: open || hovered ? 1.02 : 1,
         }}
-        transition={{ duration: 0.22, ease: 'easeOut' }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
         onAnimationComplete={() => {
           if (!open) setShowDetail(false);
         }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
         style={{ transformOrigin: dropUp ? 'bottom' : 'top' }}
-        className={`absolute inset-x-0 overflow-hidden rounded-xl border ${
+        className={`absolute inset-x-0 cursor-pointer overflow-hidden rounded-xl border ${
           dropUp ? 'bottom-0' : 'top-0'
-        } ${showDetail ? 'shadow-2xl shadow-black/60' : ''} ${closed && !open ? 'opacity-70' : ''}`}
+        } ${showDetail || hovered ? 'shadow-2xl shadow-black/60' : ''} ${
+          closed && !open ? 'opacity-70' : ''
+        }`}
       >
         <button onClick={toggle} className="block w-full p-4 text-left">
           <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
