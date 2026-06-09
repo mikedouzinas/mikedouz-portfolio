@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import type { DevRepo, Priority, Status } from '@/lib/dev/github';
-import { PRIORITY_META, STATUS_META } from '@/lib/dev/uiMeta';
+import type { DevRepo, Priority, Size, Status } from '@/lib/dev/github';
+import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
 import { GoogleText } from '@/components/ui/GoogleText';
@@ -17,6 +17,11 @@ const STATUS_OPTS = (['todo', 'in progress'] as Status[]).map((s) => ({
   label: STATUS_META[s].label,
   color: STATUS_META[s].color,
 }));
+const SIZE_OPTS = (['S', 'M', 'L'] as Size[]).map((s) => ({
+  value: s,
+  label: SIZE_META[s].label,
+  color: SIZE_META[s].color,
+}));
 
 export function CreateIssueForm({
   repos,
@@ -30,6 +35,7 @@ export function CreateIssueForm({
   const [body, setBody] = useState('');
   const [priority, setPriority] = useState<Priority>('p3');
   const [status, setStatus] = useState<Status>('todo');
+  const [size, setSize] = useState<Size>('M');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -44,7 +50,7 @@ export function CreateIssueForm({
       const res = await fetch('/api/dev/issues', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ repo, title, body, priority, status }),
+        body: JSON.stringify({ repo, title, body, priority, status, size }),
       });
       if (!res.ok) {
         setError('Failed to create issue.');
@@ -54,6 +60,7 @@ export function CreateIssueForm({
       setBody('');
       setPriority('p3');
       setStatus('todo');
+      setSize('M');
       onCreated();
     } catch {
       setError('Network error creating the issue.');
@@ -63,7 +70,7 @@ export function CreateIssueForm({
   }
 
   return (
-    <form onSubmit={submit} className="mb-8 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+    <form onSubmit={submit} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
       <div className="mb-3 flex flex-wrap gap-2">
         <Dropdown ariaLabel="Repo" value={repo} options={repoOpts} onChange={setRepo} />
         <Dropdown
@@ -77,6 +84,12 @@ export function CreateIssueForm({
           value={status}
           options={STATUS_OPTS}
           onChange={(v) => setStatus(v as Status)}
+        />
+        <Dropdown
+          ariaLabel="Size"
+          value={size}
+          options={SIZE_OPTS}
+          onChange={(v) => setSize(v as Size)}
         />
       </div>
       <input

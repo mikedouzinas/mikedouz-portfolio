@@ -3,10 +3,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { DevIssue, DevRepo } from '@/lib/dev/github';
 import { Button } from '@/components/ui/Button';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { GoogleText } from '@/components/ui/GoogleText';
 import { HarlequinTitle } from '@/components/dev/HarlequinTitle';
-import { RepoPicker } from '@/components/dev/RepoPicker';
-import { CreateIssueForm } from '@/components/dev/CreateIssueForm';
-import { IssueList } from '@/components/dev/IssueList';
+import { RepoChips, RepoManagePanel } from '@/components/dev/RepoPicker';
+import { GroupByToggle } from '@/components/dev/GroupByToggle';
+import { GearMenu } from '@/components/dev/GearMenu';
+import { DogfirisPanel } from '@/components/dev/DogfirisPanel';
+import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
+
+const SORT_OPTS: { value: SortBy; label: string }[] = [
+  { value: 'priority', label: 'Priority' },
+  { value: 'recent', label: 'Recent' },
+];
 
 export default function DevConsolePage() {
   const [repos, setRepos] = useState<DevRepo[]>([]);
@@ -16,6 +25,9 @@ export default function DevConsolePage() {
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
   const [managing, setManaging] = useState(false);
+  const [groupBy, setGroupBy] = useState<GroupBy>('status');
+  const [sort, setSort] = useState<SortBy>('priority');
+  const [composerOpen, setComposerOpen] = useState(false);
 
   const loadRepos = useCallback(async () => {
     const res = await fetch('/api/dev/repos');
@@ -46,6 +58,18 @@ export default function DevConsolePage() {
     loadIssues();
   }, [loadIssues]);
 
+  // ⌘K (the main-site Iris is suppressed on /dev) opens dogfiris instead.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setComposerOpen((o) => !o);
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   async function hide(slug: string) {
     await fetch('/api/dev/repos', {
       method: 'POST',
@@ -72,49 +96,79 @@ export default function DevConsolePage() {
     window.location.href = '/';
   }
 
+  const openCount = issues.filter((i) => i.state === 'open').length;
+
   return (
-    <div className="min-h-screen dev-workpad p-8 text-white">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-8 flex items-center justify-between">
-          <HarlequinTitle />
-          <div className="flex items-center gap-2">
-            <Button variant="hatch-google" glowColor="66, 133, 244" onClick={() => setManaging((m) => !m)}>
-              {managing ? 'Done' : 'Manage repos'}
-            </Button>
-            <Button variant="hatch-red" glowColor="234, 67, 53" onClick={logout} disabled={loggingOut}>
-              {loggingOut ? 'Logging out…' : 'Log out'}
-            </Button>
+    <div className="min-h-screen dev-workpad text-white">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#070b12]/85 backdrop-blur-sm">
+        <div className="mx-auto max-w-6xl px-6 py-4">
+          <div className="flex items-center justify-between gap-4">
+            <HarlequinTitle />
+            <div className="flex items-center gap-3">
+              <div className="hidden md:block">
+                <GroupByToggle value={groupBy} onChange={setGroupBy} />
+              </div>
+              <Button
+                variant="hatch-google"
+                glowColor="66, 133, 244"
+                onClick={() => setComposerOpen(true)}
+              >
+                <span className="text-base leading-none">＋</span>
+                <GoogleText text="dogfiris" className="font-semibold" />
+                <kbd className="ml-1 hidden rounded border border-white/20 px-1 text-[10px] font-normal text-white/50 sm:inline">
+                  ⌘K
+                </kbd>
+              </Button>
+            </div>
           </div>
+
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <RepoChips repos={repos} selected={selected} onSelect={setSelected} />
+            <div className="flex shrink-0 items-center gap-2">
+              <div className="md:hidden">
+                <GroupByToggle value={groupBy} onChange={setGroupBy} />
+              </div>
+              <Dropdown
+                ariaLabel="Sort"
+                value={sort}
+                options={SORT_OPTS}
+                onChange={(v) => setSort(v as SortBy)}
+              />
+              <GearMenu
+                onManage={() => setManaging((m) => !m)}
+                onLogout={logout}
+                loggingOut={loggingOut}
+              />
+            </div>
+          </div>
+
+          {managing && repos.length > 0 && (
+            <RepoManagePanel repos={repos} hidden={hidden} onHide={hide} onUnhide={unhide} />
+          )}
         </div>
+      </header>
 
-        <RepoPicker
-          repos={repos}
-          hidden={hidden}
-          selected={selected}
-          managing={managing}
-          onSelect={setSelected}
-          onHide={hide}
-          onUnhide={unhide}
-        />
-
-        {repos.length > 0 && (
-          <>
-            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/35">
-              New ticket
-            </h2>
-            <CreateIssueForm repos={repos} onCreated={loadIssues} />
-          </>
+      <main className="mx-auto max-w-6xl px-6 py-6">
+        <p className="mb-4 text-[11px] uppercase tracking-[0.2em] text-white/35">
+          {loading ? 'Loading…' : `${openCount} open`}
+        </p>
+        {!loading && (
+          <IssueList
+            issues={issues}
+            repos={repos}
+            groupBy={groupBy}
+            sort={sort}
+            onChanged={loadIssues}
+          />
         )}
+      </main>
 
-        <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/35">
-          Backlog{!loading && ` · ${issues.length} open`}
-        </h2>
-        {loading ? (
-          <p className="text-white/50">Loading…</p>
-        ) : (
-          <IssueList issues={issues} repos={repos} onChanged={loadIssues} />
-        )}
-      </div>
+      <DogfirisPanel
+        open={composerOpen}
+        onClose={() => setComposerOpen(false)}
+        repos={repos}
+        onCreated={loadIssues}
+      />
     </div>
   );
 }
