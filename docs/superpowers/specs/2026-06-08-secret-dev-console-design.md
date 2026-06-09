@@ -21,7 +21,7 @@ is immediately workable from a terminal via `gh` and the GitHub UI. Each item ca
 be **exported to Claude Code** with one click.
 
 ### Goals
-- File tasks with a **description + t-shirt size** (the Buganizer feel) for any of Mike's repos.
+- File tasks with a **description + priority** (the Buganizer feel) for any of Mike's repos.
 - See/triage all items across repos in **one cross-repo board**.
 - **Export an item to Claude Code** in one click to actually work it.
 - A **mutable links launchpad** for the services behind each product.
@@ -31,7 +31,7 @@ be **exported to Claude Code** with one click.
 ### Non-goals (v1)
 - No agent auto-dispatch / job runner (the site can't run Claude Code). Export = copy-to-clipboard prompt.
 - No duplicate task database — GitHub Issues are the source of truth.
-- No GitHub Projects v2 / GraphQL. T-shirt size is a `size/*` **label** on the issue.
+- No GitHub Projects v2 / GraphQL. Priority is a `priority/*` **label** on the issue.
 - No TOTP/2FA in v1 (tracked as a future item; see Future Work).
 
 ---
@@ -41,11 +41,11 @@ be **exported to Claude Code** with one click.
 | Decision | Choice |
 |---|---|
 | Tracker backend | GitHub Issues per repo, one in-app cross-repo board |
-| T-shirt size | `size/XS … size/XL` labels |
+| Priority | `p5 … p1` labels |
 | Who works items | Mike + Claude Code agents |
 | Auth strength (v1) | Strong password only (hashed, rate-limited, signed cookie) |
 | Session lifetime | Session cookie (dies on browser close) + ~2h absolute expiry + ~30m idle timeout |
-| Secret trigger | Animated "portal" on hover that poofs on leave; ⌘⇧D shortcut is **P3** |
+| Secret trigger | Animated "portal" on hover that poofs on leave; ⌘⇧J shortcut is **P3** |
 | Export to Claude Code | One-click "Copy for Claude Code" prompt to clipboard |
 | Links launchpad storage | Supabase (`dev_products` + `dev_links`) |
 | Phasing | **Board first, links next** (so links/​shortcut get filed *on* the board) |
@@ -97,6 +97,20 @@ server-side, so a visitor who navigates directly to `/dev` or curls
   stays server-only; mutations are same-origin behind a `SameSite=Strict` cookie
   (CSRF-safe).
 
+### Secret trigger — desktop + mobile
+
+The trigger is cosmetic (security is the cookie/middleware above), but it must
+exist on both form factors since `hover` doesn't exist on touch.
+
+- **Desktop**: a near-invisible footer hotspot. On **hover** the portal animates
+  open and reveals the password field; on mouse-leave it **poofs** away.
+- **Mobile**: no hover and limited scroll, so the analog is a **long-press
+  (~600ms) on the same footer hotspot** (fallback: a 5-tap pattern, like the
+  Android build-number easter egg). It opens the **same `<DevPortal>` as a
+  centered modal** (not hover-anchored), with a backdrop tap / "poof" to dismiss.
+- `<DevPortal>` detects touch (`pointer: coarse`) and renders the appropriate
+  affordance; the password → `/api/dev/auth` → cookie flow is identical on both.
+
 ### Components / files (anticipated)
 
 **Phase 1 — secure auth + portal**
@@ -111,7 +125,7 @@ server-side, so a visitor who navigates directly to `/dev` or curls
 **Phase 2 — board + export**
 - `src/lib/dev/github.ts` — list/create/update issues across configured repos via REST (reuse token/caching approach from `src/lib/iris/github.ts`).
 - `src/lib/dev/repos.ts` — configured repo list (display name, accent). Config file in v1.
-- `src/app/api/dev/issues/route.ts` — `GET` (cross-repo list w/ filters), `POST` (create w/ `size/*` label), `PATCH` (size/close).
+- `src/app/api/dev/issues/route.ts` — `GET` (cross-repo list w/ filters), `POST` (create w/ `priority/*` label), `PATCH` (priority/close).
 - `src/app/dev/page.tsx` — console shell + board UI (create form, filters, list, per-item "Copy for Claude Code").
 - `src/components/dev/CopyForClaude.tsx` — builds the clipboard prompt.
 
@@ -122,7 +136,7 @@ server-side, so a visitor who navigates directly to `/dev` or curls
 
 ### Data
 
-**GitHub Issues** — the task store. Size = label (`size/XS|S|M|L|XL`). Description = issue body. Repo = the issue's repo.
+**GitHub Issues** — the task store. Priority = label (p1|p2|p3|p4|p5). Description = issue body. Repo = the issue's repo.
 
 **Supabase (Phase 3):**
 ```
@@ -135,7 +149,7 @@ dev_links(id, product_id FK, label, url, category, icon, sort, created_at)
 
 Per item, "Copy for Claude Code" places on the clipboard:
 ```
-Work on this task in the <repo> repo (GitHub issue #<n>, size <S/M/L>).
+Work on this task in the <repo> repo (GitHub issue #<n>, priority <p1/p2/p3>).
 
 <title>
 
@@ -150,11 +164,18 @@ Mike pastes it into a Claude Code session opened in that repo. No infra, no queu
 ## Phasing / build order
 
 1. **Phase 1 — Secure auth + portal.** Foundation + the security-critical work. Done = portal opens, password → session, middleware locks `/dev` and `/api/dev`, rate-limit + timeouts verified.
-2. **Phase 2 — Board + export.** Create/triage GitHub issues across repos with size labels; "Copy for Claude Code". Done = Buganizer core usable end-to-end.
+2. **Phase 2 — Board + export.** Create/triage GitHub issues across repos with priority labels; "Copy for Claude Code". Done = Buganizer core usable end-to-end.
 3. **Phase 3 — Links launchpad.** Supabase-backed editable service links per product. *Filed as items on the board itself.*
-4. **P3 — ⌘⇧D shortcut.** Filed as the first `size/S` item in the tool (dogfooding). Must not collide with ⌘K (Iris).
 
 Each phase is independently shippable; Phase 1 must land before any other.
+
+### Dogfood board items (file these *in* the tool once Phase 2 lands)
+The moment the board exists, seed it with the remaining work — the tool tracks its own roadmap:
+- **Phase 3 — links launchpad** build-out (one item, `p2`).
+- **Seed the launchpad data** with the per-product links below (one item, `p3`).
+- **⌘⇧J keyboard shortcut** to open the portal anywhere (`p3`; must not collide with ⌘K/Iris).
+- **Mobile secret trigger** — long-press / 5-tap portal modal (`p3`).
+- **Unify with existing admin** — fold the current `/admin/inbox` + comment-deletion controls into the dev console so there's one secured surface (`p3`; see Future Work).
 
 ### Seed links (per product)
 - **mikeveson.com**: Vercel, Supabase, Upstash Redis, Resend, Google Analytics, GoDaddy (DNS), Anthropic console, GitHub repo, live site, `/admin/inbox`.
@@ -165,7 +186,8 @@ Each phase is independently shippable; Phase 1 must land before any other.
 
 ## Testing
 - **Auth**: unauthenticated `/dev` → 404; unauthenticated `/api/dev/*` → 401; wrong password → generic 401; >5 attempts → 429; valid login sets cookie and reaches console; browser-close / 30m idle / 2h absolute all force re-auth.
-- **Board**: create issue lands in the right repo with the right `size/*` label; cross-repo list + filters correct; size change and close persist; GitHub failure degrades gracefully.
+- **Secret trigger**: desktop hover opens/poofs the portal; touch (`pointer: coarse`) long-press / 5-tap opens the centered modal; both reach the same auth flow.
+- **Board**: create issue lands in the right repo with the right `priority/*` label; cross-repo list + filters correct; priority change and close persist; GitHub failure degrades gracefully.
 - **Export**: clipboard payload matches format and references the correct repo/issue.
 - **Links** (Phase 3): CRUD round-trips; Supabase RLS / service-role access correct.
 
@@ -178,5 +200,7 @@ Each phase is independently shippable; Phase 1 must land before any other.
 
 ## Future work (not v1)
 - TOTP / 2FA on top of the password.
-- ⌘⇧D keyboard shortcut (P3, filed on the board).
+- ⌘⇧J keyboard shortcut (P3, filed on the board).
+- **Mobile secret trigger** polish (long-press / 5-tap) — captured in the design above; filed on the board.
+- **Unify the admin surfaces (P3).** Fold today's `x-admin-key`-gated `/admin/inbox` and the comment-deletion controls under the dev-console session/middleware so there's one secured admin entry instead of two auth schemes. Migrate those API routes from header-key checks to the dev session cookie.
 - File-based export queue the terminal auto-ingests (only if clipboard proves insufficient).
