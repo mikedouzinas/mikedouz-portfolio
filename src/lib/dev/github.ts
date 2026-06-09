@@ -160,11 +160,12 @@ async function ensureLabels(repo: string): Promise<void> {
       });
       if (create.status === 422) {
         // Already exists — sync its color.
-        await fetch(`${GH}/repos/${repo}/labels/${encodeURIComponent(def.name)}`, {
+        const patch = await fetch(`${GH}/repos/${repo}/labels/${encodeURIComponent(def.name)}`, {
           method: 'PATCH',
           headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
           body: JSON.stringify({ color: def.color }),
         });
+        if (!patch.ok) throw new Error(`GitHub label sync ${repo}/${def.name}: ${patch.status}`);
       }
     }),
   );
@@ -178,6 +179,7 @@ export async function listIssues(
 ): Promise<DevIssue[]> {
   const perRepo = await Promise.all(
     repos.map(async (repo) => {
+      // >100 issues per repo isn't expected for this board; add pagination if it ever is.
       const res = await fetch(`${GH}/repos/${repo}/issues?state=${state}&per_page=100`, {
         headers: ghHeaders(),
       });
