@@ -2,20 +2,27 @@
  * GitHub access for the dev-console board.
  * - Repos are DISCOVERED live (no hardcoded list); owned repos are the security boundary.
  * - Priority = label p1..p5. Status = label "status: todo" | "status: in progress".
- *   Done = a closed issue (no Done label).
- * - Priority/status labels are ensured WITH COLORS (idempotent) per repo.
+ *   Size = label "size: S" | "size: M" | "size: L". Done = a closed issue (no Done label).
+ * - Priority/status/size labels are ensured WITH COLORS (idempotent) per repo.
  * Uses GITHUB_TOKEN (server-only).
  */
 const GH = 'https://api.github.com';
 
 export type Priority = 'p1' | 'p2' | 'p3' | 'p4' | 'p5';
 export type Status = 'todo' | 'in progress';
+export type Size = 'S' | 'M' | 'L';
 
 const PRIORITY_RE = /^p[1-5]$/;
 const STATUS_RE = /^status:\s*(todo|in progress)$/i;
+const SIZE_RE = /^size:\s*([SML])$/i;
 const STATUS_LABEL: Record<Status, string> = {
   todo: 'status: todo',
   'in progress': 'status: in progress',
+};
+const SIZE_LABEL: Record<Size, string> = {
+  S: 'size: S',
+  M: 'size: M',
+  L: 'size: L',
 };
 
 /** Label color definitions (hex, no #). */
@@ -27,6 +34,9 @@ const LABEL_DEFS: { name: string; color: string }[] = [
   { name: 'p5', color: 'c5def5' }, // light blue — lowest
   { name: 'status: todo', color: 'ededed' }, // gray
   { name: 'status: in progress', color: 'd4a72c' }, // amber
+  { name: 'size: S', color: '4285f4' }, // blue — small / quick
+  { name: 'size: M', color: 'fbca04' }, // yellow — medium
+  { name: 'size: L', color: 'fb923c' }, // orange — large / deep
 ];
 
 const ACCENTS = [
@@ -51,6 +61,7 @@ export interface DevIssue {
   body: string;
   priority: Priority | null;
   status: Status | null;
+  size: Size | null;
   state: 'open' | 'closed';
   url: string;
   updatedAt: string;
@@ -100,6 +111,13 @@ function statusOf(labels: GhLabel[]): Status | null {
   for (const l of labels) {
     const m = l.name.match(STATUS_RE);
     if (m) return m[1].toLowerCase() as Status;
+  }
+  return null;
+}
+function sizeOf(labels: GhLabel[]): Size | null {
+  for (const l of labels) {
+    const m = l.name.match(SIZE_RE);
+    if (m) return m[1].toUpperCase() as Size;
   }
   return null;
 }
@@ -176,13 +194,16 @@ async function ensureLabels(repo: string): Promise<void> {
 export async function listIssues(
   repos: string[],
   state: 'open' | 'closed' | 'all' = 'open',
+  since?: string,
 ): Promise<DevIssue[]> {
+  const sinceParam = since ? `&since=${encodeURIComponent(since)}` : '';
   const perRepo = await Promise.all(
     repos.map(async (repo) => {
       // >100 issues per repo isn't expected for this board; add pagination if it ever is.
-      const res = await fetch(`${GH}/repos/${repo}/issues?state=${state}&per_page=100`, {
-        headers: ghHeaders(),
-      });
+      const res = await fetch(
+        `${GH}/repos/${repo}/issues?state=${state}&per_page=100${sinceParam}`,
+        { headers: ghHeaders() },
+      );
       if (!res.ok) throw new Error(`GitHub list ${repo}: ${res.status}`);
       const arr = (await res.json()) as GhIssue[];
       return arr
@@ -194,6 +215,7 @@ export async function listIssues(
           body: i.body ?? '',
           priority: priorityOf(i.labels ?? []),
           status: statusOf(i.labels ?? []),
+          size: sizeOf(i.labels ?? []),
           state: i.state,
           url: i.html_url,
           updatedAt: i.updated_at,
@@ -209,18 +231,38 @@ export async function listIssues(
     );
 }
 
+/**
+ * Board view: every open issue plus issues closed within the last `days` so the
+ * Kanban's "Done" column shows recent wins without dragging in years of history.
+ * GitHub's `since` filters by updated_at; closing an issue bumps that, so it's a
+ * good proxy for "recently closed".
+ */
+export async function listBoardIssues(
+  repos: string[],
+  days = 7,
+  nowMs = Date.now(),
+): Promise<DevIssue[]> {
+  const since = new Date(nowMs - days * 24 * 60 * 60 * 1000).toISOString();
+  const [open, closed] = await Promise.all([
+    listIssues(repos, 'open'),
+    listIssues(repos, 'closed', since),
+  ]);
+  return [...open, ...closed.filter((i) => i.state === 'closed')];
+}
+
 export async function createIssue(
   repo: string,
   title: string,
   body: string,
   priority: Priority,
   status: Status,
+  size: Size,
 ): Promise<DevIssue> {
   await ensureLabels(repo);
   const res = await fetch(`${GH}/repos/${repo}/issues`, {
     method: 'POST',
     headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, body, labels: [priority, STATUS_LABEL[status]] }),
+    body: JSON.stringify({ title, body, labels: [priority, STATUS_LABEL[status], SIZE_LABEL[size]] }),
   });
   if (!res.ok) throw new Error(`GitHub create ${repo}: ${res.status} ${await res.text()}`);
   const i = (await res.json()) as GhIssue;
@@ -231,6 +273,7 @@ export async function createIssue(
     body: i.body ?? '',
     priority,
     status,
+    size,
     state: i.state,
     url: i.html_url,
     updatedAt: i.updated_at,
@@ -240,21 +283,29 @@ export async function createIssue(
 export async function updateIssue(
   repo: string,
   number: number,
-  patch: { priority?: Priority; status?: Status; state?: 'open' | 'closed' },
+  patch: {
+    priority?: Priority;
+    status?: Status;
+    size?: Size;
+    state?: 'open' | 'closed';
+    body?: string;
+  },
 ): Promise<void> {
   await ensureLabels(repo);
   const payload: Record<string, unknown> = {};
 
-  if (patch.priority || patch.status) {
+  if (patch.priority || patch.status || patch.size) {
     const cur = await fetch(`${GH}/repos/${repo}/issues/${number}`, { headers: ghHeaders() });
     if (!cur.ok) throw new Error(`GitHub get ${repo}#${number}: ${cur.status}`);
     const issue = (await cur.json()) as GhIssue;
     let names = (issue.labels ?? []).map((l) => l.name);
     if (patch.priority) names = names.filter((n) => !PRIORITY_RE.test(n)).concat(patch.priority);
     if (patch.status) names = names.filter((n) => !STATUS_RE.test(n)).concat(STATUS_LABEL[patch.status]);
+    if (patch.size) names = names.filter((n) => !SIZE_RE.test(n)).concat(SIZE_LABEL[patch.size]);
     payload.labels = names;
   }
   if (patch.state) payload.state = patch.state;
+  if (typeof patch.body === 'string') payload.body = patch.body;
   if (Object.keys(payload).length === 0) return;
 
   const res = await fetch(`${GH}/repos/${repo}/issues/${number}`, {

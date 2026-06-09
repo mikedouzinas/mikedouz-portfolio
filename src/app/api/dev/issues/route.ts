@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { listIssues, createIssue, updateIssue, listRepos, isOwnedRepo } from '@/lib/dev/github';
+import { listIssues, listBoardIssues, createIssue, updateIssue, listRepos, isOwnedRepo } from '@/lib/dev/github';
 import { getHiddenRepos } from '@/lib/dev/hidden';
 
 export const runtime = 'nodejs';
 
 const PRIORITY = z.enum(['p1', 'p2', 'p3', 'p4', 'p5']);
 const STATUS = z.enum(['todo', 'in progress']);
+const SIZE = z.enum(['S', 'M', 'L']);
 
 async function visibleRepoSlugs(): Promise<string[]> {
   const [all, hidden] = await Promise.all([listRepos(), getHiddenRepos()]);
@@ -31,7 +32,9 @@ export async function GET(req: NextRequest) {
     } else {
       repos = await visibleRepoSlugs();
     }
-    const issues = await listIssues(repos, state);
+    // The default board view (state=open) also includes recently-closed issues
+    // so the Kanban's Done column has content; explicit closed/all bypass that.
+    const issues = state === 'open' ? await listBoardIssues(repos) : await listIssues(repos, state);
     return NextResponse.json({ issues });
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 502 });
@@ -44,6 +47,7 @@ const CreateSchema = z.object({
   body: z.string().default(''),
   priority: PRIORITY.default('p3'),
   status: STATUS.default('todo'),
+  size: SIZE.default('M'),
 });
 
 export async function POST(req: NextRequest) {
@@ -59,6 +63,7 @@ export async function POST(req: NextRequest) {
       parsed.data.body,
       parsed.data.priority,
       parsed.data.status,
+      parsed.data.size,
     );
     return NextResponse.json({ issue });
   } catch (e) {
@@ -71,7 +76,9 @@ const PatchSchema = z.object({
   number: z.number().int().positive(),
   priority: PRIORITY.optional(),
   status: STATUS.optional(),
+  size: SIZE.optional(),
   state: z.enum(['open', 'closed']).optional(),
+  body: z.string().optional(),
 });
 
 export async function PATCH(req: NextRequest) {
@@ -84,7 +91,9 @@ export async function PATCH(req: NextRequest) {
     await updateIssue(parsed.data.repo, parsed.data.number, {
       priority: parsed.data.priority,
       status: parsed.data.status,
+      size: parsed.data.size,
       state: parsed.data.state,
+      body: parsed.data.body,
     });
     return NextResponse.json({ ok: true });
   } catch (e) {
