@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { GoogleText } from '@/components/ui/GoogleText';
 import { GOOGLE_COLORS } from '@/lib/dev/uiMeta';
@@ -12,7 +11,8 @@ import { GOOGLE_COLORS } from '@/lib/dev/uiMeta';
 export function HarlequinTitle() {
   return (
     <h1 className="flex items-center gap-2 select-none">
-      <Link
+      {/* Full navigation (not client-side) so home loads completely. */}
+      <a
         href="/"
         aria-label="Back to mikeveson.com"
         className="group relative grid h-6 w-6 place-items-center"
@@ -28,7 +28,7 @@ export function HarlequinTitle() {
           aria-hidden
           className="absolute h-5 w-5 text-red-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
         />
-      </Link>
+      </a>
       <GoogleText text="THE HARLEQUIN" className="text-2xl font-extrabold tracking-[0.22em]" />
       <span aria-hidden className="text-base" style={{ color: GOOGLE_COLORS[3] }}>
         ◆
