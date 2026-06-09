@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { DevIssue, DevRepo } from '@/lib/dev/github';
+import { Button } from '@/components/ui/Button';
 import { HarlequinTitle } from '@/components/dev/HarlequinTitle';
 import { RepoPicker } from '@/components/dev/RepoPicker';
 import { CreateIssueForm } from '@/components/dev/CreateIssueForm';
@@ -77,19 +78,12 @@ export default function DevConsolePage() {
         <div className="mb-8 flex items-center justify-between">
           <HarlequinTitle />
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setManaging((m) => !m)}
-              className="workpad-btn rounded-lg border border-white/15 px-3 py-1.5 text-sm text-white/70 hover:text-white"
-            >
+            <Button variant="hatch" glowColor="52, 211, 153" onClick={() => setManaging((m) => !m)}>
               {managing ? 'Done' : 'Manage repos'}
-            </button>
-            <button
-              onClick={logout}
-              disabled={loggingOut}
-              className="workpad-btn rounded-lg border border-white/15 px-3 py-1.5 text-sm text-white/70 hover:text-white"
-            >
+            </Button>
+            <Button variant="hatch" glowColor="234, 67, 53" onClick={logout} disabled={loggingOut}>
               {loggingOut ? 'Logging out…' : 'Log out'}
-            </button>
+            </Button>
           </div>
         </div>
 
