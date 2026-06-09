@@ -33,6 +33,7 @@ function IssueCard({
 }) {
   const [open, setOpen] = useState(false);
   const [showDetail, setShowDetail] = useState(false); // mounted through the close tween, then dropped
+  const [fullyOpen, setFullyOpen] = useState(false); // overflow-visible only when settled, so dropdowns escape
   const [dropUp, setDropUp] = useState(false);
   const slotRef = useRef<HTMLDivElement>(null);
   const pr = PRIORITY_META[issue.priority ?? 'p3'];
@@ -52,6 +53,7 @@ function IssueCard({
       setShowDetail(true);
       setOpen(true);
     } else {
+      setFullyOpen(false); // re-clip immediately so the collapse tween stays contained
       setOpen(false); // keep the detail mounted so the collapse animates; drop it on complete
     }
   }
@@ -76,12 +78,15 @@ function IssueCard({
         }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
         onAnimationComplete={() => {
-          if (!open) setShowDetail(false);
+          // Once settled open, drop overflow clipping so dropdown popovers can
+          // extend past the card; on close, unmount the detail.
+          if (open) setFullyOpen(true);
+          else setShowDetail(false);
         }}
         style={{ transformOrigin: dropUp ? 'bottom' : 'top' }}
-        className={`absolute inset-x-0 overflow-hidden rounded-xl border ${
-          dropUp ? 'bottom-0' : 'top-0'
-        } ${showDetail ? 'shadow-2xl shadow-black/60' : ''}`}
+        className={`absolute inset-x-0 rounded-xl border ${
+          fullyOpen ? 'overflow-visible' : 'overflow-hidden'
+        } ${dropUp ? 'bottom-0' : 'top-0'} ${showDetail ? 'shadow-2xl shadow-black/60' : ''}`}
       >
         <button onClick={toggle} className="block w-full p-4 text-left">
           <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
