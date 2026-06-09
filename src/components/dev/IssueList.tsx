@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import type { DevIssue, DevRepo, Priority, Status } from '@/lib/dev/github';
 import { PRIORITY_META, STATUS_META, suggestTags } from '@/lib/dev/uiMeta';
@@ -31,13 +31,27 @@ function IssueCard({
   onPatch: (issue: DevIssue, body: PatchBody) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [dropUp, setDropUp] = useState(false);
+  const slotRef = useRef<HTMLDivElement>(null);
   const pr = PRIORITY_META[issue.priority ?? 'p3'];
   const st = STATUS_META[issue.status ?? 'todo'];
   const tags = suggestTags(issue.title, issue.body);
 
+  // The card lifts out of its slot (absolute) so neighbors don't reflow. For the
+  // bottom row that would overflow past the workpad backdrop, so when there isn't
+  // room below we anchor to the slot's bottom and grow upward instead.
+  function toggle() {
+    if (!open && slotRef.current) {
+      const { top } = slotRef.current.getBoundingClientRect();
+      const ESTIMATED_EXPANDED = 380; // header + title + body + actions
+      setDropUp(window.innerHeight - top < ESTIMATED_EXPANDED);
+    }
+    setOpen((o) => !o);
+  }
+
   return (
     // Fixed-height slot keeps the grid uniform; the card lifts out of it on expand.
-    <div className="relative h-32">
+    <div ref={slotRef} className="relative h-32">
       <div
         // Background + border ease toward the Spotify-panel green only while
         // expanded; transition-all carries it there and back on collapse.
@@ -45,13 +59,15 @@ function IssueCard({
           backgroundColor: open ? '#0a1a13' : '#0c1118',
           borderColor: open ? 'rgba(29, 185, 84, 0.40)' : 'rgba(255, 255, 255, 0.10)',
         }}
-        className={`absolute inset-x-0 top-0 origin-top rounded-xl border transition-all duration-300 ease-out ${
+        className={`absolute inset-x-0 rounded-xl border transition-all duration-300 ease-out ${
           open
-            ? 'z-30 h-auto scale-[1.02] shadow-2xl shadow-black/60'
-            : 'h-32 overflow-hidden'
+            ? `z-30 h-auto scale-[1.02] shadow-2xl shadow-black/60 ${
+                dropUp ? 'bottom-0 origin-bottom' : 'top-0 origin-top'
+              }`
+            : 'top-0 h-32 origin-top overflow-hidden'
         }`}
       >
-        <button onClick={() => setOpen((o) => !o)} className="block w-full p-4 text-left">
+        <button onClick={toggle} className="block w-full p-4 text-left">
           <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
             <span style={{ color: pr.color }}>{pr.short}</span>
             <span className="inline-flex items-center gap-1">
