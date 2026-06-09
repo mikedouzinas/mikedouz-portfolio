@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { DeepModeProvider } from "@/components/DeepModeContext";
 import { AdminModeProvider } from "@/components/AdminModeProvider";
 import IrisPalette from "@/components/IrisPalette";
+import { DevPortal } from "@/components/dev/DevPortal";
 import "../styles/globals.css";
 
 export const metadata: Metadata = {
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <DeepModeProvider>
             <AdminModeProvider>
               {children}
+              <DevPortal />
               <IrisPalette />
             </AdminModeProvider>
           </DeepModeProvider>
