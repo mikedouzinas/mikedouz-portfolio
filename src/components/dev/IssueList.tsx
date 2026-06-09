@@ -11,8 +11,8 @@ import { Dropdown } from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
 import { CopyForClaude } from './CopyForClaude';
 
-export type GroupBy = 'status' | 'repo' | 'size';
-export type SortBy = 'priority' | 'recent';
+export type GroupBy = 'status' | 'repo';
+export type SortBy = 'priority' | 'recent' | 'size';
 
 const PRIORITY_OPTS = (['p1', 'p2', 'p3', 'p4', 'p5'] as Priority[]).map((p) => ({
   value: p,
@@ -37,6 +37,21 @@ type PatchBody = {
   state?: 'open' | 'closed';
   body?: string;
 };
+
+/** One green for everything "done" — the Done lane dot and the expand tint. */
+const DONE_GREEN = '#1DB954';
+
+// Expanded-card tint keyed by status, so the lift colour tells you where a
+// ticket stands at a glance: blue = todo, amber = in progress, and the
+// original Spotify-panel green = done. Same dark-tint-of-the-accent recipe.
+const STATUS_EXPAND: Record<'todo' | 'in progress' | 'done', { bg: string; border: string }> = {
+  todo: { bg: '#0b1322', border: 'rgba(66, 133, 244, 0.40)' }, // blue
+  'in progress': { bg: '#1a1607', border: 'rgba(251, 188, 5, 0.40)' }, // amber
+  done: { bg: '#0a1a13', border: 'rgba(29, 185, 84, 0.40)' }, // Spotify green
+};
+
+/** Size sort order — largest first, matching "most demanding first" like priority. */
+const SIZE_RANK: Record<Size, number> = { L: 0, M: 1, S: 2 };
 
 function SizeChip({ size }: { size: Size }) {
   const s = SIZE_META[size];
@@ -67,9 +82,12 @@ function IssueCard({
   const [copiedSub, setCopiedSub] = useState<number | null>(null);
   const slotRef = useRef<HTMLDivElement>(null);
   const pr = PRIORITY_META[issue.priority ?? 'p3'];
-  const st = STATUS_META[issue.status ?? 'todo'];
   const size = issue.size ?? 'M';
   const closed = issue.state === 'closed';
+  // Closed items read as "Done" (green) regardless of their lingering status label.
+  const st = closed ? { label: 'Done', color: DONE_GREEN } : STATUS_META[issue.status ?? 'todo'];
+  const expandKey: 'todo' | 'in progress' | 'done' = closed ? 'done' : issue.status ?? 'todo';
+  const tint = STATUS_EXPAND[expandKey];
   const subs = parseSubtasks(issue.body);
   const prog = subtaskProgress(issue.body);
 
@@ -119,8 +137,8 @@ function IssueCard({
         initial={false}
         animate={{
           height: open ? 'auto' : 128,
-          backgroundColor: open ? '#0a1a13' : '#0c1118',
-          borderColor: open ? 'rgba(29, 185, 84, 0.40)' : 'rgba(255, 255, 255, 0.10)',
+          backgroundColor: open ? tint.bg : '#0c1118',
+          borderColor: open ? tint.border : 'rgba(255, 255, 255, 0.10)',
           scale: open ? 1.02 : 1,
         }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
@@ -269,16 +287,21 @@ function IssueCard({
   );
 }
 
+function byPriority(a: DevIssue, b: DevIssue): number {
+  return (
+    (a.priority ?? 'p9').localeCompare(b.priority ?? 'p9') ||
+    b.updatedAt.localeCompare(a.updatedAt)
+  );
+}
+
 function sortIssues(items: DevIssue[], sort: SortBy): DevIssue[] {
   const arr = [...items];
   if (sort === 'recent') {
     arr.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  } else if (sort === 'size') {
+    arr.sort((a, b) => SIZE_RANK[a.size ?? 'M'] - SIZE_RANK[b.size ?? 'M'] || byPriority(a, b));
   } else {
-    arr.sort(
-      (a, b) =>
-        (a.priority ?? 'p9').localeCompare(b.priority ?? 'p9') ||
-        b.updatedAt.localeCompare(a.updatedAt),
-    );
+    arr.sort(byPriority);
   }
   return arr;
 }
@@ -286,7 +309,7 @@ function sortIssues(items: DevIssue[], sort: SortBy): DevIssue[] {
 const STATUS_LANES: { key: string; label: string; color: string }[] = [
   { key: 'todo', label: 'Todo', color: STATUS_META.todo.color },
   { key: 'in progress', label: 'In progress', color: STATUS_META['in progress'].color },
-  { key: 'done', label: 'Done', color: '#1DB954' }, // Spotify green — completed
+  { key: 'done', label: 'Done', color: DONE_GREEN },
 ];
 
 function laneOf(i: DevIssue): string {
@@ -382,27 +405,18 @@ export function IssueList({
     );
   }
 
-  // REPO / SIZE → vertical sections (too many buckets to be columns). Closed
-  // items only surface in the Status Kanban's Done lane, so filter to open here.
+  // REPO → vertical sections per repo (too many to be columns). Closed items
+  // only surface in the Status Kanban's Done lane, so filter to open here.
+  // Within each section, the active sort (incl. Size) decides the order.
   const openItems = issues.filter((i) => i.state === 'open');
-  const sections =
-    groupBy === 'repo'
-      ? repos
-          .map((r) => ({
-            key: r.slug,
-            label: r.name,
-            color: `rgb(${r.accent})`,
-            items: openItems.filter((i) => i.repo === r.slug),
-          }))
-          .filter((s) => s.items.length > 0)
-      : (['S', 'M', 'L'] as Size[])
-          .map((sz) => ({
-            key: sz,
-            label: SIZE_META[sz].label,
-            color: SIZE_META[sz].color,
-            items: openItems.filter((i) => (i.size ?? 'M') === sz),
-          }))
-          .filter((s) => s.items.length > 0);
+  const sections = repos
+    .map((r) => ({
+      key: r.slug,
+      label: r.name,
+      color: `rgb(${r.accent})`,
+      items: openItems.filter((i) => i.repo === r.slug),
+    }))
+    .filter((s) => s.items.length > 0);
 
   return (
     <div>
