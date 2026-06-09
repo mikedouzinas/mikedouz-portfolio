@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Check, ChevronDown } from 'lucide-react';
 import type { DevIssue, DevRepo, Priority, Status } from '@/lib/dev/github';
 import { PRIORITY_META, STATUS_META, suggestTags } from '@/lib/dev/uiMeta';
@@ -52,20 +53,23 @@ function IssueCard({
   return (
     // Fixed-height slot keeps the grid uniform; the card lifts out of it on expand.
     <div ref={slotRef} className="relative h-32">
-      <div
-        // Background + border ease toward the Spotify-panel green only while
-        // expanded; transition-all carries it there and back on collapse.
-        style={{
+      <motion.div
+        // framer animates the actual height (CSS can't tween to auto), so open/
+        // close slide; background/border ease toward the Spotify-panel green.
+        // Detail is always mounted below so the collapse animates too — overflow
+        // clips it while collapsed. dropUp anchors the bottom row and grows up.
+        initial={false}
+        animate={{
+          height: open ? 'auto' : 128,
           backgroundColor: open ? '#0a1a13' : '#0c1118',
           borderColor: open ? 'rgba(29, 185, 84, 0.40)' : 'rgba(255, 255, 255, 0.10)',
+          scale: open ? 1.02 : 1,
         }}
-        className={`absolute inset-x-0 rounded-xl border transition-all duration-300 ease-out ${
-          open
-            ? `z-30 h-auto scale-[1.02] shadow-2xl shadow-black/60 ${
-                dropUp ? 'bottom-0 origin-bottom' : 'top-0 origin-top'
-              }`
-            : 'top-0 h-32 origin-top overflow-hidden'
-        }`}
+        transition={{ duration: 0.28, ease: 'easeOut' }}
+        style={{ transformOrigin: dropUp ? 'bottom' : 'top' }}
+        className={`absolute inset-x-0 overflow-hidden rounded-xl border ${
+          dropUp ? 'bottom-0' : 'top-0'
+        } ${open ? 'z-30 shadow-2xl shadow-black/60' : ''}`}
       >
         <button onClick={toggle} className="block w-full p-4 text-left">
           <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
@@ -93,8 +97,7 @@ function IssueCard({
           )}
         </button>
 
-        {open && (
-          <div className="px-4 pb-4">
+        <div className="px-4 pb-4" aria-hidden={!open}>
             {issue.body && (
               <div className="mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-sm leading-relaxed text-white/70">
                 <p className="whitespace-pre-wrap">{issue.body}</p>
@@ -125,8 +128,7 @@ function IssueCard({
               </Button>
             </div>
           </div>
-        )}
-      </div>
+      </motion.div>
     </div>
   );
 }
