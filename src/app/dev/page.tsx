@@ -13,6 +13,7 @@ export default function DevConsolePage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [managing, setManaging] = useState(false);
 
   const loadRepos = useCallback(async () => {
     const res = await fetch('/api/dev/repos');
@@ -73,20 +74,29 @@ export default function DevConsolePage() {
     <div className="min-h-screen dev-workpad p-8 text-white">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Dev Console</h1>
-          <button
-            onClick={logout}
-            disabled={loggingOut}
-            className="rounded-lg border border-white/15 px-3 py-1.5 text-sm text-white/70 hover:bg-white/5"
-          >
-            {loggingOut ? 'Logging out…' : 'Log out'}
-          </button>
+          <h1 className="text-2xl font-bold tracking-tight">The Forge</h1>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setManaging((m) => !m)}
+              className="workpad-btn rounded-lg border border-white/15 px-3 py-1.5 text-sm text-white/70 hover:text-white"
+            >
+              {managing ? 'Done' : 'Manage repos'}
+            </button>
+            <button
+              onClick={logout}
+              disabled={loggingOut}
+              className="workpad-btn rounded-lg border border-white/15 px-3 py-1.5 text-sm text-white/70 hover:text-white"
+            >
+              {loggingOut ? 'Logging out…' : 'Log out'}
+            </button>
+          </div>
         </div>
 
         <RepoPicker
           repos={repos}
           hidden={hidden}
           selected={selected}
+          managing={managing}
           onSelect={setSelected}
           onHide={hide}
           onUnhide={unhide}

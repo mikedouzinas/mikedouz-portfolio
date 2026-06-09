@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import type { DevRepo } from '@/lib/dev/github';
 
 export function RepoPicker({
   repos,
   hidden,
   selected,
+  managing,
   onSelect,
   onHide,
   onUnhide,
@@ -14,12 +14,11 @@ export function RepoPicker({
   repos: DevRepo[];
   hidden: DevRepo[];
   selected: string | null; // null = All
+  managing: boolean; // panel visibility, controlled by the header toggle
   onSelect: (slug: string | null) => void;
   onHide: (slug: string) => void;
   onUnhide: (slug: string) => void;
 }) {
-  const [managing, setManaging] = useState(false);
-
   return (
     <div className="mb-6">
       <div className="flex flex-wrap items-center gap-2">
@@ -46,12 +45,6 @@ export function RepoPicker({
             {r.name}
           </button>
         ))}
-        <button
-          onClick={() => setManaging((m) => !m)}
-          className="ml-auto rounded-md border border-white/10 px-2 py-1 text-xs text-white/50 hover:bg-white/5"
-        >
-          {managing ? 'Done' : 'Manage repos'}
-        </button>
       </div>
 
       {managing && (

@@ -268,3 +268,14 @@ html {
   background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
   background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
 }
+
+/* Utility-button accent: faint green diagonal cross-hatch (the forge glow). */
+.workpad-btn {
+  background-color: rgba(74, 222, 128, 0.04);
+  background-image:
+    repeating-linear-gradient(45deg, rgba(74, 222, 128, 0.16) 0, rgba(74, 222, 128, 0.16) 1px, transparent 1px, transparent 7px),
+    repeating-linear-gradient(-45deg, rgba(74, 222, 128, 0.16) 0, rgba(74, 222, 128, 0.16) 1px, transparent 1px, transparent 7px);
+}
+.workpad-btn:hover {
+  background-color: rgba(74, 222, 128, 0.10);
+}
