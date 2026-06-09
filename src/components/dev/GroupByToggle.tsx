@@ -5,7 +5,6 @@ import type { GroupBy } from './IssueList';
 const OPTS: { value: GroupBy; label: string }[] = [
   { value: 'status', label: 'Status' },
   { value: 'repo', label: 'Repo' },
-  { value: 'size', label: 'Size' },
 ];
 
 /** Segmented control choosing the board's primary organizing axis. */

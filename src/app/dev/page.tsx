@@ -15,6 +15,7 @@ import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList
 const SORT_OPTS: { value: SortBy; label: string }[] = [
   { value: 'priority', label: 'Priority' },
   { value: 'recent', label: 'Recent' },
+  { value: 'size', label: 'Size' },
 ];
 
 export default function DevConsolePage() {
