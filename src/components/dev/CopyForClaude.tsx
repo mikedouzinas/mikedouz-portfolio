@@ -3,25 +3,16 @@
 import { useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import type { DevIssue } from '@/lib/dev/github';
+import { buildClaudePrompt } from '@/lib/dev/copy';
 import { Button } from '@/components/ui/Button';
 
 export function CopyForClaude({ issue }: { issue: DevIssue }) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
-    const repoName = issue.repo.split('/')[1] ?? issue.repo;
-    const text =
-      `Work on this task in the ${repoName} repo.\n\n` +
-      `Repo: ${issue.repo}\n` +
-      `GitHub: https://github.com/${issue.repo}\n` +
-      `Issue: #${issue.number} — ${issue.url}\n` +
-      `Clone: gh repo clone ${issue.repo}   (or: git clone https://github.com/${issue.repo}.git)\n` +
-      `Likely local path: ~/Downloads/Dev/${repoName}\n` +
-      `Priority: ${issue.priority ?? 'p3'} · Status: ${issue.status ?? 'todo'}\n\n` +
-      `${issue.title}\n\n${issue.body}\n\n` +
-      `When complete, close issue #${issue.number}.`;
+    // Whole-ticket prompt — includes the body's subtask checklist automatically.
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(buildClaudePrompt(issue));
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
