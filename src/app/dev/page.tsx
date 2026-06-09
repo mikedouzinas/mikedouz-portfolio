@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { PawPrint } from 'lucide-react';
 import type { DevIssue, DevRepo } from '@/lib/dev/github';
 import { Button } from '@/components/ui/Button';
 import { Dropdown } from '@/components/ui/Dropdown';
@@ -114,7 +115,7 @@ export default function DevConsolePage() {
                 glowColor="66, 133, 244"
                 onClick={() => setComposerOpen(true)}
               >
-                <span className="text-base leading-none">＋</span>
+                <PawPrint className="h-4 w-4" />
                 <GoogleText text="dogfiris" className="font-semibold" />
                 <kbd className="ml-1 hidden rounded border border-white/20 px-1 text-[10px] font-normal text-white/50 sm:inline">
                   ⌘K
