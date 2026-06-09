@@ -302,3 +302,12 @@ html {
 .workpad-btn-google:hover {
   background-color: rgba(255, 255, 255, 0.07);
 }
+
+/* Hide the scrollbar on the repo chip row — still scrolls, no fat bar over the chips. */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE/Edge legacy */
+  scrollbar-width: none; /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}

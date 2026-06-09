@@ -13,7 +13,7 @@ export function RepoChips({
   onSelect: (slug: string | null) => void;
 }) {
   return (
-    <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
+    <div className="no-scrollbar flex flex-nowrap items-center gap-2 overflow-x-auto">
       <button
         onClick={() => onSelect(null)}
         className={`shrink-0 rounded-full px-3 py-1 text-xs transition-colors ${
