@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { DevIssue, DevRepo } from '@/lib/dev/github';
+import { HarlequinTitle } from '@/components/dev/HarlequinTitle';
 import { RepoPicker } from '@/components/dev/RepoPicker';
 import { CreateIssueForm } from '@/components/dev/CreateIssueForm';
 import { IssueList } from '@/components/dev/IssueList';
@@ -74,7 +75,7 @@ export default function DevConsolePage() {
     <div className="min-h-screen dev-workpad p-8 text-white">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">The Forge</h1>
+          <HarlequinTitle />
           <div className="flex items-center gap-2">
             <button
               onClick={() => setManaging((m) => !m)}
