@@ -79,6 +79,9 @@ function IssueCard({
   const [showDetail, setShowDetail] = useState(false); // mounted through the close tween, then dropped
   const [dropUp, setDropUp] = useState(false);
   const [hovered, setHovered] = useState(false);
+  // Once fully expanded we drop overflow:hidden so the action dropdowns can
+  // escape the card; while animating/collapsed it stays clipped for the height tween.
+  const [overflowVisible, setOverflowVisible] = useState(false);
   const [addText, setAddText] = useState('');
   const [copiedSub, setCopiedSub] = useState<number | null>(null);
   const slotRef = useRef<HTMLDivElement>(null);
@@ -105,6 +108,7 @@ function IssueCard({
       setShowDetail(true);
       setOpen(true);
     } else {
+      setOverflowVisible(false); // re-clip before collapsing so the tween stays clean
       setOpen(false); // keep the detail mounted so the collapse animates; drop it on complete
     }
   }
@@ -146,15 +150,16 @@ function IssueCard({
         transition={{ duration: 0.2, ease: 'easeOut' }}
         onAnimationComplete={() => {
           if (!open) setShowDetail(false);
+          else setOverflowVisible(true); // let the dropdowns spill out of the card
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         style={{ transformOrigin: dropUp ? 'bottom' : 'top' }}
-        className={`absolute inset-x-0 cursor-pointer overflow-hidden rounded-xl border ${
-          dropUp ? 'bottom-0' : 'top-0'
-        } ${showDetail || hovered ? 'shadow-2xl shadow-black/60' : ''} ${
-          closed && !open ? 'opacity-70' : ''
-        }`}
+        className={`absolute inset-x-0 cursor-pointer rounded-xl border ${
+          overflowVisible ? 'overflow-visible' : 'overflow-hidden'
+        } ${dropUp ? 'bottom-0' : 'top-0'} ${
+          showDetail || hovered ? 'shadow-2xl shadow-black/60' : ''
+        } ${closed && !open ? 'opacity-70' : ''}`}
       >
         <button onClick={toggle} className="block w-full p-4 text-left">
           <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
