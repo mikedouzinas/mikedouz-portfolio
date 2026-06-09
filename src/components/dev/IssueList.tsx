@@ -39,10 +39,16 @@ function IssueCard({
     // Fixed-height slot keeps the grid uniform; the card lifts out of it on expand.
     <div className="relative h-32">
       <div
-        className={`absolute inset-x-0 top-0 origin-top rounded-xl border bg-[#0c1118] transition-all duration-200 ease-out ${
+        // Background + border ease toward the Spotify-panel green only while
+        // expanded; transition-all carries it there and back on collapse.
+        style={{
+          backgroundColor: open ? '#0a1a13' : '#0c1118',
+          borderColor: open ? 'rgba(29, 185, 84, 0.40)' : 'rgba(255, 255, 255, 0.10)',
+        }}
+        className={`absolute inset-x-0 top-0 origin-top rounded-xl border transition-all duration-300 ease-out ${
           open
-            ? 'z-30 h-auto scale-[1.02] border-white/25 shadow-2xl shadow-black/60'
-            : 'h-32 overflow-hidden border-white/10 hover:border-white/20'
+            ? 'z-30 h-auto scale-[1.02] shadow-2xl shadow-black/60'
+            : 'h-32 overflow-hidden'
         }`}
       >
         <button onClick={() => setOpen((o) => !o)} className="block w-full p-4 text-left">
