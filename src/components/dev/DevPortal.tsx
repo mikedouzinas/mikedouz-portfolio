@@ -15,7 +15,11 @@ export function DevPortal() {
   const [busy, setBusy] = useState(false);
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const openPortal = useCallback(() => setOpen(true), []);
+  const openPortal = useCallback(() => {
+    setPassword(''); // never reopen pre-filled (e.g. browser/password-manager autofill)
+    setError('');
+    setOpen(true);
+  }, []);
   const closePortal = useCallback(() => {
     setOpen(false);
     setPassword('');
@@ -89,6 +93,10 @@ export function DevPortal() {
               <input
                 autoFocus
                 type="password"
+                name="dev-portal-code"
+                autoComplete="new-password"
+                data-1p-ignore
+                data-lpignore="true"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="·····"
