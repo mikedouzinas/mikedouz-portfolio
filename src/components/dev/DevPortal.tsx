@@ -33,18 +33,24 @@ export function DevPortal() {
     e.preventDefault();
     setBusy(true);
     setError('');
-    const res = await fetch('/api/dev/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
-    });
-    setBusy(false);
-    if (res.ok) {
-      window.location.href = '/dev';
-      return;
+    try {
+      const res = await fetch('/api/dev/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        window.location.href = '/dev';
+        return;
+      }
+      setError(res.status === 429 ? 'Too many attempts. Try later.' : 'Nope.');
+      setPassword('');
+    } catch {
+      setError('Network error. Try again.');
+      setPassword('');
+    } finally {
+      setBusy(false);
     }
-    setError(res.status === 429 ? 'Too many attempts. Try later.' : 'Nope.');
-    setPassword('');
   }
 
   return (
