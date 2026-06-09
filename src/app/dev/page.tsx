@@ -78,10 +78,10 @@ export default function DevConsolePage() {
         <div className="mb-8 flex items-center justify-between">
           <HarlequinTitle />
           <div className="flex items-center gap-2">
-            <Button variant="hatch" glowColor="52, 211, 153" onClick={() => setManaging((m) => !m)}>
+            <Button variant="hatch-google" glowColor="66, 133, 244" onClick={() => setManaging((m) => !m)}>
               {managing ? 'Done' : 'Manage repos'}
             </Button>
-            <Button variant="hatch" glowColor="234, 67, 53" onClick={logout} disabled={loggingOut}>
+            <Button variant="hatch-red" glowColor="234, 67, 53" onClick={logout} disabled={loggingOut}>
               {loggingOut ? 'Logging out…' : 'Log out'}
             </Button>
           </div>
