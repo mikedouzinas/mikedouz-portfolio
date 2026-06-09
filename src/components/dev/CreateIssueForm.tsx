@@ -93,8 +93,19 @@ export function CreateIssueForm({
         className="mb-3 w-full rounded-md border border-white/15 bg-white/[0.03] px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-white/30"
       />
       {error && <p className="mb-2 text-xs text-red-400">{error}</p>}
-      <Button type="submit" disabled={busy} variant="solid" glowColor="251, 188, 5" className="px-4 py-2">
-        {busy ? <span className="text-white/70">Filing…</span> : <GoogleText text="File it" className="font-semibold" />}
+      <Button
+        type="submit"
+        disabled={busy}
+        variant="solid"
+        glowColor="234, 67, 53"
+        glowIntensity={0.16}
+        className="border-white/30 bg-white/90 px-4 py-2 hover:bg-white"
+      >
+        {busy ? (
+          <span className="text-slate-600">Filing…</span>
+        ) : (
+          <GoogleText text="File it" className="font-bold" />
+        )}
       </Button>
     </form>
   );

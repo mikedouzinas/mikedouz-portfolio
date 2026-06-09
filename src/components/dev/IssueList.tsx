@@ -36,81 +36,75 @@ function IssueCard({
   const tags = suggestTags(issue.title, issue.body);
 
   return (
-    <div
-      className="group relative flex flex-col rounded-xl border border-white/10 bg-white/[0.03] transition-colors hover:border-white/20"
-      style={{ boxShadow: `inset 3px 0 0 ${pr.color}` }}
-    >
-      <button onClick={() => setOpen((o) => !o)} className="block w-full p-4 text-left">
-        <div className="mb-2 flex items-center gap-2 text-[11px] text-white/40">
-          <span
-            className="rounded px-1.5 py-0.5 font-medium"
-            style={{ backgroundColor: `${pr.color}22`, color: pr.color }}
-          >
-            {pr.short}
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: st.color }} />
-            {st.label}
-          </span>
-          <span className="ml-auto truncate">
-            {repoName} #{issue.number}
-          </span>
-          <ChevronDown
-            className={`h-3.5 w-3.5 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
-          />
-        </div>
-        <p className="font-medium leading-snug text-white/90">{issue.title}</p>
-        {tags.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1">
-            {tags.map((t) => (
-              <span
-                key={t.tag}
-                className="rounded-full px-1.5 py-0.5 text-[10px]"
-                style={{ backgroundColor: `${t.color}1f`, color: t.color }}
-              >
-                #{t.tag}
-              </span>
-            ))}
+    // Fixed-height slot keeps the grid uniform; the card lifts out of it on expand.
+    <div className="relative h-32">
+      <div
+        className={`absolute inset-x-0 top-0 origin-top rounded-xl border bg-[#0c1118] transition-all duration-200 ease-out ${
+          open
+            ? 'z-30 h-auto scale-[1.02] border-white/25 shadow-2xl shadow-black/60'
+            : 'h-32 overflow-hidden border-white/10 hover:border-white/20'
+        }`}
+      >
+        <button onClick={() => setOpen((o) => !o)} className="block w-full p-4 text-left">
+          <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
+            <span style={{ color: pr.color }}>{pr.short}</span>
+            <span className="inline-flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: st.color }} />
+              {st.label}
+            </span>
+            <span className="ml-auto truncate">
+              {repoName} #{issue.number}
+            </span>
+            <ChevronDown
+              className={`h-3.5 w-3.5 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+            />
           </div>
-        )}
-      </button>
-
-      {open && (
-        <div className="border-t border-white/10 p-4 pt-3">
-          {issue.body && (
-            <div
-              className="mb-3 rounded-lg border-l-2 p-3 text-sm text-white/70"
-              style={{ borderColor: pr.color, backgroundColor: `${pr.color}0f` }}
-            >
-              <p className="whitespace-pre-wrap">{issue.body}</p>
+          <p className={`font-medium leading-snug text-white/90 ${open ? '' : 'line-clamp-2'}`}>
+            {issue.title}
+          </p>
+          {tags.length > 0 && (
+            <div className="mt-1.5 flex flex-wrap gap-x-2 text-[10px] text-white/35">
+              {tags.map((t) => (
+                <span key={t.tag}>#{t.tag}</span>
+              ))}
             </div>
           )}
-          <div className="flex flex-wrap items-center gap-2">
-            <Dropdown
-              ariaLabel="Priority"
-              value={issue.priority ?? 'p3'}
-              options={PRIORITY_OPTS}
-              onChange={(v) => onPatch(issue, { priority: v as Priority })}
-            />
-            <Dropdown
-              ariaLabel="Status"
-              value={issue.status ?? 'todo'}
-              options={STATUS_OPTS}
-              onChange={(v) => onPatch(issue, { status: v as Status })}
-            />
-            <CopyForClaude issue={issue} />
-            <Button
-              variant="ghost"
-              glowColor="52, 211, 153"
-              onClick={() => onPatch(issue, { state: 'closed' })}
-              className="text-xs text-emerald-300/85"
-            >
-              <Check className="h-3.5 w-3.5" />
-              Done
-            </Button>
+        </button>
+
+        {open && (
+          <div className="px-4 pb-4">
+            {issue.body && (
+              <div className="mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-sm leading-relaxed text-white/70">
+                <p className="whitespace-pre-wrap">{issue.body}</p>
+              </div>
+            )}
+            <div className="flex flex-wrap items-center gap-2">
+              <Dropdown
+                ariaLabel="Priority"
+                value={issue.priority ?? 'p3'}
+                options={PRIORITY_OPTS}
+                onChange={(v) => onPatch(issue, { priority: v as Priority })}
+              />
+              <Dropdown
+                ariaLabel="Status"
+                value={issue.status ?? 'todo'}
+                options={STATUS_OPTS}
+                onChange={(v) => onPatch(issue, { status: v as Status })}
+              />
+              <CopyForClaude issue={issue} />
+              <Button
+                variant="ghost"
+                glowColor="52, 211, 153"
+                onClick={() => onPatch(issue, { state: 'closed' })}
+                className="text-xs text-emerald-300/85"
+              >
+                <Check className="h-3.5 w-3.5" />
+                Done
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

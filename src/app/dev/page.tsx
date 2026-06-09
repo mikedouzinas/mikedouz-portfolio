@@ -97,8 +97,18 @@ export default function DevConsolePage() {
           onUnhide={unhide}
         />
 
-        {repos.length > 0 && <CreateIssueForm repos={repos} onCreated={loadIssues} />}
+        {repos.length > 0 && (
+          <>
+            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/35">
+              New ticket
+            </h2>
+            <CreateIssueForm repos={repos} onCreated={loadIssues} />
+          </>
+        )}
 
+        <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/35">
+          Backlog{!loading && ` · ${issues.length} open`}
+        </h2>
         {loading ? (
           <p className="text-white/50">Loading…</p>
         ) : (
