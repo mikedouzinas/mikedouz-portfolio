@@ -2,10 +2,11 @@
 
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 import { Check, CheckSquare, ChevronDown, Copy, Square } from 'lucide-react';
 import type { DevIssue, DevRepo, Priority, Size, Status } from '@/lib/dev/github';
 import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
-import { addSubtask, parseSubtasks, subtaskProgress, toggleSubtask } from '@/lib/dev/subtasks';
+import { addSubtask, parseSubtasks, stripSubtasks, subtaskProgress, toggleSubtask } from '@/lib/dev/subtasks';
 import { buildClaudePrompt } from '@/lib/dev/copy';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
@@ -53,6 +54,41 @@ const STATUS_EXPAND: Record<'todo' | 'in progress' | 'done', { bg: string; borde
 /** Size sort order — largest first, matching "most demanding first" like priority. */
 const SIZE_RANK: Record<Size, number> = { L: 0, M: 1, S: 2 };
 
+/** Compact markdown for a ticket description — tuned for the dark card, no images/headings sprawl. */
+function IssueBodyMarkdown({ children }: { children: string }) {
+  return (
+    <ReactMarkdown
+      components={{
+        p: ({ children }) => <p className="mb-1.5 last:mb-0">{children}</p>,
+        strong: ({ children }) => <strong className="font-semibold text-white/90">{children}</strong>,
+        em: ({ children }) => <em className="text-white/60">{children}</em>,
+        a: ({ href, children }) => (
+          <a href={href} target="_blank" rel="noopener noreferrer" className="text-sky-300 underline underline-offset-2 hover:text-sky-200">
+            {children}
+          </a>
+        ),
+        ul: ({ children }) => <ul className="mb-1.5 ml-4 list-disc space-y-0.5">{children}</ul>,
+        ol: ({ children }) => <ol className="mb-1.5 ml-4 list-decimal space-y-0.5">{children}</ol>,
+        li: ({ children }) => <li>{children}</li>,
+        h1: ({ children }) => <p className="mb-1 font-semibold text-white/90">{children}</p>,
+        h2: ({ children }) => <p className="mb-1 font-semibold text-white/90">{children}</p>,
+        h3: ({ children }) => <p className="mb-1 font-semibold text-white/85">{children}</p>,
+        blockquote: ({ children }) => (
+          <blockquote className="my-1.5 border-l-2 border-white/20 pl-2.5 italic text-white/55">{children}</blockquote>
+        ),
+        code: ({ children }) => (
+          <code className="rounded bg-white/[0.08] px-1 py-0.5 text-[0.9em] text-sky-200/90">{children}</code>
+        ),
+        pre: ({ children }) => (
+          <pre className="my-1.5 overflow-x-auto rounded-md bg-black/30 p-2.5 text-[12px]">{children}</pre>
+        ),
+      }}
+    >
+      {children}
+    </ReactMarkdown>
+  );
+}
+
 function SizeChip({ size }: { size: Size }) {
   const s = SIZE_META[size];
   return (
@@ -94,6 +130,7 @@ function IssueCard({
   const tint = STATUS_EXPAND[expandKey];
   const subs = parseSubtasks(issue.body);
   const prog = subtaskProgress(issue.body);
+  const prose = stripSubtasks(issue.body); // description without the checklist lines
 
   // The card lifts out of its slot (absolute) so neighbors don't reflow. For the
   // bottom row that would overflow past the workpad backdrop, so when there isn't
@@ -192,9 +229,9 @@ function IssueCard({
 
         {showDetail && (
           <div className="px-4 pb-4" aria-hidden={!open}>
-            {issue.body.trim() && (
-              <div className="mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-sm leading-relaxed text-white/70">
-                <p className="whitespace-pre-wrap">{issue.body}</p>
+            {prose && (
+              <div className="dev-markdown mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-sm leading-relaxed text-white/70">
+                <IssueBodyMarkdown>{prose}</IssueBodyMarkdown>
               </div>
             )}
 

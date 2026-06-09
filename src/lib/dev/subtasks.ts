@@ -27,6 +27,20 @@ export function subtaskProgress(body: string): { done: number; total: number } {
   return { done: subs.filter((s) => s.done).length, total: subs.length };
 }
 
+/**
+ * The body with its checklist lines removed — prose only. Subtasks render in a
+ * dedicated checklist UI, so the description block must not repeat them. Collapses
+ * the blank lines left behind so the prose reads cleanly.
+ */
+export function stripSubtasks(body: string): string {
+  return body
+    .split('\n')
+    .filter((line) => !LINE_RE.test(line))
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 /** Toggle the nth checklist item (by document order) and return the new body. */
 export function toggleSubtask(body: string, index: number, done: boolean): string {
   let i = 0;
