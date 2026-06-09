@@ -20,8 +20,13 @@ export const STATUS_META: Record<Status, { label: string; color: string }> = {
   'in progress': { label: 'In progress', color: '#FBBC05' }, // amber
 };
 
+// Order matters: the first match is treated as an item's "primary" tag, which
+// drives board grouping. Area rules (dev / blog / main) come first so a ticket
+// lands in the right product bucket before falling back to a topical tag.
 const TAG_RULES: { tag: string; color: string; re: RegExp }[] = [
-  { tag: 'ui', color: '#4285F4', re: /\b(ui|design|theme|button|dropdown|dashboard|colou?r|layout|card|portal|harlequin|wordmark)\b/i },
+  { tag: 'dev', color: '#A142F4', re: /\b(harlequin|dev.?console|dev.?page|\/dev|portal|board|ticket|launchpad)\b/i },
+  { tag: 'blog', color: '#24C1E0', re: /\b(blog|the.?web|newsletter|soundtrack|elevenlabs|post)\b/i },
+  { tag: 'ui', color: '#4285F4', re: /\b(ui|design|theme|button|dropdown|dashboard|colou?r|layout|card|wordmark)\b/i },
   { tag: 'security', color: '#EA4335', re: /\b(security|lockout|auth|password|pin|session|token|brute|csrf|rate.?limit)\b/i },
   { tag: 'infra', color: '#34A853', re: /\b(supabase|redis|upstash|vercel|env|deploy|deployment|migration|infra|cron)\b/i },
   { tag: 'docs', color: '#FBBC05', re: /\b(kb|docs|readme|skill|documentation|knowledge.?base)\b/i },

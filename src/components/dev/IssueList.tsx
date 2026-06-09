@@ -152,19 +152,49 @@ export function IssueList({
     return <p className="text-white/50">No open items. File one above.</p>;
   }
 
+  const groups = groupByTag(issues);
+
   return (
     <div>
       {error && <p className="mb-3 text-xs text-red-400">{error}</p>}
-      <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {issues.map((issue) => (
-          <IssueCard
-            key={`${issue.repo}#${issue.number}`}
-            issue={issue}
-            repoName={repoName(issue.repo)}
-            onPatch={patch}
-          />
-        ))}
-      </div>
+      {groups.map((g) => (
+        <section key={g.tag} className="mb-6 last:mb-0">
+          <div className="mb-2 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.15em] text-white/45">
+            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: g.color }} />
+            {g.tag}
+            <span className="text-white/25">· {g.items.length}</span>
+          </div>
+          <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {g.items.map((issue) => (
+              <IssueCard
+                key={`${issue.repo}#${issue.number}`}
+                issue={issue}
+                repoName={repoName(issue.repo)}
+                onPatch={patch}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   );
+}
+
+/** Primary-tag order for board grouping; areas (dev/blog) lead, then topics. */
+const TAG_ORDER = ['dev', 'blog', 'ui', 'ux', 'security', 'infra', 'data', 'docs'];
+
+function groupByTag(issues: DevIssue[]): { tag: string; color: string; items: DevIssue[] }[] {
+  const map = new Map<string, { tag: string; color: string; items: DevIssue[] }>();
+  for (const issue of issues) {
+    const primary = suggestTags(issue.title, issue.body)[0];
+    const tag = primary?.tag ?? 'general';
+    const color = primary?.color ?? '#9AA0A6';
+    if (!map.has(tag)) map.set(tag, { tag, color, items: [] });
+    map.get(tag)!.items.push(issue);
+  }
+  const rank = (t: string) => {
+    const i = TAG_ORDER.indexOf(t);
+    return i === -1 ? TAG_ORDER.length : i;
+  };
+  return [...map.values()].sort((a, b) => rank(a.tag) - rank(b.tag));
 }
