@@ -11,7 +11,7 @@ import { IrisChat } from '@/components/iris/IrisChat';
 import { useDogfiris } from './useDogfiris';
 
 const WIDTH = 440;
-const MAX_HEIGHT = 560;
+const MAX_HEIGHT = 500;
 
 function ActionRow({ action }: { action: DogfirisAction }) {
   const repoName = action.repo.split('/')[1] ?? action.repo;
@@ -146,6 +146,7 @@ export function DogfirisPanel({
             placeholder="Describe a ticket…"
             busyLabel="dogfiris is thinking…"
             accent="52, 211, 153"
+            sendVariant="harlequin"
             emptyHint={
               <div className="mt-1 space-y-2 text-sm text-white/45">
                 <p>Tell me what to file — I&apos;ll draft the tickets and you confirm. One message can create several.</p>

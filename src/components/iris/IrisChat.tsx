@@ -23,6 +23,7 @@ export function IrisChat({
   emptyHint,
   belowMessages,
   accent = '52, 211, 153',
+  sendVariant = 'plain',
   className = '',
 }: {
   messages: IrisMessage[];
@@ -34,6 +35,8 @@ export function IrisChat({
   belowMessages?: ReactNode;
   /** Send button accent as "R, G, B". */
   accent?: string;
+  /** 'harlequin' = Google-palette diamond send button; 'plain' = solid accent. */
+  sendVariant?: 'plain' | 'harlequin';
   className?: string;
 }) {
   const [input, setInput] = useState('');
@@ -141,18 +144,37 @@ export function IrisChat({
           className="flex-1 resize-none rounded-[10px] border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-[13px] leading-relaxed text-white/90 outline-none transition-colors placeholder:text-white/30 focus:border-white/[0.16] disabled:opacity-50"
           style={{ minHeight: '40px', maxHeight: '140px' }}
         />
-        <button
-          type="submit"
-          disabled={!input.trim() || busy}
-          className="mb-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-white/20 text-white transition-all duration-200 disabled:opacity-30"
-          style={{ backgroundColor: `rgb(${accent})` }}
-          aria-label="Send"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 10 4 15 9 20" />
-            <path d="M20 4v7a4 4 0 0 1-4 4H4" />
-          </svg>
-        </button>
+        {sendVariant === 'harlequin' ? (
+          // Starting-point harlequin treatment: a Google-palette diamond (the
+          // wordmark motif). Deeper design is tracked as a subtask on the theme.
+          <button
+            type="submit"
+            disabled={!input.trim() || busy}
+            className="mb-0.5 flex h-7 w-7 flex-shrink-0 rotate-45 items-center justify-center rounded-[7px] border border-white/25 text-white shadow-[0_2px_10px_rgba(0,0,0,0.4)] transition-transform duration-200 hover:scale-110 active:scale-95 disabled:opacity-30 disabled:hover:scale-100"
+            style={{ background: 'conic-gradient(from 135deg, #4285F4, #EA4335, #FBBC05, #34A853, #4285F4)' }}
+            aria-label="Send"
+          >
+            <span className="-rotate-45 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 10 4 15 9 20" />
+                <path d="M20 4v7a4 4 0 0 1-4 4H4" />
+              </svg>
+            </span>
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={!input.trim() || busy}
+            className="mb-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-white/20 text-white transition-all duration-200 disabled:opacity-30"
+            style={{ backgroundColor: `rgb(${accent})` }}
+            aria-label="Send"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 10 4 15 9 20" />
+              <path d="M20 4v7a4 4 0 0 1-4 4H4" />
+            </svg>
+          </button>
+        )}
       </form>
     </div>
   );
