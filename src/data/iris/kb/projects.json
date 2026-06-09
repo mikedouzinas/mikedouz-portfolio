@@ -197,7 +197,8 @@
       "Deep Mode: Hidden layer triggered by clicking the profile photo. Reveals in-progress projects, blueprints, and the Spotify timeline. Animated green-blue border bars on viewport edges, profile ring gradient animation. Content sections fade in with staggered delays.",
       "Ask Mike Inbox: Contact system where Iris can draft messages on behalf of visitors. Smart contact field auto-detects email vs phone. Honeypot spam detection, rate limiting, rich HTML email notifications via Resend.",
       "Interactive UI: Global mouse glow effects, contained card glows with per-section colors, hover cards with rich previews, dark mode throughout, mobile-responsive with sheet-based navigation.",
-      "Production infrastructure: Redis caching (1hr TTL), IP-based rate limiting, Supabase PostgreSQL with RLS, Vercel deployment with cron jobs for Spotify data refresh, pre-computed importance rankings at build time."
+      "Production infrastructure: Redis caching (1hr TTL), IP-based rate limiting, Supabase PostgreSQL with RLS, Vercel deployment with cron jobs for Spotify data refresh, pre-computed importance rankings at build time.",
+      "Includes a hidden, password-protected dev console (secret animated portal login with a server-enforced session) featuring a cross-repo GitHub Issues board that auto-discovers Mike's repos and tracks work with priority and status labels, plus one-click export of tasks to Claude Code."
     ],
     "skills": [
       "api_integration",
