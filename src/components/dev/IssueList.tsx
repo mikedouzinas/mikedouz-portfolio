@@ -37,7 +37,7 @@ function IssueCard({
 
   return (
     <div
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] transition-colors hover:border-white/20"
+      className="group relative flex flex-col rounded-xl border border-white/10 bg-white/[0.03] transition-colors hover:border-white/20"
       style={{ boxShadow: `inset 3px 0 0 ${pr.color}` }}
     >
       <button onClick={() => setOpen((o) => !o)} className="block w-full p-4 text-left">
