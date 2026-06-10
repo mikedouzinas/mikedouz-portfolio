@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 /**
- * Secret login trigger. Desktop: hover the dot to open the portal.
+ * Secret login trigger. Desktop: hover the dot — or press ⌘⇧K (Ctrl+Shift+K)
+ * from anywhere on the page — to open the portal.
  * Touch: long-press (~600ms) the dot to open it as a centered modal.
  * The animation is cosmetic — real auth is server-side (cookie + middleware).
  */
@@ -25,6 +26,24 @@ export function DevPortal() {
     setPassword('');
     setError('');
   }, []);
+
+  // Ticket #12 — global ⌘⇧K (Ctrl+Shift+K) opens the portal from anywhere on the page.
+  // DevPortal is only mounted on the homepage (not on /dev), so this never reaches
+  // Cere's ⌘K on /dev. The shiftKey requirement also keeps it distinct from Iris's
+  // plain ⌘K on the main site. We key off event.code ('KeyK') so it's unaffected by
+  // Shift altering event.key to 'K'.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      const modifier = e.metaKey || e.ctrlKey;
+      if (modifier && e.shiftKey && e.code === 'KeyK') {
+        e.preventDefault();
+        e.stopPropagation();
+        openPortal();
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [openPortal]);
 
   const onTouchStart = () => {
     pressTimer.current = setTimeout(openPortal, 600);
