@@ -9,6 +9,7 @@ import { CereMark } from './CereMark';
 import { CereGameLoader } from './CereGameLoader';
 import { IrisBubble } from '@/components/iris/IrisBubble';
 import { IrisChat, type IrisChatHandle } from '@/components/iris/IrisChat';
+import { Poof } from './Poof';
 import { useCere } from './useCere';
 
 const WIDTH = 440;
@@ -139,21 +140,26 @@ export function CerePanel({
     };
   }, [open, attemptClose]);
 
-  if (!open) return null;
+  // Keep rendering through the close animation: Poof owns mount/unmount, so we
+  // can't early-return on !open or the exit "poof" never plays. SSR renders
+  // nothing (Poof's show is false until the client opens it).
+  const hasWindow = typeof window !== 'undefined';
 
-  const style: CSSProperties | undefined = isMobile
-    ? undefined
-    : {
-        position: 'fixed',
-        top: Math.max(16, (window.innerHeight - MAX_HEIGHT) / 2),
-        left: (window.innerWidth - WIDTH) / 2,
-        width: WIDTH,
-        maxHeight: MAX_HEIGHT,
-        zIndex: 50,
-      };
+  const style: CSSProperties | undefined =
+    isMobile || !hasWindow
+      ? undefined
+      : {
+          position: 'fixed',
+          top: Math.max(16, (window.innerHeight - MAX_HEIGHT) / 2),
+          left: (window.innerWidth - WIDTH) / 2,
+          width: WIDTH,
+          maxHeight: MAX_HEIGHT,
+          zIndex: 50,
+        };
 
   return (
-    <IrisBubble ref={bubbleRef} mobile={isMobile} expanded tone="champagne" style={style}>
+    <Poof show={open} color="231, 226, 212" className="fixed inset-0 z-50 pointer-events-none">
+    <IrisBubble ref={bubbleRef} mobile={isMobile} expanded tone="champagne" noEnterAnim className="pointer-events-auto" style={isMobile ? undefined : { ...style, position: 'absolute' }}>
       <div
         className="flex flex-col"
         style={{ height: isMobile ? undefined : MAX_HEIGHT - BUBBLE_INSET }}
@@ -255,5 +261,6 @@ export function CerePanel({
         </div>
       </div>
     </IrisBubble>
+    </Poof>
   );
 }
