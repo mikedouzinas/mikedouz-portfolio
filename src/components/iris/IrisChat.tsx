@@ -22,6 +22,7 @@ export function IrisChat({
   busyLabel = 'Thinking…',
   emptyHint,
   belowMessages,
+  thinkingSlot,
   accent = '52, 211, 153',
   sendVariant = 'plain',
   className = '',
@@ -33,6 +34,8 @@ export function IrisChat({
   busyLabel?: string;
   emptyHint?: ReactNode;
   belowMessages?: ReactNode;
+  /** Replaces the default pulse-dots while thinking (e.g. Cere's harlequin loader). */
+  thinkingSlot?: ReactNode;
   /** Send button accent as "R, G, B". */
   accent?: string;
   /** 'harlequin' = Google-palette diamond send button; 'plain' = solid accent. */
@@ -113,20 +116,21 @@ export function IrisChat({
           </div>
         ))}
 
-        {showThinking && (
-          <div className="flex items-center gap-2 py-1">
-            <div className="flex gap-1">
-              {[0, 150, 300].map((d) => (
-                <div
-                  key={d}
-                  className="h-1 w-1 rounded-full animate-pulse"
-                  style={{ backgroundColor: `rgb(${accent})`, animationDelay: `${d}ms` }}
-                />
-              ))}
+        {showThinking &&
+          (thinkingSlot ?? (
+            <div className="flex items-center gap-2 py-1">
+              <div className="flex gap-1">
+                {[0, 150, 300].map((d) => (
+                  <div
+                    key={d}
+                    className="h-1 w-1 rounded-full animate-pulse"
+                    style={{ backgroundColor: `rgb(${accent})`, animationDelay: `${d}ms` }}
+                  />
+                ))}
+              </div>
+              <span className="text-[11px] italic text-white/30">{busyLabel}</span>
             </div>
-            <span className="text-[11px] italic text-white/30">{busyLabel}</span>
-          </div>
-        )}
+          ))}
       </div>
 
       {belowMessages}
@@ -148,13 +152,19 @@ export function IrisChat({
             single-line textarea, even with the diamond's rotated bounding box. */}
         <div className="flex h-10 shrink-0 items-center">
           {sendVariant === 'harlequin' ? (
-            // Starting-point harlequin treatment: a Google-palette diamond (the
-            // wordmark motif). Deeper design is a subtask on the theme ticket.
+            // THE HARLEQUIN send: a champagne glass diamond (the Cere-panel
+            // material) ringed by the full Google-palette conic gradient — the
+            // rainbow kept as a border accent, not a flat slab. The arrow and
+            // fill stay metal; the ring is the only place the palette lives here.
             <button
               type="submit"
               disabled={!input.trim() || busy}
-              className="flex h-7 w-7 rotate-45 items-center justify-center rounded-[7px] border border-white/25 text-white shadow-[0_2px_10px_rgba(0,0,0,0.4)] transition-transform duration-200 hover:scale-110 active:scale-95 disabled:opacity-30 disabled:hover:scale-100"
-              style={{ background: 'conic-gradient(from 135deg, #4285F4, #EA4335, #FBBC05, #34A853, #4285F4)' }}
+              className="flex h-7 w-7 rotate-45 items-center justify-center rounded-[7px] text-[#E7E2D4] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_3px_12px_rgba(0,0,0,0.45)] transition-all duration-200 hover:scale-110 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_0_14px_rgba(231,226,212,0.18)] active:scale-95 disabled:opacity-30 disabled:hover:scale-100"
+              style={{
+                border: '1.5px solid transparent',
+                background:
+                  'linear-gradient(rgba(231,226,212,0.10), rgba(231,226,212,0.10)) padding-box, conic-gradient(from 135deg, #4285F4, #EA4335, #FBBC05, #34A853, #4285F4) border-box',
+              }}
               aria-label="Send"
             >
               <span className="-rotate-45 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">

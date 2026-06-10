@@ -6,6 +6,7 @@ import type { CereAction } from '@/lib/dev/cere';
 import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
 import { Button } from '@/components/ui/Button';
 import { CereMark } from './CereMark';
+import { CereGameLoader } from './CereGameLoader';
 import { IrisBubble } from '@/components/iris/IrisBubble';
 import { IrisChat } from '@/components/iris/IrisChat';
 import { useCere } from './useCere';
@@ -123,7 +124,7 @@ export function CerePanel({
       };
 
   return (
-    <IrisBubble ref={bubbleRef} mobile={isMobile} expanded style={style}>
+    <IrisBubble ref={bubbleRef} mobile={isMobile} expanded tone="champagne" style={style}>
       <div
         className="flex flex-col"
         style={{ height: isMobile ? undefined : MAX_HEIGHT - BUBBLE_INSET }}
@@ -146,7 +147,7 @@ export function CerePanel({
             busy={busy}
             onSend={send}
             placeholder="Describe a ticket…"
-            busyLabel="Cere is thinking…"
+            thinkingSlot={<CereGameLoader />}
             accent="52, 211, 153"
             sendVariant="harlequin"
             emptyHint={
