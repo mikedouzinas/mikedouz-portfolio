@@ -1,19 +1,23 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { LogOut, Settings, SlidersHorizontal } from 'lucide-react';
+import { Inbox, LogOut, Settings, SlidersHorizontal } from 'lucide-react';
 
 /**
- * Overflow menu on the repo bar. Holds the two rare actions — Manage repos and
- * Log out — so the header stays clean. (The wordmark's back-diamond only
- * navigates home; it does NOT end the session, so Log out lives here.)
+ * Overflow menu on the repo bar. Holds the rare actions — Manage repos, Inbox,
+ * and Log out — so the header stays clean. The Inbox link rides the same
+ * dev_session as the board, so it's only reachable once logged in. (The
+ * wordmark's back-diamond only navigates home; it does NOT end the session, so
+ * Log out lives here.)
  */
 export function GearMenu({
   onManage,
+  onInbox,
   onLogout,
   loggingOut,
 }: {
   onManage: () => void;
+  onInbox: () => void;
   onLogout: () => void;
   loggingOut: boolean;
 }) {
@@ -58,6 +62,17 @@ export function GearMenu({
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
             Manage repos
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              onInbox();
+              setOpen(false);
+            }}
+            className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs text-white/75 transition-colors hover:bg-white/[0.07] hover:text-white"
+          >
+            <Inbox className="h-3.5 w-3.5" />
+            Inbox
           </button>
           <button
             type="button"

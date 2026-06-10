@@ -144,6 +144,7 @@ export default function DevConsolePage() {
               />
               <GearMenu
                 onManage={() => setManaging((m) => !m)}
+                onInbox={() => { window.location.href = '/admin/inbox'; }}
                 onLogout={logout}
                 loggingOut={loggingOut}
               />
