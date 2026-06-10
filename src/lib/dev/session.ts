@@ -11,6 +11,7 @@
  *  - verifySession returns a `refreshed` token (new lastSeen, same exp) on success.
  */
 import { SignJWT, jwtVerify } from 'jose';
+import type { NextRequest } from 'next/server';
 
 export const DEV_SESSION_COOKIE = 'dev_session';
 
@@ -72,4 +73,19 @@ export async function verifySession(token: string, nowMs: number): Promise<Verif
   } catch {
     return { valid: false };
   }
+}
+
+/**
+ * True iff the request carries a currently-valid dev session cookie.
+ *
+ * Convenience wrapper for API routes that want to gate an individual handler
+ * (e.g. the public /api/inbox POST coexists with an admin-only GET, so the
+ * matcher can't blanket-guard the whole route). Routes wholly under the
+ * middleware matcher don't need this — the edge check already ran.
+ */
+export async function hasValidDevSession(req: NextRequest): Promise<boolean> {
+  const token = req.cookies.get(DEV_SESSION_COOKIE)?.value;
+  if (!token) return false;
+  const result = await verifySession(token, Date.now());
+  return result.valid;
 }

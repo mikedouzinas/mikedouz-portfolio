@@ -5,6 +5,7 @@ import { insertInboxMessage, getInboxMessages } from '@/lib/supabaseAdmin';
 import { validateAndFormatPhone } from '@/lib/phone';
 import { sanitizeText, escapeHtml, previewText, hashIpUa } from '@/lib/security';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { hasValidDevSession } from '@/lib/dev/session';
 import { Resend } from 'resend';
 
 export const runtime = 'nodejs';
@@ -131,20 +132,21 @@ export async function POST(req: NextRequest) {
 
 /**
  * GET /api/inbox
- * Admin-only endpoint to retrieve inbox messages
- * Requires x-admin-key header
+ * Admin-only endpoint to retrieve inbox messages.
+ *
+ * Gated by the dev_session cookie (same portal login as /dev). The handler
+ * self-gates rather than relying on the middleware matcher because the sibling
+ * POST on this route is public ("Ask Mike" submissions).
  */
 export async function GET(req: NextRequest) {
   try {
-    // Check admin authentication
-    const adminKey = req.headers.get('x-admin-key');
-    if (!adminKey || adminKey !== env.adminApiKey) {
+    if (!(await hasValidDevSession(req))) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
-    
+
     // Parse query parameters
     const searchParams = req.nextUrl.searchParams;
     const limit = parseInt(searchParams.get('limit') || '20', 10);
