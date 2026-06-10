@@ -2,15 +2,16 @@
 
 import { Limelight } from 'next/font/google';
 import { ArrowLeft } from 'lucide-react';
-import { GoogleText } from '@/components/ui/GoogleText';
 import { GOOGLE_COLORS } from '@/lib/dev/uiMeta';
 
 // Art Deco / 1930s-marquee display face for the wordmark only.
 const marquee = Limelight({ weight: '400', subsets: ['latin'], display: 'swap' });
 
 /**
- * THE HARLEQUIN wordmark. The leading diamond is a hidden back affordance:
- * on hover it crossfades into a red arrow that returns to mikeveson.com.
+ * THE HARLEQUIN wordmark — champagne duotone. The Google palette no longer
+ * floods the letters; it only *flickers* in: the trailing diamond cycles the
+ * four hues once on load, then settles to champagne. The leading diamond is a
+ * hidden back affordance: on hover it crossfades into a red arrow home.
  */
 export function HarlequinTitle() {
   return (
@@ -33,11 +34,10 @@ export function HarlequinTitle() {
           className="absolute h-5 w-5 text-red-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
         />
       </a>
-      <GoogleText
-        text="THE HARLEQUIN"
-        className={`${marquee.className} text-3xl tracking-[0.18em]`}
-      />
-      <span aria-hidden className="text-base" style={{ color: GOOGLE_COLORS[3] }}>
+      <span className={`${marquee.className} text-3xl tracking-[0.18em] text-[#E7E2D4]`}>
+        THE HARLEQUIN
+      </span>
+      <span aria-hidden className="harlequin-diamond-flicker text-base">
         ◆
       </span>
     </h1>
