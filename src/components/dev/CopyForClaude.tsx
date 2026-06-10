@@ -23,7 +23,7 @@ export function CopyForClaude({ issue }: { issue: DevIssue }) {
   return (
     <Button variant="ghost" glowColor="66, 133, 244" glowIntensity={0.18} onClick={copy} className="text-xs">
       {copied ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Copy className="h-3.5 w-3.5" />}
-      {copied ? 'Copied' : 'Copy for Claude Code'}
+      {copied ? 'Copied' : 'Copy'}
     </Button>
   );
 }
