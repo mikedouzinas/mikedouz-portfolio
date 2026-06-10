@@ -12,6 +12,11 @@ import { useCere } from './useCere';
 
 const WIDTH = 440;
 const MAX_HEIGHT = 420;
+// The desktop IrisBubble shell adds p-5 padding (20px each side) plus a 1px
+// border each side. Subtract both so the inner content fits the shell's client
+// box exactly — otherwise it overshoots by 2px and the shell shows a faint
+// scrollbar the moment Cere opens, before any messages.
+const BUBBLE_INSET = 42; // 40 padding + 2 border
 
 function ActionRow({ action }: { action: CereAction }) {
   const repoName = action.repo.split('/')[1] ?? action.repo;
@@ -121,7 +126,7 @@ export function CerePanel({
     <IrisBubble ref={bubbleRef} mobile={isMobile} expanded style={style}>
       <div
         className="flex flex-col"
-        style={{ height: isMobile ? undefined : MAX_HEIGHT - 40 }}
+        style={{ height: isMobile ? undefined : MAX_HEIGHT - BUBBLE_INSET }}
       >
         <div className="mb-3 flex items-center justify-between">
           <CereMark size="md" />
