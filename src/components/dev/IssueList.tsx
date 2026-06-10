@@ -3,10 +3,18 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { Check, CheckSquare, ChevronDown, Copy, Pencil, Square } from 'lucide-react';
+import { Check, CheckSquare, ChevronDown, Copy, Pencil, Square, X } from 'lucide-react';
 import type { DevIssue, DevRepo, Priority, Size, Status } from '@/lib/dev/github';
 import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
-import { addSubtask, parseSubtasks, setProse, stripSubtasks, subtaskProgress, toggleSubtask } from '@/lib/dev/subtasks';
+import {
+  addSubtask,
+  composeBody,
+  parseSubtasks,
+  stripSubtasks,
+  subtaskProgress,
+  toggleSubtask,
+  type DraftSubtask,
+} from '@/lib/dev/subtasks';
 import { buildClaudePrompt } from '@/lib/dev/copy';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
@@ -15,9 +23,11 @@ import { CopyForClaude } from './CopyForClaude';
 export type GroupBy = 'status' | 'repo';
 export type SortBy = 'priority' | 'recent' | 'size';
 
+// Priority shows just the code (P1…P5) — the descriptive word ("· Medium") was
+// confusable with the t-shirt size's "M · Medium". The color dot carries severity.
 const PRIORITY_OPTS = (['p1', 'p2', 'p3', 'p4', 'p5'] as Priority[]).map((p) => ({
   value: p,
-  label: PRIORITY_META[p].label,
+  label: PRIORITY_META[p].short,
   color: PRIORITY_META[p].color,
 }));
 const STATUS_OPTS = (['todo', 'in progress'] as Status[]).map((s) => ({
@@ -123,7 +133,8 @@ function IssueCard({
   const [copiedSub, setCopiedSub] = useState<number | null>(null);
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
-  const [editBody, setEditBody] = useState('');
+  const [editProse, setEditProse] = useState('');
+  const [editSubs, setEditSubs] = useState<DraftSubtask[]>([]);
   const slotRef = useRef<HTMLDivElement>(null);
   const pr = PRIORITY_META[issue.priority ?? 'p3'];
   const size = issue.size ?? 'M';
@@ -168,14 +179,30 @@ function IssueCard({
     e.preventDefault();
     const t = addText.trim();
     if (!t) return;
-    onPatch(issue, { body: addSubtask(issue.body, t) });
+    if (editing) {
+      // Edit mode batches everything into the draft; persist happens on Save.
+      setEditSubs((prev) => [...prev, { text: t, done: false }]);
+    } else {
+      onPatch(issue, { body: addSubtask(issue.body, t) });
+    }
     setAddText('');
   }
 
   function startEdit() {
     setEditTitle(issue.title);
-    setEditBody(prose);
+    setEditProse(prose);
+    setEditSubs(subs.map((s) => ({ text: s.text, done: s.done })));
+    setAddText('');
     setEditing(true);
+  }
+
+  // Edit mode is a fully-local draft (title + prose + subtasks). Nothing patches
+  // until Save, so a stray reload can't wipe a half-typed edit.
+  function updateDraftSub(i: number, patch: Partial<DraftSubtask>) {
+    setEditSubs((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+  }
+  function removeDraftSub(i: number) {
+    setEditSubs((prev) => prev.filter((_, idx) => idx !== i));
   }
 
   function saveEdit() {
@@ -183,7 +210,7 @@ function IssueCard({
     if (!t) return;
     const patch: PatchBody = {};
     if (t !== issue.title) patch.title = t;
-    const newBody = setProse(issue.body, editBody);
+    const newBody = composeBody(editProse, editSubs);
     if (newBody !== issue.body) patch.body = newBody;
     if (patch.title || patch.body) onPatch(issue, patch); // reload remounts with fresh props
     setEditing(false);
@@ -248,24 +275,74 @@ function IssueCard({
           )}
         </button>
 
-        {showDetail && (
-          <div className="px-4 pb-4" aria-hidden={!open}>
-            {editing ? (
-              <div className="mb-3 space-y-2">
-                <input
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  placeholder="Title"
-                  className="w-full rounded-md border border-white/15 bg-white/[0.03] px-2.5 py-1.5 text-sm font-medium text-white outline-none focus:border-white/30"
-                />
-                <textarea
-                  value={editBody}
-                  onChange={(e) => setEditBody(e.target.value)}
-                  placeholder="Description (markdown supported)…"
-                  rows={4}
-                  className="w-full resize-y rounded-md border border-white/10 bg-white/[0.02] px-2.5 py-2 text-sm leading-relaxed text-white/85 outline-none placeholder:text-white/30 focus:border-white/25"
-                />
-                <div className="flex items-center gap-2">
+        {showDetail &&
+          (editing ? (
+            // EDIT MODE — a self-contained draft. Nothing persists until Save, so
+            // a stray board reload can't wipe an in-progress edit. No status/Done
+            // controls here: editing is about content (title, description, tasks).
+            <div className="space-y-3 px-4 pb-4">
+              <input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="Title"
+                className="w-full rounded-md border border-white/15 bg-white/[0.03] px-2.5 py-1.5 text-sm font-medium text-white outline-none focus:border-white/30"
+              />
+              <textarea
+                value={editProse}
+                onChange={(e) => setEditProse(e.target.value)}
+                placeholder="Description (markdown supported)…"
+                rows={4}
+                className="w-full resize-y rounded-md border border-white/10 bg-white/[0.02] px-2.5 py-2 text-sm leading-relaxed text-white/85 outline-none placeholder:text-white/30 focus:border-white/25"
+              />
+
+              <div>
+                <p className="mb-1.5 text-[11px] uppercase tracking-[0.15em] text-white/35">
+                  Subtasks · {editSubs.length}
+                </p>
+                {editSubs.length > 0 && (
+                  <ul className="mb-2 space-y-1">
+                    {editSubs.map((s, i) => (
+                      <li key={i} className="flex items-center gap-2 text-sm">
+                        <button
+                          type="button"
+                          onClick={() => updateDraftSub(i, { done: !s.done })}
+                          className="shrink-0 text-white/50 transition-colors hover:text-emerald-300"
+                          aria-label={s.done ? 'Mark subtask incomplete' : 'Mark subtask complete'}
+                        >
+                          {s.done ? (
+                            <CheckSquare className="h-4 w-4 text-emerald-300/80" />
+                          ) : (
+                            <Square className="h-4 w-4" />
+                          )}
+                        </button>
+                        <input
+                          value={s.text}
+                          onChange={(e) => updateDraftSub(i, { text: e.target.value })}
+                          placeholder="subtask…"
+                          className="flex-1 rounded-md border border-white/10 bg-white/[0.02] px-2 py-1 text-sm text-white/85 outline-none placeholder:text-white/30 focus:border-white/25"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeDraftSub(i)}
+                          className="shrink-0 text-white/40 transition-colors hover:text-red-300"
+                          aria-label="Remove subtask"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <form onSubmit={submitSubtask}>
+                  <input
+                    value={addText}
+                    onChange={(e) => setAddText(e.target.value)}
+                    placeholder="add subtask…"
+                    className="w-full rounded-md border border-white/10 bg-white/[0.02] px-2.5 py-1.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-white/25"
+                  />
+                </form>
+
+                <div className="mt-3 flex items-center gap-2">
                   <Button variant="hatch" glowColor="52, 211, 153" onClick={saveEdit} className="text-xs text-emerald-300/85">
                     <Check className="h-3.5 w-3.5" />
                     Save
@@ -278,90 +355,90 @@ function IssueCard({
                   >
                     Cancel
                   </Button>
-                  <span className="text-[11px] text-white/30">subtasks are edited below</span>
                 </div>
               </div>
-            ) : (
-              prose && (
+            </div>
+          ) : (
+            // VIEW MODE — rendered description, toggleable checklist, action row.
+            <div className="px-4 pb-4" aria-hidden={!open}>
+              {prose && (
                 <div className="dev-markdown mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-sm leading-relaxed text-white/70">
                   <IssueBodyMarkdown>{prose}</IssueBodyMarkdown>
                 </div>
-              )
-            )}
-
-            <div className="mb-3">
-              {subs.length > 0 && (
-                <>
-                  <p className="mb-1.5 text-[11px] uppercase tracking-[0.15em] text-white/35">
-                    Subtasks · {prog.done}/{prog.total}
-                  </p>
-                  <ul className="mb-2 space-y-1">
-                    {subs.map((s) => (
-                      <li key={s.index} className="group/sub flex items-center gap-2 text-sm">
-                        <button
-                          type="button"
-                          onClick={() => onPatch(issue, { body: toggleSubtask(issue.body, s.index, !s.done) })}
-                          className="shrink-0 text-white/50 transition-colors hover:text-emerald-300"
-                          aria-label={s.done ? 'Mark subtask incomplete' : 'Mark subtask complete'}
-                        >
-                          {s.done ? (
-                            <CheckSquare className="h-4 w-4 text-emerald-300/80" />
-                          ) : (
-                            <Square className="h-4 w-4" />
-                          )}
-                        </button>
-                        <span className={s.done ? 'text-white/40 line-through' : 'text-white/75'}>
-                          {s.text}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => copySubtask(s.text, s.index)}
-                          className="ml-auto inline-flex shrink-0 items-center gap-1 text-[11px] text-white/40 opacity-0 transition-opacity hover:text-white/80 group-hover/sub:opacity-100"
-                          title="Copy this subtask (with full context) for Claude"
-                        >
-                          {copiedSub === s.index ? (
-                            <Check className="h-3 w-3 text-emerald-300" />
-                          ) : (
-                            <Copy className="h-3 w-3" />
-                          )}
-                          copy
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </>
               )}
-              <form onSubmit={submitSubtask}>
-                <input
-                  value={addText}
-                  onChange={(e) => setAddText(e.target.value)}
-                  placeholder="add subtask…"
-                  className="w-full rounded-md border border-white/10 bg-white/[0.02] px-2.5 py-1.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-white/25"
-                />
-              </form>
-            </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <Dropdown
-                ariaLabel="Priority"
-                value={issue.priority ?? 'p3'}
-                options={PRIORITY_OPTS}
-                onChange={(v) => onPatch(issue, { priority: v as Priority })}
-              />
-              <Dropdown
-                ariaLabel="Status"
-                value={issue.status ?? 'todo'}
-                options={STATUS_OPTS}
-                onChange={(v) => onPatch(issue, { status: v as Status })}
-              />
-              <Dropdown
-                ariaLabel="Size"
-                value={size}
-                options={SIZE_OPTS}
-                onChange={(v) => onPatch(issue, { size: v as Size })}
-              />
-              <CopyForClaude issue={issue} />
-              {!editing && (
+              <div className="mb-3">
+                {subs.length > 0 && (
+                  <>
+                    <p className="mb-1.5 text-[11px] uppercase tracking-[0.15em] text-white/35">
+                      Subtasks · {prog.done}/{prog.total}
+                    </p>
+                    <ul className="mb-2 space-y-1">
+                      {subs.map((s) => (
+                        <li key={s.index} className="group/sub flex items-center gap-2 text-sm">
+                          <button
+                            type="button"
+                            onClick={() => onPatch(issue, { body: toggleSubtask(issue.body, s.index, !s.done) })}
+                            className="shrink-0 text-white/50 transition-colors hover:text-emerald-300"
+                            aria-label={s.done ? 'Mark subtask incomplete' : 'Mark subtask complete'}
+                          >
+                            {s.done ? (
+                              <CheckSquare className="h-4 w-4 text-emerald-300/80" />
+                            ) : (
+                              <Square className="h-4 w-4" />
+                            )}
+                          </button>
+                          <span className={s.done ? 'text-white/40 line-through' : 'text-white/75'}>
+                            {s.text}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => copySubtask(s.text, s.index)}
+                            className="ml-auto inline-flex shrink-0 items-center gap-1 text-[11px] text-white/40 opacity-0 transition-opacity hover:text-white/80 group-hover/sub:opacity-100"
+                            title="Copy this subtask (with full context) for Claude"
+                          >
+                            {copiedSub === s.index ? (
+                              <Check className="h-3 w-3 text-emerald-300" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                            copy
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                <form onSubmit={submitSubtask}>
+                  <input
+                    value={addText}
+                    onChange={(e) => setAddText(e.target.value)}
+                    placeholder="add subtask…"
+                    className="w-full rounded-md border border-white/10 bg-white/[0.02] px-2.5 py-1.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-white/25"
+                  />
+                </form>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <Dropdown
+                  ariaLabel="Priority"
+                  value={issue.priority ?? 'p3'}
+                  options={PRIORITY_OPTS}
+                  onChange={(v) => onPatch(issue, { priority: v as Priority })}
+                />
+                <Dropdown
+                  ariaLabel="Status"
+                  value={issue.status ?? 'todo'}
+                  options={STATUS_OPTS}
+                  onChange={(v) => onPatch(issue, { status: v as Status })}
+                />
+                <Dropdown
+                  ariaLabel="Size"
+                  value={size}
+                  options={SIZE_OPTS}
+                  onChange={(v) => onPatch(issue, { size: v as Size })}
+                />
+                <CopyForClaude issue={issue} />
                 <Button
                   variant="ghost"
                   glowColor="148, 163, 184"
@@ -371,30 +448,29 @@ function IssueCard({
                   <Pencil className="h-3.5 w-3.5" />
                   Edit
                 </Button>
-              )}
-              {closed ? (
-                <Button
-                  variant="ghost"
-                  glowColor="148, 163, 184"
-                  onClick={() => onPatch(issue, { state: 'open' })}
-                  className="text-xs text-white/70"
-                >
-                  Reopen
-                </Button>
-              ) : (
-                <Button
-                  variant="ghost"
-                  glowColor="52, 211, 153"
-                  onClick={() => onPatch(issue, { state: 'closed' })}
-                  className="text-xs text-emerald-300/85"
-                >
-                  <Check className="h-3.5 w-3.5" />
-                  Done
-                </Button>
-              )}
+                {closed ? (
+                  <Button
+                    variant="ghost"
+                    glowColor="148, 163, 184"
+                    onClick={() => onPatch(issue, { state: 'open' })}
+                    className="text-xs text-white/70"
+                  >
+                    Reopen
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    glowColor="52, 211, 153"
+                    onClick={() => onPatch(issue, { state: 'closed' })}
+                    className="text-xs text-emerald-300/85"
+                  >
+                    <Check className="h-3.5 w-3.5" />
+                    Done
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          ))}
       </motion.div>
     </div>
   );

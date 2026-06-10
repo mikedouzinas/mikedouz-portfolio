@@ -41,14 +41,21 @@ export function stripSubtasks(body: string): string {
     .trim();
 }
 
+/** A subtask draft while editing — text + checked state, no document position. */
+export interface DraftSubtask {
+  text: string;
+  done: boolean;
+}
+
 /**
- * Replace the prose of a body while preserving its checklist verbatim (text +
- * checked state + order). Lets the description be edited without touching the
- * subtasks, which have their own UI. Prose sits above the checklist, matching
- * how addSubtask groups them.
+ * Reassemble a body from edited prose + checklist drafts. Prose sits above the
+ * checklist (matching addSubtask). Empty subtasks are dropped. This is the
+ * inverse of stripSubtasks + parseSubtasks used by the card's edit mode.
  */
-export function setProse(body: string, prose: string): string {
-  const checklist = body.split('\n').filter((l) => LINE_RE.test(l));
+export function composeBody(prose: string, subs: DraftSubtask[]): string {
+  const checklist = subs
+    .filter((s) => s.text.trim())
+    .map((s) => `- [${s.done ? 'x' : ' '}] ${s.text.trim()}`);
   const clean = prose.trim();
   if (!checklist.length) return clean;
   return clean ? `${clean}\n\n${checklist.join('\n')}` : checklist.join('\n');
