@@ -7,6 +7,7 @@ import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
 import { Button } from '@/components/ui/Button';
 import { CereMark } from './CereMark';
 import { CereGameLoader } from './CereGameLoader';
+import { BodyDiff } from './BodyDiff';
 import { IrisBubble } from '@/components/iris/IrisBubble';
 import { IrisChat, type IrisChatHandle } from '@/components/iris/IrisChat';
 import { Poof } from './Poof';
@@ -47,6 +48,8 @@ function ActionRow({ action }: { action: CereAction }) {
   if (action.priority) changes.push(PRIORITY_META[action.priority].short);
   if (action.status) changes.push(STATUS_META[action.status].label);
   if (action.size) changes.push(`size ${action.size}`);
+  const bodyChanged = typeof action.body === 'string';
+  if (bodyChanged) changes.push('edit description');
   return (
     <li className="rounded-lg border border-sky-400/20 bg-sky-500/[0.06] p-2.5 text-sm">
       <div className="mb-1 flex items-center gap-2 text-[11px] text-white/55">
@@ -56,6 +59,7 @@ function ActionRow({ action }: { action: CereAction }) {
         </span>
       </div>
       <p className="text-white/90">{changes.join(' · ') || 'no change'}</p>
+      {bodyChanged && <BodyDiff before={action.bodyBefore ?? ''} after={action.body ?? ''} />}
     </li>
   );
 }

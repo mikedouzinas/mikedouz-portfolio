@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    const parsedOut = parseActions(res.content);
+    const parsedOut = parseActions(res.content, issues);
     const resolved = resolveActionRepos(parsedOut.actions, repos);
     return NextResponse.json({
       reply: parsedOut.reply,
