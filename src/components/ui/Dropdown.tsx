@@ -53,7 +53,7 @@ export function Dropdown({
         type="button"
         aria-label={ariaLabel}
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-xs text-white/80 transition-colors hover:border-white/25"
+        className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-xs text-white/80 transition-colors hover:border-[#e7e2d4]/30"
       >
         {current?.color && (
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: current.color }} />

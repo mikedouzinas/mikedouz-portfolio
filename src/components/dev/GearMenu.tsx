@@ -42,7 +42,7 @@ export function GearMenu({
         type="button"
         aria-label="Board settings"
         onClick={() => setOpen((o) => !o)}
-        className="grid h-7 w-7 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-white/60 transition-colors hover:border-white/25 hover:text-white/90"
+        className="grid h-7 w-7 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-white/60 transition-colors hover:border-[#e7e2d4]/30 hover:text-[#e7e2d4]"
       >
         <Settings className="h-3.5 w-3.5" />
       </button>

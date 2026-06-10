@@ -16,8 +16,10 @@ export function RepoChips({
     <div className="no-scrollbar flex flex-nowrap items-center gap-2 overflow-x-auto">
       <button
         onClick={() => onSelect(null)}
-        className={`shrink-0 rounded-full px-3 py-1 text-xs transition-colors ${
-          selected === null ? 'bg-white/15 text-white' : 'bg-white/5 text-white/60 hover:text-white/80'
+        className={`shrink-0 rounded-full border px-3 py-1 text-xs transition-colors ${
+          selected === null
+            ? 'border-[#e7e2d4]/30 bg-[#e7e2d4]/15 text-[#e7e2d4]'
+            : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:text-white/85'
         }`}
       >
         All
@@ -26,12 +28,14 @@ export function RepoChips({
         <button
           key={r.slug}
           onClick={() => onSelect(r.slug)}
-          className={`shrink-0 rounded-full px-3 py-1 text-xs transition-colors ${
-            selected === r.slug ? 'text-white' : 'text-white/60 hover:text-white/80'
+          className={`shrink-0 rounded-full border px-3 py-1 text-xs transition-colors ${
+            selected === r.slug ? 'text-white' : 'text-white/60 hover:text-white/85'
           }`}
           style={{
             backgroundColor:
-              selected === r.slug ? `rgba(${r.accent}, 0.25)` : 'rgba(255,255,255,0.05)',
+              selected === r.slug ? `rgba(${r.accent}, 0.22)` : 'rgba(255,255,255,0.03)',
+            borderColor:
+              selected === r.slug ? `rgba(${r.accent}, 0.45)` : 'rgba(255,255,255,0.10)',
           }}
         >
           {r.name}

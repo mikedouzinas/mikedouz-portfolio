@@ -25,7 +25,7 @@ export function GroupByToggle({
             onClick={() => onChange(o.value)}
             className={`rounded-md px-2.5 py-1 transition-colors ${
               value === o.value
-                ? 'bg-white/15 text-white'
+                ? 'bg-[#e7e2d4]/15 text-[#e7e2d4]'
                 : 'text-white/55 hover:text-white/85'
             }`}
           >
