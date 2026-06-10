@@ -39,18 +39,27 @@ export default function DevConsolePage() {
     }
   }, []);
 
-  const loadIssues = useCallback(async () => {
-    setLoading(true);
-    const url = selected
-      ? `/api/dev/issues?state=open&repo=${encodeURIComponent(selected)}`
-      : '/api/dev/issues?state=open';
-    const res = await fetch(url);
-    if (res.ok) {
-      const data = (await res.json()) as { issues: DevIssue[] };
-      setIssues(data.issues);
-    }
-    setLoading(false);
-  }, [selected]);
+  // `silent` refreshes update the list in place WITHOUT toggling `loading`, so
+  // IssueList stays mounted and cards keep their state (an expanded/edited ticket
+  // stays put). Used after any board mutation; only the first load + repo switch
+  // show the loading state.
+  const loadIssues = useCallback(
+    async (silent = false) => {
+      if (!silent) setLoading(true);
+      const url = selected
+        ? `/api/dev/issues?state=open&repo=${encodeURIComponent(selected)}`
+        : '/api/dev/issues?state=open';
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = (await res.json()) as { issues: DevIssue[] };
+        setIssues(data.issues);
+      }
+      if (!silent) setLoading(false);
+    },
+    [selected],
+  );
+
+  const refreshIssues = useCallback(() => loadIssues(true), [loadIssues]);
 
   useEffect(() => {
     loadRepos();
@@ -158,7 +167,7 @@ export default function DevConsolePage() {
             repos={repos}
             groupBy={groupBy}
             sort={sort}
-            onChanged={loadIssues}
+            onChanged={refreshIssues}
           />
         )}
       </main>
@@ -166,7 +175,7 @@ export default function DevConsolePage() {
       <CerePanel
         open={composerOpen}
         onClose={() => setComposerOpen(false)}
-        onApplied={loadIssues}
+        onApplied={refreshIssues}
       />
     </div>
   );
