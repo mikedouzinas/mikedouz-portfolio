@@ -3,10 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
+const LONG_PRESS_MS = 600;
+const TAP_COUNT_TO_OPEN = 5;
+const TAP_WINDOW_MS = 1500; // taps must land within this rolling window
+
 /**
  * Secret login trigger. Desktop: hover the dot — or press ⌘⇧K (Ctrl+Shift+K)
  * from anywhere on the page — to open the portal.
- * Touch: long-press (~600ms) the dot to open it as a centered modal.
+ * Touch: long-press (~600ms) OR 5 quick taps on the dot opens it as a centered modal.
  * The animation is cosmetic — real auth is server-side (cookie + middleware).
  */
 export function DevPortal() {
@@ -15,6 +19,8 @@ export function DevPortal() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressFired = useRef(false);
+  const tapTimes = useRef<number[]>([]);
 
   const openPortal = useCallback(() => {
     setPassword(''); // never reopen pre-filled (e.g. browser/password-manager autofill)
@@ -45,12 +51,38 @@ export function DevPortal() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [openPortal]);
 
+  // Ticket #13 — mobile secret trigger: long-press (~600ms) OR 5 quick taps.
   const onTouchStart = () => {
-    pressTimer.current = setTimeout(openPortal, 600);
+    longPressFired.current = false;
+    if (pressTimer.current) clearTimeout(pressTimer.current);
+    pressTimer.current = setTimeout(() => {
+      longPressFired.current = true;
+      openPortal();
+    }, LONG_PRESS_MS);
   };
   const cancelPress = () => {
-    if (pressTimer.current) clearTimeout(pressTimer.current);
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
   };
+  const onTouchEnd = () => {
+    cancelPress();
+    // A completed long-press already opened the portal; don't also count it as a tap.
+    if (longPressFired.current) {
+      longPressFired.current = false;
+      return;
+    }
+    const now = Date.now();
+    tapTimes.current = [...tapTimes.current, now].filter((t) => now - t <= TAP_WINDOW_MS);
+    if (tapTimes.current.length >= TAP_COUNT_TO_OPEN) {
+      tapTimes.current = [];
+      openPortal();
+    }
+  };
+
+  // Clean up any pending long-press timer on unmount.
+  useEffect(() => () => cancelPress(), []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -82,7 +114,8 @@ export function DevPortal() {
         aria-hidden
         onMouseEnter={openPortal}
         onTouchStart={onTouchStart}
-        onTouchEnd={cancelPress}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={cancelPress}
         onTouchMove={cancelPress}
         className="cursor-default select-none text-xs text-white/10 transition-colors hover:text-white/25"
       >
