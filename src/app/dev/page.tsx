@@ -9,6 +9,7 @@ import { GroupByToggle } from '@/components/dev/GroupByToggle';
 import { GearMenu } from '@/components/dev/GearMenu';
 import { CerePortal } from '@/components/dev/CerePortal';
 import { CerePanel } from '@/components/dev/CerePanel';
+import { HarlequinReveal } from '@/components/dev/HarlequinReveal';
 import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
 
 const SORT_OPTS: { value: SortBy; label: string }[] = [
@@ -109,7 +110,11 @@ export default function DevConsolePage() {
 
   return (
     <div className="min-h-screen dev-workpad text-white">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#070b12]/85 backdrop-blur-sm">
+      <HarlequinReveal />
+      <header
+        data-suppress-reveal
+        className="sticky top-0 z-40 border-b border-[#e7e2d4]/15 bg-[#0e0c12]/70 backdrop-blur-md"
+      >
         <div className="mx-auto max-w-6xl px-6 py-4">
           <div className="flex items-center justify-between gap-4">
             <HarlequinTitle />
@@ -147,8 +152,8 @@ export default function DevConsolePage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-6">
-        <p className="mb-4 text-[11px] uppercase tracking-[0.2em] text-white/35">
+      <main className="relative z-10 mx-auto max-w-6xl px-6 py-6">
+        <p className="mb-4 text-[11px] uppercase tracking-[0.2em] text-[#e7e2d4]/55">
           {loading ? 'Loading…' : `${openCount} open`}
         </p>
         {!loading && (

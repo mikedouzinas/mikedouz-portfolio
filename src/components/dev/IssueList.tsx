@@ -57,10 +57,11 @@ const DONE_GREEN = '#1DB954';
 // Expanded-card tint keyed by status, so the lift colour tells you where a
 // ticket stands at a glance: blue = todo, amber = in progress, and the
 // original Spotify-panel green = done. Same dark-tint-of-the-accent recipe.
+// Translucent so the harlequin argyle whispers through the glass card.
 const STATUS_EXPAND: Record<'todo' | 'in progress' | 'done', { bg: string; border: string }> = {
-  todo: { bg: '#0b1322', border: 'rgba(66, 133, 244, 0.40)' }, // blue
-  'in progress': { bg: '#1a1607', border: 'rgba(251, 188, 5, 0.40)' }, // amber
-  done: { bg: '#0a1a13', border: 'rgba(29, 185, 84, 0.40)' }, // Spotify green
+  todo: { bg: 'rgba(11, 19, 34, 0.66)', border: 'rgba(66, 133, 244, 0.45)' }, // blue
+  'in progress': { bg: 'rgba(26, 22, 7, 0.66)', border: 'rgba(251, 188, 5, 0.45)' }, // amber
+  done: { bg: 'rgba(10, 26, 19, 0.66)', border: 'rgba(29, 185, 84, 0.45)' }, // Spotify green
 };
 
 /** Size sort order — largest first, matching "most demanding first" like priority. */
@@ -226,10 +227,11 @@ function IssueCard({
         // framer animates the actual height (CSS can't tween to auto), so open/
         // close slide. Collapsed, a hover previews the status tint + a slight
         // lift — the same Spotify-style reaction as the buttons and the expand.
+        data-suppress-reveal
         initial={false}
         animate={{
           height: open ? 'auto' : 128,
-          backgroundColor: open || hovered ? tint.bg : '#0c1118',
+          backgroundColor: open || hovered ? tint.bg : 'rgba(12, 17, 24, 0.52)',
           borderColor: open || hovered ? tint.border : 'rgba(255, 255, 255, 0.10)',
           scale: open || hovered ? 1.02 : 1,
         }}
@@ -241,7 +243,7 @@ function IssueCard({
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         style={{ transformOrigin: dropUp ? 'bottom' : 'top' }}
-        className={`absolute inset-x-0 cursor-pointer rounded-xl border ${
+        className={`absolute inset-x-0 cursor-pointer rounded-xl border backdrop-blur-md ${
           overflowVisible ? 'overflow-visible' : 'overflow-hidden'
         } ${dropUp ? 'bottom-0' : 'top-0'} ${
           showDetail || hovered ? 'shadow-2xl shadow-black/60' : ''
@@ -521,10 +523,10 @@ function laneOf(i: DevIssue): string {
 
 function LaneHeader({ color, label, count }: { color: string; label: string; count: number }) {
   return (
-    <div className="mb-2 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.15em] text-white/45">
+    <div className="mb-2 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.15em] text-[#e7e2d4]/70">
       <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
       {label}
-      <span className="text-white/25">· {count}</span>
+      <span className="text-[#e7e2d4]/40">· {count}</span>
     </div>
   );
 }
