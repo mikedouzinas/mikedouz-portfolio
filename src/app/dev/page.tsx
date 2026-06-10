@@ -2,13 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { DevIssue, DevRepo } from '@/lib/dev/github';
-import { Button } from '@/components/ui/Button';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { HarlequinTitle } from '@/components/dev/HarlequinTitle';
 import { RepoChips, RepoManagePanel } from '@/components/dev/RepoPicker';
 import { GroupByToggle } from '@/components/dev/GroupByToggle';
 import { GearMenu } from '@/components/dev/GearMenu';
-import { CereMark } from '@/components/dev/CereMark';
+import { CerePortal } from '@/components/dev/CerePortal';
 import { CerePanel } from '@/components/dev/CerePanel';
 import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
 
@@ -118,16 +117,7 @@ export default function DevConsolePage() {
               <div className="hidden md:block">
                 <GroupByToggle value={groupBy} onChange={setGroupBy} />
               </div>
-              <Button
-                variant="solid"
-                glowColor="178, 58, 72"
-                onClick={() => setComposerOpen(true)}
-              >
-                <CereMark size="sm" />
-                <kbd className="ml-1 hidden rounded border border-white/20 px-1 text-[10px] font-normal text-white/50 sm:inline">
-                  ⌘K
-                </kbd>
-              </Button>
+              <CerePortal onClick={() => setComposerOpen(true)} />
             </div>
           </div>
 
