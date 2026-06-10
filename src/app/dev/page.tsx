@@ -9,6 +9,7 @@ import { GroupByToggle } from '@/components/dev/GroupByToggle';
 import { GearMenu } from '@/components/dev/GearMenu';
 import { CerePortal } from '@/components/dev/CerePortal';
 import { CerePanel } from '@/components/dev/CerePanel';
+import { CereGameLoader } from '@/components/dev/CereGameLoader';
 import { HarlequinReveal } from '@/components/dev/HarlequinReveal';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
@@ -158,9 +159,15 @@ export default function DevConsolePage() {
 
       <main className="relative z-10 mx-auto max-w-6xl px-6 py-6">
         <p className="mb-4 text-[11px] uppercase tracking-[0.2em] text-[#e7e2d4]/55">
-          {loading ? 'Loading…' : `${openCount} open`}
+          {loading ? ' ' : `${openCount} open`}
         </p>
-        {!loading && (
+        {loading ? (
+          // Interim branded loader: the same thinking animation Cere plays,
+          // centered horizontally in the board's slot.
+          <div className="flex justify-center py-16">
+            <CereGameLoader />
+          </div>
+        ) : (
           <IssueList
             issues={issues}
             repos={repos}
