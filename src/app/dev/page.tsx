@@ -10,6 +10,7 @@ import { GearMenu } from '@/components/dev/GearMenu';
 import { CerePortal } from '@/components/dev/CerePortal';
 import { CerePanel } from '@/components/dev/CerePanel';
 import { HarlequinReveal } from '@/components/dev/HarlequinReveal';
+import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
 
 const SORT_OPTS: { value: SortBy; label: string }[] = [
@@ -113,9 +114,12 @@ export default function DevConsolePage() {
       <HarlequinReveal />
       <header
         data-suppress-reveal
+        data-has-contained-glow="true"
         className="sticky top-0 z-40 border-b border-[#e7e2d4]/15 bg-[#0e0c12]/70 backdrop-blur-md"
       >
-        <div className="mx-auto max-w-6xl px-6 py-4">
+        {/* Contained champagne light within the header bar (self-clips). */}
+        <ContainedMouseGlow color="231, 226, 212" intensity={0.12} size={260} />
+        <div className="relative z-10 mx-auto max-w-6xl px-6 py-4">
           <div className="flex items-center justify-between gap-4">
             <HarlequinTitle />
             <div className="flex items-center gap-3">

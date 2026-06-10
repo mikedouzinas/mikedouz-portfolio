@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { Check, CheckSquare, ChevronDown, Copy, Pencil, Square, X } from 'lucide-react';
+import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import type { DevIssue, DevRepo, Priority, Size, Status } from '@/lib/dev/github';
 import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
 import {
@@ -228,6 +229,7 @@ function IssueCard({
         // close slide. Collapsed, a hover previews the status tint + a slight
         // lift — the same Spotify-style reaction as the buttons and the expand.
         data-suppress-reveal
+        data-has-contained-glow="true"
         initial={false}
         animate={{
           height: open ? 'auto' : 128,
@@ -249,7 +251,10 @@ function IssueCard({
           showDetail || hovered ? 'shadow-2xl shadow-black/60' : ''
         } ${closed && !open ? 'opacity-70' : ''}`}
       >
-        <button onClick={toggle} className="block w-full p-4 text-left">
+        {/* Cursor-following light contained to the ticket — the harlequin's
+            confined "lighting up", distinct from the board's argyle reveal. */}
+        <ContainedMouseGlow color="231, 226, 212" intensity={0.16} size={220} />
+        <button onClick={toggle} className="relative z-10 block w-full p-4 text-left">
           <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
             <span style={{ color: pr.color }}>{pr.short}</span>
             <span className="inline-flex items-center gap-1">
@@ -369,7 +374,7 @@ function IssueCard({
             </div>
           ) : (
             // VIEW MODE — rendered description, toggleable checklist, action row.
-            <div className="px-4 pb-4" aria-hidden={!open}>
+            <div className="relative z-10 px-4 pb-4" aria-hidden={!open}>
               {prose && (
                 <div className="dev-markdown mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-sm leading-relaxed text-white/70">
                   <IssueBodyMarkdown>{prose}</IssueBodyMarkdown>
