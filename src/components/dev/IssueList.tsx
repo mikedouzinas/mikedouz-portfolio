@@ -8,6 +8,7 @@ import type { DevIssue, DevRepo, Priority, Size, Status } from '@/lib/dev/github
 import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
 import {
   addSubtask,
+  checkAllSubtasks,
   composeBody,
   parseSubtasks,
   stripSubtasks,
@@ -261,17 +262,23 @@ function IssueCard({
               className={`h-3.5 w-3.5 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
             />
           </div>
-          <p
-            className={`font-medium leading-snug ${
-              closed ? 'text-white/55 line-through' : 'text-white/90'
-            } ${open ? '' : 'line-clamp-2'}`}
-          >
-            {issue.title}
-          </p>
-          {prog.total > 0 && (
-            <p className="mt-1 text-[11px] text-white/35">
-              {prog.done}/{prog.total} subtasks
-            </p>
+          {/* In edit mode the title is shown as an input below, so suppress the
+              static title + progress here to avoid a duplicate header. */}
+          {!editing && (
+            <>
+              <p
+                className={`font-medium leading-snug ${
+                  closed ? 'text-white/55 line-through' : 'text-white/90'
+                } ${open ? '' : 'line-clamp-2'}`}
+              >
+                {issue.title}
+              </p>
+              {prog.total > 0 && (
+                <p className="mt-1 text-[11px] text-white/35">
+                  {prog.done}/{prog.total} subtasks
+                </p>
+              )}
+            </>
           )}
         </button>
 
@@ -461,7 +468,13 @@ function IssueCard({
                   <Button
                     variant="ghost"
                     glowColor="52, 211, 153"
-                    onClick={() => onPatch(issue, { state: 'closed' })}
+                    onClick={() =>
+                      onPatch(issue, {
+                        state: 'closed',
+                        // Marking the ticket Done completes its checklist too.
+                        ...(prog.total > 0 ? { body: checkAllSubtasks(issue.body) } : {}),
+                      })
+                    }
                     className="text-xs text-emerald-300/85"
                   >
                     <Check className="h-3.5 w-3.5" />

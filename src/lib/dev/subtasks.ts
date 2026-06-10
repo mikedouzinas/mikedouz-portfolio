@@ -61,6 +61,17 @@ export function composeBody(prose: string, subs: DraftSubtask[]): string {
   return clean ? `${clean}\n\n${checklist.join('\n')}` : checklist.join('\n');
 }
 
+/** Mark every checklist item complete — used when a ticket is marked Done. */
+export function checkAllSubtasks(body: string): string {
+  return body
+    .split('\n')
+    .map((line) => {
+      const m = line.match(LINE_RE);
+      return m ? `${m[1]}- [x] ${m[3]}` : line;
+    })
+    .join('\n');
+}
+
 /** Toggle the nth checklist item (by document order) and return the new body. */
 export function toggleSubtask(body: string, index: number, done: boolean): string {
   let i = 0;
