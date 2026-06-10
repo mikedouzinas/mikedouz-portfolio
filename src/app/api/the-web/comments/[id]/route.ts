@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { env } from '@/lib/env';
 import { deleteComment } from '@/lib/comments';
 
 export const runtime = 'nodejs';
@@ -10,18 +9,16 @@ const UUIDParam = z.string().uuid();
 /**
  * DELETE /api/the-web/comments/[id]
  * Admin-only endpoint to soft-delete a comment.
- * Requires x-admin-key header.
+ *
+ * Auth is enforced by the edge middleware (the dev_session cookie from the /dev
+ * portal login), which 401s any request without a valid session before this
+ * handler runs — same model as the /api/dev/* routes. No header check here.
  */
 export async function DELETE(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const adminKey = req.headers.get('x-admin-key');
-    if (!adminKey || adminKey !== env.adminApiKey) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { id } = await params;
     const parsed = UUIDParam.safeParse(id);
     if (!parsed.success) {
