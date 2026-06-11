@@ -7,7 +7,17 @@ import {
 
 export const config = {
   // Include bare `/dev` explicitly — `:path*` can miss the base segment.
-  matcher: ['/dev', '/dev/:path*', '/api/dev/:path*'],
+  // /admin/inbox + the comment-DELETE API ride the same dev_session so one
+  // portal login unlocks the board, the inbox, and comment moderation.
+  // (/api/inbox is intentionally absent: its POST is public; its GET self-gates.)
+  matcher: [
+    '/dev',
+    '/dev/:path*',
+    '/api/dev/:path*',
+    '/admin/inbox',
+    '/admin/inbox/:path*',
+    '/api/the-web/comments/:path*',
+  ],
 };
 
 export async function middleware(req: NextRequest) {

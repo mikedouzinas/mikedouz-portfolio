@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyPassword } from '@/lib/dev/password';
-import { signSession, DEV_SESSION_COOKIE, sessionCookieOptions } from '@/lib/dev/session';
+import {
+  signSession,
+  hasValidDevSession,
+  DEV_SESSION_COOKIE,
+  sessionCookieOptions,
+} from '@/lib/dev/session';
 import {
   checkAuthRateLimit,
   checkGlobalLockout,
@@ -19,6 +24,18 @@ function tooManyAttempts(rl: RateLimitResult): NextResponse {
     res.headers.set('Retry-After', String(rl.retryAfterS));
   }
   return res;
+}
+
+/**
+ * GET → reports whether the caller holds a valid dev session.
+ *
+ * Public (the middleware lets /api/dev/auth through unauthenticated), so
+ * non-admins simply get `{ authed: false }` rather than a 404/401. Lets client
+ * components light up admin affordances (e.g. comment deletion) without reading
+ * the httpOnly cookie. Never reveals the cookie value.
+ */
+export async function GET(req: NextRequest) {
+  return NextResponse.json({ authed: await hasValidDevSession(req) });
 }
 
 /** POST { password } → sets session cookie on success. */

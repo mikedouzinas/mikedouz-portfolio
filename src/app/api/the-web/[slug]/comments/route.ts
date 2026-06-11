@@ -202,8 +202,6 @@ async function sendCommentNotification(data: {
     }
   }
 
-  const deleteCmd = `curl -X DELETE https://mikeveson.com/api/the-web/comments/${data.commentId} -H "x-admin-key: $ADMIN_API_KEY"`;
-
   const html = `
 <!DOCTYPE html>
 <html>
@@ -214,7 +212,7 @@ async function sendCommentNotification(data: {
   ${replyContext}
   <blockquote style="margin: 16px 0; padding: 12px 16px; background: #f3f4f6; border-left: 3px solid #a78bfa; border-radius: 4px; white-space: pre-wrap;">${escapeHtml(data.body)}</blockquote>
   <p><a href="https://mikeveson.com/the-web/${data.slug}#comment-${data.commentId}" style="color: #a78bfa;">View on site</a></p>
-  <p style="margin-top: 24px; font-size: 12px; color: #9ca3af;">Delete:<br><code style="font-size: 11px; background: #f3f4f6; padding: 4px 8px; border-radius: 4px; word-break: break-all;">${escapeHtml(deleteCmd)}</code></p>
+  <p style="margin-top: 24px; font-size: 12px; color: #9ca3af;">To delete: log in at <a href="https://mikeveson.com/dev" style="color: #a78bfa;">/dev</a>, open the post, and use the inline delete control on the comment.</p>
 </body>
 </html>`;
 
