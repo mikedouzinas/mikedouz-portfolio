@@ -85,11 +85,20 @@ export function Poof({
 }) {
   const reduce = useReducedMotion();
 
+  // Default to `position: relative` so the particle burst (absolute, inset-0)
+  // anchors to the wrapper — but only when the caller hasn't supplied their own
+  // positioning. In Tailwind's generated CSS `.relative` is emitted after
+  // `.fixed`/`.absolute`, so a naive `relative ${className}` would override a
+  // caller's `fixed` regardless of class order and drop the wrapper back into
+  // document flow (CerePanel relies on `fixed inset-0` to stay in-viewport).
+  const hasPosition = /\b(fixed|absolute|sticky|relative)\b/.test(className);
+  const position = hasPosition ? '' : 'relative';
+
   return (
     <AnimatePresence>
       {show && (
         <motion.div
-          className={`relative ${className}`}
+          className={`${position} ${className}`.trim()}
           variants={contentVariants}
           initial={reduce ? 'visible' : 'hidden'}
           animate="visible"

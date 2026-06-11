@@ -69,7 +69,9 @@ export function IrisChat({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useImperativeHandle(handleRef, () => ({
-    focusInput: () => textareaRef.current?.focus(),
+    // preventScroll: focusing inside a fixed/transformed overlay (e.g. Cere's
+    // Poof wrapper) must not scroll the page to chase the off-flow input.
+    focusInput: () => textareaRef.current?.focus({ preventScroll: true }),
   }), []);
 
   // Update the input and notify the parent (for dirty-input dismissal guards).
@@ -83,9 +85,11 @@ export function IrisChat({
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages.length, messages[messages.length - 1]?.content, busy]);
 
-  // Auto-focus the composer on mount.
+  // Auto-focus the composer on mount. preventScroll so opening inside a
+  // fixed/transformed overlay (Cere's Poof wrapper) doesn't scroll the page
+  // down to the off-flow input.
   useEffect(() => {
-    const t = setTimeout(() => textareaRef.current?.focus(), 80);
+    const t = setTimeout(() => textareaRef.current?.focus({ preventScroll: true }), 80);
     return () => clearTimeout(t);
   }, []);
 
