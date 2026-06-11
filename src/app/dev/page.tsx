@@ -84,10 +84,11 @@ export default function DevConsolePage() {
     return () => clearTimeout(id);
   }, [loading]);
 
-  // ⌘K (the main-site Iris is suppressed on /dev) opens Cere instead.
+  // ⌘K (the main-site Iris is suppressed on /dev) opens Cere instead. Ignore
+  // Shift so ⌘⇧K stays reserved for the portal twin and doesn't also open Cere.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setComposerOpen((o) => !o);
       }

@@ -108,6 +108,7 @@ export function useCere(onApplied: () => void) {
           if (a.status) patch.status = a.status;
           if (a.size) patch.size = a.size;
           if (a.state) patch.state = a.state;
+          if (typeof a.body === 'string') patch.body = a.body;
           res = await fetch('/api/dev/issues', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },

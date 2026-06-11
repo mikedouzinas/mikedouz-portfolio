@@ -55,7 +55,9 @@ export const CREATE_ISSUE_TOOL: Anthropic.Tool = {
 export const UPDATE_ISSUE_TOOL: Anthropic.Tool = {
   name: 'update_issue',
   description:
-    'Propose changing an existing ticket (identified by repo + number from the board context). Set state to "closed" to mark it Done.',
+    'Propose changing an existing ticket (identified by repo + number from the board context). Set state to "closed" to mark it Done. ' +
+    'To edit the description or its checklist, pass the FULL new body in `body` — include the complete updated text, not just the delta (the existing body is shown to you in the board context). ' +
+    'Alternatively, pass `addSubtasks` to append new checklist items to the existing body without rewriting it.',
   input_schema: {
     type: 'object' as const,
     required: ['repo', 'number'],
@@ -66,6 +68,17 @@ export const UPDATE_ISSUE_TOOL: Anthropic.Tool = {
       status: { type: 'string', enum: ['todo', 'in progress'] },
       size: { type: 'string', enum: ['S', 'M', 'L'] },
       state: { type: 'string', enum: ['open', 'closed'] },
+      body: {
+        type: 'string',
+        description:
+          'The complete replacement description/body (Markdown, may include a `- [ ]` checklist). Use for any edit to the existing description or subtasks.',
+      },
+      addSubtasks: {
+        type: 'array',
+        items: { type: 'string' },
+        description:
+          'New checklist items to append as `- [ ]` lines to the existing body. Use this instead of `body` when only adding subtasks.',
+      },
     },
   },
 };
@@ -87,6 +100,8 @@ const UpdateInput = z.object({
   status: STATUS.optional(),
   size: SIZE.optional(),
   state: z.enum(['open', 'closed']).optional(),
+  body: z.string().optional(),
+  addSubtasks: z.array(z.string()).optional(),
 });
 
 /** Normalized, client-facing proposed mutations. */
@@ -109,6 +124,10 @@ export type CereAction =
       status?: Status;
       size?: Size;
       state?: 'open' | 'closed';
+      /** Full replacement body when the description/subtasks change. */
+      body?: string;
+      /** The ticket's current body, captured so the client can render a diff. */
+      bodyBefore?: string;
     };
 
 /** System prompt: who Cere is + the live board context to ground its calls. */
@@ -116,10 +135,18 @@ export function buildCereSystem(repos: DevRepo[], issues: DevIssue[]): string {
   const repoLines = repos.map((r) => `- ${r.slug} (${r.name})`).join('\n');
   const open = issues.filter((i) => i.state === 'open');
   const issueLines = open
-    .map(
-      (i) =>
-        `- #${i.number} [${i.repo}] (${i.priority ?? 'p3'}/${i.status ?? 'todo'}/${i.size ?? 'M'}) ${i.title}`,
-    )
+    .map((i) => {
+      const head = `- #${i.number} [${i.repo}] (${i.priority ?? 'p3'}/${i.status ?? 'todo'}/${i.size ?? 'M'}) ${i.title}`;
+      // Include the current body (indented) so Cere can compose a complete
+      // replacement when asked to edit a description or its checklist.
+      const body = i.body?.trim();
+      if (!body) return head;
+      const indented = body
+        .split('\n')
+        .map((l) => `    ${l}`)
+        .join('\n');
+      return `${head}\n${indented}`;
+    })
     .join('\n');
 
   return `You are Cere, the filing assistant for THE HARLEQUIN — Mike's private dev board, built on GitHub Issues.
@@ -140,8 +167,15 @@ ${issueLines || '(none)'}
 When Mike doesn't name a repo, default to ${repos[0]?.slug ?? '(none)'} (his portfolio).`;
 }
 
-/** Parse Claude's response blocks into a reply + validated proposed actions. */
-export function parseActions(content: Anthropic.ContentBlock[]): {
+/**
+ * Parse Claude's response blocks into a reply + validated proposed actions.
+ * `issues` is the live board so update actions that touch the body can capture
+ * the ticket's current `bodyBefore` for a client-side diff.
+ */
+export function parseActions(
+  content: Anthropic.ContentBlock[],
+  issues: DevIssue[] = [],
+): {
   reply: string;
   actions: CereAction[];
   warnings: string[];
@@ -149,6 +183,7 @@ export function parseActions(content: Anthropic.ContentBlock[]): {
   let reply = '';
   const actions: CereAction[] = [];
   const warnings: string[] = [];
+  const issueByKey = new Map(issues.map((i) => [`${i.repo}#${i.number}`, i]));
 
   for (const block of content) {
     if (block.type === 'text') {
@@ -169,7 +204,28 @@ export function parseActions(content: Anthropic.ContentBlock[]): {
         warnings.push(`Skipped a malformed change.`);
         continue;
       }
-      actions.push({ kind: 'update', ...parsed.data });
+      const { body, addSubtasks, ...rest } = parsed.data;
+      const current = issueByKey.get(`${rest.repo}#${rest.number}`);
+      const before = current?.body ?? '';
+
+      // Resolve the final body: an explicit full replacement wins; otherwise,
+      // appending subtasks builds the new body from the current one.
+      let nextBody: string | undefined;
+      if (typeof body === 'string') {
+        nextBody = body;
+      } else if (addSubtasks && addSubtasks.length > 0) {
+        const checklist = addSubtasks.map((s) => `- [ ] ${s}`).join('\n');
+        nextBody = before.trim() ? `${before.trimEnd()}\n${checklist}` : checklist;
+      }
+
+      const action: Extract<CereAction, { kind: 'update' }> = { kind: 'update', ...rest };
+      // Only attach body fields when the body actually changes — keeps
+      // metadata-only updates (priority/size/state) clean.
+      if (nextBody !== undefined && nextBody !== before) {
+        action.body = nextBody;
+        action.bodyBefore = before;
+      }
+      actions.push(action);
     }
   }
 

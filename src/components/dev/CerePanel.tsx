@@ -1,14 +1,16 @@
 'use client';
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { X } from 'lucide-react';
 import type { CereAction } from '@/lib/dev/cere';
 import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
 import { Button } from '@/components/ui/Button';
 import { CereMark } from './CereMark';
 import { CereGameLoader } from './CereGameLoader';
+import { BodyDiff } from './BodyDiff';
 import { IrisBubble } from '@/components/iris/IrisBubble';
-import { IrisChat } from '@/components/iris/IrisChat';
+import { IrisChat, type IrisChatHandle } from '@/components/iris/IrisChat';
+import { Poof } from './Poof';
 import { useCere } from './useCere';
 
 const WIDTH = 440;
@@ -46,6 +48,8 @@ function ActionRow({ action }: { action: CereAction }) {
   if (action.priority) changes.push(PRIORITY_META[action.priority].short);
   if (action.status) changes.push(STATUS_META[action.status].label);
   if (action.size) changes.push(`size ${action.size}`);
+  const bodyChanged = typeof action.body === 'string';
+  if (bodyChanged) changes.push('edit description');
   return (
     <li className="rounded-lg border border-sky-400/20 bg-sky-500/[0.06] p-2.5 text-sm">
       <div className="mb-1 flex items-center gap-2 text-[11px] text-white/55">
@@ -55,6 +59,7 @@ function ActionRow({ action }: { action: CereAction }) {
         </span>
       </div>
       <p className="text-white/90">{changes.join(' · ') || 'no change'}</p>
+      {bodyChanged && <BodyDiff before={action.bodyBefore ?? ''} after={action.body ?? ''} />}
     </li>
   );
 }
@@ -77,12 +82,41 @@ export function CerePanel({
   const { messages, busy, applying, actions, warnings, send, confirm, discard, reset } =
     useCere(onApplied);
   const [isMobile, setIsMobile] = useState(false);
+  const [showDiscard, setShowDiscard] = useState(false);
   const bubbleRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<IrisChatHandle>(null);
+  // Live (untrimmed) composer text — non-empty means an unsent draft we must
+  // guard before dismissing.
+  const inputRef = useRef('');
+
+  // Confirm before dismissing if there's a conversation in progress OR unsent
+  // text in the composer; otherwise close immediately. Mirrors Blog Iris's
+  // close-confirmation UX, extended with the dirty-input guard.
+  const isDirty = useCallback(
+    () => messages.length > 0 || inputRef.current.trim().length > 0,
+    [messages.length],
+  );
+
+  const attemptClose = useCallback(() => {
+    if (isDirty()) setShowDiscard(true);
+    else onClose();
+  }, [isDirty, onClose]);
 
   // Fresh conversation each open.
   useEffect(() => {
-    if (!open) reset();
+    if (!open) {
+      reset();
+      setShowDiscard(false);
+      inputRef.current = '';
+    }
   }, [open, reset]);
+
+  // Auto-dismiss the discard confirmation after 3s (matches Blog Iris).
+  useEffect(() => {
+    if (!showDiscard) return;
+    const t = setTimeout(() => setShowDiscard(false), 3000);
+    return () => clearTimeout(t);
+  }, [showDiscard]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -96,10 +130,10 @@ export function CerePanel({
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') attemptClose();
     };
     const onDown = (e: MouseEvent) => {
-      if (bubbleRef.current && !bubbleRef.current.contains(e.target as Node)) onClose();
+      if (bubbleRef.current && !bubbleRef.current.contains(e.target as Node)) attemptClose();
     };
     window.addEventListener('keydown', onKey);
     const t = setTimeout(() => document.addEventListener('mousedown', onDown), 100);
@@ -108,23 +142,28 @@ export function CerePanel({
       clearTimeout(t);
       document.removeEventListener('mousedown', onDown);
     };
-  }, [open, onClose]);
+  }, [open, attemptClose]);
 
-  if (!open) return null;
+  // Keep rendering through the close animation: Poof owns mount/unmount, so we
+  // can't early-return on !open or the exit "poof" never plays. SSR renders
+  // nothing (Poof's show is false until the client opens it).
+  const hasWindow = typeof window !== 'undefined';
 
-  const style: CSSProperties | undefined = isMobile
-    ? undefined
-    : {
-        position: 'fixed',
-        top: Math.max(16, (window.innerHeight - MAX_HEIGHT) / 2),
-        left: (window.innerWidth - WIDTH) / 2,
-        width: WIDTH,
-        maxHeight: MAX_HEIGHT,
-        zIndex: 50,
-      };
+  const style: CSSProperties | undefined =
+    isMobile || !hasWindow
+      ? undefined
+      : {
+          position: 'fixed',
+          top: Math.max(16, (window.innerHeight - MAX_HEIGHT) / 2),
+          left: (window.innerWidth - WIDTH) / 2,
+          width: WIDTH,
+          maxHeight: MAX_HEIGHT,
+          zIndex: 50,
+        };
 
   return (
-    <IrisBubble ref={bubbleRef} mobile={isMobile} expanded tone="champagne" style={style}>
+    <Poof show={open} enter={false} color="231, 226, 212" className="fixed inset-0 z-50 pointer-events-none">
+    <IrisBubble ref={bubbleRef} mobile={isMobile} expanded tone="champagne" noEnterAnim className="pointer-events-auto" style={isMobile ? undefined : { ...style, position: 'absolute' }}>
       <div
         className="flex flex-col"
         style={{ height: isMobile ? undefined : MAX_HEIGHT - BUBBLE_INSET }}
@@ -134,15 +173,48 @@ export function CerePanel({
           <button
             type="button"
             aria-label="Close"
-            onClick={onClose}
+            onClick={attemptClose}
             className="grid h-6 w-6 place-items-center rounded-md text-white/50 transition-colors hover:bg-white/10 hover:text-white"
           >
             <X className="h-3.5 w-3.5" />
           </button>
         </div>
 
+        {/* Dismiss confirmation — shown when closing with a conversation or an
+            unsent draft. Cancel restores the composer; Discard closes cleanly. */}
+        {showDiscard && (
+          <div className="mb-3 flex items-center justify-between rounded-lg bg-white/[0.06] px-2.5 py-2">
+            <span className="text-[11px] text-white/55">Discard this conversation?</span>
+            <div className="flex gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDiscard(false);
+                  chatRef.current?.focusInput();
+                }}
+                className="rounded px-1.5 py-0.5 text-[11px] text-white/45 transition-colors hover:text-white/80"
+              >
+                Keep
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded px-1.5 py-0.5 text-[11px] text-red-400/80 transition-colors hover:text-red-400"
+              >
+                Discard
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex min-h-0 flex-1 flex-col">
           <IrisChat
+            handleRef={chatRef}
+            onInputChange={(v) => {
+              inputRef.current = v;
+              // Typing again after a stale prompt should clear it.
+              if (v.trim() && showDiscard) setShowDiscard(false);
+            }}
             messages={messages}
             busy={busy}
             onSend={send}
@@ -193,5 +265,6 @@ export function CerePanel({
         </div>
       </div>
     </IrisBubble>
+    </Poof>
   );
 }

@@ -34,9 +34,14 @@ export const IrisBubble = forwardRef<
     tone?: keyof typeof GLASS;
     style?: CSSProperties;
     className?: string;
+    /** Suppress the built-in `iris-hud-enter` scale-in. Use when an outer
+     *  wrapper (e.g. <Poof>) owns the open/close animation, to avoid
+     *  double-animating. */
+    noEnterAnim?: boolean;
   }
->(function IrisBubble({ children, mobile, expanded, tone = 'teal', style, className = '' }, ref) {
+>(function IrisBubble({ children, mobile, expanded, tone = 'teal', style, className = '', noEnterAnim = false }, ref) {
   const glass = GLASS[tone];
+  const enter = noEnterAnim ? '' : 'iris-hud-enter';
   const glow = <ContainedMouseGlow color={GLOW[tone]} intensity={0.15} size={320} />;
   // On /dev, keep the board's argyle reveal from blooming behind Cere's glass —
   // the panel gets its own contained glow instead. (No-op off /dev.)
@@ -46,7 +51,7 @@ export const IrisBubble = forwardRef<
       <div
         ref={ref}
         {...suppressReveal}
-        className={`iris-hud-enter fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl ${glass} p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-4px_24px_rgba(0,0,0,0.3)] ${className}`}
+        className={`${enter} fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl ${glass} p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-4px_24px_rgba(0,0,0,0.3)] ${className}`}
       >
         {glow}
         <div className="relative mb-3 flex justify-center">
@@ -63,7 +68,7 @@ export const IrisBubble = forwardRef<
       data-has-contained-glow="true"
       {...suppressReveal}
       style={style}
-      className={`iris-hud-enter ${glass} overflow-y-auto rounded-2xl transition-[top,left,width,max-height,padding,box-shadow] duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      className={`${enter} ${glass} overflow-y-auto rounded-2xl transition-[top,left,width,max-height,padding,box-shadow] duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
         expanded
           ? 'p-5 shadow-[0_0_80px_40px_rgba(0,0,0,0.35),0_4px_24px_rgba(0,0,0,0.25)]'
           : 'p-3.5 shadow-[0_8px_48px_rgba(0,0,0,0.65),0_2px_12px_rgba(0,0,0,0.4)]'

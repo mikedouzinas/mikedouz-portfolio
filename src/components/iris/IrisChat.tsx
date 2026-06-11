@@ -1,6 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import {
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+  type Ref,
+} from 'react';
 import ReactMarkdown from 'react-markdown';
 
 export interface IrisMessage {
@@ -14,6 +22,12 @@ export interface IrisMessage {
  * via `accent` (send button) and slot extra UI between the list and the
  * composer with `belowMessages`. Used by Cere and the blog assistant.
  */
+/** Imperative handle for parents that need to focus the composer (e.g. after a
+ *  cancelled close-confirmation). */
+export interface IrisChatHandle {
+  focusInput: () => void;
+}
+
 export function IrisChat({
   messages,
   busy = false,
@@ -26,6 +40,8 @@ export function IrisChat({
   accent = '52, 211, 153',
   sendVariant = 'plain',
   className = '',
+  onInputChange,
+  handleRef,
 }: {
   messages: IrisMessage[];
   busy?: boolean;
@@ -41,19 +57,39 @@ export function IrisChat({
   /** 'harlequin' = Google-palette diamond send button; 'plain' = solid accent. */
   sendVariant?: 'plain' | 'harlequin';
   className?: string;
+  /** Notified with the live (untrimmed) composer value — lets a parent guard
+   *  dismissal when there's unsent text. */
+  onInputChange?: (value: string) => void;
+  /** Imperative handle to focus the composer (used to restore focus after a
+   *  cancelled close-confirmation). */
+  handleRef?: Ref<IrisChatHandle>;
 }) {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useImperativeHandle(handleRef, () => ({
+    // preventScroll: focusing inside a fixed/transformed overlay (e.g. Cere's
+    // Poof wrapper) must not scroll the page to chase the off-flow input.
+    focusInput: () => textareaRef.current?.focus({ preventScroll: true }),
+  }), []);
+
+  // Update the input and notify the parent (for dirty-input dismissal guards).
+  function updateInput(value: string) {
+    setInput(value);
+    onInputChange?.(value);
+  }
 
   // Auto-scroll as content streams in.
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages.length, messages[messages.length - 1]?.content, busy]);
 
-  // Auto-focus the composer on mount.
+  // Auto-focus the composer on mount. preventScroll so opening inside a
+  // fixed/transformed overlay (Cere's Poof wrapper) doesn't scroll the page
+  // down to the off-flow input.
   useEffect(() => {
-    const t = setTimeout(() => textareaRef.current?.focus(), 80);
+    const t = setTimeout(() => textareaRef.current?.focus({ preventScroll: true }), 80);
     return () => clearTimeout(t);
   }, []);
 
@@ -71,7 +107,7 @@ export function IrisChat({
     const trimmed = input.trim();
     if (!trimmed || busy) return;
     onSend(trimmed);
-    setInput('');
+    updateInput('');
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -139,7 +175,7 @@ export function IrisChat({
         <textarea
           ref={textareaRef}
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => updateInput(e.target.value)}
           onKeyDown={onKeyDown}
           maxLength={4000}
           placeholder={placeholder}
