@@ -404,8 +404,10 @@ export default function IrisButton() {
       // Cmd+K (Mac) or Ctrl+K (Windows/Linux) to toggle palette and start appropriate animation
       const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
       const modifierPressed = isMac ? event.metaKey : event.ctrlKey;
-      
-      if (modifierPressed && event.key === 'k') {
+
+      // ⌘⇧K is reserved for the dev portal (DevPortal #12). Guard against Shift so
+      // plain ⌘K opens Iris but ⌘⇧K does not (it falls through to the portal only).
+      if (modifierPressed && !event.shiftKey && event.code === 'KeyK') {
         
         if (!isAnimating.current) {
           event.preventDefault();
