@@ -120,8 +120,8 @@ function SizeChip({ size }: { size: Size }) {
 // The detached panel is noticeably wider than the inline card and tall enough
 // for a full description — the same centered, elevated treatment as the Cere /
 // blog-Iris panels, just larger.
-const DETACHED_WIDTH = 640; // inline cards sit at ~320–360px in the 3-col grid
-const DETACHED_MAX_HEIGHT_VH = 82; // cap so a long ticket scrolls inside the panel
+const DETACHED_WIDTH = 800; // inline cards sit at ~320–360px in the 3-col grid; this zooms in closer
+const DETACHED_MAX_HEIGHT_VH = 90; // cap so a long ticket scrolls inside the panel; short tickets size to content
 
 function IssueCard({
   issue,
