@@ -1,9 +1,10 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { Check, CheckSquare, ChevronDown, Copy, Pencil, Square, X } from 'lucide-react';
+import { Check, CheckSquare, Copy, Maximize2, Minimize2, Pencil, Square, X } from 'lucide-react';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import type { DevIssue, DevRepo, Priority, Size, Status } from '@/lib/dev/github';
 import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
@@ -116,6 +117,12 @@ function SizeChip({ size }: { size: Size }) {
   );
 }
 
+// The detached panel is noticeably wider than the inline card and tall enough
+// for a full description — the same centered, elevated treatment as the Cere /
+// blog-Iris panels, just larger.
+const DETACHED_WIDTH = 800; // inline cards sit at ~320–360px in the 3-col grid; this zooms in closer
+const DETACHED_MAX_HEIGHT_VH = 90; // cap so a long ticket scrolls inside the panel; short tickets size to content
+
 function IssueCard({
   issue,
   repoName,
@@ -125,13 +132,12 @@ function IssueCard({
   repoName: string;
   onPatch: (issue: DevIssue, body: PatchBody) => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const [showDetail, setShowDetail] = useState(false); // mounted through the close tween, then dropped
-  const [dropUp, setDropUp] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  // Once fully expanded we drop overflow:hidden so the action dropdowns can
-  // escape the card; while animating/collapsed it stays clipped for the height tween.
-  const [overflowVisible, setOverflowVisible] = useState(false);
+  const [open, setOpen] = useState(false); // true === detached + centered
+  // The vacated-slot placeholder lives on its own flag so it can OUTLAST the
+  // collapse: it stays mounted while the card morphs back and only unmounts
+  // once the inline card's layout animation lands (onLayoutAnimationComplete).
+  const [placeholderVisible, setPlaceholderVisible] = useState(false);
+  const [mounted, setMounted] = useState(false); // portal target ready (client only)
   const [addText, setAddText] = useState('');
   const [copiedSub, setCopiedSub] = useState<number | null>(null);
   const [editing, setEditing] = useState(false);
@@ -150,22 +156,42 @@ function IssueCard({
   const prog = subtaskProgress(issue.body);
   const prose = stripSubtasks(issue.body); // description without the checklist lines
 
-  // The card lifts out of its slot (absolute) so neighbors don't reflow. For the
-  // bottom row that would overflow past the workpad backdrop, so when there isn't
-  // room below we anchor to the slot's bottom and grow upward instead.
-  function toggle() {
-    if (!open) {
-      if (slotRef.current) {
-        const { top } = slotRef.current.getBoundingClientRect();
-        const ESTIMATED_EXPANDED = 420; // header + title + body + subtasks + actions
-        setDropUp(window.innerHeight - top < ESTIMATED_EXPANDED);
-      }
-      setShowDetail(true);
-      setOpen(true);
-    } else {
-      setOverflowVisible(false); // re-clip before collapsing so the tween stays clean
-      setOpen(false); // keep the detail mounted so the collapse animates; drop it on complete
-    }
+  // Stable shared-layout id: framer animates the SAME card between its inline
+  // slot and the detached centered panel, so the morph reads as one element
+  // lifting out and flying back — the detach effect.
+  const layoutId = `ticket-${issue.repo}-${issue.number}`;
+
+  useEffect(() => setMounted(true), []);
+
+  // Lock body scroll while a ticket is detached so the centered panel is the
+  // sole focus (and the backdrop scrim can't be scrolled past).
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  // Esc collapses the detached panel back into its slot.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') collapse();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function detach() {
+    setPlaceholderVisible(true); // show the placeholder immediately on detach
+    setOpen(true);
+  }
+  function collapse() {
+    // Keep the placeholder up; it's cleared by the inline card's
+    // onLayoutAnimationComplete once the card has contracted back into its slot.
+    setOpen(false);
   }
 
   async function copySubtask(text: string, index: number) {
@@ -219,78 +245,56 @@ function IssueCard({
     setEditing(false);
   }
 
-  return (
-    // Fixed-height slot keeps the grid/lane uniform; the card lifts out of it on
-    // expand. Lift the whole slot above siblings while active so the overflowing
-    // card never paints under the ticket below it.
-    <div ref={slotRef} className={`relative h-32 ${showDetail || hovered ? 'z-30' : ''}`}>
-      <motion.div
-        // framer animates the actual height (CSS can't tween to auto), so open/
-        // close slide. Collapsed, a hover previews the status tint + a slight
-        // lift — the same Spotify-style reaction as the buttons and the expand.
-        data-suppress-reveal
-        data-has-contained-glow="true"
-        initial={false}
-        animate={{
-          height: open ? 'auto' : 128,
-          backgroundColor: open || hovered ? tint.bg : 'rgba(12, 17, 24, 0.52)',
-          borderColor: open || hovered ? tint.border : 'rgba(255, 255, 255, 0.10)',
-          scale: open || hovered ? 1.02 : 1,
-        }}
-        transition={{ duration: 0.2, ease: 'easeOut' }}
-        onAnimationComplete={() => {
-          if (!open) setShowDetail(false);
-          else setOverflowVisible(true); // let the dropdowns spill out of the card
-        }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={{ transformOrigin: dropUp ? 'bottom' : 'top' }}
-        className={`absolute inset-x-0 cursor-pointer rounded-xl border backdrop-blur-md ${
-          overflowVisible ? 'overflow-visible' : 'overflow-hidden'
-        } ${dropUp ? 'bottom-0' : 'top-0'} ${
-          showDetail || hovered ? 'shadow-2xl shadow-black/60' : ''
-        } ${closed && !open ? 'opacity-70' : ''}`}
-      >
-        {/* Cursor-following light contained to the ticket — the harlequin's
-            confined "lighting up", distinct from the board's argyle reveal. */}
-        <ContainedMouseGlow color="231, 226, 212" intensity={0.16} size={220} />
-        <button onClick={toggle} className="relative z-10 block w-full p-4 text-left">
-          <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
-            <span style={{ color: pr.color }}>{pr.short}</span>
-            <span className="inline-flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: st.color }} />
-              {st.label}
-            </span>
-            <SizeChip size={size} />
-            <span className="ml-auto truncate">
-              {repoName} #{issue.number}
-            </span>
-            <ChevronDown
-              className={`h-3.5 w-3.5 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
-            />
-          </div>
-          {/* In edit mode the title is shown as an input below, so suppress the
-              static title + progress here to avoid a duplicate header. */}
-          {!editing && (
-            <>
-              <p
-                className={`font-medium leading-snug ${
-                  closed ? 'text-white/55 line-through' : 'text-white/90'
-                } ${open ? '' : 'line-clamp-2'}`}
-              >
-                {issue.title}
-              </p>
-              {prog.total > 0 && (
-                <p className="mt-1 text-[11px] text-white/35">
-                  {prog.done}/{prog.total} subtasks
-                </p>
-              )}
-            </>
+  // The card header — the always-visible summary. Shared between the inline
+  // (collapsed) card and the top of the detached panel. `detached` widens the
+  // title to a single line and swaps the expand glyph for a "collapse" one.
+  const header = (detached: boolean) => (
+    <button
+      onClick={detached ? collapse : detach}
+      className={`relative z-10 block w-full p-4 text-left ${detached ? 'pr-12' : ''}`}
+    >
+      <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
+        <span style={{ color: pr.color }}>{pr.short}</span>
+        <span className="inline-flex items-center gap-1">
+          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: st.color }} />
+          {st.label}
+        </span>
+        <SizeChip size={size} />
+        <span className="ml-auto truncate">
+          {repoName} #{issue.number}
+        </span>
+        {detached ? (
+          <Minimize2 className="h-3.5 w-3.5 shrink-0" aria-label="Collapse ticket" />
+        ) : (
+          <Maximize2 className="h-3.5 w-3.5 shrink-0" aria-label="Expand ticket" />
+        )}
+      </div>
+      {/* In edit mode the title is shown as an input below, so suppress the
+          static title + progress here to avoid a duplicate header. */}
+      {!editing && (
+        <>
+          <p
+            className={`font-medium leading-snug ${
+              closed ? 'text-white/55 line-through' : 'text-white/90'
+            } ${detached ? 'text-base' : 'line-clamp-2'}`}
+          >
+            {issue.title}
+          </p>
+          {prog.total > 0 && (
+            <p className="mt-1 text-[11px] text-white/35">
+              {prog.done}/{prog.total} subtasks
+            </p>
           )}
-        </button>
+        </>
+      )}
+    </button>
+  );
 
-        {showDetail &&
-          (editing ? (
+  // The expanded detail — description, checklist, action row (or the edit
+  // draft). Only ever rendered inside the detached centered panel.
+  const detail = (
+    <>
+      {editing ? (
             // EDIT MODE — a self-contained draft. Nothing persists until Save, so
             // a stray board reload can't wipe an in-progress edit. No status/Done
             // controls here: editing is about content (title, description, tasks).
@@ -372,10 +376,10 @@ function IssueCard({
                 </div>
               </div>
             </div>
-          ) : (
-            // VIEW MODE — rendered description, toggleable checklist, action row.
-            <div className="relative z-10 px-4 pb-4" aria-hidden={!open}>
-              {prose && (
+      ) : (
+        // VIEW MODE — rendered description, toggleable checklist, action row.
+        <div className="relative z-10 px-4 pb-4">
+          {prose && (
                 <div className="dev-markdown mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-sm leading-relaxed text-white/70">
                   <IssueBodyMarkdown>{prose}</IssueBodyMarkdown>
                 </div>
@@ -423,14 +427,8 @@ function IssueCard({
                     </ul>
                   </>
                 )}
-                <form onSubmit={submitSubtask}>
-                  <input
-                    value={addText}
-                    onChange={(e) => setAddText(e.target.value)}
-                    placeholder="add subtask…"
-                    className="w-full rounded-md border border-white/10 bg-white/[0.02] px-2.5 py-1.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-white/25"
-                  />
-                </form>
+                {/* Adding a subtask is gated behind Edit mode — only checkbox
+                    toggling and per-subtask copy are available in view mode. */}
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -490,8 +488,128 @@ function IssueCard({
                 )}
               </div>
             </div>
-          ))}
-      </motion.div>
+      )}
+    </>
+  );
+
+  return (
+    // Fixed-height slot keeps the grid/lane uniform. While detached, the slot
+    // holds a styled placeholder so neighbours don't reflow — the card itself
+    // has flown out to the centered panel (rendered in a portal below).
+    <div ref={slotRef} className="relative h-32">
+      {placeholderVisible && (
+        // PLACEHOLDER — the vacated slot. A dashed champagne outline with a
+        // little "Be right back." note + a softly pulsing dot, so the gap reads
+        // as intentional ("this ticket stepped out") rather than broken.
+        // Driven by `placeholderVisible` (NOT `open`) so it persists through the
+        // collapse and only vanishes when the card has landed back in its slot.
+        // No z-index: it sits behind the morphing inline card (later in the DOM)
+        // so the card animating home reads clearly on top of the placeholder.
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e7e2d4]/20 bg-white/[0.015] text-center">
+          <motion.span
+            aria-hidden
+            className="h-1.5 w-1.5 rounded-full bg-[#e7e2d4]/50"
+            animate={{ opacity: [0.25, 0.9, 0.25], scale: [0.85, 1.15, 0.85] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <span className="text-[11px] italic text-[#e7e2d4]/45">Be right back.</span>
+          <span className="text-[10px] text-white/25">
+            {repoName} #{issue.number}
+          </span>
+        </div>
+      )}
+      {!open && (
+        // INLINE CARD — collapsed summary, sitting in the slot. layoutId ties it
+        // to the detached panel so the expand morphs the same element forward.
+        // It renders after the placeholder in the DOM, so while collapsing it
+        // animates home ON TOP of the still-visible placeholder, which only
+        // unmounts once this card's layout animation lands.
+        <motion.div
+          layoutId={layoutId}
+          data-suppress-reveal
+          data-has-contained-glow="true"
+          initial={false}
+          onLayoutAnimationComplete={() => {
+            // The card finished morphing. If we're collapsed, it has now
+            // contracted into its slot — drop the placeholder exactly here.
+            if (!open) setPlaceholderVisible(false);
+          }}
+          whileHover={{
+            scale: 1.02,
+            backgroundColor: tint.bg,
+            borderColor: tint.border,
+          }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          style={{
+            backgroundColor: 'rgba(12, 17, 24, 0.52)',
+            borderColor: 'rgba(255, 255, 255, 0.10)',
+          }}
+          className={`absolute inset-x-0 top-0 h-32 cursor-pointer overflow-hidden rounded-xl border backdrop-blur-md hover:shadow-2xl hover:shadow-black/60 ${
+            closed ? 'opacity-70' : ''
+          }`}
+        >
+          {/* Cursor-following light contained to the ticket — the harlequin's
+              confined "lighting up", distinct from the board's argyle reveal. */}
+          <ContainedMouseGlow color="231, 226, 212" intensity={0.16} size={220} />
+          {header(false)}
+        </motion.div>
+      )}
+
+      {/* DETACHED PANEL — portalled to <body> so it escapes the lane's overflow
+          and stacking context, centered + enlarged over an invisible click-catch
+          (no dimming). Same centered-elevated treatment as Cere / blog-Iris, wider. */}
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                key={layoutId}
+                className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto p-4 sm:p-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {/* Invisible click-catch — collapse on outside click without
+                    darkening the board behind the panel. */}
+                <button
+                  type="button"
+                  aria-label="Close ticket"
+                  onClick={collapse}
+                  className="absolute inset-0 cursor-default"
+                />
+                <motion.div
+                  layoutId={layoutId}
+                  data-suppress-reveal
+                  data-has-contained-glow="true"
+                  style={{
+                    width: '100%',
+                    maxWidth: DETACHED_WIDTH,
+                    maxHeight: `${DETACHED_MAX_HEIGHT_VH}vh`,
+                    backgroundColor: tint.bg,
+                    borderColor: tint.border,
+                  }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="relative z-10 my-auto overflow-y-auto rounded-2xl border shadow-[0_0_80px_40px_rgba(0,0,0,0.45),0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl"
+                >
+                  <ContainedMouseGlow color="231, 226, 212" intensity={0.16} size={320} />
+                  {/* Explicit close affordance (Esc / scrim also work). */}
+                  <button
+                    type="button"
+                    aria-label="Collapse ticket"
+                    onClick={collapse}
+                    className="absolute right-3 top-3 z-20 grid h-7 w-7 place-items-center rounded-md text-white/50 transition-colors hover:bg-white/10 hover:text-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  {header(true)}
+                  {detail}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
     </div>
   );
 }
