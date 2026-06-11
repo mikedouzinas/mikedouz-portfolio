@@ -9,6 +9,7 @@ import { GroupByToggle } from '@/components/dev/GroupByToggle';
 import { GearMenu } from '@/components/dev/GearMenu';
 import { CerePortal } from '@/components/dev/CerePortal';
 import { CerePanel } from '@/components/dev/CerePanel';
+import { CereGameLoader } from '@/components/dev/CereGameLoader';
 import { HarlequinReveal } from '@/components/dev/HarlequinReveal';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
@@ -25,6 +26,9 @@ export default function DevConsolePage() {
   const [issues, setIssues] = useState<DevIssue[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  // Keeps the loader mounted through its fade-out after `loading` flips false,
+  // so the board crossfades in cleanly instead of hard-cutting (ticket #56).
+  const [showLoader, setShowLoader] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
   const [managing, setManaging] = useState(false);
   const [groupBy, setGroupBy] = useState<GroupBy>('status');
@@ -68,6 +72,17 @@ export default function DevConsolePage() {
   useEffect(() => {
     loadIssues();
   }, [loadIssues]);
+
+  // Mount the loader immediately when loading starts; keep it mounted for one
+  // fade duration after loading ends so it can fade out over the board.
+  useEffect(() => {
+    if (loading) {
+      setShowLoader(true);
+      return;
+    }
+    const id = setTimeout(() => setShowLoader(false), 300);
+    return () => clearTimeout(id);
+  }, [loading]);
 
   // ⌘K (the main-site Iris is suppressed on /dev) opens Cere instead.
   useEffect(() => {
@@ -159,17 +174,40 @@ export default function DevConsolePage() {
 
       <main className="relative z-10 mx-auto max-w-6xl px-6 py-6">
         <p className="mb-4 text-[11px] uppercase tracking-[0.2em] text-[#e7e2d4]/55">
-          {loading ? 'Loading…' : `${openCount} open`}
+          {loading ? ' ' : `${openCount} open`}
         </p>
-        {!loading && (
-          <IssueList
-            issues={issues}
-            repos={repos}
-            groupBy={groupBy}
-            sort={sort}
-            onChanged={refreshIssues}
-          />
-        )}
+        {/*
+          Loader → board transition. The CereGameLoader plays a quick card game
+          whose winner frame ("one card per person" + a result tag) can be live
+          at the exact moment the board data arrives. A hard swap would flash
+          that winner frame for an instant before the board paints (ticket #56).
+          Instead: once data is ready the board fades in while the loader fades
+          out on top of it, so the cutover is clean regardless of which game
+          frame happens to be live. `showLoader` keeps the loader mounted for
+          the fade, then unmounts it.
+        */}
+        <div className={`relative ${showLoader ? 'min-h-[180px]' : ''}`}>
+          <div className={`transition-opacity duration-300 ${loading ? 'opacity-0' : 'opacity-100'}`}>
+            {!loading && (
+              <IssueList
+                issues={issues}
+                repos={repos}
+                groupBy={groupBy}
+                sort={sort}
+                onChanged={refreshIssues}
+              />
+            )}
+          </div>
+          {showLoader && (
+            <div
+              className={`absolute inset-0 flex justify-center py-16 transition-opacity duration-300 ${
+                loading ? 'opacity-100' : 'pointer-events-none opacity-0'
+              }`}
+            >
+              <CereGameLoader />
+            </div>
+          )}
+        </div>
       </main>
 
       <CerePanel
