@@ -33,9 +33,15 @@ const puffTransition: Transition = {
   ease: [0.22, 1, 0.36, 1],
 };
 
+// The resting (`visible`) state must leave NO `transform`/`filter` on the
+// wrapper: a non-`none` filter/transform on an ancestor disables descendant
+// `backdrop-filter`, which would strip the frost off Cere's glass and leave it
+// see-through. So `visible` resolves to `transform: none; filter: none`, and the
+// puff transforms/blurs live only in the `hidden`/`exit` states (during the
+// open/close motion, where the panel is fading anyway).
 const contentVariants = {
   hidden: { opacity: 0, scale: 0.82, filter: 'blur(6px)' },
-  visible: { opacity: 1, scale: 1, filter: 'blur(0px)' },
+  visible: { opacity: 1, scale: 1, filter: 'none' },
   exit: { opacity: 0, scale: 1.12, filter: 'blur(8px)' },
 };
 
@@ -75,6 +81,7 @@ export function Poof({
   children,
   color = '231, 226, 212',
   className = '',
+  enter = true,
 }: {
   /** When false, the content poofs out and unmounts after the exit animation. */
   show: boolean;
@@ -82,6 +89,14 @@ export function Poof({
   /** Particle tint as "R, G, B". Defaults to champagne (THE HARLEQUIN). */
   color?: string;
   className?: string;
+  /**
+   * When false, skip the open ("poof in") animation: the content mounts
+   * directly at rest (no entrance transform/filter, so descendant
+   * `backdrop-filter` keeps working) and only the close ("poof out") animation
+   * plays on unmount. Cere uses this — Mike kept the close poof but dropped the
+   * open one.
+   */
+  enter?: boolean;
 }) {
   const reduce = useReducedMotion();
 
@@ -94,19 +109,24 @@ export function Poof({
   const hasPosition = /\b(fixed|absolute|sticky|relative)\b/.test(className);
   const position = hasPosition ? '' : 'relative';
 
+  // Skip the opening animation when `enter` is false or reduced motion is on:
+  // `initial={false}` mounts the content straight at the `visible` (rest) state
+  // with no entrance transform/filter. The exit animation still plays.
+  const skipEnter = !enter || reduce;
+
   return (
     <AnimatePresence>
       {show && (
         <motion.div
           className={`${position} ${className}`.trim()}
           variants={contentVariants}
-          initial={reduce ? 'visible' : 'hidden'}
+          initial={skipEnter ? false : 'hidden'}
           animate="visible"
           exit={reduce ? 'visible' : 'exit'}
           transition={puffTransition}
-          style={{ willChange: 'transform, opacity, filter' }}
         >
-          {!reduce && <PoofParticles color={color} />}
+          {/* Opening particle burst only when an open animation is requested. */}
+          {enter && !reduce && <PoofParticles color={color} />}
           {children}
         </motion.div>
       )}

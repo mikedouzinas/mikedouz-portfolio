@@ -162,7 +162,7 @@ export function CerePanel({
         };
 
   return (
-    <Poof show={open} color="231, 226, 212" className="fixed inset-0 z-50 pointer-events-none">
+    <Poof show={open} enter={false} color="231, 226, 212" className="fixed inset-0 z-50 pointer-events-none">
     <IrisBubble ref={bubbleRef} mobile={isMobile} expanded tone="champagne" noEnterAnim className="pointer-events-auto" style={isMobile ? undefined : { ...style, position: 'absolute' }}>
       <div
         className="flex flex-col"
