@@ -422,7 +422,10 @@ html {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(231, 226, 212, 0.4);
+  opacity: 0;
+  transition: opacity 220ms ease;
 }
+.cere-bj-who.cere-bj-who-on { opacity: 1; }
 .cere-bj-hand { display: flex; gap: 4px; }
 .cere-bj-card {
   position: relative;

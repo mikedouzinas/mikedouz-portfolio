@@ -27,7 +27,7 @@ function decide(player: Card[], dealer: Card[]): Result {
 function Hand({ who, cards }: { who: string; cards: Card[] }) {
   return (
     <div className="cere-bj-side">
-      <span className="cere-bj-who">{who}</span>
+      <span className={`cere-bj-who ${cards.length ? 'cere-bj-who-on' : ''}`}>{who}</span>
       <div className="cere-bj-hand">
         {cards.map((c, i) => (
           <PlayingCard key={i} card={c} />

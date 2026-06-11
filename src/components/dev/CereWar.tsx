@@ -13,7 +13,7 @@ type Result = { tag: string; cls: string };
 function Slot({ who, card }: { who: string; card: Card | null }) {
   return (
     <div className="cere-bj-side">
-      <span className="cere-bj-who">{who}</span>
+      <span className={`cere-bj-who ${card ? 'cere-bj-who-on' : ''}`}>{who}</span>
       <div className="cere-bj-hand">{card && <PlayingCard card={card} />}</div>
     </div>
   );
