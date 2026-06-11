@@ -1,24 +1,16 @@
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { env } from '@/lib/env';
 import { getInboxMessages } from '@/lib/supabaseAdmin';
 import type { InboxMessage } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Admin page for viewing inbox messages
- * Gated by x-admin-key header
+ * Admin page for viewing inbox messages.
+ *
+ * Auth is enforced by the edge middleware (the dev_session cookie minted by the
+ * /dev portal login). The middleware 404s any request without a valid session
+ * before this component ever renders, so there is no key check here.
  */
 export default async function AdminInboxPage() {
-  // Check authentication
-  const headersList = await headers();
-  const adminKey = headersList.get('x-admin-key');
-  
-  if (!adminKey || adminKey !== env.adminApiKey) {
-    redirect('/'); // Redirect if not authenticated
-  }
-  
   // Fetch messages
   let messages: InboxMessage[] = [];
   let error: string | null = null;

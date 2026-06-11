@@ -47,6 +47,10 @@ export const env = {
   // ElevenLabs configuration (for audio listen feature)
   elevenLabsApiKey: process.env.ELEVENLABS_API_KEY || '',
   elevenLabsVoiceId: process.env.ELEVENLABS_VOICE_ID || '',
+
+  // Secret dev console
+  devConsolePasswordHash: process.env.DEV_CONSOLE_PASSWORD_HASH || '',
+  devSessionSecret: process.env.DEV_SESSION_SECRET || '',
 } as const;
 
 /**

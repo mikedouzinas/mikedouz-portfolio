@@ -41,25 +41,21 @@ export default function CommentSection({
   const [loading, setLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [adminKey, setAdminKey] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Admin key: check URL param (?admin=key) then localStorage
+  // Admin affordances (inline comment deletion) light up whenever the visitor
+  // holds a valid dev_session — the same portal login that unlocks /dev. The
+  // cookie is httpOnly, so we ask the auth endpoint instead of reading it.
+  // No more ?admin=key URL param or localStorage admin key.
   useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const urlKey = params.get('admin');
-      if (urlKey) {
-        localStorage.setItem('admin_key', urlKey);
-        setAdminKey(urlKey);
-        // Clean the URL so the key isn't visible/bookmarkable
-        const url = new URL(window.location.href);
-        url.searchParams.delete('admin');
-        window.history.replaceState({}, '', url.toString());
-      } else {
-        const stored = localStorage.getItem('admin_key');
-        if (stored) setAdminKey(stored);
-      }
-    } catch { /* SSR or no access */ }
+    let cancelled = false;
+    fetch('/api/dev/auth')
+      .then((res) => (res.ok ? res.json() : { authed: false }))
+      .then((data: { authed?: boolean }) => {
+        if (!cancelled) setIsAdmin(!!data.authed);
+      })
+      .catch(() => { /* not authed */ });
+    return () => { cancelled = true; };
   }, []);
 
   const fetchComments = useCallback(async () => {
@@ -98,11 +94,11 @@ export default function CommentSection({
   }
 
   async function handleDelete(commentId: string): Promise<boolean> {
-    if (!adminKey) return false;
+    if (!isAdmin) return false;
     try {
+      // Auth rides the dev_session cookie (sent automatically); no header.
       const res = await fetch(`/api/the-web/comments/${commentId}`, {
         method: 'DELETE',
-        headers: { 'x-admin-key': adminKey },
       });
       if (res.ok) {
         setComments((prev) =>
@@ -111,10 +107,9 @@ export default function CommentSection({
         return true;
       }
       console.error('[Comments] Delete returned', res.status);
-      if (res.status === 401) {
-        // Bad admin key — clear it
-        localStorage.removeItem('admin_key');
-        setAdminKey(null);
+      if (res.status === 401 || res.status === 404) {
+        // Session expired/absent — drop the admin affordances.
+        setIsAdmin(false);
       }
       return false;
     } catch (err) {
@@ -150,7 +145,7 @@ export default function CommentSection({
                 replyingTo={replyingTo}
                 postSlug={postSlug}
                 onCommentAdded={handleCommentAdded}
-                isAdmin={!!adminKey}
+                isAdmin={isAdmin}
                 onDelete={handleDelete}
               />
             ))}
