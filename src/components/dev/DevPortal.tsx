@@ -136,6 +136,7 @@ export function DevPortal() {
           >
             <motion.form
               onSubmit={submit}
+              autoComplete="off"
               initial={{ scale: 0.6, rotate: -8, opacity: 0 }}
               animate={{ scale: 1, rotate: 0, opacity: 1 }}
               exit={{ scale: 0.4, opacity: 0, filter: 'blur(8px)' }}
@@ -145,10 +146,14 @@ export function DevPortal() {
               <input
                 autoFocus
                 type="password"
+                id="dev-portal-code"
                 name="dev-portal-code"
-                autoComplete="new-password"
+                autoComplete="off"
                 data-1p-ignore
                 data-lpignore="true"
+                data-bwignore="true"
+                data-form-type="other"
+                aria-autocomplete="none"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="·····"
