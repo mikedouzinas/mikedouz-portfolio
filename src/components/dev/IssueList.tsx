@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { Check, CheckSquare, ChevronDown, Copy, Pencil, Square, X } from 'lucide-react';
+import { Check, CheckSquare, Copy, Maximize2, Minimize2, Pencil, Square, X } from 'lucide-react';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import type { DevIssue, DevRepo, Priority, Size, Status } from '@/lib/dev/github';
 import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
@@ -240,7 +240,7 @@ function IssueCard({
 
   // The card header — the always-visible summary. Shared between the inline
   // (collapsed) card and the top of the detached panel. `detached` widens the
-  // title to a single line and flips the chevron to "collapse".
+  // title to a single line and swaps the expand glyph for a "collapse" one.
   const header = (detached: boolean) => (
     <button
       onClick={detached ? collapse : detach}
@@ -256,9 +256,11 @@ function IssueCard({
         <span className="ml-auto truncate">
           {repoName} #{issue.number}
         </span>
-        <ChevronDown
-          className={`h-3.5 w-3.5 shrink-0 transition-transform ${detached ? 'rotate-180' : ''}`}
-        />
+        {detached ? (
+          <Minimize2 className="h-3.5 w-3.5 shrink-0" aria-label="Collapse ticket" />
+        ) : (
+          <Maximize2 className="h-3.5 w-3.5 shrink-0" aria-label="Expand ticket" />
+        )}
       </div>
       {/* In edit mode the title is shown as an input below, so suppress the
           static title + progress here to avoid a duplicate header. */}
@@ -418,14 +420,8 @@ function IssueCard({
                     </ul>
                   </>
                 )}
-                <form onSubmit={submitSubtask}>
-                  <input
-                    value={addText}
-                    onChange={(e) => setAddText(e.target.value)}
-                    placeholder="add subtask…"
-                    className="w-full rounded-md border border-white/10 bg-white/[0.02] px-2.5 py-1.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-white/25"
-                  />
-                </form>
+                {/* Adding a subtask is gated behind Edit mode — only checkbox
+                    toggling and per-subtask copy are available in view mode. */}
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -540,8 +536,8 @@ function IssueCard({
       )}
 
       {/* DETACHED PANEL — portalled to <body> so it escapes the lane's overflow
-          and stacking context, dimmed scrim behind, centered + enlarged. Same
-          centered-elevated treatment as the Cere / blog-Iris panels, wider. */}
+          and stacking context, centered + enlarged over an invisible click-catch
+          (no dimming). Same centered-elevated treatment as Cere / blog-Iris, wider. */}
       {mounted &&
         createPortal(
           <AnimatePresence>
@@ -554,12 +550,13 @@ function IssueCard({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                {/* Scrim — click to collapse. */}
+                {/* Invisible click-catch — collapse on outside click without
+                    darkening the board behind the panel. */}
                 <button
                   type="button"
                   aria-label="Close ticket"
                   onClick={collapse}
-                  className="absolute inset-0 cursor-default bg-black/55 backdrop-blur-sm"
+                  className="absolute inset-0 cursor-default"
                 />
                 <motion.div
                   layoutId={layoutId}
