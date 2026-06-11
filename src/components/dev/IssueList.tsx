@@ -133,6 +133,10 @@ function IssueCard({
   onPatch: (issue: DevIssue, body: PatchBody) => void;
 }) {
   const [open, setOpen] = useState(false); // true === detached + centered
+  // The vacated-slot placeholder lives on its own flag so it can OUTLAST the
+  // collapse: it stays mounted while the card morphs back and only unmounts
+  // once the inline card's layout animation lands (onLayoutAnimationComplete).
+  const [placeholderVisible, setPlaceholderVisible] = useState(false);
   const [mounted, setMounted] = useState(false); // portal target ready (client only)
   const [addText, setAddText] = useState('');
   const [copiedSub, setCopiedSub] = useState<number | null>(null);
@@ -181,9 +185,12 @@ function IssueCard({
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function detach() {
+    setPlaceholderVisible(true); // show the placeholder immediately on detach
     setOpen(true);
   }
   function collapse() {
+    // Keep the placeholder up; it's cleared by the inline card's
+    // onLayoutAnimationComplete once the card has contracted back into its slot.
     setOpen(false);
   }
 
@@ -490,10 +497,14 @@ function IssueCard({
     // holds a styled placeholder so neighbours don't reflow — the card itself
     // has flown out to the centered panel (rendered in a portal below).
     <div ref={slotRef} className="relative h-32">
-      {open ? (
+      {placeholderVisible && (
         // PLACEHOLDER — the vacated slot. A dashed champagne outline with a
         // little "Be right back." note + a softly pulsing dot, so the gap reads
         // as intentional ("this ticket stepped out") rather than broken.
+        // Driven by `placeholderVisible` (NOT `open`) so it persists through the
+        // collapse and only vanishes when the card has landed back in its slot.
+        // No z-index: it sits behind the morphing inline card (later in the DOM)
+        // so the card animating home reads clearly on top of the placeholder.
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e7e2d4]/20 bg-white/[0.015] text-center">
           <motion.span
             aria-hidden
@@ -506,14 +517,23 @@ function IssueCard({
             {repoName} #{issue.number}
           </span>
         </div>
-      ) : (
+      )}
+      {!open && (
         // INLINE CARD — collapsed summary, sitting in the slot. layoutId ties it
         // to the detached panel so the expand morphs the same element forward.
+        // It renders after the placeholder in the DOM, so while collapsing it
+        // animates home ON TOP of the still-visible placeholder, which only
+        // unmounts once this card's layout animation lands.
         <motion.div
           layoutId={layoutId}
           data-suppress-reveal
           data-has-contained-glow="true"
           initial={false}
+          onLayoutAnimationComplete={() => {
+            // The card finished morphing. If we're collapsed, it has now
+            // contracted into its slot — drop the placeholder exactly here.
+            if (!open) setPlaceholderVisible(false);
+          }}
           whileHover={{
             scale: 1.02,
             backgroundColor: tint.bg,
