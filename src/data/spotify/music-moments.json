@@ -112,7 +112,7 @@
     ]
   },
   {
-    "id": "f3efe32bfefd36fccd402b1a781a058e",
+    "id": "15baa4623a0f0411045cb0f3e5b62fbc",
     "trackName": "National Treasures",
     "artist": "Drake",
     "album": "ICEMAN",
@@ -121,10 +121,10 @@
     "spotifyUrl": "https://open.spotify.com/track/393OFJFZKIIv66JmJcNm9D",
     "dateRange": {
       "start": "2026-05-15",
-      "end": "2026-06-05"
+      "end": "2026-06-09"
     },
-    "playCount": 10,
-    "weeksCount": 4,
+    "playCount": 12,
+    "weeksCount": 5,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-05-15",
@@ -140,6 +140,10 @@
       },
       {
         "date": "2026-05-29",
+        "plays": 2
+      },
+      {
+        "date": "2026-06-09",
         "plays": 2
       }
     ]
