@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Concept — Portal Circle · Tickets Spawning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink:   #0d0b11;
+    --champ: #e7e2d4;
+    --champ-2: #ede6d6;
+    --champ-dim: rgba(231,226,212,0.55);
+    --champ-faint: rgba(231,226,212,0.14);
+    --red:   #b3122b;
+    --g-blue:   #4285f4;
+    --g-red:    #ea4335;
+    --g-yellow: #fbbc05;
+    --g-green:  #34a853;
+  }
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; }
+  body {
+    font-family:"Space Grotesk",system-ui,sans-serif;
+    color:var(--champ);
+    background-color:var(--ink);
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(140,20,40,0.12), transparent 60%),
+      linear-gradient(rgba(231,226,212,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.045) 1px, transparent 1px),
+      linear-gradient(rgba(231,226,212,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.02) 1px, transparent 1px);
+    background-size:100% 100%, 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+    background-attachment:fixed;
+    display:grid; place-items:center; min-height:100vh; overflow:hidden;
+  }
+  body::after {
+    content:""; position:fixed; inset:0; z-index:90; pointer-events:none;
+    opacity:0.26; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:grain 0.5s steps(4,end) infinite;
+  }
+  @keyframes grain { 0%{transform:translate(0,0)} 25%{transform:translate(-2px,2px)} 50%{transform:translate(2px,-2px)} 75%{transform:translate(-3px,-1px)} }
+
+  /* ───── SCENE ───── */
+  .scene { position:relative; display:flex; flex-direction:column; align-items:center; gap:32px; }
+  .eyebrow {
+    font-family:"Space Mono",monospace; font-size:9px; letter-spacing:0.44em;
+    text-transform:uppercase; color:rgba(231,226,212,0.4); text-align:center;
+  }
+
+  /* ───── PORTAL CIRCLE ───── */
+  .portal-wrap {
+    position:relative; width:220px; height:220px;
+    display:grid; place-items:center;
+    cursor:pointer;
+  }
+
+  /* The circle itself — contains the harlequin argyle pattern */
+  .portal-ring {
+    position:absolute; inset:0; border-radius:50%;
+    /* double-stroke hand-inked ring */
+    box-shadow:
+      0 0 0 2px rgba(231,226,212,0.65),
+      0 0 0 4px rgba(13,11,17,0.9),
+      0 0 0 5.5px rgba(231,226,212,0.22),
+      0 20px 60px -16px rgba(0,0,0,0.95),
+      inset 0 0 50px 12px rgba(0,0,0,0.75);
+    overflow:hidden;
+  }
+
+  /* Argyle pattern fills the portal interior */
+  .portal-fill {
+    position:absolute; inset:0; border-radius:50%; overflow:hidden;
+    background-color: #0d0b11;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cpolygon points='22,2 42,22 22,42 2,22' fill='%23B3122B' stroke='%23EDE6D6' stroke-width='1'/%3E%3C/svg%3E"),
+      linear-gradient(rgba(231,226,212,0.04) 1px,transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.04) 1px,transparent 1px);
+    background-size: 44px 44px, 80px 80px, 80px 80px;
+    animation: portal-drift 12s linear infinite;
+  }
+  @keyframes portal-drift {
+    from { background-position: 0 0, 0 0, 0 0; }
+    to   { background-position: 44px 44px, 80px 80px, 80px 80px; }
+  }
+
+  /* radial vignette inside the circle so it reads like depth */
+  .portal-veil {
+    position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at 50% 45%, transparent 0%, rgba(13,11,17,0.55) 55%, rgba(13,11,17,0.90) 100%);
+  }
+
+  /* glint across the glass face */
+  .portal-glint {
+    position:absolute; top:14%; left:20%; width:48%; height:24%;
+    background:linear-gradient(135deg, rgba(231,226,212,0.08) 0%, transparent 100%);
+    border-radius:50%;
+    pointer-events:none;
+  }
+
+  /* ghost wordmark deep inside the circle */
+  .portal-ghost {
+    position:relative; z-index:4;
+    font-family:"Limelight",serif; font-weight:400;
+    font-size:16px; letter-spacing:0.18em; text-align:center; line-height:1.4;
+    color:rgba(231,226,212,0.22);
+    text-shadow:0 0 20px rgba(231,226,212,0.08);
+    pointer-events:none; user-select:none;
+  }
+
+  /* ───── TICKET SPAWNING ───── */
+  /* Tickets eject from the portal edge and float away */
+  .ticket-pool { position:absolute; inset:0; pointer-events:none; z-index:10; }
+  .ticket {
+    position:absolute;
+    background:linear-gradient(160deg,rgba(28,24,34,.97),rgba(18,15,22,.96));
+    border:1px solid rgba(231,226,212,0.14);
+    border-radius:4px;
+    padding:6px 8px 7px;
+    font-family:"Space Mono",monospace;
+    font-size:7px; color:var(--champ-dim);
+    line-height:1.4;
+    white-space:nowrap;
+    box-shadow:0 6px 18px -6px rgba(0,0,0,0.9);
+    opacity:0;
+    pointer-events:none;
+    will-change:transform,opacity;
+  }
+  .ticket .t-pip {
+    display:inline-block; width:5px; height:5px;
+    transform:rotate(45deg); border-radius:1px;
+    margin-right:4px; vertical-align:middle;
+  }
+
+  /* ───── CAPTION ───── */
+  .caption {
+    max-width:260px; text-align:center;
+    font-family:"Space Mono",monospace; font-size:9px; line-height:1.7;
+    color:rgba(231,226,212,0.32); letter-spacing:0.04em;
+  }
+  .caption b { color:rgba(231,226,212,0.55); }
+
+  /* ───── DEMO controls ───── */
+  .controls {
+    position:fixed; left:14px; bottom:14px; z-index:95;
+    display:flex; flex-direction:column; gap:6px;
+    font-family:"Space Mono",monospace;
+  }
+  .controls .lbl { font-size:8px; color:rgba(231,226,212,0.3); letter-spacing:0.2em; }
+  .controls button {
+    font:inherit; font-size:9px; letter-spacing:0.08em;
+    color:var(--champ-dim); background:rgba(8,7,11,0.82);
+    border:1px solid var(--champ-faint); border-radius:4px;
+    padding:6px 10px; cursor:pointer; text-transform:uppercase;
+  }
+  .controls button:hover { color:var(--champ); border-color:rgba(231,226,212,0.36); }
+
+  @media (prefers-reduced-motion:reduce) {
+    .portal-fill { animation:none!important; }
+    .ticket { animation:none!important; }
+    body::after { animation:none!important; }
+  }
+</style>
+</head>
+<body>
+<div class="scene">
+  <p class="eyebrow">Concept · Portal with Tickets</p>
+
+  <div class="portal-wrap" id="portalWrap">
+    <!-- the argyle-filled circle -->
+    <div class="portal-ring">
+      <div class="portal-fill"></div>
+      <div class="portal-veil"></div>
+      <div class="portal-glint"></div>
+    </div>
+    <!-- ghost wordmark inside -->
+    <div class="portal-ghost">THE<br/>HARLEQUIN</div>
+    <!-- ticket pool -->
+    <div class="ticket-pool" id="ticketPool"></div>
+  </div>
+
+  <p class="caption">
+    Hover or click the circle to spawn tickets out of the portal.<br/>
+    <b>The pattern inside is the harlequin argyle.</b> This is the
+    "circle with pattern" concept — a portal, not a door.
+  </p>
+</div>
+
+<!-- demo -->
+<div class="controls">
+  <span class="lbl">Concept — portal circle</span>
+  <button id="btnBurst">Burst tickets</button>
+  <button id="btnStop">Stop / clear</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var pool     = document.getElementById("ticketPool");
+  var wrap     = document.getElementById("portalWrap");
+  var active   = [];
+  var spawnId  = null;
+  var PORTAL_R = 110; // px, radius of the portal circle in the pool coord space
+
+  var TICKET_DATA = [
+    { label:"#62 portal entrance", color:"#4285f4" },
+    { label:"#48 auth tokens",     color:"#ea4335" },
+    { label:"#9  harlequin theme", color:"#fbbc05" },
+    { label:"#51 poof dismiss",    color:"#34a853" },
+    { label:"#45 diff preview",    color:"#4285f4" },
+    { label:"#73 brass peephole",  color:"#fbbc05" },
+    { label:"#67 ink splash",      color:"#ea4335" },
+    { label:"#65 door swing",      color:"#34a853" },
+    { label:"#10 duotone grid",    color:"#4285f4" },
+    { label:"#34 design doc",      color:"#ea4335" },
+    { label:"#44 card detach",     color:"#fbbc05" },
+    { label:"#43 scroll fix",      color:"#34a853" },
+  ];
+
+  function spawnTicket(){
+    var data = TICKET_DATA[Math.floor(Math.random()*TICKET_DATA.length)];
+
+    // eject from a random point on the circle edge
+    var ejAngle = Math.random() * Math.PI * 2;
+    var ex = PORTAL_R * Math.cos(ejAngle); // relative to center of pool
+    var ey = PORTAL_R * Math.sin(ejAngle);
+
+    // travel direction: outward + slight random offset
+    var drift = (Math.random() - 0.5) * 0.6;
+    var tx = ex + (ex * 1.4) + (drift * 60);
+    var ty = ey + (ey * 1.4) + (drift * 60);
+
+    // initial rotation — slight tumble
+    var rot0 = (Math.random() - 0.5) * 12;
+    var rotEnd = rot0 + (Math.random() - 0.5) * 24;
+
+    var el = document.createElement("div");
+    el.className = "ticket";
+    el.innerHTML = '<span class="t-pip" style="background:'+data.color+'"></span>'+data.label;
+    // position: center on ejection point (pool is 220x220, center at 110,110)
+    el.style.left = (110 + ex) + "px";
+    el.style.top  = (110 + ey) + "px";
+    el.style.transform = "translate(-50%,-50%) rotate("+rot0+"deg) scale(0.6)";
+
+    pool.appendChild(el);
+    active.push(el);
+
+    // Step 1: pop out of portal (scale up, move along travel vector)
+    var DURATION = 800 + Math.random() * 400;
+    var DELAY = Math.random() * 120;
+
+    setTimeout(function(){
+      el.style.transition = "transform "+DURATION+"ms steps(8,end), opacity "+(DURATION*0.4)+"ms steps(4,end)";
+      el.style.transform  = "translate(-50%,-50%) translate("+tx+"px,"+ty+"px) rotate("+rotEnd+"deg) scale(1)";
+      el.style.opacity    = "1";
+
+      // Step 2: fade out after dwelling
+      setTimeout(function(){
+        el.style.transition = "opacity 500ms steps(4,end)";
+        el.style.opacity = "0";
+        setTimeout(function(){
+          if(el.parentNode) el.parentNode.removeChild(el);
+          var idx = active.indexOf(el);
+          if(idx > -1) active.splice(idx,1);
+        }, 520);
+      }, DURATION + 600);
+    }, DELAY);
+  }
+
+  function startBurst(){
+    stopBurst();
+    // spawn a few immediately, then keep a slow drip
+    for(var i=0;i<3;i++)(function(d){setTimeout(spawnTicket,d*80);})(i);
+    spawnId = setInterval(function(){
+      if(active.length < 14) spawnTicket();
+    }, 260);
+  }
+
+  function stopBurst(){
+    if(spawnId){ clearInterval(spawnId); spawnId = null; }
+  }
+
+  function clearAll(){
+    stopBurst();
+    active.forEach(function(el){ if(el.parentNode) el.parentNode.removeChild(el); });
+    active = [];
+  }
+
+  // hover = passive drip
+  var hoverInterval = null;
+  wrap.addEventListener("mouseenter", function(){
+    if(spawnId) return; // manual burst overrides
+    hoverInterval = setInterval(function(){
+      if(active.length < 8) spawnTicket();
+    }, 380);
+  });
+  wrap.addEventListener("mouseleave", function(){
+    if(hoverInterval){ clearInterval(hoverInterval); hoverInterval = null; }
+  });
+
+  // click = burst
+  wrap.addEventListener("click", function(){
+    startBurst();
+    setTimeout(stopBurst, 3000);
+  });
+
+  document.getElementById("btnBurst").addEventListener("click", function(){
+    startBurst(); setTimeout(stopBurst, 4000);
+  });
+  document.getElementById("btnStop").addEventListener("click", clearAll);
+})();
+</script>
+</body>
+</html>

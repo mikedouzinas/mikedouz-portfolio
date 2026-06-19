@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Variant C2 — Diamond Door · Wall / Spin / Flush Entry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink:      #0d0b11;
+    --champ:    #e7e2d4;
+    --champ-2:  #ede6d6;
+    --champ-dim: rgba(231,226,212,0.55);
+    --champ-faint: rgba(231,226,212,0.14);
+    --red:      #b3122b;
+    --red-b:    #ea4335;
+    --g-blue:   #4285f4;
+    --g-red:    #ea4335;
+    --g-yellow: #fbbc05;
+    --g-green:  #34a853;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    color: var(--champ);
+    background-color: var(--ink);
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(140,20,40,0.10), transparent 60%),
+      linear-gradient(rgba(231,226,212,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.05) 1px, transparent 1px),
+      linear-gradient(rgba(231,226,212,0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.022) 1px, transparent 1px);
+    background-size: 100% 100%, 88px 88px, 88px 88px, 16px 16px, 16px 16px;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: grid; place-items: center; overflow: hidden;
+  }
+  /* film grain */
+  body::after {
+    content:""; position:fixed; inset:0; z-index:90; pointer-events:none;
+    opacity:0.28; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 0.5s steps(4,end) infinite;
+  }
+  @keyframes grain { 0%{transform:translate(0,0)} 25%{transform:translate(-2px,2px)} 50%{transform:translate(2px,-2px)} 75%{transform:translate(-3px,-1px)} 100%{transform:translate(0,0)} }
+
+  /* ───────────────────────────────────────────────────────────
+     SCENE WRAPPER
+  ─────────────────────────────────────────────────────────── */
+  .scene {
+    position: relative;
+    width: min(380px, 90vw);
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .eyebrow {
+    font-family:"Space Mono",monospace; font-size:9px; letter-spacing:0.44em;
+    text-transform:uppercase; color:var(--champ-dim); margin-bottom:26px;
+    padding-left:0.44em; text-align:center;
+  }
+
+  /* ───────────────────────────────────────────────────────────
+     DOOR STAGE: the portal area, centred in scene
+  ─────────────────────────────────────────────────────────── */
+  .door-stage {
+    position: relative;
+    width: 260px; height: 260px;
+    display: grid; place-items: center;
+    perspective: 900px;
+    cursor: default;
+  }
+
+  /* ───────────────────────────────────────────────────────────
+     WALL COVER — at rest this diamond-shaped cover sits over
+     the door, concealing it. On hover it dissolves upward.
+  ─────────────────────────────────────────────────────────── */
+  .wall-cover {
+    position: absolute;
+    width: 200px; height: 200px;
+    transform: rotate(45deg);
+    border-radius: 8px;
+    z-index: 20;
+    background:
+      repeating-linear-gradient(45deg, rgba(231,226,212,0.032) 0 8px, transparent 8px 16px),
+      linear-gradient(135deg, rgba(231,226,212,0.10), rgba(231,226,212,0.04));
+    border: 1px solid rgba(231,226,212,0.22);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4) inset, 0 28px 56px -20px rgba(0,0,0,0.9);
+    /* transition: clip-path, opacity  */
+    transition: opacity 0.35s steps(4,end), transform 0.35s steps(4,end);
+    pointer-events: none; /* let hover pass to door-stage */
+  }
+  /* a barely-visible inscription in the cover */
+  .wall-cover::after {
+    content: "◆";
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-family: "Limelight", serif;
+    font-size: 28px;
+    color: rgba(231,226,212,0.10);
+    transform: rotate(-45deg);
+  }
+  /* Cover disappears on hover or when door is revealed */
+  .door-stage:hover .wall-cover,
+  .door-stage[data-phase="spin"] .wall-cover,
+  .door-stage[data-phase="bloomed"] .wall-cover,
+  .door-stage[data-phase="typing"] .wall-cover,
+  .door-stage[data-phase="wrong"] .wall-cover,
+  .door-stage[data-phase="lockout"] .wall-cover,
+  .door-stage[data-phase="open"] .wall-cover {
+    opacity: 0;
+    transform: rotate(45deg) translateY(-14px) scale(0.92);
+  }
+
+  /* ───────────────────────────────────────────────────────────
+     DIAMOND CASING (champagne plinth behind leaf)
+  ─────────────────────────────────────────────────────────── */
+  .casing {
+    position: absolute;
+    width: 200px; height: 200px;
+    transform: rotate(45deg);
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(231,226,212,0.13), rgba(231,226,212,0.02));
+    border: 1px solid var(--champ-faint);
+    box-shadow: 0 28px 60px -22px rgba(0,0,0,0.9), inset 0 0 30px 8px rgba(0,0,0,0.65);
+    z-index: 2;
+    /* smooth expand when spinning/bloomed */
+    transition: width 0.5s steps(5,end), height 0.5s steps(5,end);
+  }
+
+  /* ───────────────────────────────────────────────────────────
+     BOARD GLIMPSED BEHIND DIAMOND
+  ─────────────────────────────────────────────────────────── */
+  .behind {
+    position: absolute; width: 172px; height: 172px;
+    transform: rotate(45deg);
+    border-radius: 6px; overflow: hidden;
+    background-color: #0d0b11;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Cpolygon points='19,2 36,19 19,36 2,19' fill='%23B3122B' stroke='%23EDE6D6' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: 38px 38px;
+    filter: brightness(0.4);
+    box-shadow: inset 0 0 44px 10px rgba(0,0,0,0.9);
+    z-index: 1;
+    transition: filter 0.8s steps(5,end), width 0.5s steps(5,end), height 0.5s steps(5,end);
+  }
+  .behind .inner { transform: rotate(-45deg); position: absolute; inset: -30%; }
+  .b-card {
+    position: absolute; border-radius: 3px; padding: 5px 6px;
+    background: linear-gradient(160deg,rgba(28,24,34,.97),rgba(18,15,22,.97));
+    border: 1px solid rgba(231,226,212,0.12);
+    font-family:"Space Mono",monospace; font-size:6.5px; color: var(--champ-dim);
+    transform: rotate(var(--r,0));
+  }
+  .b-card .pip { display:inline-block;width:5px;height:5px;transform:rotate(45deg);border-radius:1px;margin-right:3px;vertical-align:middle }
+  .bc1{top:22%;left:24%;width:30%;--r:-3deg}
+  .bc2{top:42%;right:24%;width:28%;--r:4deg}
+  .bc3{bottom:26%;left:30%;width:32%;--r:-2deg}
+  .behind .veil {
+    position:absolute;inset:0;
+    background:radial-gradient(circle at 50% 45%, transparent 0%, rgba(13,11,17,0.6) 60%, rgba(13,11,17,0.96) 100%);
+    transition: background 0.8s ease;
+  }
+
+  /* ───────────────────────────────────────────────────────────
+     DIAMOND LEAF (the door face itself)
+  ─────────────────────────────────────────────────────────── */
+  .leaf {
+    position: absolute; width: 172px; height: 172px;
+    transform: rotate(45deg);
+    border-radius: 6px;
+    background:
+      repeating-linear-gradient(45deg, rgba(231,226,212,0.045) 0 6px, rgba(231,226,212,0.09) 6px 12px),
+      linear-gradient(135deg, #2b2738, #171420);
+    border: 1px solid rgba(231,226,212,0.24);
+    box-shadow: 0 12px 28px -10px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(231,226,212,0.05);
+    transform-origin: left center;
+    backface-visibility: hidden;
+    z-index: 4;
+    transition:
+      transform 0.95s steps(7,end),
+      opacity 0.6s steps(4,end),
+      width 0.5s steps(5,end),
+      height 0.5s steps(5,end);
+  }
+  .leaf .hinge {
+    position:absolute; left:7px; top:50%;
+    width:6px; height:6px; border-radius:50%;
+    transform:translateY(-50%);
+    background:rgba(231,226,212,0.38);
+    box-shadow:0 0 6px rgba(231,226,212,0.38);
+  }
+
+  /* mouse cursor inside diamond — circular orbit element */
+  .cursor-orb {
+    position: absolute;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--champ);
+    box-shadow: 0 0 10px 3px rgba(231,226,212,0.55), 0 0 20px 6px rgba(231,226,212,0.22);
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    transform: translate(-50%,-50%);
+    left: 50%; top: 50%;
+  }
+  /* orb shows when in spin phase */
+  .door-stage[data-phase="spin"] .cursor-orb,
+  .door-stage[data-phase="bloomed"] .cursor-orb { opacity: 1; }
+
+  /* ───────────────────────────────────────────────────────────
+     BLOOM STATE: diamond expands to larger size
+  ─────────────────────────────────────────────────────────── */
+  .door-stage[data-phase="bloomed"] .casing,
+  .door-stage[data-phase="typing"] .casing,
+  .door-stage[data-phase="wrong"] .casing,
+  .door-stage[data-phase="lockout"] .casing {
+    width: 240px; height: 240px;
+  }
+  .door-stage[data-phase="bloomed"] .behind,
+  .door-stage[data-phase="typing"] .behind,
+  .door-stage[data-phase="wrong"] .behind,
+  .door-stage[data-phase="lockout"] .behind {
+    width: 210px; height: 210px;
+    filter: brightness(0.55);
+  }
+  .door-stage[data-phase="bloomed"] .leaf,
+  .door-stage[data-phase="typing"] .leaf,
+  .door-stage[data-phase="wrong"] .leaf,
+  .door-stage[data-phase="lockout"] .leaf {
+    width: 210px; height: 210px;
+  }
+
+  /* ───────────────────────────────────────────────────────────
+     WRONG: stop-motion rattle
+  ─────────────────────────────────────────────────────────── */
+  @keyframes rattle {
+    0%,100%{transform:rotate(45deg) translateX(0)}
+    20%{transform:rotate(45deg) translate(-5px,3px)}
+    40%{transform:rotate(45deg) translate(4px,-3px)}
+    60%{transform:rotate(45deg) translate(-3px,-1px)}
+    80%{transform:rotate(45deg) translate(3px,2px)}
+  }
+  .leaf.rattle  { animation: rattle 0.42s steps(3,end) 1; }
+  .casing.rattle{ animation: rattle 0.42s steps(3,end) 1; }
+
+  /* red bloom from center on wrong */
+  .badflash {
+    position:absolute; width:240px; height:240px; border-radius:50%; z-index:7; pointer-events:none; opacity:0;
+    background: radial-gradient(circle, rgba(234,67,53,0.80) 0%, rgba(234,67,53,0.80) 25%, transparent 52%);
+    mix-blend-mode: screen;
+  }
+  .badflash.go { animation: bf 0.5s steps(3,end) 1; }
+  @keyframes bf { 0%{opacity:0} 30%{opacity:0.9} 60%{opacity:0.4} 100%{opacity:0} }
+
+  /* ───────────────────────────────────────────────────────────
+     OPEN: door swings on stop-motion, then entire stage expands to fill
+  ─────────────────────────────────────────────────────────── */
+  .door-stage[data-phase="open"] .leaf {
+    transform: rotate(45deg) perspective(700px) rotateY(-108deg);
+    opacity: 0.85;
+    width: 210px; height: 210px;
+  }
+  .door-stage[data-phase="open"] .behind {
+    filter: brightness(1.1) saturate(1.1);
+    width: 210px; height: 210px;
+  }
+  .door-stage[data-phase="open"] .behind .veil {
+    background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(13,11,17,0.12) 80%);
+  }
+  .door-stage[data-phase="open"] .casing {
+    width: 240px; height: 240px;
+  }
+
+  /* Stage flush-expand to fill viewport */
+  .door-stage[data-phase="flush"] {
+    transition: transform 0.75s steps(6,end), border-radius 0.75s steps(6,end);
+    transform: scale(14);
+  }
+
+  /* ───────────────────────────────────────────────────────────
+     ARRIVED BOARD (the destination — fills the void left by flush expand)
+  ─────────────────────────────────────────────────────────── */
+  .arrived {
+    position: fixed; inset: 0; z-index: 70;
+    display: none; flex-direction: column;
+    padding: 28px clamp(18px,4vw,60px);
+    background-color: #0d0b11;
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(140,20,40,0.08), transparent 60%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Cpolygon points='19,2 36,19 19,36 2,19' fill='%23B3122B' stroke='%23EDE6D6' stroke-width='1'/%3E%3C/svg%3E"),
+      linear-gradient(rgba(231,226,212,0.04) 1px,transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.04) 1px,transparent 1px);
+    background-size: 100% 100%, 38px 38px, 88px 88px, 88px 88px;
+  }
+  .arrived.show { display: flex; animation: arr-in 0.4s ease both; }
+  @keyframes arr-in { from{opacity:0;transform:scale(1.03)} to{opacity:1;transform:none} }
+
+  .arrived-header { display:flex;align-items:center;gap:10px;margin-bottom:28px; }
+  .arrived-mark {
+    font-family:"Limelight",serif; font-weight:400;
+    font-size:clamp(22px,3.8vw,36px); letter-spacing:0.18em; color:var(--champ);
+  }
+  .dia-r { color:var(--g-red); }
+  .dia-g { color:var(--g-green); }
+  .arrived-columns { display:grid;grid-template-columns:repeat(3,1fr);gap:16px;flex:1;min-height:0; }
+  .col-h { font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:0.22em;text-transform:uppercase;color:var(--champ-dim);margin-bottom:12px; }
+  .arr-card { background:linear-gradient(160deg,rgba(28,24,34,.96),rgba(18,15,22,.96));border:1px solid rgba(231,226,212,0.10);border-radius:6px;padding:12px;margin-bottom:12px; }
+  .arr-card .t { font-size:13px;margin-bottom:8px; }
+  .arr-card .meta { display:flex;gap:8px;align-items:center;font-family:"Space Mono",monospace;font-size:9px;color:var(--champ-dim); }
+  .chip { display:inline-flex;align-items:center;gap:5px; }
+  .chip .pip { width:8px;height:8px;transform:rotate(45deg);border-radius:2px; }
+  .back-btn { align-self:center;margin-top:20px;font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:0.16em;color:var(--champ-dim);background:rgba(231,226,212,0.05);border:1px solid var(--champ-faint);border-radius:6px;padding:9px 16px;cursor:pointer;text-transform:uppercase; }
+  .back-btn:hover { background:rgba(231,226,212,0.10);color:var(--champ); }
+
+  /* ───────────────────────────────────────────────────────────
+     SILL — password entry panel (appears when diamond has bloomed)
+  ─────────────────────────────────────────────────────────── */
+  .sill {
+    margin-top: 24px;
+    width: 240px;
+    background: rgba(8,7,11,0.85);
+    border: 1px solid var(--champ-faint);
+    border-radius: 8px;
+    padding: 13px 14px 15px;
+    box-shadow: 0 16px 32px -12px rgba(0,0,0,0.9);
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .sill.visible {
+    opacity: 1; transform: translateY(0); pointer-events: auto;
+  }
+  .sill-label {
+    font-family:"Space Mono",monospace; font-size:8.5px; letter-spacing:0.24em;
+    text-transform:uppercase; color:var(--champ-dim); text-align:center; margin-bottom:9px;
+  }
+  .pegs { display:flex;gap:8px;justify-content:center; }
+  .peg {
+    width:24px; height:28px; display:grid; place-items:center;
+    border:1px solid var(--champ-faint); border-radius:3px;
+    background:rgba(231,226,212,0.03);
+    font-family:"Space Mono",monospace; font-size:13px; color:var(--champ);
+    transition:all 0.1s;
+  }
+  .peg.filled { border-color:rgba(231,226,212,0.52); background:rgba(231,226,212,0.09); }
+  .peg.active { box-shadow:0 0 0 2px rgba(231,226,212,0.22); }
+  .hidden-input { position:absolute;opacity:0;pointer-events:none;width:0;height:0; }
+  .sill-hint {
+    text-align:center; margin-top:9px; min-height:13px;
+    font-family:"Space Mono",monospace; font-size:8px; letter-spacing:0.05em; color:var(--champ-dim);
+  }
+  .sill-hint.bad { color:var(--red-b); }
+  .footlights { display:flex;gap:9px;justify-content:center;margin-top:8px; }
+  .footlights .fd { width:7px;height:7px;transform:rotate(45deg);background:var(--champ);box-shadow:0 0 5px rgba(231,226,212,0.4);transition:background 0.1s steps(1),box-shadow 0.1s steps(1); }
+  .footlights .fd.snuffing { animation:snuff 0.42s steps(1,end) forwards; }
+  @keyframes snuff { 0%{background:var(--g-blue)} 25%{background:var(--g-red)} 50%{background:var(--g-yellow)} 75%{background:var(--g-green)} 100%{background:#3a3530;box-shadow:none} }
+  .footlights .fd.out { background:#3a3530;box-shadow:none; }
+  .lockbar { display:none;margin-top:9px;height:3px;border-radius:2px;background:rgba(234,67,53,0.18);overflow:hidden; }
+  .sill.locked .lockbar { display:block; }
+  .lockfill { height:100%;width:100%;background:var(--red-b);transform-origin:left; }
+
+  /* spin-to-activate hint text */
+  .spin-hint {
+    position: absolute; z-index: 15; bottom: -28px; left: 50%; transform: translateX(-50%);
+    font-family:"Space Mono",monospace; font-size:8px; letter-spacing:0.22em;
+    text-transform:uppercase; color:rgba(231,226,212,0.35); white-space:nowrap;
+    opacity: 0; pointer-events:none;
+    transition: opacity 0.3s ease;
+  }
+  .door-stage:hover .spin-hint,
+  .door-stage[data-phase="spin"] .spin-hint { opacity:1; }
+  .door-stage[data-phase="bloomed"] .spin-hint,
+  .door-stage[data-phase="typing"] .spin-hint,
+  .door-stage[data-phase="wrong"] .spin-hint,
+  .door-stage[data-phase="lockout"] .spin-hint { opacity:0; }
+
+  /* lockout state */
+  .door-stage[data-phase="lockout"] .leaf { border-color:rgba(234,67,53,0.32); }
+
+  /* ───────────────────────────────────────────────────────────
+     DEMO CONTROLS
+  ─────────────────────────────────────────────────────────── */
+  .controls {
+    position:fixed;left:16px;bottom:16px;z-index:95;
+    display:flex;gap:6px;flex-wrap:wrap;max-width:320px;
+    font-family:"Space Mono",monospace;
+  }
+  .controls .lbl { font-size:8px;color:rgba(231,226,212,0.32);width:100%;letter-spacing:0.2em; }
+  .controls button {
+    font:inherit;font-size:9px;letter-spacing:0.08em;
+    color:var(--champ-dim);background:rgba(8,7,11,0.82);
+    border:1px solid var(--champ-faint);border-radius:4px;
+    padding:6px 9px;cursor:pointer;text-transform:uppercase;
+  }
+  .controls button:hover { color:var(--champ);border-color:rgba(231,226,212,0.38); }
+
+  .hint-note {
+    position:fixed;right:16px;bottom:16px;z-index:95;
+    max-width:240px;text-align:right;
+    font-family:"Space Mono",monospace;font-size:9px;line-height:1.65;
+    color:rgba(231,226,212,0.32);letter-spacing:0.04em;
+  }
+  .hint-note b { color:rgba(231,226,212,0.58); }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::after,.leaf.rattle,.casing.rattle,.badflash.go { animation:none!important; }
+    .wall-cover,.casing,.behind,.leaf,.door-stage,.sill,.cursor-orb { transition:opacity 0.16s ease!important; }
+    .door-stage[data-phase="flush"] { transform:none!important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <p class="eyebrow">Variant C2 · The Diamond Door</p>
+
+  <!-- DOOR STAGE -->
+  <div class="door-stage" id="doorStage" data-phase="rest">
+
+    <!-- wall cover at rest — lifts on hover -->
+    <div class="wall-cover" id="wallCover"></div>
+
+    <!-- layers: casing (plinth) / behind (board) / leaf (door face) -->
+    <div class="casing" id="casing"></div>
+
+    <div class="behind" id="behind">
+      <div class="inner">
+        <div class="b-card bc1"><span class="pip" style="background:var(--g-blue)"></span>#48 auth</div>
+        <div class="b-card bc2"><span class="pip" style="background:var(--g-yellow)"></span>#62 portal</div>
+        <div class="b-card bc3"><span class="pip" style="background:var(--g-green)"></span>#9 mark</div>
+      </div>
+      <div class="veil" id="veil"></div>
+    </div>
+
+    <div class="leaf" id="leaf"><span class="hinge"></span></div>
+
+    <!-- mouse cursor orb — orbits inside the diamond when spinning -->
+    <div class="cursor-orb" id="cursorOrb"></div>
+
+    <!-- bad flash on wrong -->
+    <div class="badflash" id="badflash"></div>
+
+    <p class="spin-hint">spin the mouse inside · unlock the door</p>
+  </div>
+
+  <!-- SILL (password entry) -->
+  <div class="sill" id="sill">
+    <div class="sill-label" id="sillLabel">Knock — say the word</div>
+    <div class="pegs" id="pegs">
+      <div class="peg"></div>
+      <div class="peg"></div>
+      <div class="peg"></div>
+      <div class="peg"></div>
+      <div class="peg"></div>
+    </div>
+    <input class="hidden-input" id="codeInput" type="text" maxlength="5" autocomplete="off"
+           data-1p-ignore data-lpignore="true" aria-label="Password" />
+    <div class="sill-hint" id="sillHint">click diamond · type · password is OPEN5</div>
+    <div class="footlights" id="footlights" aria-hidden="true">
+      <span class="fd"></span><span class="fd"></span><span class="fd"></span><span class="fd"></span><span class="fd"></span>
+    </div>
+    <div class="lockbar"><div class="lockfill" id="lockfill"></div></div>
+  </div>
+</div>
+
+<!-- ARRIVED BOARD -->
+<div class="arrived" id="arrived">
+  <div class="arrived-header">
+    <span class="dia-r" style="font-size:15px">◆</span>
+    <span class="arrived-mark">THE HARLEQUIN</span>
+    <span class="dia-g" style="font-size:15px">◆</span>
+  </div>
+  <div class="arrived-columns">
+    <div>
+      <div class="col-h">Todo</div>
+      <div class="arr-card"><div class="t">Diamond-door portal entrance</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-blue)"></span>S</span><span>#62</span></div></div>
+      <div class="arr-card"><div class="t">Flush expand enter anim</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-yellow)"></span>M</span><span>#73</span></div></div>
+    </div>
+    <div>
+      <div class="col-h">In Progress</div>
+      <div class="arr-card"><div class="t">Wall cover + hover reveal</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-yellow)"></span>M</span><span>#65</span></div></div>
+      <div class="arr-card"><div class="t">Spin-to-bloom interaction</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-blue)"></span>S</span><span>#67</span></div></div>
+    </div>
+    <div>
+      <div class="col-h">Done</div>
+      <div class="arr-card"><div class="t">Limelight wordmark</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-green)"></span>S</span><span>#9</span></div></div>
+      <div class="arr-card"><div class="t">Champagne duotone grid</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-green)"></span>L</span><span>#10</span></div></div>
+    </div>
+  </div>
+  <button class="back-btn" id="backBtn">← step back out</button>
+</div>
+
+<!-- DEMO CONTROLS -->
+<div class="controls">
+  <span class="lbl">Demo states — variant C2</span>
+  <button data-act="reset">Reset</button>
+  <button data-act="hover">Hover (reveal)</button>
+  <button data-act="spin">Spin</button>
+  <button data-act="bloom">Bloom → entry</button>
+  <button data-act="wrong">Wrong</button>
+  <button data-act="lockout">Lockout</button>
+  <button data-act="correct">Correct → enter</button>
+</div>
+<div class="hint-note">
+  Hover the diamond to lift the wall cover.<br/>
+  Spin your mouse inside → it blooms.<br/>
+  Password: <b>OPEN5</b>. Esc resets.
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PASSWORD = "OPEN5";
+  var stage    = document.getElementById("doorStage");
+  var leaf     = document.getElementById("leaf");
+  var casing   = document.getElementById("casing");
+  var badflash = document.getElementById("badflash");
+  var sill     = document.getElementById("sill");
+  var sillLabel= document.getElementById("sillLabel");
+  var sillHint = document.getElementById("sillHint");
+  var pegsEl   = document.getElementById("pegs").querySelectorAll(".peg");
+  var input    = document.getElementById("codeInput");
+  var lights   = document.getElementById("footlights").querySelectorAll(".fd");
+  var lockfill = document.getElementById("lockfill");
+  var arrived  = document.getElementById("arrived");
+  var orb      = document.getElementById("cursorOrb");
+
+  var phase    = "rest";  // rest | hover | spin | bloomed | typing | wrong | lockout | open | flush
+  var tries    = 5;
+  var locked   = false;
+  var lockTimer= null;
+
+  // Spin tracking
+  var spinAngles   = [];          // rolling buffer of mouse angles (deg) inside diamond
+  var spinLast     = null;        // last angle
+  var spinTotal    = 0;           // cumulative degrees turned (absolute)
+  var SPIN_NEEDED  = 360;         // full circle to bloom
+  var spinAnimId   = null;        // rAF for autonomous orb animation (demo mode)
+  var spinAuto     = false;       // true in demo mode
+
+  // Orb autonomous orbit (for demo "spin" button)
+  var autoAngle = 0;
+  var ORB_RADIUS = 52;  // px from center
+
+  function setPhase(p){
+    phase = p;
+    stage.setAttribute("data-phase", p);
+  }
+
+  /* ────────────── RENDER pegs ────────────── */
+  function renderPegs(){
+    var v = input.value.toUpperCase();
+    pegsEl.forEach(function(p,i){
+      p.classList.toggle("filled", i < v.length);
+      p.classList.toggle("active", i === v.length && !locked);
+      p.textContent = i < v.length ? "◆" : "";
+    });
+  }
+
+  /* ────────────── SILL helpers ────────────── */
+  function setHint(m, bad){
+    sillHint.className = "sill-hint" + (bad ? " bad" : "");
+    sillHint.textContent = m || (locked ? "bolted. wait." : 'click diamond · type · password is OPEN5');
+  }
+  function resetLights(){
+    tries = 5;
+    lights.forEach(function(d){ d.classList.remove("out","snuffing"); });
+    setHint("", false);
+  }
+
+  /* ────────────── SHOW / HIDE SILL ────────────── */
+  function showSill(){
+    sill.classList.add("visible");
+    setTimeout(function(){ try{ input.focus(); }catch(e){} }, 160);
+  }
+  function hideSill(){
+    sill.classList.remove("visible","locked");
+    sill.querySelector(".lockbar").style.display = "";
+  }
+
+  /* ────────────── WRONG ────────────── */
+  function wrong(){
+    tries = Math.max(0, tries - 1);
+    var idx = 5 - tries - 1;
+    if(lights[idx]){
+      lights[idx].classList.add("snuffing");
+      (function(el){ setTimeout(function(){ el.classList.remove("snuffing"); el.classList.add("out"); }, 430); })(lights[idx]);
+    }
+    leaf.classList.remove("rattle"); casing.classList.remove("rattle");
+    void leaf.offsetWidth;
+    leaf.classList.add("rattle"); casing.classList.add("rattle");
+    badflash.classList.remove("go"); void badflash.offsetWidth; badflash.classList.add("go");
+    input.value = ""; renderPegs();
+    setPhase("wrong");
+    setHint((tries > 0 ? tries+" of 5 tries left" : "last try used…"), true);
+    setTimeout(function(){
+      if(!locked){
+        setPhase("typing");
+        try{ input.focus(); }catch(e){}
+      }
+    }, 480);
+    if(tries <= 0){ setTimeout(lockout, 500); }
+  }
+
+  /* ────────────── LOCKOUT ────────────── */
+  function lockout(){
+    locked = true;
+    setPhase("lockout");
+    sill.classList.add("locked");
+    lights.forEach(function(d){ d.classList.remove("snuffing"); d.classList.add("out"); });
+    sillLabel.textContent = "Bolted shut";
+    setHint("locked for a beat…", true);
+    lockfill.style.animation = "none"; void lockfill.offsetWidth;
+    lockfill.style.animation = "lockdrain 7s linear 1 forwards";
+    lockTimer = setTimeout(function(){
+      reset();
+    }, 7000);
+  }
+
+  /* ────────────── CORRECT → FLUSH ENTER ────────────── */
+  function correct(){
+    setHint("…the word.", false);
+    sillLabel.textContent = "Come through";
+    setPhase("open");
+    setTimeout(function(){
+      hideSill();
+      setPhase("flush");
+    }, 900);
+    setTimeout(function(){
+      arrived.classList.add("show");
+      arrived.setAttribute("aria-hidden","false");
+    }, 1400);
+  }
+
+  /* ────────────── CHECK ────────────── */
+  function check(){
+    if(locked) return;
+    var val = input.value.trim().toUpperCase();
+    if(!val) return;
+    if(val === PASSWORD){ correct(); return; }
+    wrong();
+  }
+
+  /* ────────────── RESET ────────────── */
+  function reset(){
+    if(lockTimer){ clearTimeout(lockTimer); lockTimer = null; }
+    stopAutoSpin();
+    locked = false;
+    setPhase("rest");
+    input.value = "";
+    hideSill();
+    resetLights();
+    leaf.classList.remove("rattle"); casing.classList.remove("rattle");
+    badflash.classList.remove("go");
+    sillLabel.textContent = "Knock — say the word";
+    arrived.classList.remove("show");
+    arrived.setAttribute("aria-hidden","true");
+    spinTotal = 0; spinLast = null; spinAngles = [];
+    orb.style.left = "50%"; orb.style.top = "50%";
+    renderPegs();
+  }
+
+  document.getElementById("backBtn").addEventListener("click", reset);
+
+  /* ────────────── INPUT HANDLING ────────────── */
+  stage.addEventListener("click", function(){
+    if(phase === "bloomed" || phase === "typing"){
+      try{ input.focus(); }catch(e){}
+    }
+  });
+  sill.addEventListener("click", function(e){
+    if(!locked) try{ input.focus(); }catch(e){}
+  });
+  input.addEventListener("input", function(){
+    if(locked){ input.value=""; return; }
+    input.value = input.value.replace(/[^a-zA-Z0-9]/g,"").slice(0,5).toUpperCase();
+    if(phase === "bloomed") setPhase("typing");
+    setHint("", false);
+    renderPegs();
+    if(input.value.length === 5) check();
+  });
+  input.addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); check(); } });
+
+  window.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){ reset(); }
+  });
+
+  /* ────────────── SPIN TRACKING (real mouse) ────────────── */
+  // Track mouse angle around center of stage.
+  // Accumulate rotation; when it exceeds SPIN_NEEDED → bloom.
+  stage.addEventListener("mousemove", function(e){
+    if(locked) return;
+    if(phase === "bloomed" || phase === "typing" || phase === "open" || phase === "flush") return;
+
+    var rect  = stage.getBoundingClientRect();
+    var cx    = rect.left + rect.width/2;
+    var cy    = rect.top  + rect.height/2;
+    var dx    = e.clientX - cx;
+    var dy    = e.clientY - cy;
+
+    // only count if cursor is roughly inside the diamond (Chebyshev-ish)
+    var r = stage.clientWidth * 0.38;
+    if(Math.abs(dx) > r || Math.abs(dy) > r) return;
+
+    // move orb
+    orb.style.left = (e.clientX - rect.left) + "px";
+    orb.style.top  = (e.clientY - rect.top)  + "px";
+
+    var angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+    if(phase === "rest" || phase === "hover"){
+      setPhase("spin");
+    }
+
+    if(spinLast !== null){
+      var delta = angle - spinLast;
+      // unwrap to [-180, 180]
+      if(delta >  180) delta -= 360;
+      if(delta < -180) delta += 360;
+      spinTotal += Math.abs(delta);
+      if(spinTotal >= SPIN_NEEDED){
+        bloom();
+        return;
+      }
+    }
+    spinLast = angle;
+  });
+
+  stage.addEventListener("mouseleave", function(){
+    if(phase === "spin"){
+      setPhase("rest");
+      spinTotal = 0; spinLast = null;
+      orb.style.left = "50%"; orb.style.top = "50%";
+    }
+  });
+
+  function bloom(){
+    stopAutoSpin();
+    spinTotal = 0; spinLast = null;
+    orb.style.opacity = "0";
+    setPhase("bloomed");
+    showSill();
+  }
+
+  /* ────────────── AUTO SPIN ORB (demo mode) ────────────── */
+  function startAutoSpin(onComplete){
+    stopAutoSpin();
+    spinAuto = true;
+    autoAngle = 0;
+    var turned = 0;
+    var prevAngle = null;
+    setPhase("spin");
+
+    function tick(){
+      if(!spinAuto) return;
+      autoAngle += 3.8; // degrees per frame, ~1 full circle in 95 frames
+      var rad = (autoAngle * Math.PI / 180);
+      var x   = 50 + ORB_RADIUS * Math.cos(rad);
+      var y   = 50 + ORB_RADIUS * Math.sin(rad);
+      orb.style.left = x + "%";
+      orb.style.top  = y + "%";
+
+      var delta = 3.8;
+      turned += delta;
+      if(turned >= SPIN_NEEDED){
+        stopAutoSpin();
+        if(onComplete) onComplete();
+        return;
+      }
+      spinAnimId = requestAnimationFrame(tick);
+    }
+    spinAnimId = requestAnimationFrame(tick);
+  }
+
+  function stopAutoSpin(){
+    spinAuto = false;
+    if(spinAnimId){ cancelAnimationFrame(spinAnimId); spinAnimId = null; }
+  }
+
+  /* ────────────── DEMO CONTROLS ────────────── */
+  var typer = null;
+  function autoType(str, done){
+    if(typer) clearInterval(typer);
+    input.value = ""; renderPegs(); setHint("");
+    var i = 0;
+    typer = setInterval(function(){
+      if(i >= str.length){ clearInterval(typer); typer = null; if(done) done(); return; }
+      input.value += str[i++]; renderPegs();
+    }, 150);
+  }
+
+  document.querySelector(".controls").addEventListener("click", function(e){
+    var b = e.target.closest("button"); if(!b) return;
+    var act = b.dataset.act;
+    if(act === "reset"){ reset(); return; }
+    reset();
+    if(act === "hover"){
+      setTimeout(function(){ setPhase("hover"); }, 60);
+    }
+    if(act === "spin"){
+      setTimeout(function(){ startAutoSpin(null); }, 80);
+    }
+    if(act === "bloom"){
+      setTimeout(function(){
+        startAutoSpin(function(){
+          bloom();
+        });
+      }, 80);
+    }
+    if(act === "wrong"){
+      setTimeout(function(){
+        startAutoSpin(function(){
+          bloom();
+          setTimeout(function(){ autoType("WRONG", check); }, 320);
+        });
+      }, 80);
+    }
+    if(act === "lockout"){
+      setTimeout(function(){
+        startAutoSpin(function(){
+          bloom();
+          setTimeout(function(){
+            autoType("BAD1", function(){ setTimeout(function(){
+              input.value=""; tries=1;
+              autoType("BAD2", function(){ setTimeout(function(){
+                input.value=""; tries=0;
+                autoType("BAD3", check);
+              }, 350); });
+            }, 350); });
+          }, 320);
+        });
+      }, 80);
+    }
+    if(act === "correct"){
+      setTimeout(function(){
+        startAutoSpin(function(){
+          bloom();
+          setTimeout(function(){ autoType("OPEN5", check); }, 320);
+        });
+      }, 80);
+    }
+  });
+
+  // inject lockdrain keyframe
+  var st = document.createElement("style");
+  st.textContent = "@keyframes lockdrain{from{transform:scaleX(1)}to{transform:scaleX(0)}}";
+  document.head.appendChild(st);
+
+  renderPegs();
+})();
+</script>
+</body>
+</html>

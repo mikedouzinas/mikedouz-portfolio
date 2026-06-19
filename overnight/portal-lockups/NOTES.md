@@ -103,3 +103,75 @@ satisfying or does it read as janky/dropped-frames (intentional, but tune the st
   SVG data-URIs or CSS gradients; only the `<link>` to fonts.googleapis.com is external.
 - All four files open standalone; `index.html` links the three with relative names.
 - `prefers-reduced-motion` is honored in every variant (animations/transitions disabled).
+
+---
+
+## Session 2 — Mike's feedback, changes made (2026-06-19)
+
+### A — THE SEAM (entry-flow/index.html) — two fixes applied
+
+1. **Scrim removed.** The `.scrim` element (`position:fixed;inset:0; background: radial-gradient dark overlay`) was the source of the full-screen dimming. It's now `display:none` — the portal opens over the page without any darkening behind it. The page content stays fully visible when the window is open.
+
+2. **Blue-focus artifact on outside click fixed.** Three-pronged fix:
+   - The `.stage` element now carries `tabindex="-1" style="outline:none"` so it cannot receive a browser focus ring when clicked.
+   - The global `:focus-visible` rule that was applying a blue outline to everything is replaced with targeted rules: only `.knock-input:focus-visible` gets a subtle champagne outline; demo buttons get the blue ring only.
+   - A `mousedown` listener on the stage fires `e.preventDefault()` before `closePortal()`, suppressing the focus state before the browser can assign it.
+   - The `mouseleave` close still works; Esc still works; clicking *inside* the window does not close it.
+
+Everything else (the seam warm/tap-ramp, footlights, leaves splitting, the board drift, the splash wipe, all triggers) is unchanged.
+
+---
+
+### B — DIAMOND DOOR (variant-c2.html) — full redesign of the interaction arc
+
+Kept the visual DNA of variant-c.html (champagne duotone, Limelight, harlequin argyle, stop-motion `steps()`) but rebuilt the *interaction choreography* to match Mike's description:
+
+**Wall cover at rest.**
+At rest, a second diamond-shaped element (`.wall-cover`) sits flush over the door at z-index 20 — same diamond silhouette, same grid lines, but slightly lighter fill with a barely-visible `◆` glyph. It *conceals* the leaf and board behind it.
+
+**Hover → wall lifts.**
+On `:hover` the wall cover transitions out (opacity → 0, translateY(-14px) scale(0.92), `steps(4)`) to reveal the diamond door. A "spin the mouse inside · unlock the door" hint appears.
+
+**Mouse spin inside diamond → bloom.**
+Mouse movement inside the diamond boundary is tracked by angle accumulation. A champagne glow orb (`.cursor-orb`) follows the cursor. Once the accumulated rotation crosses 360°, the diamond **blooms** — the casing, behind, and leaf all expand to a larger size (172px → 210px inner, 200px → 240px casing) via `steps(5)` transitions. The password sill fades in below.
+
+**Password entry.** Same OPEN5 mechanic, footlights, rattle-on-wrong, lockout bar.
+
+**Flush entry animation.**
+On correct password: the door leaf swings open (`rotateY(-108deg)` on `steps(7)`), then the whole `.door-stage` scales to `scale(14)` on `steps(6)` — a stop-motion expansion that covers the viewport. The arrived board fades in behind it. This is the "flush expand": the diamond BECOMES the board rather than cutting away.
+
+> **Still needs refinement:** The flush expand (`scale(14)`) works but is not a true seamless morph into the board because CSS `scale` on a diamond-shaped element still leaves a seam at the edges. The ideal version would clip-path-expand the diamond into a rectangle and cross-dissolve into the board. This would require either a Canvas approach or SVG clip-path animation (both are viable). The current version is a tasteful approximation — the scale is fast enough and the arrived board fades in simultaneously so it reads as an expansion. Worth revisiting when wiring into the real app.
+
+---
+
+### C — CONCEPTS CAPTURED
+
+#### Two-style randomizable portal identity
+Mike's idea: the site could randomly pick between two distinct portal styles on each visit, making the entrance feel alive and slightly unpredictable.
+
+**Axis 1 — Password-interface style** (the comic-book look, variant B): a structured UI artifact — speech bubble, panel borders, stamped type, SFX onomatopoeia. The portal is a *form* dressed in a costume.
+
+**Axis 2 — Portal-design style** (variant C / the circle): an *architectural object* — a door, a circle, a shape that exists in the world of the wall. The password entry is secondary to the object itself.
+
+These two axes are genuinely different in feel. Randomizing between them (or between sub-variants like "diamond door" and "framed circle") would mean every visit has a slightly different character — consistent brand, different *mood*.
+
+Implementation note: a single random coin-flip in `DevPortal.tsx` could toggle between two CSS theme classes or swap the component entirely. The password and auth logic are identical; only the visual wrapper changes.
+
+#### Comic Iris / Portal with Tickets (portal-circle.html)
+Separate concept demo exploring the "circle with pattern inside" look. A full-bleed circle filled with the harlequin argyle (drifting), with a ghost Limelight wordmark at center. On hover or click, **tickets spawn out of the portal edge** — each one is a small board card (issue number + pip) that ejects radially and floats away in stop-motion steps.
+
+Mike's note: he does NOT love the current comic animations in variant B, but *does* love the circle-with-pattern and the idea of tickets coming out of a portal. This demo captures that look *without* the comic framing — it's a pure portal object that emits board artifacts. Could be its own entrance style or a decorative idle animation on the /dev page.
+
+#### What to do with variant B
+The Comic Iris structure (three panels, speech bubble) reads as too elaborate for a login. Consider stripping it down to *just* the iris aperture — the circular window with the argyle inside, no panels — which is essentially what `portal-circle.html` prototypes. The password entry could appear below the circle the same way it appears in C2.
+
+---
+
+## Files in this directory (updated)
+- `index.html` — gallery (links variant-a through c)
+- `variant-a.html` — The Framed Window (unchanged)
+- `variant-b.html` — The Comic-Panel Iris (unchanged)
+- `variant-c.html` — Diamond Door (original — peephole variant)
+- `variant-c2.html` — Diamond Door v2 (wall cover + spin-to-bloom + flush entry) ← NEW
+- `portal-circle.html` — Concept: circle-with-pattern + ticket spawning ← NEW
+- `entry-flow/index.html` — THE SEAM standalone (scrim removed, focus-ring fixed)

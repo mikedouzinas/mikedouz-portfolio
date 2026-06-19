@@ -67,16 +67,8 @@
   .seam-slot[data-tap="4"] .seam{background:rgba(231,226,212,.55);box-shadow:0 0 9px 0 rgba(179,18,43,.35);}
 
   /* ===== THE WINDOW / VAULT (shared element the seam morphs into) ===== */
-  /* Local radial scrim that grows OUT of the seam position — not a hard inset-0 cut. */
-  .scrim{
-    position:fixed;inset:0;z-index:70;pointer-events:none;opacity:0;
-    background:radial-gradient(circle at 50% 78%, rgba(5,4,8,.0) 0%, rgba(5,4,8,.86) 22%, rgba(5,4,8,.94) 100%);
-    transition:opacity 300ms ease;
-  }
-  .stage[data-state="peer"] .scrim,
-  .stage[data-state="knock"] .scrim,
-  .stage[data-state="error"] .scrim,
-  .stage[data-state="lockout"] .scrim{opacity:1;pointer-events:auto;}
+  /* Scrim removed: no full-screen dimming — the portal opens without darkening the page behind it. */
+  .scrim{display:none;}
 
   .stage{position:fixed;inset:0;z-index:80;pointer-events:none;display:grid;place-items:end center;padding-bottom:46px;}
   .stage[data-state]:not([data-state="rest"]):not([data-state="dimmed"]){pointer-events:auto;}
@@ -234,7 +226,11 @@
   .hint{position:fixed;right:14px;bottom:14px;z-index:120;max-width:260px;text-align:right;font-size:10px;line-height:1.6;color:rgba(231,226,212,.34);letter-spacing:.04em;}
   .hint b{color:rgba(231,226,212,.6);font-weight:700;}
 
-  :focus-visible{outline:2px solid var(--g-blue);outline-offset:2px;}
+  /* Suppress focus ring on the stage overlay itself — it's a click-outside trap, not a focusable. */
+  .stage:focus{outline:none;}
+  /* Only show focus rings on truly interactive elements inside the portal. */
+  .knock-input:focus-visible{outline:1px solid rgba(231,226,212,.35);outline-offset:2px;}
+  .demo button:focus-visible{outline:2px solid var(--g-blue);outline-offset:1px;}
 
   /* ===== prefers-reduced-motion: no morph/drift/rattle; cross-fade only ===== */
   @media (prefers-reduced-motion: reduce){
@@ -274,8 +270,8 @@
     </div>
   </div>
 
-  <!-- The stage: scrim + morphing window/vault. data-state drives the whole sequence. -->
-  <div class="stage" id="stage" data-state="rest">
+  <!-- The stage: morphing window/vault. data-state drives the whole sequence. tabindex=-1 to prevent blue focus ring on click-outside. -->
+  <div class="stage" id="stage" data-state="rest" tabindex="-1" style="outline:none">
     <div class="scrim"></div>
     <div class="window" id="window">
       <div class="glass">
@@ -432,6 +428,18 @@
   slot.addEventListener('mouseleave', function(){ if(getState()==='rest') unwarm(); });
   // reverse-on-leave from the window (graceful, not a hard close)
   stage.addEventListener('mouseleave', function(){ if(getState()==='peer'){ closePortal(); } });
+
+  // Click outside the window (on the stage backdrop) → close cleanly, no blue highlight
+  stage.addEventListener('mousedown', function(e){
+    // only close if clicking the stage itself, not any child element of the window
+    if (e.target === stage || e.target.classList.contains('scrim')){
+      e.preventDefault(); // suppress focus-ring from mousedown
+      if(getState()!=='rest' && getState()!=='dimmed'){
+        if(lockTimer){clearInterval(lockTimer);lockTimer=null;}
+        closePortal();
+      }
+    }
+  });
 
   // keyboard activate on the seam
   slot.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openPortal(); } });
