@@ -1,8 +1,10 @@
 # CLAUDE.md
 
 **Project**: mikeveson.com — portfolio, Iris AI assistant, and "the web" blog
-**Stack**: Next.js 15 (App Router), React 19, TypeScript, Anthropic Claude Sonnet 4.6, Upstash Redis, Supabase, Resend
-**Last updated**: 2026-04-20
+**Stack**: Next.js 16 (App Router), React 19, TypeScript, Anthropic Claude Sonnet 4.6, Upstash Redis, Supabase, Resend
+**Last updated**: 2026-06-19
+
+> Lint: `next lint` was removed in Next 16. `npm run lint` runs ESLint directly (`eslint .`) against the flat `eslint.config.mjs` (native `eslint-config-next` flat configs). `next build` does NOT run ESLint — run `npm run lint` separately.
 
 ---
 
