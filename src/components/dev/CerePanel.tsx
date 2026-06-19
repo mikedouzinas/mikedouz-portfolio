@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { X } from 'lucide-react';
 import type { CereAction } from '@/lib/dev/cere';
+import type { DevIssue } from '@/lib/dev/github';
 import { PRIORITY_META, SIZE_META, STATUS_META } from '@/lib/dev/uiMeta';
 import { Button } from '@/components/ui/Button';
 import { CereMark } from './CereMark';
@@ -21,7 +22,7 @@ const MAX_HEIGHT = 420;
 // scrollbar the moment Cere opens, before any messages.
 const BUBBLE_INSET = 42; // 40 padding + 2 border
 
-function ActionRow({ action }: { action: CereAction }) {
+function ActionRow({ action, title }: { action: CereAction; title: string }) {
   const repoName = action.repo.split('/')[1] ?? action.repo;
 
   if (action.kind === 'create') {
@@ -54,11 +55,14 @@ function ActionRow({ action }: { action: CereAction }) {
     <li className="rounded-lg border border-sky-400/20 bg-sky-500/[0.06] p-2.5 text-sm">
       <div className="mb-1 flex items-center gap-2 text-[11px] text-white/55">
         <span className="rounded bg-sky-500/20 px-1.5 py-0.5 text-sky-200/90">Update</span>
-        <span className="ml-auto truncate">
-          {repoName} #{action.number}
-        </span>
+        <span className="ml-auto truncate">{repoName}</span>
       </div>
-      <p className="text-white/90">{changes.join(' · ') || 'no change'}</p>
+      {/* Lead with #number + title so each change is individually identifiable,
+          even when several updates land in one turn (ticket #66). */}
+      <p className="text-white/90">
+        <span className="text-white/60">#{action.number}</span> — {title}
+      </p>
+      <p className="mt-0.5 text-white/65">{changes.join(' · ') || 'no change'}</p>
       {bodyChanged && <BodyDiff before={action.bodyBefore ?? ''} after={action.body ?? ''} />}
     </li>
   );
@@ -74,13 +78,27 @@ export function CerePanel({
   open,
   onClose,
   onApplied,
+  issues = [],
 }: {
   open: boolean;
   onClose: () => void;
-  onApplied: () => void;
+  /** Called after actions are applied, with any newly-created issues so the
+   *  board can optimistically insert them (ticket #71). */
+  onApplied: (created: DevIssue[]) => void;
+  /** Live board issues — used to resolve ticket titles for the proposal preview
+   *  (ticket #66). */
+  issues?: DevIssue[];
 }) {
   const { messages, busy, applying, actions, warnings, send, confirm, discard, reset } =
-    useCere(onApplied);
+    useCere(onApplied, issues);
+
+  // Resolve the display title for a proposed action: creates carry their own;
+  // updates/closes resolve theirs from the already-loaded board (ticket #66).
+  const titleFor = (a: CereAction): string => {
+    if (a.kind === 'create') return a.title;
+    const hit = issues.find((i) => i.repo === a.repo && i.number === a.number);
+    return hit?.title ?? `ticket #${a.number}`;
+  };
   const [isMobile, setIsMobile] = useState(false);
   const [showDiscard, setShowDiscard] = useState(false);
   const bubbleRef = useRef<HTMLDivElement>(null);
@@ -238,7 +256,7 @@ export function CerePanel({
                   </p>
                   <ul className="mb-3 max-h-44 space-y-2 overflow-y-auto">
                     {actions.map((a, i) => (
-                      <ActionRow key={i} action={a} />
+                      <ActionRow key={i} action={a} title={titleFor(a)} />
                     ))}
                   </ul>
                   {warnings.length > 0 && (

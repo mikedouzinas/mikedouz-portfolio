@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import type { CereAction } from '@/lib/dev/cere';
+import type { DevIssue } from '@/lib/dev/github';
 import type { IrisMessage } from '@/components/iris/IrisChat';
 
 interface CereState {
@@ -34,14 +35,31 @@ function summarize(actions: CereAction[]): string {
 /**
  * Cere conversation state: sends to the planner (/api/dev/iris), holds the
  * proposed actions for preview, and on confirm executes them through the
- * existing /api/dev/issues endpoints. `onApplied` refreshes the board.
+ * existing /api/dev/issues endpoints. `onApplied` refreshes the board and is
+ * handed any newly-created issues so the board can optimistically insert them
+ * (GitHub's list endpoint is eventually-consistent — ticket #71). `issues` is
+ * the live board, used to resolve ticket titles for the per-change summary
+ * (ticket #66).
  */
-export function useCere(onApplied: () => void) {
+export function useCere(
+  onApplied: (created: DevIssue[]) => void,
+  issues: DevIssue[] = [],
+) {
   const [state, setState] = useState<CereState>(EMPTY);
   const messagesRef = useRef<IrisMessage[]>([]);
   const actionsRef = useRef<CereAction[]>([]);
+  const issuesRef = useRef<DevIssue[]>([]);
   messagesRef.current = state.messages;
   actionsRef.current = state.actions;
+  issuesRef.current = issues;
+
+  // Title for a change summary line. Creates carry their own proposed title;
+  // updates/closes resolve theirs from the already-loaded board (ticket #66).
+  const titleFor = useCallback((a: CereAction): string => {
+    if (a.kind === 'create') return a.title;
+    const hit = issuesRef.current.find((i) => i.repo === a.repo && i.number === a.number);
+    return hit?.title ?? `ticket #${a.number}`;
+  }, []);
 
   const send = useCallback(async (message: string) => {
     const history = messagesRef.current;
@@ -86,11 +104,19 @@ export function useCere(onApplied: () => void) {
 
     let ok = 0;
     let fail = 0;
+    // Each line leads with the ticket number + title so every applied change is
+    // individually identifiable, even with several in one turn (ticket #66).
+    const lines: string[] = [];
+    // Issues the create POST returns, threaded back so the board can insert them
+    // immediately rather than waiting on GitHub's eventually-consistent list
+    // endpoint (ticket #71).
+    const created: DevIssue[] = [];
+
     for (const a of actions) {
+      const title = titleFor(a);
       try {
-        let res: Response;
         if (a.kind === 'create') {
-          res = await fetch('/api/dev/issues', {
+          const res = await fetch('/api/dev/issues', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -102,6 +128,11 @@ export function useCere(onApplied: () => void) {
               size: a.size,
             }),
           });
+          if (!res.ok) throw new Error();
+          const data = (await res.json()) as { issue: DevIssue };
+          created.push(data.issue);
+          lines.push(`#${data.issue.number} — ${title}: filed`);
+          ok++;
         } else {
           const patch: Record<string, unknown> = { repo: a.repo, number: a.number };
           if (a.priority) patch.priority = a.priority;
@@ -109,35 +140,36 @@ export function useCere(onApplied: () => void) {
           if (a.size) patch.size = a.size;
           if (a.state) patch.state = a.state;
           if (typeof a.body === 'string') patch.body = a.body;
-          res = await fetch('/api/dev/issues', {
+          const res = await fetch('/api/dev/issues', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(patch),
           });
+          if (!res.ok) throw new Error();
+          lines.push(`#${a.number} — ${title}: updated`);
+          ok++;
         }
-        if (!res.ok) throw new Error();
-        ok++;
       } catch {
+        lines.push(`#${a.kind === 'create' ? '?' : a.number} — ${title}: failed`);
         fail++;
       }
     }
 
-    onApplied();
+    onApplied(created);
+
+    const header = fail
+      ? `Applied ${ok}, ${fail} failed — check the GitHub token's Issues write permission.`
+      : `Done — ${ok} ${ok === 1 ? 'change' : 'changes'} applied. Anything else?`;
     setState((s) => ({
       ...s,
       applying: false,
       actions: [],
       messages: [
         ...s.messages,
-        {
-          role: 'assistant',
-          content: fail
-            ? `Applied ${ok}, but ${fail} failed — check the GitHub token's Issues write permission.`
-            : `Done — ${ok} ${ok === 1 ? 'change' : 'changes'} applied. Anything else?`,
-        },
+        { role: 'assistant', content: `${header}\n\n${lines.map((l) => `- ${l}`).join('\n')}` },
       ],
     }));
-  }, [onApplied]);
+  }, [onApplied, titleFor]);
 
   const discard = useCallback(() => {
     setState((s) => ({

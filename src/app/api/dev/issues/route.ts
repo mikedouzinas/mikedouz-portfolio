@@ -35,7 +35,9 @@ export async function GET(req: NextRequest) {
     // The default board view (state=open) also includes recently-closed issues
     // so the Kanban's Done column has content; explicit closed/all bypass that.
     const issues = state === 'open' ? await listBoardIssues(repos) : await listIssues(repos, state);
-    return NextResponse.json({ issues });
+    // no-store: a freshly-filed ticket must not be masked by a cached list
+    // response (ticket #71).
+    return NextResponse.json({ issues }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 502 });
   }

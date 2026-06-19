@@ -54,7 +54,9 @@ export default function DevConsolePage() {
       const url = selected
         ? `/api/dev/issues?state=open&repo=${encodeURIComponent(selected)}`
         : '/api/dev/issues?state=open';
-      const res = await fetch(url);
+      // no-store: GitHub's list endpoint is eventually-consistent and the
+      // browser/Next caches make freshly-filed tickets lag further (ticket #71).
+      const res = await fetch(url, { cache: 'no-store' });
       if (res.ok) {
         const data = (await res.json()) as { issues: DevIssue[] };
         setIssues(data.issues);
@@ -65,6 +67,23 @@ export default function DevConsolePage() {
   );
 
   const refreshIssues = useCallback(() => loadIssues(true), [loadIssues]);
+
+  // Optimistic insert: merge issues Cere just created into the board immediately
+  // (deduped on the card key repo#number), then silent-refetch to reconcile —
+  // GitHub's list endpoint takes several reloads to surface a new issue (#71).
+  const onCereApplied = useCallback(
+    (created: DevIssue[]) => {
+      if (created.length) {
+        setIssues((prev) => {
+          const seen = new Set(prev.map((i) => `${i.repo}#${i.number}`));
+          const fresh = created.filter((i) => !seen.has(`${i.repo}#${i.number}`));
+          return fresh.length ? [...fresh, ...prev] : prev;
+        });
+      }
+      void loadIssues(true);
+    },
+    [loadIssues],
+  );
 
   useEffect(() => {
     loadRepos();
@@ -214,7 +233,8 @@ export default function DevConsolePage() {
       <CerePanel
         open={composerOpen}
         onClose={() => setComposerOpen(false)}
-        onApplied={refreshIssues}
+        onApplied={onCereApplied}
+        issues={issues}
       />
     </div>
   );
