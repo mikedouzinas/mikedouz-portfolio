@@ -124,6 +124,60 @@ function sizeOf(labels: GhLabel[]): Size | null {
   return null;
 }
 
+// ---- Review-block helpers (pure, no network) ----
+
+export interface ReviewBlock { preview?: string; test?: string; feedback?: string }
+
+const REVIEW_START = '<!-- awaiting-review:start -->';
+const REVIEW_END = '<!-- awaiting-review:end -->';
+const REVIEW_RE = /<!-- awaiting-review:start -->[\s\S]*?<!-- awaiting-review:end -->/;
+
+/** Idempotently insert or replace the awaiting-review marker block in an issue body. */
+export function upsertReviewBlock(body: string, fields: ReviewBlock): string {
+  const existing = parseReviewBlock(body) ?? {};
+  const merged: ReviewBlock = { ...existing, ...fields };
+  const lines = [REVIEW_START];
+  if (merged.preview) lines.push(`**Preview:** ${merged.preview}`);
+  if (merged.test) lines.push(`**What to test:** ${merged.test}`);
+  if (merged.feedback) lines.push(`**Last feedback:** ${merged.feedback}`);
+  lines.push(REVIEW_END);
+  const block = lines.join('\n');
+  if (REVIEW_RE.test(body)) return body.replace(REVIEW_RE, block);
+  const sep = body.trim().length ? `${body.trimEnd()}\n\n` : '';
+  return `${sep}${block}\n`;
+}
+
+/** Parse the review block out of an issue body; returns null when absent. */
+export function parseReviewBlock(body: string): ReviewBlock | null {
+  const m = body.match(REVIEW_RE);
+  if (!m) return null;
+  const seg = m[0];
+  const pick = (label: string) => {
+    const r = new RegExp(`\\*\\*${label}:\\*\\*\\s*(.+)`);
+    const hit = seg.match(r);
+    return hit ? hit[1].trim() : undefined;
+  };
+  return { preview: pick('Preview'), test: pick('What to test'), feedback: pick('Last feedback') };
+}
+
+/**
+ * Derive the Vercel branch-preview URL for a given branch name.
+ * Pattern: <project>-git-<branch-slug>-<team>.vercel.app (max 63 chars).
+ * Project: mikedouz-portfolio, team: mikedouzinas.
+ *
+ * IMPORTANT: verify this alias against the live Vercel project dashboard
+ * (Settings → Git → Preview Deployments) before relying on --auto mode.
+ * Use --preview <url> (Task 3) as the guaranteed fallback.
+ */
+export function previewUrlForBranch(branch: string): string {
+  const slug = branch
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  const host = `mikedouz-portfolio-git-${slug}-mikedouzinas.vercel.app`.slice(0, 63);
+  return `https://${host.replace(/-+$/, '')}`;
+}
+
 // ---- Repo discovery (cached) ----
 interface RepoCache { data: DevRepo[]; expiry: number }
 declare global {
