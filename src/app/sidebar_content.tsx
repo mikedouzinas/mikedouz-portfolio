@@ -5,6 +5,7 @@ import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { SiGooglemeet } from 'react-icons/si';
 import PlaygroundButton from '../components/PlaygroundButton';
 import SpotifyBubble from '@/components/spotify/SpotifyBubble';
+import { PortalCircle } from '@/components/dev/PortalCircle';
 
 // Hook to detect the currently active section using Intersection Observer
 const useActiveSection = (sectionIds: string[]): string => {
@@ -40,9 +41,11 @@ const useActiveSection = (sectionIds: string[]): string => {
 
 interface SidebarHomeProps {
     scrollToTop: () => void;
+    /** When the random portal slot lands on the sidebar (Slot B), show the circle inline with the social icons. */
+    showPortal?: boolean;
 }
 
-const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
+const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop, showPortal = false }) => {
     const navItems = [
         { id: 'about', label: 'About' },
         { id: 'experience', label: 'Experience' },
@@ -165,6 +168,8 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
                     >
                         <SiGooglemeet size={24} />
                     </a>
+                    {/* Slot B — secret HARLEQUIN portal inline with the social icons (desktop only) */}
+                    {showPortal && <PortalCircle size="sm" />}
                 </div>
             </div>
         </div>
