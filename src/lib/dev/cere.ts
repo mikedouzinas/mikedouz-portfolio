@@ -151,7 +151,13 @@ export function buildCereSystem(repos: DevRepo[], issues: DevIssue[]): string {
 
   return `You are Cere, the filing assistant for THE HARLEQUIN — Mike's private dev board, built on GitHub Issues.
 
-Mike talks to you in plain language and you propose ticket changes. You don't chat for its own sake: when he describes work, call create_issue to propose it (call it multiple times to file several tickets at once). When he asks to change, re-prioritize, resize, or close something, call update_issue. Always include one short plain-language sentence summarizing what you're proposing.
+Mike talks to you in plain language and you PROPOSE ticket changes — you never apply them yourself. When he describes work, call create_issue to propose it (call it multiple times to file several tickets at once). When he asks to change, re-prioritize, resize, or close something, call update_issue. Always include one short plain-language sentence summarizing what you're proposing.
+
+CRITICAL — you are a proposer, not an executor. Nothing happens until Mike clicks Confirm on the preview. Therefore:
+- Speak ONLY in the future/proposal tense: "I'll file…", "I'm proposing…", "Here's the change I'd make…".
+- NEVER say a change is "done", "filed", "created", "updated", "changed", "closed", "reopened", "marked", "applied", "saved", or "completed". Those are false until Mike confirms — claiming them is a serious error.
+- Whenever you describe a concrete create/update, you MUST emit the matching tool call. Never describe a change in text without also calling the tool for it. If you can't form a valid tool call, do not pretend the change exists.
+- If you have nothing concrete to propose (the message isn't actionable, or you need more detail), say so plainly in text and call no tools — do not imply any change was or will be made.
 
 If the message is a genuine question or needs clarification (not a filing request), just reply in text without calling tools.
 
@@ -192,7 +198,12 @@ export function parseActions(
     } else if (block.type === 'tool_use' && block.name === 'create_issue') {
       const parsed = CreateInput.safeParse(block.input);
       if (!parsed.success) {
-        warnings.push('Skipped a malformed new ticket.');
+        const guessTitle =
+          typeof (block.input as { title?: unknown })?.title === 'string'
+            ? ` ("${(block.input as { title: string }).title}")`
+            : '';
+        const fields = parsed.error.issues.map((i) => i.path.join('.') || 'input').join(', ');
+        warnings.push(`Couldn't propose a new ticket${guessTitle} — invalid fields: ${fields}.`);
         continue;
       }
       const { subtasks, body, ...rest } = parsed.data;
@@ -202,7 +213,13 @@ export function parseActions(
     } else if (block.type === 'tool_use' && block.name === 'update_issue') {
       const parsed = UpdateInput.safeParse(block.input);
       if (!parsed.success) {
-        warnings.push(`Skipped a malformed change.`);
+        const raw = block.input as { repo?: unknown; number?: unknown };
+        const ref =
+          typeof raw?.number === 'number'
+            ? ` to ${typeof raw.repo === 'string' ? `${raw.repo}#` : '#'}${raw.number}`
+            : '';
+        const fields = parsed.error.issues.map((i) => i.path.join('.') || 'input').join(', ');
+        warnings.push(`Couldn't propose a change${ref} — invalid fields: ${fields}.`);
         continue;
       }
       const { body, addSubtasks, ...rest } = parsed.data;
@@ -226,11 +243,75 @@ export function parseActions(
         action.body = nextBody;
         action.bodyBefore = before;
       }
+
+      // Drop no-op updates: an update_issue call that carries no mutating field
+      // (or only a body that matches the current one) isn't a real change. Letting
+      // it through renders a "no change" proposal card that then applies nothing —
+      // exactly the phantom-change symptom (#80). Make the drop visible.
+      const mutates =
+        action.priority !== undefined ||
+        action.status !== undefined ||
+        action.size !== undefined ||
+        action.state !== undefined ||
+        action.body !== undefined;
+      if (!mutates) {
+        warnings.push(
+          `No actual change proposed for ${rest.repo}#${rest.number} — nothing to update, so it was skipped.`,
+        );
+        continue;
+      }
+
       actions.push(action);
     }
   }
 
   return { reply: reply.trim(), actions, warnings };
+}
+
+/**
+ * Verbs that imply a change was actually carried out. Cere is a proposer, so any
+ * of these in the reply while no action will be applied is a phantom completion
+ * claim (ticket #77). Kept narrow/past-tense so legitimate proposal prose
+ * ("I'll file…", "I'm proposing…") is not falsely caught.
+ */
+const COMPLETION_CLAIM =
+  /\b(filed|created|updated|changed|closed|reopened|marked|applied|added|saved|completed|done|set the|moved|renamed|deleted|removed)\b/i;
+
+/**
+ * Reconcile the planner's free-text reply against the actions that will actually
+ * be offered for confirmation. The reply is decoupled from whether any tool call
+ * survived parsing/repo-resolution, so Claude can narrate a completed change
+ * while `actions` is empty (ticket #77/#80). When that happens we replace the
+ * misleading prose with an honest message so the UI never shows a phantom "done"
+ * without a proposal card.
+ *
+ * @param reply        the planner's text
+ * @param actionCount  number of actionable proposals that will be shown
+ * @param dropped      whether ≥1 tool call was emitted but dropped (Zod / repo)
+ */
+export function reconcileReply(
+  reply: string,
+  actionCount: number,
+  dropped: boolean,
+): { reply: string; warnings: string[] } {
+  if (actionCount > 0) return { reply, warnings: [] };
+  if (!COMPLETION_CLAIM.test(reply)) return { reply, warnings: [] };
+
+  // The reply claims a change but nothing will be applied. Be honest about why.
+  if (dropped) {
+    return {
+      reply:
+        "I couldn't turn that into a valid change — see the note above for what got skipped. " +
+        'Want to clarify and I\'ll re-draft it for you to confirm?',
+      warnings: ['Cere described a change but no valid proposal survived — reply rewritten.'],
+    };
+  }
+  return {
+    reply:
+      "I didn't actually make any changes — I can only propose them, and you confirm before anything is filed. " +
+      "I couldn't turn that into a concrete change. Can you clarify what you'd like, and I'll draft it?",
+    warnings: ['Cere described a change but emitted no actionable proposal — reply rewritten.'],
+  };
 }
 
 /**
@@ -251,7 +332,7 @@ export function resolveActionRepos(
     if (!slugs.has(repo)) {
       const resolved = byName.get(repo.toLowerCase());
       if (!resolved) {
-        warnings.push(`Couldn't match repo "${a.repo}" — skipped that one.`);
+        warnings.push(`Couldn't match repo "${a.repo}" — it's not on your board, so that change was skipped.`);
         continue;
       }
       repo = resolved;
