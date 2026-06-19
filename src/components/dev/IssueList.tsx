@@ -131,10 +131,12 @@ function IssueCard({
   issue,
   repoName,
   onPatch,
+  inReview = false,
 }: {
   issue: DevIssue;
   repoName: string;
   onPatch: (issue: DevIssue, body: PatchBody) => void;
+  inReview?: boolean;
 }) {
   const [open, setOpen] = useState(false); // true === detached + centered
   // The vacated-slot placeholder lives on its own flag so it can OUTLAST the
@@ -276,7 +278,7 @@ function IssueCard({
             the SAME close/complete action as the Complete button. It must not
             also expand the ticket, so its click/keydown stop propagation to the
             surrounding header button. Hidden once closed (then it reads Done). */}
-        {!closed && (
+        {!closed && !inReview && (
           <span
             role="checkbox"
             aria-checked={false}
@@ -515,7 +517,7 @@ function IssueCard({
                   >
                     Reopen
                   </Button>
-                ) : (
+                ) : !inReview ? (
                   <Button
                     variant="ghost"
                     glowColor="52, 211, 153"
@@ -525,7 +527,7 @@ function IssueCard({
                     <Check className="h-3.5 w-3.5" />
                     Complete
                   </Button>
-                )}
+                ) : null}
               </div>
             </div>
       )}
@@ -806,7 +808,13 @@ export function IssueList({
       <div className="flex flex-col gap-3">
         {awaiting.map((i) => (
           <div key={`${i.repo}#${i.number}`}>
-            {card(i)}
+            <IssueCard
+              key={`${i.repo}#${i.number}`}
+              issue={i}
+              repoName={repoName(i.repo)}
+              onPatch={patch}
+              inReview
+            />
             <ReviewActions issue={i} onApprove={onApprove} onSendBack={onSendBack} />
           </div>
         ))}
