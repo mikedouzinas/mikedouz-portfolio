@@ -76,12 +76,19 @@ against the real Vercel project settings before relying on (1).
 A pinned **Awaiting Review** lane at the top of the board (above In Progress). Each card:
 - renders the "what to test" note inline + a **Test ↗** button opening the preview URL;
 - **Approve → Done** — closes the issue (Mike is the actor, so the normal close path);
-- **Send back** — returns the ticket to `status: in progress`; an optional one-line reason
-  is appended to the issue body (plain text the next agent reads). No feedback DB in v1.
+- **Send back** — opens an **in-app feedback textarea**; on submit it returns the ticket to
+  `status: in progress` and **posts the feedback as a GitHub issue comment** (timestamped,
+  non-destructive — a real history the next agent reads). The board **surfaces the latest
+  review feedback inline** on the card so an item that's bounced back shows why. No feedback
+  DB — GitHub comments are the store.
 
-Touches `src/components/dev/IssueList.tsx` (grouping + a small packet renderer) and
-`src/app/dev/page.tsx` (state + the approve/send-back handlers, reusing the existing
-`/api/dev/issues` owner-only path).
+In-app feedback is a first-class part of the loop (Mike's requirement): the card tells him
+**what to test**, he tests via **Test ↗**, and he replies right there with **Send back**.
+
+Touches `src/components/dev/IssueList.tsx` (grouping + packet renderer + the feedback box) and
+`src/app/dev/page.tsx` (approve / send-back handlers). Backend: the approve/send-back +
+comment-post + latest-comment-read go through the owner-only `/api/dev/*` boundary; add a
+comment read/post helper to `src/lib/dev/github.ts` (the board's GitHub client).
 
 ### 5. Automation hook (agent handoff)
 A new convenience command makes handoff one step and becomes a **hard rule** in the
@@ -100,7 +107,7 @@ Done; Vercel's PR preview URL captured automatically. Slots in once the agentic-
 (#70) matures; the §2 block and §4 UI don't change.
 
 ## Build surfaces (summary)
-- `src/lib/dev/github.ts` — status label + color.
+- `src/lib/dev/github.ts` — status label + color; read latest issue comment + post a comment.
 - `scripts/board.ts` — `--status "awaiting review"`, new `handoff` command, `--auto` URL resolve.
 - `src/components/dev/IssueList.tsx` — Awaiting Review lane + packet renderer + actions.
 - `src/app/dev/page.tsx` (+ `/api/dev/issues` if needed) — approve / send-back handlers.
