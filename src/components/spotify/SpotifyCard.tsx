@@ -93,7 +93,6 @@ export default function SpotifyCard({
   compact = false,
   isPlaying = false,
   isLoading = false,
-  playProgress = 0,
   playPosition = 0,
   playDuration = 0,
   onPlayToggle,

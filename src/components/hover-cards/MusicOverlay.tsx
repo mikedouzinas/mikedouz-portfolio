@@ -14,13 +14,16 @@ const VOLUME = 0.15;
 const FADE_DURATION = 400;
 
 function FloatingNote({ delay }: { delay: number }) {
+  // Compute the horizontal drift once on mount via a lazy initializer so the
+  // random value is stable across re-renders and not generated during render.
+  const [driftX] = useState(() => Math.random() * 20 - 10);
   return (
     <motion.span
       initial={{ opacity: 0, y: 0, x: 0 }}
       animate={{
         opacity: [0, 0.7, 0],
         y: -40,
-        x: Math.random() * 20 - 10,
+        x: driftX,
       }}
       transition={{
         duration: 2,

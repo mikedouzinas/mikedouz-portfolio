@@ -27,7 +27,9 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
 
   if (!isVisible) return null;
 
-  const PlayPauseIcon = ({ size }: { size: number }) => {
+  // Render helper (not a component) — invoked directly so it doesn't create a
+  // nested component during render.
+  const renderPlayPauseIcon = (size: number) => {
     if (isLoading) return <Loader2 size={size} className="animate-spin text-[#2dd4bf]" />;
     if (isPlaying) return <Pause size={size} fill="#2dd4bf" className="text-[#2dd4bf]" />;
     return <Play size={size} fill="#2dd4bf" className="text-[#2dd4bf] translate-x-px" />;
@@ -53,7 +55,7 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
             aria-label={isLoading ? 'Loading' : isPlaying ? 'Pause' : 'Play'}
             className="w-7 h-7 rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/35 flex items-center justify-center flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <PlayPauseIcon size={12} />
+            {renderPlayPauseIcon(12)}
           </button>
 
           <span className="text-xs text-gray-300 truncate flex-1 min-w-0">{postTitle}</span>
@@ -100,7 +102,7 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
               aria-label={isLoading ? 'Loading' : isPlaying ? 'Pause' : 'Play'}
               className="w-9 h-9 rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/35 flex items-center justify-center flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <PlayPauseIcon size={14} />
+              {renderPlayPauseIcon(14)}
             </button>
             <div className="flex-1 min-w-0">
               <div className="text-xs text-gray-300 truncate">{postTitle}</div>

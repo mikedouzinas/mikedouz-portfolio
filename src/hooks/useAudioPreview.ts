@@ -39,13 +39,18 @@ export function useAudioPreview(): UseAudioPreviewReturn {
   }, [cancelRaf]);
 
   const updateProgress = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio || audio.duration === 0 || isNaN(audio.duration)) {
-      rafRef.current = requestAnimationFrame(updateProgress);
-      return;
+    // Named hoisted function so the rAF loop can re-schedule itself without
+    // referencing the useCallback binding before it is declared.
+    function loop() {
+      const audio = audioRef.current;
+      if (!audio || audio.duration === 0 || isNaN(audio.duration)) {
+        rafRef.current = requestAnimationFrame(loop);
+        return;
+      }
+      setProgress(audio.currentTime / audio.duration);
+      rafRef.current = requestAnimationFrame(loop);
     }
-    setProgress(audio.currentTime / audio.duration);
-    rafRef.current = requestAnimationFrame(updateProgress);
+    loop();
   }, []);
 
   const togglePlay = useCallback(

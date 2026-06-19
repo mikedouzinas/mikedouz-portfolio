@@ -1,22 +1,13 @@
 import type { MusicMoment, MusicInsight } from "@/lib/spotify/types";
-
-// Lazy-loaded data — not bundled into initial JS
-let _moments: MusicMoment[] | null = null;
-let _insights: MusicInsight[] | null = null;
+import momentsData from "./music-moments.json";
+import insightsData from "./music-insights.json";
 
 export function getMusicMoments(): MusicMoment[] {
-  if (!_moments) {
-    // Dynamic require at runtime, not at bundle time
-    _moments = require("./music-moments.json") as MusicMoment[];
-  }
-  return _moments;
+  return momentsData as MusicMoment[];
 }
 
 export function getMusicInsights(): MusicInsight[] {
-  if (!_insights) {
-    _insights = require("./music-insights.json") as MusicInsight[];
-  }
-  return _insights;
+  return insightsData as MusicInsight[];
 }
 
 export function getMomentsByMonth(

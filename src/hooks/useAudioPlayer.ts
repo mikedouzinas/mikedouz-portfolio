@@ -121,7 +121,7 @@ export function useAudioPlayer(
       audio.currentTime = Math.max(audio.currentTime - 15, 0);
       setCurrentTime(audio.currentTime);
     });
-  }, []);
+  }, [cancelRaf, tick]);
 
   // Initiate: fetch audio URL from API, load audio + timestamps
   const initiate = useCallback(async () => {
@@ -239,7 +239,7 @@ export function useAudioPlayer(
       setErrorMessage("Couldn't load audio. Try again.");
       hasInitiatedRef.current = false;
     }
-  }, [slug, cancelRaf]);
+  }, [slug, cancelRaf, contentRef]);
 
   // Keep initiateRef in sync so recursive calls always use the latest version
   useEffect(() => {

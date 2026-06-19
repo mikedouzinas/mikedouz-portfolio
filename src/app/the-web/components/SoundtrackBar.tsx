@@ -23,14 +23,27 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
 
   if (dismissed || soundtrack.length === 0) return null;
 
-  const { currentTrack, currentIndex, trackCount } = player;
+  const {
+    currentTrack,
+    currentIndex,
+    trackCount,
+    containerRef,
+    prev,
+    next,
+    togglePlay,
+    isPlaying,
+    isLoading,
+    position,
+    duration,
+    stop,
+  } = player;
   if (!currentTrack) return null;
 
   return (
     <>
       {/* Hidden Spotify embed container */}
       <div
-        ref={player.containerRef}
+        ref={containerRef}
         style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', opacity: 0 }}
       />
 
@@ -61,7 +74,7 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
             {/* Prev button */}
             {trackCount > 1 && (
               <button
-                onClick={player.prev}
+                onClick={prev}
                 className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-white/60 hover:text-white transition-colors"
                 aria-label="Previous track"
               >
@@ -71,13 +84,13 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
 
             {/* Play / Pause button */}
             <button
-              onClick={player.togglePlay}
+              onClick={togglePlay}
               className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/30 transition-colors"
-              aria-label={player.isPlaying ? 'Pause' : 'Play'}
+              aria-label={isPlaying ? 'Pause' : 'Play'}
             >
-              {player.isLoading ? (
+              {isLoading ? (
                 <LoadingBars />
-              ) : player.isPlaying ? (
+              ) : isPlaying ? (
                 <Pause className="w-3.5 h-3.5 text-[#2dd4bf]" fill="#2dd4bf" />
               ) : (
                 <Play className="w-3.5 h-3.5 text-[#2dd4bf] ml-0.5" fill="#2dd4bf" />
@@ -87,7 +100,7 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
             {/* Next button */}
             {trackCount > 1 && (
               <button
-                onClick={player.next}
+                onClick={next}
                 className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-white/60 hover:text-white transition-colors"
                 aria-label="Next track"
               >
@@ -103,9 +116,9 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
             </div>
             <div className="text-[11px] text-white/40 truncate">
               {currentTrack.artist}
-              {player.isPlaying && player.duration > 0 && (
+              {isPlaying && duration > 0 && (
                 <span className="text-white/30 ml-1.5">
-                  {formatTime(player.position)} / {formatTime(player.duration)}
+                  {formatTime(position)} / {formatTime(duration)}
                 </span>
               )}
             </div>
@@ -135,7 +148,7 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
           {/* Close button */}
           <button
             onClick={() => {
-              player.stop();
+              stop();
               setDismissed(true);
             }}
             className="flex-shrink-0 w-4 h-4 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
