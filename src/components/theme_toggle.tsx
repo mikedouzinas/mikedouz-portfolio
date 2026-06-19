@@ -1,12 +1,19 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
 
+const emptySubscribe = () => () => {};
+
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  // Render nothing during SSR/first client render to avoid a theme-mismatch
+  // flash; useSyncExternalStore returns the client snapshot only after mount.
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
   if (!mounted) return null;
 
   return (

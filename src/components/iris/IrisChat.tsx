@@ -93,10 +93,11 @@ export function IrisChat({
   }
 
   // Auto-scroll as content streams in — but only if the user is at the bottom.
+  const lastMessageContent = messages[messages.length - 1]?.content;
   useEffect(() => {
     const el = scrollRef.current;
     if (el && pinnedRef.current) el.scrollTop = el.scrollHeight;
-  }, [messages.length, messages[messages.length - 1]?.content, busy]);
+  }, [messages.length, lastMessageContent, busy]);
 
   // Auto-focus the composer on mount. preventScroll so opening inside a
   // fixed/transformed overlay (Cere's Poof wrapper) doesn't scroll the page

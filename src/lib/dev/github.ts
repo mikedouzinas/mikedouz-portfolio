@@ -125,7 +125,6 @@ function sizeOf(labels: GhLabel[]): Size | null {
 // ---- Repo discovery (cached) ----
 interface RepoCache { data: DevRepo[]; expiry: number }
 declare global {
-  // eslint-disable-next-line no-var
   var __devRepoCache: RepoCache | undefined;
 }
 const REPO_TTL_MS = 10 * 60 * 1000;

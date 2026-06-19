@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown } from 'lucide-react';
+
+const emptySubscribe = () => () => {};
 
 export interface DropdownOption {
   value: string;
@@ -34,7 +36,6 @@ export function Dropdown({
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [coords, setCoords] = useState<{
     top?: number;
     bottom?: number;
@@ -52,7 +53,8 @@ export function Dropdown({
   const menuRef = useRef<HTMLDivElement>(null);
   const current = options.find((o) => o.value === value) ?? options[0];
 
-  useEffect(() => setMounted(true), []);
+  // Gate the body-portal until after mount (createPortal needs document.body).
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   // Anchor the portalled menu under the trigger. Recomputed on open and while
   // open on scroll/resize so it tracks the button (fixed coords, viewport-based).

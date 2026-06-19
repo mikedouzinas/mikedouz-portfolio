@@ -204,7 +204,6 @@ async function main(): Promise<void> {
     for (const region of regions) {
       // Map trimmed-array indices back to global week indices
       const globalRegionStart = lo + region.start;
-      const globalRegionEnd = lo + region.end;
 
       // Split into sub-peaks
       // splitIntoPeaks expects the full (trimmed) count array and relative indices

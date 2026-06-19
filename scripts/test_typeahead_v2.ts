@@ -1,4 +1,4 @@
-import { TypeaheadV2, createTypeaheadV2 } from "@/lib/iris/typeahead_v2";
+import { createTypeaheadV2 } from "@/lib/iris/typeahead_v2";
 
 async function testTypeahead() {
   console.log("Testing Enhanced Typeahead V2\n");

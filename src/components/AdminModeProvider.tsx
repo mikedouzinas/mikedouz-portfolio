@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useState, useEffect, type ReactNode } from "react";
+import React, { createContext, useEffect, useSyncExternalStore, type ReactNode } from "react";
 
 interface AdminModeContextType {
   adminMode: boolean;
@@ -10,24 +10,47 @@ export const AdminModeContext = createContext<AdminModeContextType>({ adminMode:
 
 const STORAGE_KEY = "mv-admin-mode";
 
-export function AdminModeProvider({ children }: { children: ReactNode }) {
-  const [adminMode, setAdminMode] = useState(false);
+// localStorage-backed external store so admin mode can be read SSR-safely
+// (server snapshot is always false) without synchronous setState-in-effect.
+const listeners = new Set<() => void>();
 
+function emit() {
+  for (const l of listeners) l();
+}
+
+function readStore(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function subscribe(onChange: () => void): () => void {
+  listeners.add(onChange);
+  return () => {
+    listeners.delete(onChange);
+  };
+}
+
+export function AdminModeProvider({ children }: { children: ReactNode }) {
+  const adminMode = useSyncExternalStore(subscribe, readStore, () => false);
+
+  // One-time: reconcile the ?admin=… query param with localStorage and strip
+  // it from the URL. This only writes to external systems (localStorage, URL),
+  // then notifies the store; it never calls setState synchronously.
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === "true") setAdminMode(true);
-
       const params = new URLSearchParams(window.location.search);
       const adminParam = params.get("admin");
       const expectedKey = process.env.NEXT_PUBLIC_ADMIN_MODE_KEY;
 
       if (adminParam === "off") {
         localStorage.removeItem(STORAGE_KEY);
-        setAdminMode(false);
+        emit();
       } else if (adminParam && expectedKey && adminParam === expectedKey) {
         localStorage.setItem(STORAGE_KEY, "true");
-        setAdminMode(true);
+        emit();
       }
 
       // Strip admin param from URL

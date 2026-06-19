@@ -120,11 +120,21 @@ export function CerePanel({
     else onClose();
   }, [isDirty, onClose]);
 
-  // Fresh conversation each open.
+  // Reset the discard confirmation the moment the panel closes. Done during
+  // render (tracking the previous `open`) rather than in an effect so it doesn't
+  // trip set-state-in-effect / cause an extra render.
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (prevOpen !== open) {
+    setPrevOpen(open);
+    if (!open) setShowDiscard(false);
+  }
+
+  // Fresh conversation each open: clear the conversation + composer draft when
+  // the panel closes. (reset() lives in useCere and is a side effect, so it
+  // stays in an effect; the discard flag is reset during render above.)
   useEffect(() => {
     if (!open) {
       reset();
-      setShowDiscard(false);
       inputRef.current = '';
     }
   }, [open, reset]);

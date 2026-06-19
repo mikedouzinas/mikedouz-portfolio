@@ -5,7 +5,7 @@
  * Only detects one directive per stream to avoid duplicates
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { ContactDirective, ContactReason, ContactOpenBehavior } from '@/lib/types';
 
 /**
@@ -85,26 +85,31 @@ export function detectContactDirective(text: string): ContactDirective | null {
  * @returns The detected directive or null
  */
 export function useUiDirectives(streamText: string): ContactDirective | null {
+  // Sticky directive: once detected for an answer it persists until a new
+  // answer arrives (streamText changes). This is derived from streamText, so we
+  // compute it during render using the "store previous value + adjust state
+  // during render" pattern instead of an effect (avoids setState-in-effect and
+  // the extra render an effect would cause).
   const [directive, setDirective] = useState<ContactDirective | null>(null);
   const [lastStreamText, setLastStreamText] = useState<string>('');
-  
-  useEffect(() => {
-    // Reset directive if streamText has changed to a new answer
-    // This happens when a new query starts (streamText becomes empty or different)
-    if (streamText !== lastStreamText) {
-      setDirective(null);
-      setLastStreamText(streamText);
-    }
-    
-    // Only detect if we haven't already found one for this answer
-    if (directive) return;
-    
+
+  if (streamText !== lastStreamText) {
+    // Text changed (new answer or more streamed in): detect from latest text.
+    const detected = detectContactDirective(streamText);
+    setLastStreamText(streamText);
+    setDirective(detected);
+    return detected;
+  }
+
+  // Same answer, but a directive may now have streamed in if none was found yet.
+  if (!directive) {
     const detected = detectContactDirective(streamText);
     if (detected) {
       setDirective(detected);
+      return detected;
     }
-  }, [streamText, directive, lastStreamText]);
-  
+  }
+
   return directive;
 }
 

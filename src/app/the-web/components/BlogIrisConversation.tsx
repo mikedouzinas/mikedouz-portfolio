@@ -31,10 +31,16 @@ export default function BlogIrisConversation({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [loadingMsg, setLoadingMsg] = useState(getRandomBlogLoadingMessage);
 
-  // Rotate loading message every 3s while streaming
+  // Pick a fresh loading message the instant streaming begins (during render via
+  // prev-tracking so it's not a frame late), then rotate it every 3s in an
+  // effect for the duration of the stream.
+  const [prevStreaming, setPrevStreaming] = useState(isStreaming);
+  if (prevStreaming !== isStreaming) {
+    setPrevStreaming(isStreaming);
+    if (isStreaming) setLoadingMsg(getRandomBlogLoadingMessage());
+  }
   useEffect(() => {
     if (!isStreaming) return;
-    setLoadingMsg(getRandomBlogLoadingMessage());
     const interval = setInterval(() => {
       setLoadingMsg(getRandomBlogLoadingMessage());
     }, 3000);
@@ -42,11 +48,12 @@ export default function BlogIrisConversation({
   }, [isStreaming]);
 
   // Auto-scroll on new content
+  const lastMessageContent = messages[messages.length - 1]?.content;
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages.length, messages[messages.length - 1]?.content]);
+  }, [messages.length, lastMessageContent]);
 
   // Auto-focus textarea on mount
   useEffect(() => {

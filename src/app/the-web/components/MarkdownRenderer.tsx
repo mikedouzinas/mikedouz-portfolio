@@ -16,7 +16,6 @@ interface MarkdownRendererProps {
 // tree. Runs against the hast tree (not during React render), so it produces
 // the same indices on server and client — unlike a render-time counter which
 // double-counts under React StrictMode and causes hydration mismatches.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function rehypeAddParaIdx() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tree: any) => {

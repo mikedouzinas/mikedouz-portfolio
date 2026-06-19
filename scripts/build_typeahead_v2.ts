@@ -4,6 +4,23 @@ import { loadKBItems } from "@/lib/iris/load";
 
 const OUT = path.join(process.cwd(), "src/data/iris/derived/typeahead_v2.json");
 
+// Loose structural view of a KB item: KBItem is a discriminated union and these
+// scripts read fields that only exist on some members, so we access them through
+// this optional-field shape rather than `any`.
+type KbLike = {
+  id: string;
+  kind?: string;
+  title?: string;
+  name?: string;
+  role?: string;
+  company?: string;
+  value?: string;
+  interest?: string;
+  summary?: string;
+  tags?: string[];
+  aliases?: string[];
+};
+
 // Enhanced typeahead item with question patterns
 type TypeaheadItem = {
   id: string;
@@ -17,7 +34,7 @@ type TypeaheadItem = {
 };
 
 // Question templates based on item type
-const QUESTION_TEMPLATES: Record<string, (item: any) => string[]> = {
+const QUESTION_TEMPLATES: Record<string, (item: KbLike) => string[]> = {
   project: (item) => [
     `What is ${item.title}?`,
     `Tell me about ${item.title}`,
@@ -96,7 +113,7 @@ const COMMON_PATTERNS = [
 ];
 
 // Generate contextual sentence starters based on partial input
-function generatePatterns(item: any): string[] {
+function generatePatterns(item: KbLike): string[] {
   const patterns: string[] = [];
   
   if (item.kind === 'project') {
@@ -126,7 +143,8 @@ function generatePatterns(item: any): string[] {
   const kb = await loadKBItems();
   
   // Build enhanced typeahead items with questions
-  const items: TypeaheadItem[] = kb.map((d: any) => {
+  const items: TypeaheadItem[] = kb.map((item) => {
+    const d = item as KbLike;
     const base: TypeaheadItem = {
       id: d.id,
       kind: d.kind ?? undefined,

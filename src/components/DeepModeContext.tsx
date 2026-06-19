@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useSyncExternalStore } from 'react';
 
 interface DeepModeContextType {
   deepMode: boolean;
@@ -13,53 +13,66 @@ const DeepModeContext = createContext<DeepModeContextType>({
 
 const STORAGE_KEY = 'mv-deep-mode';
 
+// External store backing deep mode. It is the single source of truth so the
+// value can be read SSR-safely via useSyncExternalStore (server snapshot is
+// always false, the client snapshot reads localStorage after mount) and shared
+// across every consumer without synchronous setState-in-effect.
+const listeners = new Set<() => void>();
+
+function emit() {
+  for (const l of listeners) l();
+}
+
+function readStore(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function setStore(next: boolean) {
+  try {
+    localStorage.setItem(STORAGE_KEY, String(next));
+  } catch {
+    // localStorage unavailable
+  }
+  emit();
+}
+
+function subscribe(onChange: () => void): () => void {
+  listeners.add(onChange);
+  return () => {
+    listeners.delete(onChange);
+  };
+}
+
 export function DeepModeProvider({ children }: { children: React.ReactNode }) {
-  const [deepMode, setDeepMode] = useState(false);
+  const deepMode = useSyncExternalStore(subscribe, readStore, () => false);
 
-  // Hydrate from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === 'true') {
-        setDeepMode(true);
-      }
-    } catch {
-      // SSR or localStorage unavailable
-    }
+  const toggleDeepMode = useCallback(() => {
+    setStore(!readStore());
   }, []);
-
-  // Persist to localStorage on change
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, String(deepMode));
-    } catch {
-      // localStorage unavailable
-    }
-  }, [deepMode]);
 
   // Keyboard shortcut: Cmd+Shift+. (Mac) / Ctrl+Shift+. (Windows) to toggle deep mode
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.code === 'Period' || e.key === '>' || e.key === '.')) {
         e.preventDefault();
-        setDeepMode(prev => !prev);
+        toggleDeepMode();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [toggleDeepMode]);
 
   // Listen for toggle events from other components (e.g. Iris palette commands)
   useEffect(() => {
-    const handleToggleEvent = () => setDeepMode(prev => !prev);
+    const handleToggleEvent = () => toggleDeepMode();
     window.addEventListener('mv-toggle-deep-mode', handleToggleEvent);
     return () => window.removeEventListener('mv-toggle-deep-mode', handleToggleEvent);
-  }, []);
-
-  const toggleDeepMode = useCallback(() => {
-    setDeepMode(prev => !prev);
-  }, []);
+  }, [toggleDeepMode]);
 
   return (
     <DeepModeContext.Provider value={{ deepMode, toggleDeepMode }}>

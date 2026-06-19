@@ -43,7 +43,9 @@ export default function RankedByMVPage() {
   );
   const [savedRatings, setSavedRatings] = useState<SavedRating[]>([]);
 
-  // Load saved ratings from localStorage on component mount
+  // Load saved ratings from localStorage on component mount. Two-phase by
+  // design (render empty on server/first paint, then hydrate from localStorage
+  // after mount) to avoid an SSR hydration mismatch — so this stays an effect.
   useEffect(() => {
     const saved = localStorage.getItem('mv_ranked_v1');
     if (saved) {
@@ -52,6 +54,7 @@ export default function RankedByMVPage() {
           ...rating,
           timestamp: new Date(rating.timestamp)
         }));
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time localStorage hydration after mount, kept two-phase to avoid SSR mismatch
         setSavedRatings(parsedRatings);
       } catch (error) {
         console.error('Error loading saved ratings:', error);

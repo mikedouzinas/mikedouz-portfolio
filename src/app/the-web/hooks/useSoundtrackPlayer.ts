@@ -52,7 +52,11 @@ export function useSoundtrackPlayer(soundtrack: SoundtrackTrack[]) {
   const trackEnded =
     isCurrentPlaying && embed.progress >= 1 && !embed.isPlaying;
 
+  // Reacts to an external system (the audio embed reaching the end of a track)
+  // to auto-advance the soundtrack — a legitimate effect synchronizing with the
+  // player, not render-derived state.
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- responds to external audio-playback end event, not derived state */
     if (trackEnded && !autoAdvancing && soundtrack.length > 1) {
       setAutoAdvancing(true);
       const nextIdx = (currentIndex + 1) % soundtrack.length;
@@ -67,6 +71,7 @@ export function useSoundtrackPlayer(soundtrack: SoundtrackTrack[]) {
     if (trackEnded && soundtrack.length === 1) {
       setPreviewEnded(true);
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [trackEnded, autoAdvancing, currentIndex, soundtrack.length, asMoments, embedTogglePlay]);
 
   const play = useCallback(() => {

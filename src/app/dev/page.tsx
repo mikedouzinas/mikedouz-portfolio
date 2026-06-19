@@ -85,20 +85,29 @@ export default function DevConsolePage() {
     [loadIssues],
   );
 
+  // Data fetching on mount / when the selected repo changes. This is the
+  // canonical use of an effect (sync React with an external system — the API);
+  // the setState inside the loaders runs after the fetch resolves, not as
+  // render-derived state. The rule can't see across the async loader boundary.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- on-mount data fetch, not derived state
     loadRepos();
   }, [loadRepos]);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on selected-repo change, not derived state
     loadIssues();
   }, [loadIssues]);
 
-  // Mount the loader immediately when loading starts; keep it mounted for one
-  // fade duration after loading ends so it can fade out over the board.
+  // Mount the loader immediately when loading starts (handled during render via
+  // prev-tracking so it's never a frame late), then keep it mounted for one fade
+  // duration after loading ends so it can fade out over the board.
+  const [prevLoading, setPrevLoading] = useState(loading);
+  if (prevLoading !== loading) {
+    setPrevLoading(loading);
+    if (loading) setShowLoader(true);
+  }
   useEffect(() => {
-    if (loading) {
-      setShowLoader(true);
-      return;
-    }
+    if (loading) return;
     const id = setTimeout(() => setShowLoader(false), 300);
     return () => clearTimeout(id);
   }, [loading]);

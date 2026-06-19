@@ -83,7 +83,7 @@ export default function CommentSection({
     return () => window.removeEventListener('iris-comment-posted', handler);
   }, [fetchComments]);
 
-  function handleReply(commentId: string, _authorName: string) {
+  function handleReply(commentId: string) {
     setReplyingTo(commentId === replyingTo ? null : commentId);
   }
 

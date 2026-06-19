@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -25,6 +25,8 @@ import { CopyForClaude } from './CopyForClaude';
 
 export type GroupBy = 'status' | 'repo';
 export type SortBy = 'priority' | 'recent' | 'size';
+
+const emptySubscribe = () => () => {};
 
 // Priority shows just the code (P1…P5) — the descriptive word ("· Medium") was
 // confusable with the t-shirt size's "M · Medium". The color dot carries severity.
@@ -137,7 +139,8 @@ function IssueCard({
   // collapse: it stays mounted while the card morphs back and only unmounts
   // once the inline card's layout animation lands (onLayoutAnimationComplete).
   const [placeholderVisible, setPlaceholderVisible] = useState(false);
-  const [mounted, setMounted] = useState(false); // portal target ready (client only)
+  // portal target ready (client only) — true only after mount, SSR-safe
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [addText, setAddText] = useState('');
   const [copiedSub, setCopiedSub] = useState<number | null>(null);
   const [editing, setEditing] = useState(false);
@@ -161,8 +164,6 @@ function IssueCard({
   // lifting out and flying back — the detach effect.
   const layoutId = `ticket-${issue.repo}-${issue.number}`;
 
-  useEffect(() => setMounted(true), []);
-
   // Lock body scroll while a ticket is detached so the centered panel is the
   // sole focus (and the backdrop scrim can't be scrolled past).
   useEffect(() => {
@@ -174,6 +175,16 @@ function IssueCard({
     };
   }, [open]);
 
+  function detach() {
+    setPlaceholderVisible(true); // show the placeholder immediately on detach
+    setOpen(true);
+  }
+  const collapse = useCallback(() => {
+    // Keep the placeholder up; it's cleared by the inline card's
+    // onLayoutAnimationComplete once the card has contracted back into its slot.
+    setOpen(false);
+  }, []);
+
   // Esc collapses the detached panel back into its slot.
   useEffect(() => {
     if (!open) return;
@@ -182,17 +193,7 @@ function IssueCard({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  function detach() {
-    setPlaceholderVisible(true); // show the placeholder immediately on detach
-    setOpen(true);
-  }
-  function collapse() {
-    // Keep the placeholder up; it's cleared by the inline card's
-    // onLayoutAnimationComplete once the card has contracted back into its slot.
-    setOpen(false);
-  }
+  }, [open, collapse]);
 
   async function copySubtask(text: string, index: number) {
     try {

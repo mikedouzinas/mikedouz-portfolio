@@ -45,6 +45,14 @@ export default function AboutSheet({ open, onClose }: AboutSheetProps) {
    */
   const [bioExpanded, setBioExpanded] = useState(false);
 
+  // Reset bio expansion when the sheet closes. Done during render via
+  // prev-tracking (not in the effect below) to avoid setState-in-effect.
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (prevOpen !== open) {
+    setPrevOpen(open);
+    if (!open) setBioExpanded(false);
+  }
+
   /**
    * Handle ESC key press to close modal
    * Cleanup listener on unmount or when open state changes
@@ -60,9 +68,6 @@ export default function AboutSheet({ open, onClose }: AboutSheetProps) {
       document.addEventListener('keydown', handleEscape);
       // Prevent body scroll when sheet is open
       document.body.style.overflow = 'hidden';
-    } else {
-      // Reset bio expansion when sheet closes
-      setBioExpanded(false);
     }
 
     return () => {
