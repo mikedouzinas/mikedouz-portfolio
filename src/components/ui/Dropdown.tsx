@@ -35,10 +35,17 @@ export function Dropdown({
 }) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [coords, setCoords] = useState<{ top: number; left: number; width: number }>({
+  const [coords, setCoords] = useState<{
+    top?: number;
+    bottom?: number;
+    left: number;
+    width: number;
+    maxHeight: number;
+  }>({
     top: 0,
     left: 0,
     width: 0,
+    maxHeight: 0,
   });
   const ref = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -55,7 +62,25 @@ export function Dropdown({
       const el = btnRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      setCoords({ top: r.bottom + 4, left: r.left, width: r.width });
+      const margin = 8;
+      const gap = 4;
+      const spaceBelow = window.innerHeight - r.bottom - margin;
+      const spaceAbove = r.top - margin;
+      // Flip the menu above the trigger when there isn't enough room below —
+      // critical inside the tall detached ticket panel, where bottom-row
+      // dropdowns would otherwise open off the bottom of the viewport. The menu
+      // is also capped to the available space and scrolls internally.
+      if (spaceBelow >= spaceAbove) {
+        setCoords({ top: r.bottom + gap, left: r.left, width: r.width, maxHeight: Math.max(spaceBelow, 120) });
+      } else {
+        // Anchor by `bottom` so the menu grows upward from just above the trigger.
+        setCoords({
+          bottom: window.innerHeight - r.top + gap,
+          left: r.left,
+          width: r.width,
+          maxHeight: Math.max(spaceAbove, 120),
+        });
+      }
     }
     place();
     window.addEventListener('scroll', place, true);
@@ -108,10 +133,12 @@ export function Dropdown({
             style={{
               position: 'fixed',
               top: coords.top,
+              bottom: coords.bottom,
               left: coords.left,
               minWidth: Math.max(coords.width, 160),
+              maxHeight: coords.maxHeight,
             }}
-            className="z-[120] overflow-hidden rounded-lg border border-white/10 bg-[#0c1118] p-1 shadow-xl"
+            className="z-[120] overflow-y-auto rounded-lg border border-white/10 bg-[#0c1118] p-1 shadow-xl"
           >
             {options.map((o) => (
               <button
