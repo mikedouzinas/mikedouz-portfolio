@@ -239,3 +239,8 @@ None of these require disclosing any private detail; they're framing directions.
 
 _These are directions, not commitments — each can be adopted independently and at
 whatever level of personal disclosure Mike is comfortable with._
+
+---
+
+## Mike's steer (2026-06-19)
+Music / the dated timeline can seed **part** of each moment, but a moment must **not** be a music-sole connection. Each moment should combine multiple inputs — a photo (or short video), a brief anecdote/text, place, and the felt texture — with the song + date as one authentic layer among several, not the whole thing. Design the format so the visual/narrative carries equal weight to the audio.
