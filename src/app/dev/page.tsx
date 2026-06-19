@@ -68,6 +68,18 @@ export default function DevConsolePage() {
 
   const refreshIssues = useCallback(() => loadIssues(true), [loadIssues]);
 
+  const patchIssue = useCallback(async (repo: string, number: number, patch: Record<string, unknown>) => {
+    await fetch('/api/dev/issues', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repo, number, ...patch }),
+    });
+    await loadIssues(true);
+  }, [loadIssues]);
+
+  const onApprove = useCallback((i: DevIssue) => patchIssue(i.repo, i.number, { state: 'closed' }), [patchIssue]);
+  const onSendBack = useCallback((i: DevIssue, feedback: string) => patchIssue(i.repo, i.number, { feedback }), [patchIssue]);
+
   // Optimistic insert: merge issues Cere just created into the board immediately
   // (deduped on the card key repo#number), then silent-refetch to reconcile —
   // GitHub's list endpoint takes several reloads to surface a new issue (#71).
@@ -224,6 +236,8 @@ export default function DevConsolePage() {
                 groupBy={groupBy}
                 sort={sort}
                 onChanged={refreshIssues}
+                onApprove={onApprove}
+                onSendBack={onSendBack}
               />
             )}
           </div>

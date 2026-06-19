@@ -19,6 +19,7 @@ import {
   type DraftSubtask,
 } from '@/lib/dev/subtasks';
 import { buildClaudePrompt } from '@/lib/dev/copy';
+import { parseReviewBlock } from '@/lib/dev/github';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
 import { CopyForClaude } from './CopyForClaude';
@@ -675,9 +676,11 @@ function sortIssues(items: DevIssue[], sort: SortBy): DevIssue[] {
 const STATUS_LANES: { key: string; label: string; color: string }[] = [
   { key: 'todo', label: 'Todo', color: STATUS_META.todo.color },
   { key: 'in progress', label: 'In progress', color: STATUS_META['in progress'].color },
-  { key: 'awaiting review', label: 'Awaiting review', color: STATUS_META['awaiting review'].color },
   { key: 'done', label: 'Done', color: DONE_GREEN },
 ];
+
+/** True when an issue lives in the pinned Awaiting Review section. */
+const isAwaiting = (i: DevIssue) => i.state === 'open' && i.status === 'awaiting review';
 
 function laneOf(i: DevIssue): string {
   if (i.state === 'closed') return 'done';
@@ -694,18 +697,59 @@ function LaneHeader({ color, label, count }: { color: string; label: string; cou
   );
 }
 
+function ReviewActions({
+  issue,
+  onApprove,
+  onSendBack,
+}: {
+  issue: DevIssue;
+  onApprove: (i: DevIssue) => void;
+  onSendBack: (i: DevIssue, feedback: string) => void;
+}) {
+  const review = parseReviewBlock(issue.body);
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState('');
+  return (
+    <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] p-2 text-xs">
+      {review?.test && <p className="mb-2 text-white/70"><span className="text-white/40">Test: </span>{review.test}</p>}
+      {review?.feedback && <p className="mb-2 text-amber-300/80">↩ {review.feedback}</p>}
+      <div className="flex flex-wrap items-center gap-2">
+        {review?.preview && (
+          <a href={review.preview} target="_blank" rel="noreferrer"
+             className="rounded bg-white/10 px-2 py-1 hover:bg-white/20">Test ↗</a>
+        )}
+        <button onClick={() => onApprove(issue)} className="rounded bg-emerald-600/80 px-2 py-1 hover:bg-emerald-600">Approve → Done</button>
+        <button onClick={() => setOpen((v) => !v)} className="rounded bg-white/10 px-2 py-1 hover:bg-white/20">Send back</button>
+      </div>
+      {open && (
+        <div className="mt-2">
+          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2}
+            placeholder="What needs fixing?"
+            className="w-full rounded bg-black/30 p-2 text-white outline-none" />
+          <button disabled={!text.trim()} onClick={() => { onSendBack(issue, text.trim()); setOpen(false); setText(''); }}
+            className="mt-1 rounded bg-amber-600/80 px-2 py-1 disabled:opacity-40">Send back to In progress</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function IssueList({
   issues,
   repos,
   groupBy,
   sort,
   onChanged,
+  onApprove,
+  onSendBack,
 }: {
   issues: DevIssue[];
   repos: DevRepo[];
   groupBy: GroupBy;
   sort: SortBy;
   onChanged: () => void;
+  onApprove?: (i: DevIssue) => void;
+  onSendBack?: (i: DevIssue, feedback: string) => void;
 }) {
   const [error, setError] = useState('');
 
@@ -744,14 +788,37 @@ export function IssueList({
     />
   );
 
+  // Pinned awaiting-review items — shown above BOTH grouping views so they never
+  // appear in a lane or repo section (excluded below via !isAwaiting).
+  const awaiting = sortIssues(issues.filter(isAwaiting), sort);
+
+  const awaitingSection = awaiting.length > 0 && onApprove && onSendBack ? (
+    <div className="mb-5 rounded-xl border border-[#e7b34a]/30 bg-[#e7b34a]/[0.06] p-3">
+      <LaneHeader color="#E7B34A" label="Awaiting review" count={awaiting.length} />
+      <div className="flex flex-col gap-3">
+        {awaiting.map((i) => (
+          <div key={`${i.repo}#${i.number}`}>
+            {card(i)}
+            <ReviewActions issue={i} onApprove={onApprove} onSendBack={onSendBack} />
+          </div>
+        ))}
+      </div>
+    </div>
+  ) : null;
+
   // STATUS → a real Kanban: three columns, each a vertical stack.
+  // Awaiting-review items are excluded — they live only in the pinned section.
   if (groupBy === 'status') {
     return (
       <div>
         {error && <p className="mb-3 text-xs text-red-400">{error}</p>}
+        {awaitingSection}
         <div className="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-3">
           {STATUS_LANES.map((lane) => {
-            const items = sortIssues(issues.filter((i) => laneOf(i) === lane.key), sort);
+            const items = sortIssues(
+              issues.filter((i) => laneOf(i) === lane.key && !isAwaiting(i)),
+              sort,
+            );
             return (
               <div key={lane.key}>
                 <LaneHeader color={lane.color} label={lane.label} count={items.length} />
@@ -774,8 +841,9 @@ export function IssueList({
 
   // REPO → vertical sections per repo (too many to be columns). Closed items
   // only surface in the Status Kanban's Done lane, so filter to open here.
+  // Awaiting-review items are excluded — they live only in the pinned section.
   // Within each section, the active sort (incl. Size) decides the order.
-  const openItems = issues.filter((i) => i.state === 'open');
+  const openItems = issues.filter((i) => i.state === 'open' && !isAwaiting(i));
   const sections = repos
     .map((r) => ({
       key: r.slug,
@@ -788,6 +856,7 @@ export function IssueList({
   return (
     <div>
       {error && <p className="mb-3 text-xs text-red-400">{error}</p>}
+      {awaitingSection}
       {sections.map((sec) => (
         <section key={sec.key} className="mb-6 last:mb-0">
           <LaneHeader color={sec.color} label={sec.label} count={sec.items.length} />
