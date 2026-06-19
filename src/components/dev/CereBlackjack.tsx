@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type Card, draw, sleep, total, PlayingCard } from './CereCards';
 
 /**
@@ -24,13 +24,15 @@ function decide(player: Card[], dealer: Card[]): Result {
   return { tag: 'Push', cls: 'cere-bj-push', chip: `${pv} all` };
 }
 
-function Hand({ who, cards }: { who: string; cards: Card[] }) {
+function Hand({ who, cards, handId }: { who: string; cards: Card[]; handId: number }) {
   return (
     <div className="cere-bj-side">
       <span className={`cere-bj-who ${cards.length ? 'cere-bj-who-on' : ''}`}>{who}</span>
       <div className="cere-bj-hand">
         {cards.map((c, i) => (
-          <PlayingCard key={i} card={c} />
+          // Hand-scoped stable key so each dealt card mounts fresh and its
+          // mount-only `cere-bj-deal` animation replays (see ticket #68).
+          <PlayingCard key={`${handId}-${i}`} card={c} />
         ))}
       </div>
     </div>
@@ -41,51 +43,71 @@ export function CereBlackjack() {
   const [dealer, setDealer] = useState<Card[]>([]);
   const [player, setPlayer] = useState<Card[]>([]);
   const [result, setResult] = useState<Result | null>(null);
+  const [handId, setHandId] = useState(0);
+  // Bumped on every effect run; a torn-down loop reads its own captured id and
+  // refuses to write once a newer run has started (kills StrictMode zombies).
+  const runIdRef = useRef(0);
 
   useEffect(() => {
     let alive = true;
+    const myRun = ++runIdRef.current;
+    // Live only if this loop owns the current run and wasn't cleaned up.
+    const live = () => alive && runIdRef.current === myRun;
     (async () => {
-      while (alive) {
+      let hid = 0;
+      while (live()) {
+        if (!live()) return;
+        setHandId(hid);
+        if (!live()) return;
         setResult(null);
+        if (!live()) return;
         setDealer([]);
+        if (!live()) return;
         setPlayer([]);
         await sleep(140);
-        if (!alive) return;
+        if (!live()) return;
 
         const ph = [draw()];
         const dh = [draw()];
+        if (!live()) return;
         setPlayer([...ph]);
         await sleep(170);
-        if (!alive) return;
+        if (!live()) return;
         setDealer([...dh]);
         await sleep(170);
-        if (!alive) return;
+        if (!live()) return;
         ph.push(draw());
+        if (!live()) return;
         setPlayer([...ph]);
         await sleep(170);
-        if (!alive) return;
+        if (!live()) return;
         dh.push(draw());
+        if (!live()) return;
         setDealer([...dh]);
         await sleep(190);
-        if (!alive) return;
+        if (!live()) return;
 
         // a quick hit for a low hand, for drama
         if (total(ph) < 16) {
           ph.push(draw());
+          if (!live()) return;
           setPlayer([...ph]);
           await sleep(200);
-          if (!alive) return;
+          if (!live()) return;
         }
         if (total(dh) < 16) {
           dh.push(draw());
+          if (!live()) return;
           setDealer([...dh]);
           await sleep(200);
-          if (!alive) return;
+          if (!live()) return;
         }
 
+        if (!live()) return;
         setResult(decide(ph, dh));
         await sleep(1000);
-        if (!alive) return;
+        if (!live()) return;
+        hid += 1;
       }
     })();
     return () => {
@@ -96,8 +118,8 @@ export function CereBlackjack() {
   return (
     <div className="cere-bj" aria-live="polite" aria-label="Cere is thinking">
       <div className="cere-bj-table">
-        <Hand who="Cere" cards={dealer} />
-        <Hand who="You" cards={player} />
+        <Hand who="Cere" cards={dealer} handId={handId} />
+        <Hand who="You" cards={player} handId={handId} />
       </div>
       <div className={`cere-bj-res ${result ? 'cere-bj-show' : ''}`}>
         {result && (
