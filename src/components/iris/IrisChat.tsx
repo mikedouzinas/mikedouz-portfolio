@@ -80,9 +80,22 @@ export function IrisChat({
     onInputChange?.(value);
   }
 
-  // Auto-scroll as content streams in.
+  // Track whether the user is pinned to the bottom of the message list. We only
+  // autoscroll on new content when they already are — appending a proposal must
+  // never yank them away from where they scrolled (ticket #67). The list is its
+  // own overflow-y-auto container, so this scroll stays self-contained.
+  const pinnedRef = useRef(true);
+  function onScroll() {
+    const el = scrollRef.current;
+    if (!el) return;
+    // 24px slack so a near-bottom position still counts as pinned.
+    pinnedRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
+  }
+
+  // Auto-scroll as content streams in — but only if the user is at the bottom.
   useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    const el = scrollRef.current;
+    if (el && pinnedRef.current) el.scrollTop = el.scrollHeight;
   }, [messages.length, messages[messages.length - 1]?.content, busy]);
 
   // Auto-focus the composer on mount. preventScroll so opening inside a
@@ -106,6 +119,8 @@ export function IrisChat({
     e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || busy) return;
+    // Sending your own message always sticks to the bottom.
+    pinnedRef.current = true;
     onSend(trimmed);
     updateInput('');
   }
@@ -122,7 +137,7 @@ export function IrisChat({
 
   return (
     <div className={`flex h-full min-h-0 flex-col ${className}`}>
-      <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto pr-1">
+      <div ref={scrollRef} onScroll={onScroll} className="flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1">
         {messages.length === 0 && emptyHint}
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
