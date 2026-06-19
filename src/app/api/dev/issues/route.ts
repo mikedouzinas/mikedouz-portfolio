@@ -96,7 +96,7 @@ export async function PATCH(req: NextRequest) {
     if (feedback) {
       await postComment(repo, number, `**Review feedback (sent back):**\n\n${feedback}`);
       const [issue] = (await listIssues([repo], 'all')).filter((i) => i.number === number);
-      const body = issue ? upsertReviewBlock(issue.body, { feedback }) : undefined;
+      const body = issue ? upsertReviewBlock(issue.body ?? '', { feedback }) : undefined;
       await updateIssue(repo, number, { status: 'in progress', body });
       return NextResponse.json({ ok: true });
     }

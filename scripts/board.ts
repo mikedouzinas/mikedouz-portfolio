@@ -85,8 +85,8 @@ function fail(msg: string): never {
 async function requireRepo(flags: Flags): Promise<string> {
   const repo = str(flags, 'repo');
   if (!repo) fail('--repo <owner/name> is required.');
-  if (!(await isOwnedRepo(repo!))) fail(`Repo "${repo}" is not an owned repo — refusing.`);
-  return repo!;
+  if (!(await isOwnedRepo(repo))) fail(`Repo "${repo}" is not an owned repo — refusing.`);
+  return repo;
 }
 
 function fmtIssue(i: DevIssue): string {
@@ -198,15 +198,15 @@ async function cmdHandoff(flags: Flags): Promise<void> {
   if (!preview && flags['auto']) {
     const branch = str(flags, 'branch');
     if (!branch) fail('--auto needs --branch <name> (or pass --preview <url>).');
-    preview = previewUrlForBranch(branch!);
+    preview = previewUrlForBranch(branch);
   }
   if (!preview) fail('Provide --preview <url> or --auto --branch <name>.');
 
   const [issue] = await listIssues([repo], 'all').then((all) => all.filter((i) => i.number === number));
   if (!issue) fail(`#${number} not found in ${repo}.`);
-  const body = upsertReviewBlock(issue.body, { preview: preview!, test });
+  const body = upsertReviewBlock(issue.body ?? '', { preview, test });
   await updateIssue(repo, number, { status: 'awaiting review', body });
-  console.log(`✓ handoff #${number} → awaiting review\n  Preview: ${preview!}`);
+  console.log(`✓ handoff #${number} → awaiting review\n  Preview: ${preview}`);
 }
 
 const HELP = `THE HARLEQUIN board CLI

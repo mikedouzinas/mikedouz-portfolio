@@ -189,13 +189,6 @@ export async function postComment(repo: string, number: number, body: string): P
   if (!res.ok) throw new Error(`GitHub comment ${repo}#${number}: ${res.status}`);
 }
 
-export async function getLatestComment(repo: string, number: number): Promise<string | null> {
-  const res = await fetch(`${GH}/repos/${repo}/issues/${number}/comments?per_page=100`, { headers: ghHeaders() });
-  if (!res.ok) throw new Error(`GitHub comments ${repo}#${number}: ${res.status}`);
-  const arr = (await res.json()) as { body: string }[];
-  return arr.length ? arr[arr.length - 1].body : null;
-}
-
 // ---- Repo discovery (cached) ----
 interface RepoCache { data: DevRepo[]; expiry: number }
 declare global {

@@ -63,7 +63,7 @@ const DONE_GREEN = '#1DB954';
 // ticket stands at a glance: blue = todo, amber = in progress, champagne = awaiting review,
 // and the original Spotify-panel green = done. Same dark-tint-of-the-accent recipe.
 // Translucent so the harlequin argyle whispers through the glass card.
-const STATUS_EXPAND: Record<'todo' | 'in progress' | 'awaiting review' | 'done', { bg: string; border: string }> = {
+const STATUS_EXPAND: Record<Status | 'done', { bg: string; border: string }> = {
   todo: { bg: 'rgba(11, 19, 34, 0.66)', border: 'rgba(66, 133, 244, 0.45)' }, // blue
   'in progress': { bg: 'rgba(26, 22, 7, 0.66)', border: 'rgba(251, 188, 5, 0.45)' }, // amber
   'awaiting review': { bg: 'rgba(26, 22, 7, 0.66)', border: 'rgba(231, 179, 74, 0.45)' }, // champagne-amber
@@ -155,7 +155,7 @@ function IssueCard({
   const closed = issue.state === 'closed';
   // Closed items read as "Done" (green) regardless of their lingering status label.
   const st = closed ? { label: 'Done', color: DONE_GREEN } : STATUS_META[issue.status ?? 'todo'];
-  const expandKey: 'todo' | 'in progress' | 'awaiting review' | 'done' = closed ? 'done' : issue.status ?? 'todo';
+  const expandKey: Status | 'done' = closed ? 'done' : issue.status ?? 'todo';
   const tint = STATUS_EXPAND[expandKey];
   const subs = parseSubtasks(issue.body);
   const prog = subtaskProgress(issue.body);
@@ -703,12 +703,13 @@ function ReviewActions({
   onSendBack,
 }: {
   issue: DevIssue;
-  onApprove: (i: DevIssue) => void;
-  onSendBack: (i: DevIssue, feedback: string) => void;
+  onApprove: (i: DevIssue) => void | Promise<void>;
+  onSendBack: (i: DevIssue, feedback: string) => void | Promise<void>;
 }) {
   const review = parseReviewBlock(issue.body);
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
+  const [busy, setBusy] = useState(false);
   return (
     <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] p-2 text-xs">
       {review?.test && <p className="mb-2 text-white/70"><span className="text-white/40">Test: </span>{review.test}</p>}
@@ -718,7 +719,11 @@ function ReviewActions({
           <a href={review.preview} target="_blank" rel="noreferrer"
              className="rounded bg-white/10 px-2 py-1 hover:bg-white/20">Test ↗</a>
         )}
-        <button onClick={() => onApprove(issue)} className="rounded bg-emerald-600/80 px-2 py-1 hover:bg-emerald-600">Approve → Done</button>
+        <button
+          disabled={busy}
+          onClick={async () => { setBusy(true); await onApprove(issue); setBusy(false); }}
+          className="rounded bg-emerald-600/80 px-2 py-1 hover:bg-emerald-600 disabled:opacity-40"
+        >Approve → Done</button>
         <button onClick={() => setOpen((v) => !v)} className="rounded bg-white/10 px-2 py-1 hover:bg-white/20">Send back</button>
       </div>
       {open && (
@@ -726,8 +731,11 @@ function ReviewActions({
           <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2}
             placeholder="What needs fixing?"
             className="w-full rounded bg-black/30 p-2 text-white outline-none" />
-          <button disabled={!text.trim()} onClick={() => { onSendBack(issue, text.trim()); setOpen(false); setText(''); }}
-            className="mt-1 rounded bg-amber-600/80 px-2 py-1 disabled:opacity-40">Send back to In progress</button>
+          <button
+            disabled={!text.trim() || busy}
+            onClick={async () => { setBusy(true); await onSendBack(issue, text.trim()); setOpen(false); setText(''); setBusy(false); }}
+            className="mt-1 rounded bg-amber-600/80 px-2 py-1 disabled:opacity-40"
+          >Send back to In progress</button>
         </div>
       )}
     </div>
@@ -748,8 +756,8 @@ export function IssueList({
   groupBy: GroupBy;
   sort: SortBy;
   onChanged: () => void;
-  onApprove?: (i: DevIssue) => void;
-  onSendBack?: (i: DevIssue, feedback: string) => void;
+  onApprove: (i: DevIssue) => void | Promise<void>;
+  onSendBack: (i: DevIssue, feedback: string) => void | Promise<void>;
 }) {
   const [error, setError] = useState('');
 
@@ -792,7 +800,7 @@ export function IssueList({
   // appear in a lane or repo section (excluded below via !isAwaiting).
   const awaiting = sortIssues(issues.filter(isAwaiting), sort);
 
-  const awaitingSection = awaiting.length > 0 && onApprove && onSendBack ? (
+  const awaitingSection = awaiting.length > 0 ? (
     <div className="mb-5 rounded-xl border border-[#e7b34a]/30 bg-[#e7b34a]/[0.06] p-3">
       <LaneHeader color="#E7B34A" label="Awaiting review" count={awaiting.length} />
       <div className="flex flex-col gap-3">

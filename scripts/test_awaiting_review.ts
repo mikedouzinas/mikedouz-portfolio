@@ -9,6 +9,9 @@ assert(a.includes('Original body.'), 'preserves body');
 assert(a.includes('<!-- awaiting-review:start -->') && a.includes('<!-- awaiting-review:end -->'), 'has markers');
 assert((a.match(/awaiting-review:start/g) ?? []).length === 1, 'single block');
 
+// non-empty body is separated from the marker block by a blank line
+assert(a.includes('Original body.\n\n<!-- awaiting-review:start -->'), 'blank line separator between body and marker block');
+
 // upsert is idempotent (replace, not append)
 const b = upsertReviewBlock(a, { preview: 'https://y.test', test: 'open /dev', feedback: 'looks off' });
 assert((b.match(/awaiting-review:start/g) ?? []).length === 1, 'still single block after re-upsert');
