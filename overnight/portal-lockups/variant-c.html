@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Variant C — The Diamond Door (stop-motion peephole)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #0d0b11;
+    --champ: #e7e2d4;
+    --champ-dim: rgba(231,226,212,0.55);
+    --champ-faint: rgba(231,226,212,0.16);
+    --red: #b3122b;
+    --red-bright: #ea4335;
+    --g-blue: #4285f4;
+    --g-red: #ea4335;
+    --g-yellow: #fbbc05;
+    --g-green: #34a853;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    color: var(--champ);
+    background-color: var(--ink);
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(140,20,40,0.10), transparent 60%),
+      linear-gradient(rgba(231,226,212,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.05) 1px, transparent 1px),
+      linear-gradient(rgba(231,226,212,0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.022) 1px, transparent 1px);
+    background-size: 100% 100%, 88px 88px, 88px 88px, 16px 16px, 16px 16px;
+    background-attachment: fixed;
+    min-height: 100vh; display:grid; place-items:center; overflow:hidden;
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0.3;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 0.5s steps(4,end) infinite;
+  }
+  @keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-2px,2px)}50%{transform:translate(2px,-2px)}75%{transform:translate(-3px,-1px)}100%{transform:translate(0,0)}}
+
+  .wall { position:relative; width:min(380px,90vw); display:flex; flex-direction:column; align-items:center; }
+  .eyebrow{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.42em;text-transform:uppercase;color:var(--champ-dim);margin-bottom:22px;padding-left:0.42em;text-align:center}
+
+  /* ---------- The diamond door, set into the wall ---------- */
+  .door-frame {
+    position: relative;
+    width: 230px; height: 230px;
+    display: grid; place-items: center;
+    perspective: 800px;
+  }
+
+  /* champagne diamond plinth behind the door (the casing) */
+  .casing {
+    position:absolute; width:200px; height:200px; transform: rotate(45deg);
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(231,226,212,0.16), rgba(231,226,212,0.03));
+    border: 1px solid var(--champ-faint);
+    box-shadow: 0 30px 60px -24px rgba(0,0,0,0.9), inset 0 0 30px 6px rgba(0,0,0,0.7);
+  }
+
+  /* The actual board, revealed behind, sized to the diamond aperture (clipped) */
+  .behind {
+    position:absolute; width:172px; height:172px; transform: rotate(45deg);
+    border-radius: 6px; overflow:hidden;
+    background-color:#0d0b11;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Cpolygon points='19,2 36,19 19,36 2,19' fill='%23B3122B' stroke='%23EDE6D6' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: 38px 38px;
+    filter: brightness(0.5);
+    box-shadow: inset 0 0 40px 8px rgba(0,0,0,0.85);
+  }
+  .behind .inner { transform: rotate(-45deg); position:absolute; inset:-30%; }
+  .behind .veil { position:absolute; inset:0; background: radial-gradient(circle at 50% 45%, transparent 0%, rgba(13,11,17,0.55) 60%, rgba(13,11,17,0.95) 100%); }
+  .b-card{position:absolute;border-radius:3px;padding:5px 6px;background:linear-gradient(160deg,rgba(28,24,34,.96),rgba(18,15,22,.96));border:1px solid rgba(231,226,212,0.12);font-family:"Space Mono",monospace;font-size:6.5px;color:var(--champ-dim);transform:rotate(var(--r,0))}
+  .b-card .pip{display:inline-block;width:5px;height:5px;transform:rotate(45deg);border-radius:1px;margin-right:3px;vertical-align:middle}
+  .bc1{top:22%;left:24%;width:30%;--r:-3deg}
+  .bc2{top:42%;right:24%;width:28%;--r:4deg}
+  .bc3{bottom:26%;left:30%;width:32%;--r:-2deg}
+
+  /* The diamond DOOR leaf itself — champagne plate that swings open */
+  .leaf {
+    position:absolute; width:172px; height:172px; transform: rotate(45deg);
+    border-radius: 6px;
+    background:
+      repeating-linear-gradient(45deg, rgba(231,226,212,0.05) 0 6px, rgba(231,226,212,0.10) 6px 12px),
+      linear-gradient(135deg, #2a2630, #16131b);
+    border: 1px solid rgba(231,226,212,0.22);
+    box-shadow: 0 12px 26px -10px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(231,226,212,0.05);
+    transform-origin: left center;
+    transition: transform 0.9s steps(7, end), opacity 0.6s steps(4,end);
+    z-index: 4;
+    backface-visibility: hidden;
+  }
+  /* hinge dot on the door */
+  .leaf .hinge { position:absolute; left:6px; top:50%; width:6px; height:6px; border-radius:50%; transform:translateY(-50%); background:rgba(231,226,212,0.4); box-shadow:0 0 6px rgba(231,226,212,0.4); }
+
+  /* BRASS PEEPHOLE — the little window proper. A fisheye lens into the board. */
+  .peep {
+    position:absolute; width:54px; height:54px; border-radius:50%;
+    transform: rotate(-45deg); /* counter-rotate so the lens reads upright */
+    z-index:6;
+    border: 4px solid; border-color: #d8c690 #b89a4a #8a7330 #c9b478;
+    background: radial-gradient(circle at 38% 34%, rgba(231,226,212,0.25), rgba(0,0,0,0.6) 70%);
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.6), 0 6px 14px rgba(0,0,0,0.7), inset 0 0 10px rgba(0,0,0,0.8);
+    overflow: hidden;
+    transition: opacity 0.4s;
+  }
+  /* fisheye glimpse of board inside the peephole */
+  .peep .lens {
+    position:absolute; inset:-40%;
+    background-color:#0d0b11;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Cpolygon points='15,1 29,15 15,29 1,15' fill='%23B3122B' stroke='%23EDE6D6' stroke-width='0.8'/%3E%3C/svg%3E");
+    background-size:30px 30px;
+    border-radius:50%;
+    transform: scale(1.4);
+    filter: brightness(0.7) contrast(1.05);
+  }
+  .peep .lens::after { content:""; position:absolute; inset:0; border-radius:50%; box-shadow: inset 0 0 18px 6px rgba(0,0,0,0.9); }
+  /* glint on the glass */
+  .peep .glint { position:absolute; top:18%; left:24%; width:14px; height:8px; border-radius:50%; background:rgba(231,226,212,0.5); filter:blur(2px); }
+
+  /* ---------- the lock plate: a brass keypad strip under the door ---------- */
+  .plate {
+    margin-top: 22px;
+    width: 250px;
+    background: rgba(8,7,11,0.8);
+    border: 1px solid var(--champ-faint);
+    border-radius: 8px;
+    padding: 13px 14px 14px;
+    box-shadow: 0 16px 30px -14px rgba(0,0,0,0.9);
+    transition: transform .15s ease, opacity .5s;
+  }
+  .plate-label{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:0.22em;text-transform:uppercase;color:var(--champ-dim);text-align:center;margin-bottom:9px}
+  .pegs{display:flex;gap:8px;justify-content:center}
+  .peg{width:24px;height:28px;display:grid;place-items:center;border:1px solid var(--champ-faint);border-radius:3px;background:rgba(231,226,212,0.03);font-family:"Space Mono",monospace;font-size:13px;color:var(--champ);transition:all .12s}
+  .peg.filled{border-color:rgba(231,226,212,0.5);background:rgba(231,226,212,0.09)}
+  .peg.active{box-shadow:0 0 0 2px rgba(231,226,212,0.25)}
+  .hidden-input{position:absolute;opacity:0;pointer-events:none}
+  .plate-hint{text-align:center;margin-top:9px;min-height:12px;font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:0.05em;color:var(--champ-dim)}
+  .plate-hint.bad{color:var(--red-bright)}
+  .lockbar{display:none;margin-top:9px;height:4px;border-radius:2px;background:rgba(234,67,53,0.18);overflow:hidden}
+  .plate.locked .lockbar{display:block}
+  .lockfill{height:100%;width:100%;background:var(--red-bright);transform-origin:left}
+
+  /* ---------- WRONG: stop-motion rattle + red flicker on the door + ink ---------- */
+  @keyframes rattle {
+    0%,100%{transform:rotate(45deg) translateX(0)}
+    20%{transform:rotate(45deg) translate(-4px,2px)}
+    40%{transform:rotate(45deg) translate(3px,-2px)}
+    60%{transform:rotate(45deg) translate(-3px,-1px)}
+    80%{transform:rotate(45deg) translate(2px,2px)}
+  }
+  .leaf.rattle{ animation: rattle 0.4s steps(2,end) 1; }
+  .casing.rattle{ animation: rattle 0.4s steps(2,end) 1; }
+
+  /* red halftone flash bursts from the peephole */
+  .badflash{position:absolute;width:230px;height:230px;border-radius:50%;z-index:7;pointer-events:none;opacity:0;
+    background-image:radial-gradient(circle,rgba(234,67,53,0.85) 0%,rgba(234,67,53,0.85) 30%,transparent 55%);
+    background-size:9px 9px;mix-blend-mode:screen;}
+  .badflash.go{ animation: bf 0.5s steps(3,end) 1; }
+  @keyframes bf{0%{opacity:0}30%{opacity:0.95}60%{opacity:0.4}100%{opacity:0}}
+
+  /* ink splatter from the keyhole */
+  .ink{position:absolute;width:230px;height:230px;z-index:8;pointer-events:none}
+  .ink svg{width:100%;height:100%;opacity:0}
+  .ink.go svg{ animation: inkp 0.7s steps(4,end) 1 forwards; }
+  @keyframes inkp{0%{opacity:0;transform:scale(0.5)}35%{opacity:0.9;transform:scale(1.05)}100%{opacity:0;transform:scale(1.25)}}
+
+  /* ---------- lockout ---------- */
+  .door-frame.locked .peep{ filter: grayscale(0.8) brightness(0.5); }
+  .door-frame.locked .leaf{ border-color: rgba(234,67,53,0.35); }
+
+  /* ---------- CORRECT: door swings open in stop-motion, board comes forward ---------- */
+  .door-frame.open .leaf {
+    transform: rotate(45deg) perspective(600px) rotateY(-105deg);
+    opacity: 0.9;
+  }
+  .door-frame.open .peep { opacity: 0; }
+  .door-frame.open .behind { filter: brightness(1); transition: filter 0.9s steps(5,end); }
+  .door-frame.open .behind .veil { background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(13,11,17,0.2) 80%); transition: background .9s; }
+
+  /* once open, dolly the whole frame toward viewer then hand to arrived board */
+  .door-frame.dolly { transition: transform 0.8s steps(6,end); transform: scale(3.4); }
+
+  .arrived{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;padding:28px clamp(20px,5vw,64px);
+    background-color:#0d0b11;
+    background-image:radial-gradient(120% 80% at 50% -10%, rgba(140,20,40,0.08), transparent 60%),
+      linear-gradient(rgba(231,226,212,0.04) 1px,transparent 1px),linear-gradient(90deg, rgba(231,226,212,0.04) 1px,transparent 1px);
+    background-size:100% 100%,88px 88px,88px 88px; animation:arr 0.9s ease 1 both;}
+  .arrived.show{display:flex}
+  @keyframes arr{from{opacity:0;transform:scale(1.08)}to{opacity:1;transform:none}}
+  .arrived header{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+  .arrived .mark{font-family:"Limelight",serif;font-size:clamp(24px,4vw,38px);letter-spacing:0.18em;color:var(--champ)}
+  .columns{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;flex:1;min-height:0}
+  .col-h{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--champ-dim);margin-bottom:12px}
+  .card{background:linear-gradient(160deg,rgba(28,24,34,.95),rgba(18,15,22,.95));border:1px solid rgba(231,226,212,0.10);border-radius:6px;padding:12px;margin-bottom:12px}
+  .card .t{font-size:13px;margin-bottom:8px}
+  .card .meta{display:flex;gap:8px;align-items:center;font-family:"Space Mono",monospace;font-size:9px;color:var(--champ-dim)}
+  .chip{display:inline-flex;align-items:center;gap:5px}
+  .chip .pip{width:8px;height:8px;transform:rotate(45deg);border-radius:2px}
+  .back{margin-top:20px;align-self:center;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.16em;color:var(--champ-dim);background:rgba(231,226,212,0.05);border:1px solid var(--champ-faint);border-radius:6px;padding:9px 16px;cursor:pointer;text-transform:uppercase}
+  .back:hover{background:rgba(231,226,212,0.1);color:var(--champ)}
+
+  .controls{position:fixed;left:16px;bottom:16px;z-index:95;display:flex;gap:6px;flex-wrap:wrap;max-width:280px;font-family:"Space Mono",monospace}
+  .controls button{font:inherit;font-size:9px;letter-spacing:0.08em;color:var(--champ-dim);background:rgba(8,7,11,0.8);border:1px solid var(--champ-faint);border-radius:4px;padding:6px 8px;cursor:pointer;text-transform:uppercase}
+  .controls button:hover{color:var(--champ);border-color:rgba(231,226,212,0.4)}
+  .controls .lbl{font-size:8px;color:rgba(231,226,212,0.3);width:100%;letter-spacing:0.2em}
+
+  @media (prefers-reduced-motion: reduce){
+    body::after,.leaf.rattle,.casing.rattle,.badflash.go,.ink.go svg,.arrived{animation:none!important}
+    .leaf,.behind,.door-frame.dolly,.door-frame.open .leaf{transition:none!important}
+  }
+</style>
+</head>
+<body>
+  <div class="wall" id="wall">
+    <p class="eyebrow">Knock first</p>
+
+    <div class="door-frame" id="frame">
+      <div class="casing" id="casing"></div>
+
+      <div class="behind">
+        <div class="inner">
+          <div class="b-card bc1"><span class="pip" style="background:var(--g-blue)"></span>#48 auth</div>
+          <div class="b-card bc2"><span class="pip" style="background:var(--g-yellow)"></span>#62 portal</div>
+          <div class="b-card bc3"><span class="pip" style="background:var(--g-green)"></span>#9 mark</div>
+        </div>
+        <div class="veil"></div>
+      </div>
+
+      <div class="leaf" id="leaf"><span class="hinge"></span></div>
+
+      <div class="peep" id="peep">
+        <div class="lens"></div>
+        <div class="glint"></div>
+      </div>
+
+      <div class="badflash" id="badflash"></div>
+      <div class="ink" id="ink">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <g fill="#b3122b">
+            <circle cx="50" cy="50" r="11"/>
+            <circle cx="34" cy="44" r="5"/><circle cx="66" cy="46" r="6"/>
+            <circle cx="58" cy="66" r="5"/><circle cx="40" cy="64" r="4"/>
+            <circle cx="24" cy="52" r="3"/><circle cx="76" cy="56" r="3.5"/>
+            <circle cx="50" cy="30" r="3"/><circle cx="50" cy="74" r="2.5"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <form class="plate" id="plate" autocomplete="off">
+      <div class="plate-label" id="plateLabel">Knock — say the word</div>
+      <div class="pegs" id="pegs">
+        <div class="peg"></div><div class="peg"></div><div class="peg"></div><div class="peg"></div><div class="peg"></div>
+      </div>
+      <input class="hidden-input" id="codeInput" type="text" maxlength="5" autocomplete="off" />
+      <div class="plate-hint" id="hint">click &amp; type · password "OPEN5"</div>
+      <div class="lockbar"><div class="lockfill" id="lockfill"></div></div>
+    </form>
+  </div>
+
+  <div class="arrived" id="arrived">
+    <header>
+      <span style="color:var(--g-red);font-size:16px">&#9670;</span>
+      <span class="mark">THE HARLEQUIN</span>
+      <span style="color:var(--champ);font-size:16px">&#9670;</span>
+    </header>
+    <div class="columns">
+      <div><div class="col-h">Todo</div>
+        <div class="card"><div class="t">Diamond-door portal entrance</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-blue)"></span>S</span><span>#62</span></div></div>
+        <div class="card"><div class="t">Brass peephole fisheye</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-yellow)"></span>M</span><span>#73</span></div></div>
+      </div>
+      <div><div class="col-h">In progress</div>
+        <div class="card"><div class="t">Stop-motion door swing</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-yellow)"></span>M</span><span>#65</span></div></div>
+        <div class="card"><div class="t">Ink-splatter on wrong</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-blue)"></span>S</span><span>#67</span></div></div>
+      </div>
+      <div><div class="col-h">Done</div>
+        <div class="card"><div class="t">Limelight wordmark</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-green)"></span>S</span><span>#9</span></div></div>
+        <div class="card"><div class="t">Champagne duotone grid</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-green)"></span>L</span><span>#10</span></div></div>
+      </div>
+    </div>
+    <button class="back" id="back">&larr; Step back out</button>
+  </div>
+
+  <div class="controls">
+    <span class="lbl">DEMO STATES — variant C</span>
+    <button data-act="type">Type</button>
+    <button data-act="wrong">Wrong</button>
+    <button data-act="lockout">Lockout</button>
+    <button data-act="correct">Correct &rarr; enter</button>
+    <button data-act="reset">Reset</button>
+  </div>
+
+<script>
+(function(){
+  var PASSWORD="OPEN5";
+  var wall=document.getElementById("wall");
+  var frame=document.getElementById("frame");
+  var leaf=document.getElementById("leaf");
+  var casing=document.getElementById("casing");
+  var peep=document.getElementById("peep");
+  var badflash=document.getElementById("badflash");
+  var ink=document.getElementById("ink");
+  var plate=document.getElementById("plate");
+  var pegs=document.getElementById("pegs").querySelectorAll(".peg");
+  var input=document.getElementById("codeInput");
+  var hint=document.getElementById("hint");
+  var plateLabel=document.getElementById("plateLabel");
+  var lockfill=document.getElementById("lockfill");
+  var arrived=document.getElementById("arrived");
+  var attempts=3, locked=false;
+
+  peep.addEventListener("click",function(){ if(!locked) input.focus(); });
+  plate.addEventListener("click",function(){ if(!locked) input.focus(); });
+
+  function render(){
+    var v=input.value.toUpperCase();
+    pegs.forEach(function(p,i){
+      p.classList.toggle("filled", i<v.length);
+      p.classList.toggle("active", i===v.length && !locked);
+      p.textContent = i<v.length ? "◆" : "";
+    });
+  }
+  input.addEventListener("input",function(){
+    if(locked){input.value="";return;}
+    input.value=input.value.replace(/[^a-zA-Z0-9]/g,"").slice(0,5).toUpperCase();
+    setHint(""); render();
+    if(input.value.length===5) check();
+  });
+  function setHint(m,c){ hint.className="plate-hint"+(c?" "+c:""); hint.textContent=m||(locked?"bolted. wait.":'click & type · password "OPEN5"'); }
+  function check(){ input.value.toUpperCase()===PASSWORD ? correct() : wrong(); }
+
+  function wrong(){
+    attempts-=1;
+    leaf.classList.remove("rattle"); casing.classList.remove("rattle");
+    void leaf.offsetWidth; leaf.classList.add("rattle"); casing.classList.add("rattle");
+    badflash.classList.remove("go"); void badflash.offsetWidth; badflash.classList.add("go");
+    ink.classList.remove("go"); void ink.offsetWidth; ink.classList.add("go");
+    input.value=""; render();
+    if(attempts<=0){ lockout(); return; }
+    setHint(attempts+" attempt"+(attempts===1?"":"s")+" left","bad");
+    setTimeout(function(){ if(!locked) input.focus(); },420);
+  }
+  function lockout(){
+    locked=true; plate.classList.add("locked"); frame.classList.add("locked");
+    plateLabel.textContent="Bolted shut";
+    setHint("locked for a beat…","bad");
+    lockfill.style.animation="none"; void lockfill.offsetWidth;
+    lockfill.style.animation="lockdrain 6s linear 1 forwards";
+    setTimeout(reset,6000);
+  }
+  function correct(){
+    setHint("…the word.","");
+    plateLabel.textContent="Come through";
+    frame.classList.add("open");
+    setTimeout(function(){ frame.classList.add("dolly"); plate.style.opacity="0"; },700);
+    setTimeout(function(){ arrived.classList.add("show"); },1400);
+  }
+  function reset(){
+    locked=false; attempts=3; input.value="";
+    plate.classList.remove("locked"); frame.classList.remove("locked","open","dolly");
+    plate.style.opacity=""; arrived.classList.remove("show");
+    leaf.classList.remove("rattle"); casing.classList.remove("rattle");
+    badflash.classList.remove("go"); ink.classList.remove("go");
+    plateLabel.textContent="Knock — say the word";
+    render(); setHint("");
+  }
+  document.getElementById("back").addEventListener("click",reset);
+
+  // inject the lockdrain keyframe (kept inline w/ JS to avoid extra css name clash)
+  var st=document.createElement("style");
+  st.textContent="@keyframes lockdrain{from{transform:scaleX(1)}to{transform:scaleX(0)}}";
+  document.head.appendChild(st);
+
+  var typer=null;
+  function autoType(t,done){
+    if(typer) clearInterval(typer);
+    input.value=""; render(); setHint("");
+    var i=0;
+    typer=setInterval(function(){
+      if(i>=t.length){clearInterval(typer);typer=null;if(done)done();return;}
+      input.value+=t[i++]; render();
+    },170);
+  }
+  document.querySelector(".controls").addEventListener("click",function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    var act=b.dataset.act;
+    if(act==="reset") return reset();
+    reset();
+    if(act==="type") setTimeout(function(){autoType("OP");},60);
+    if(act==="wrong") setTimeout(function(){autoType("WRONG",check);},60);
+    if(act==="lockout") setTimeout(function(){
+      autoType("NOPE1",function(){setTimeout(function(){autoType("NOPE2",function(){setTimeout(function(){autoType("NOPE3",check);},500);});},500);});
+    },60);
+    if(act==="correct") setTimeout(function(){autoType("OPEN5",check);},60);
+  });
+  render();
+})();
+</script>
+</body>
+</html>

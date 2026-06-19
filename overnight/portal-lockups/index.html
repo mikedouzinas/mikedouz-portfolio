@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>#62 — The Little Window · Portal lockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{--ink:#0d0b11;--champ:#e7e2d4;--champ-dim:rgba(231,226,212,0.55);--champ-faint:rgba(231,226,212,0.16);--red:#b3122b;--g-blue:#4285f4;--g-red:#ea4335;--g-yellow:#fbbc05;--g-green:#34a853;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Space Grotesk",system-ui,sans-serif;color:var(--champ);background-color:var(--ink);min-height:100vh;
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(140,20,40,0.10), transparent 60%),
+      linear-gradient(rgba(231,226,212,0.045) 1px,transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.045) 1px,transparent 1px);
+    background-size:100% 100%,80px 80px,80px 80px;background-attachment:fixed;
+    padding:clamp(32px,7vw,80px) clamp(20px,6vw,80px);
+  }
+  body::after{content:"";position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0.22;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .eyebrow{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.4em;text-transform:uppercase;color:var(--champ-dim);padding-left:0.4em}
+  h1{font-family:"Limelight",serif;font-size:clamp(34px,6.5vw,64px);letter-spacing:0.16em;font-weight:400;margin:14px 0 6px}
+  .dia{display:inline-block;vertical-align:middle;font-size:0.5em}
+  .sub{color:var(--champ-dim);max-width:54ch;line-height:1.6;margin-bottom:40px;font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;max-width:1100px}
+  a.card{
+    display:block;text-decoration:none;color:inherit;position:relative;overflow:hidden;
+    border:1px solid var(--champ-faint);border-radius:10px;padding:22px;
+    background:linear-gradient(160deg, rgba(28,24,34,0.7), rgba(18,15,22,0.7));
+    transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  a.card:hover{transform:translateY(-3px);border-color:rgba(231,226,212,0.4);box-shadow:0 18px 40px -18px rgba(0,0,0,0.9)}
+  .tag{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--champ-dim)}
+  .vtitle{font-size:19px;margin:10px 0 8px;letter-spacing:0.01em}
+  .vdesc{color:var(--champ-dim);font-size:13px;line-height:1.55}
+  .swatch{display:flex;gap:6px;margin-top:16px}
+  .swatch i{width:12px;height:12px;transform:rotate(45deg);border-radius:2px;display:block}
+  .open{margin-top:16px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.14em;color:var(--champ)}
+  .foot{margin-top:42px;color:rgba(231,226,212,0.3);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:0.05em;max-width:60ch;line-height:1.6}
+</style>
+</head>
+<body>
+  <p class="eyebrow">Ticket #62 · standalone lockups</p>
+  <h1>The little window <span class="dia" style="color:var(--g-red)">&#9670;</span></h1>
+  <p class="sub">Three takes on the portal entrance to THE HARLEQUIN — a small, gated glimpse of the board beyond, with a comic / Spider-Verse / stop-motion feel. Each opens on its own. Use the demo buttons (bottom-left) to walk idle &rarr; typing &rarr; wrong &rarr; lockout &rarr; correct, or just type <b>OPEN5</b>.</p>
+
+  <div class="grid">
+    <a class="card" href="variant-a.html">
+      <span class="tag">Variant A</span>
+      <div class="vtitle">The Framed Window</div>
+      <div class="vdesc">A literal mullioned window with parallax depth: the board sits far behind cold glass with sheen and vignette. Correct dollies the frame forward and zooms you through.</div>
+      <div class="swatch"><i style="background:var(--champ)"></i><i style="background:var(--red)"></i><i style="background:var(--g-blue)"></i></div>
+      <div class="open">Open &rarr;</div>
+    </a>
+    <a class="card" href="variant-b.html">
+      <span class="tag">Variant B</span>
+      <div class="vtitle">The Comic-Panel Iris</div>
+      <div class="vdesc">A three-cell comic strip with narration boxes; the middle panel is a camera iris you peer through. Password lives in a speech bubble; wrong throws benday SFX ("SKKT!"). Correct irises wide open.</div>
+      <div class="swatch"><i style="background:var(--g-yellow)"></i><i style="background:var(--red)"></i><i style="background:var(--champ)"></i></div>
+      <div class="open">Open &rarr;</div>
+    </a>
+    <a class="card" href="variant-c.html">
+      <span class="tag">Variant C</span>
+      <div class="vtitle">The Diamond Door</div>
+      <div class="vdesc">A champagne diamond door set into the grid wall with a brass fisheye peephole. Wrong rattles the door + ink-splats; correct swings it open in choppy stop-motion steps() frames, then dollies through.</div>
+      <div class="swatch"><i style="background:#c9b478"></i><i style="background:var(--red)"></i><i style="background:var(--g-green)"></i></div>
+      <div class="open">Open &rarr;</div>
+    </a>
+  </div>
+
+  <p class="foot">Self-contained HTML · fonts via Google CDN · no build step · double-click to open. Champagne duotone palette, Limelight display face, Google rainbow used as flicker accent only, subtle grid retained, no Marcellus. Read NOTES.md for techniques + what to evaluate.</p>
+</body>
+</html>

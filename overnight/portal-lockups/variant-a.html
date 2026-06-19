@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Variant A — The Little Window (framed, parallax depth)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #0d0b11;
+    --champ: #e7e2d4;
+    --champ-dim: rgba(231, 226, 212, 0.55);
+    --champ-faint: rgba(231, 226, 212, 0.16);
+    --red: #b3122b;
+    --red-bright: #ea4335;
+    --g-blue: #4285f4;
+    --g-red: #ea4335;
+    --g-yellow: #fbbc05;
+    --g-green: #34a853;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    color: var(--champ);
+    background-color: var(--ink);
+    /* The resting engineering grid — champagne lines, warm top glow. */
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(140, 20, 40, 0.10), transparent 60%),
+      linear-gradient(rgba(231, 226, 212, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231, 226, 212, 0.045) 1px, transparent 1px),
+      linear-gradient(rgba(231, 226, 212, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231, 226, 212, 0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Film grain wash over everything. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    pointer-events: none;
+    opacity: 0.28;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    /* stop-motion: grain jitters on whole frames */
+    animation: grain-jitter 0.6s steps(4, end) infinite;
+  }
+  @keyframes grain-jitter {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-3px, 2px); }
+    50% { transform: translate(2px, -2px); }
+    75% { transform: translate(-2px, -3px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  /* ---------- THE SCENE: you are outside, peering through a window ---------- */
+  .scene {
+    position: relative;
+    width: min(420px, 88vw);
+    perspective: 900px;
+  }
+
+  .eyebrow {
+    text-align: center;
+    font-family: "Space Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--champ-dim);
+    margin-bottom: 18px;
+    padding-left: 0.42em;
+  }
+
+  /* The window frame: a small, distant, framed glimpse. Deep bevel + sill. */
+  .window {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 4px;
+    /* champagne wood-ish frame with deep inner shadow = depth */
+    padding: 16px;
+    background:
+      linear-gradient(135deg, rgba(231,226,212,0.14), rgba(231,226,212,0.04));
+    border: 1px solid var(--champ-faint);
+    box-shadow:
+      0 40px 80px -30px rgba(0,0,0,0.9),
+      inset 0 0 0 1px rgba(231,226,212,0.06);
+    transform-style: preserve-3d;
+    transition: transform 0.25s cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* the muntin cross-bars that make it read as a *window* not a screen */
+  .window::before,
+  .window::after {
+    content: "";
+    position: absolute;
+    z-index: 6;
+    background: linear-gradient(180deg, rgba(231,226,212,0.22), rgba(231,226,212,0.06));
+    box-shadow: 0 0 8px rgba(0,0,0,0.6);
+    pointer-events: none;
+  }
+  .window::before { left: 50%; top: 16px; bottom: 16px; width: 3px; transform: translateX(-50%); }
+  .window::after { top: 50%; left: 16px; right: 16px; height: 3px; transform: translateY(-50%); }
+
+  /* The glass — clips the distant board. Cold sheen + condensation grain. */
+  .glass {
+    position: relative;
+    height: 100%;
+    border-radius: 2px;
+    overflow: hidden;
+    background: #08070b;
+    box-shadow: inset 0 0 60px 10px rgba(0,0,0,0.85);
+  }
+
+  /* The board, far away, behind the glass. Parallax layers. */
+  .board-far {
+    position: absolute;
+    inset: -8%;
+    transform: scale(0.82) translateZ(-120px);
+    transition: transform 1.1s cubic-bezier(.7,0,.2,1), filter 1.1s ease, opacity .8s ease;
+    will-change: transform;
+    /* the dim harlequin argyle, far away */
+    background-color: #0d0b11;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cpolygon points='22,2 42,22 22,42 2,22' fill='%23B3122B' stroke='%23EDE6D6' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: 44px 44px;
+    filter: brightness(0.5) blur(0.4px);
+  }
+  .board-far .arg-mask {
+    position: absolute; inset: 0;
+    background: radial-gradient(120% 90% at 50% 30%, transparent 0%, rgba(13,11,17,0.55) 55%, rgba(13,11,17,0.95) 100%);
+  }
+
+  /* a couple of distant ticket cards floating in the board */
+  .far-card {
+    position: absolute;
+    border-radius: 4px;
+    background: linear-gradient(160deg, rgba(28,24,34,0.95), rgba(18,15,22,0.95));
+    border: 1px solid rgba(231,226,212,0.10);
+    box-shadow: 0 8px 18px -8px rgba(0,0,0,0.8);
+    padding: 7px 8px;
+    font-family: "Space Mono", monospace;
+    font-size: 7px;
+    letter-spacing: 0.05em;
+    color: var(--champ-dim);
+    transform: rotate(var(--r, 0deg));
+    overflow: hidden;
+  }
+  .far-card .pip { display:inline-block; width:6px; height:6px; transform: rotate(45deg); border-radius:1px; margin-right:4px; vertical-align:middle; }
+  .far-card .bar { height: 3px; border-radius: 2px; background: rgba(231,226,212,0.14); margin-top:5px; }
+  .fc1 { top: 9%; left: 8%; width: 46%; --r: -3deg; }
+  .fc2 { top: 30%; right: 7%; width: 42%; --r: 4deg; }
+  .fc3 { bottom: 24%; left: 14%; width: 50%; --r: -2deg; }
+  .fc4 { bottom: 7%; right: 10%; width: 40%; --r: 3deg; }
+
+  /* cold reflection sheen on the glass — top-left, like real glazing */
+  .sheen {
+    position: absolute; inset: 0; z-index: 7; pointer-events: none;
+    background: linear-gradient(125deg, rgba(231,226,212,0.16) 0%, rgba(231,226,212,0.02) 22%, transparent 40%);
+    mix-blend-mode: screen;
+  }
+  /* vignette pulling your eye to the centre */
+  .vignette {
+    position: absolute; inset: 0; z-index: 5; pointer-events: none;
+    box-shadow: inset 0 0 70px 18px rgba(0,0,0,0.7);
+  }
+
+  /* ---------- The lock plate that sits ON the window sill ---------- */
+  .lock {
+    position: absolute;
+    z-index: 8;
+    left: 50%;
+    bottom: 9%;
+    transform: translateX(-50%);
+    width: 78%;
+    background: rgba(8,7,11,0.78);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--champ-faint);
+    border-radius: 6px;
+    padding: 12px 12px 13px;
+    box-shadow: 0 16px 30px -14px rgba(0,0,0,0.9);
+    transition: transform .18s ease, opacity .4s ease;
+  }
+
+  .lock-label {
+    font-family: "Space Mono", monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--champ-dim);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  /* the diamond-cell passcode display */
+  .pins { display: flex; gap: 8px; justify-content: center; }
+  .pin {
+    width: 26px; height: 26px;
+    display: grid; place-items: center;
+    transform: rotate(45deg);
+    border: 1px solid var(--champ-faint);
+    border-radius: 3px;
+    background: rgba(231,226,212,0.03);
+    transition: border-color .15s, background .15s, box-shadow .15s;
+  }
+  .pin span {
+    transform: rotate(-45deg);
+    font-family: "Space Mono", monospace;
+    font-size: 13px;
+    color: var(--champ);
+  }
+  .pin.filled { border-color: rgba(231,226,212,0.5); background: rgba(231,226,212,0.08); }
+  .pin.active { box-shadow: 0 0 0 2px rgba(231,226,212,0.25), 0 0 12px rgba(231,226,212,0.2); }
+
+  /* hidden real input behind the pins */
+  .hidden-input { position:absolute; opacity:0; pointer-events:none; }
+
+  .hint {
+    text-align: center;
+    margin-top: 9px;
+    min-height: 13px;
+    font-family: "Space Mono", monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.06em;
+    color: var(--champ-dim);
+    transition: color .2s;
+  }
+  .hint.warn { color: var(--g-yellow); }
+  .hint.bad { color: var(--red-bright); }
+
+  /* ---------- WRONG: ink splash + halftone red flash + shake ---------- */
+  @keyframes shake-stutter {
+    0%,100% { transform: translateX(-50%) translateX(0); }
+    15% { transform: translateX(-50%) translateX(-7px) rotate(-1deg); }
+    30% { transform: translateX(-50%) translateX(6px) rotate(1deg); }
+    45% { transform: translateX(-50%) translateX(-5px); }
+    60% { transform: translateX(-50%) translateX(4px) rotate(.5deg); }
+    75% { transform: translateX(-50%) translateX(-2px); }
+  }
+  .lock.wrong { animation: shake-stutter 0.45s steps(2, end) 1; border-color: var(--red); }
+
+  .halftone-flash {
+    position: absolute; inset: 0; z-index: 20; pointer-events: none;
+    opacity: 0;
+    /* red halftone dots */
+    background-image: radial-gradient(circle at center, rgba(234,67,53,0.85) 0%, rgba(234,67,53,0.85) 30%, transparent 55%);
+    background-size: 9px 9px;
+    mix-blend-mode: screen;
+  }
+  .halftone-flash.go { animation: halftone-burst 0.5s steps(3, end) 1; }
+  @keyframes halftone-burst {
+    0% { opacity: 0; }
+    30% { opacity: 0.9; }
+    60% { opacity: 0.4; }
+    100% { opacity: 0; }
+  }
+
+  /* ink splash drips from the lock plate on wrong */
+  .ink { position:absolute; inset:0; z-index:19; pointer-events:none; }
+  .ink svg { width:100%; height:100%; opacity:0; }
+  .ink.go svg { animation: ink-pop 0.7s steps(4,end) 1 forwards; }
+  @keyframes ink-pop {
+    0% { opacity:0; transform: scale(0.6); }
+    35% { opacity: 0.95; transform: scale(1.05); }
+    100% { opacity: 0; transform: scale(1.2); }
+  }
+
+  /* ---------- LOCKOUT ---------- */
+  .lock.locked .pins { opacity: 0.25; }
+  .lockout-bar {
+    margin-top: 9px;
+    height: 4px; border-radius: 2px;
+    background: rgba(234,67,53,0.18);
+    overflow: hidden;
+    display: none;
+  }
+  .lock.locked .lockout-bar { display: block; }
+  .lockout-fill {
+    height: 100%; width: 100%;
+    background: var(--red-bright);
+    transform-origin: left;
+    animation: lockout-drain 6s linear 1 forwards;
+  }
+  @keyframes lockout-drain { from { transform: scaleX(1);} to { transform: scaleX(0);} }
+
+  /* ---------- CORRECT: step through the portal ---------- */
+  /* the whole window dollies forward, glass clears, board zooms toward you */
+  .scene.through .window {
+    transform: scale(2.6) translateZ(220px);
+    transition: transform 1.3s cubic-bezier(.7,0,.2,1);
+  }
+  .scene.through .board-far {
+    transform: scale(1.25) translateZ(40px);
+    filter: brightness(1) blur(0);
+  }
+  .scene.through .board-far .arg-mask { background: radial-gradient(120% 90% at 50% 40%, transparent 0%, rgba(13,11,17,0.2) 80%, rgba(13,11,17,0.6) 100%); }
+  .scene.through .lock,
+  .scene.through .sheen,
+  .scene.through .vignette,
+  .scene.through .window::before { opacity: 0; }
+
+  /* white-wipe flash at the moment of crossing */
+  .crossfade {
+    position: fixed; inset: 0; z-index: 80; pointer-events: none;
+    background: radial-gradient(circle at 50% 55%, var(--champ) 0%, transparent 65%);
+    opacity: 0;
+  }
+  .crossfade.go { animation: cross 1.3s steps(5, end) 1 forwards; }
+  @keyframes cross {
+    0% { opacity: 0; }
+    55% { opacity: 0; }
+    70% { opacity: 0.9; }
+    100% { opacity: 0; }
+  }
+
+  /* The full board view we land on */
+  .arrived {
+    position: fixed; inset: 0; z-index: 70;
+    display: none;
+    flex-direction: column;
+    padding: 28px clamp(20px, 5vw, 64px);
+    background-color: #0d0b11;
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(140,20,40,0.08), transparent 60%),
+      linear-gradient(rgba(231,226,212,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 80px 80px, 80px 80px;
+    animation: arrive-in 0.9s ease 1 both;
+  }
+  .arrived.show { display: flex; }
+  @keyframes arrive-in { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: none; } }
+
+  .arrived header { display:flex; align-items:center; gap:10px; margin-bottom: 26px; }
+  .arrived .mark {
+    font-family: "Limelight", serif;
+    font-size: clamp(24px, 4vw, 38px);
+    letter-spacing: 0.18em;
+    color: var(--champ);
+  }
+  .arrived .dia { font-size: 16px; }
+
+  .columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; flex: 1; min-height: 0; }
+  .col-h { font-family: "Space Mono", monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--champ-dim); margin-bottom: 12px; }
+  .card {
+    background: linear-gradient(160deg, rgba(28,24,34,0.95), rgba(18,15,22,0.95));
+    border: 1px solid rgba(231,226,212,0.10);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .card .t { font-size: 13px; color: var(--champ); margin-bottom: 8px; }
+  .card .meta { display:flex; gap:8px; align-items:center; font-family:"Space Mono", monospace; font-size:9px; color:var(--champ-dim);}
+  .chip { display:inline-flex; align-items:center; gap:5px; }
+  .chip .pip { width:8px; height:8px; transform: rotate(45deg); border-radius:2px; }
+
+  .back {
+    margin-top: 20px;
+    align-self: center;
+    font-family: "Space Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--champ-dim);
+    background: rgba(231,226,212,0.05);
+    border: 1px solid var(--champ-faint);
+    border-radius: 6px;
+    padding: 9px 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  .back:hover { background: rgba(231,226,212,0.1); color: var(--champ); }
+
+  /* demo state controls — clearly a lockup tool, sits bottom-left */
+  .controls {
+    position: fixed; left: 16px; bottom: 16px; z-index: 95;
+    display: flex; gap: 6px; flex-wrap: wrap; max-width: 280px;
+    font-family: "Space Mono", monospace;
+  }
+  .controls button {
+    font: inherit; font-size: 9px; letter-spacing: 0.08em;
+    color: var(--champ-dim);
+    background: rgba(8,7,11,0.8);
+    border: 1px solid var(--champ-faint);
+    border-radius: 4px;
+    padding: 6px 8px; cursor: pointer; text-transform: uppercase;
+  }
+  .controls button:hover { color: var(--champ); border-color: rgba(231,226,212,0.4); }
+  .controls .lbl { font-size: 8px; color: rgba(231,226,212,0.3); width:100%; letter-spacing:0.2em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::after, .lock.wrong, .halftone-flash.go, .ink.go svg, .lockout-fill,
+    .crossfade.go, .arrived { animation: none !important; }
+    .board-far, .window, .scene.through .window { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="crossfade" id="crossfade"></div>
+
+  <div class="scene" id="scene">
+    <p class="eyebrow">A door, kept small</p>
+    <div class="window" id="window">
+      <div class="glass">
+        <div class="board-far" id="boardFar">
+          <div class="far-card fc1"><span class="pip" style="background:var(--g-blue)"></span>auth flow<div class="bar"></div></div>
+          <div class="far-card fc2"><span class="pip" style="background:var(--g-yellow)"></span>portal copy<div class="bar"></div></div>
+          <div class="far-card fc3"><span class="pip" style="background:var(--g-green)"></span>ship #62<div class="bar"></div></div>
+          <div class="far-card fc4"><span class="pip" style="background:var(--g-red)"></span>grain pass<div class="bar"></div></div>
+          <div class="arg-mask"></div>
+        </div>
+        <div class="vignette"></div>
+        <div class="sheen"></div>
+        <div class="halftone-flash" id="halftone"></div>
+        <div class="ink" id="ink">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+            <g fill="#b3122b">
+              <circle cx="50" cy="78" r="9"/>
+              <circle cx="34" cy="72" r="5"/><circle cx="66" cy="74" r="6"/>
+              <circle cx="24" cy="80" r="3"/><circle cx="78" cy="82" r="4"/>
+              <circle cx="44" cy="64" r="3"/><circle cx="58" cy="62" r="2.4"/>
+              <circle cx="50" cy="90" r="2.5"/>
+            </g>
+          </svg>
+        </div>
+
+        <form class="lock" id="lock" autocomplete="off">
+          <div class="lock-label" id="lockLabel">Enter the passphrase</div>
+          <div class="pins" id="pins">
+            <div class="pin"><span></span></div>
+            <div class="pin"><span></span></div>
+            <div class="pin"><span></span></div>
+            <div class="pin"><span></span></div>
+            <div class="pin"><span></span></div>
+          </div>
+          <input class="hidden-input" id="codeInput" type="text" inputmode="text" maxlength="5" autocomplete="off" />
+          <div class="hint" id="hint">Click to type · password is "OPEN5"</div>
+          <div class="lockout-bar"><div class="lockout-fill" id="lockoutFill"></div></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- The board you land on after stepping through -->
+  <div class="arrived" id="arrived">
+    <header>
+      <span class="dia" style="color:var(--g-red)">&#9670;</span>
+      <span class="mark">THE HARLEQUIN</span>
+      <span class="dia" style="color:var(--champ)">&#9670;</span>
+    </header>
+    <div class="columns">
+      <div>
+        <div class="col-h">Todo</div>
+        <div class="card"><div class="t">Little-window portal entrance</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-blue)"></span>S</span><span>#62</span></div></div>
+        <div class="card"><div class="t">Stop-motion grain pass</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-yellow)"></span>M</span><span>#71</span></div></div>
+      </div>
+      <div>
+        <div class="col-h">In progress</div>
+        <div class="card"><div class="t">Champagne duotone tokens</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-yellow)"></span>M</span><span>#48</span></div></div>
+        <div class="card"><div class="t">Halftone failure flash</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-blue)"></span>S</span><span>#63</span></div></div>
+      </div>
+      <div>
+        <div class="col-h">Done</div>
+        <div class="card"><div class="t">Limelight wordmark</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-green)"></span>S</span><span>#9</span></div></div>
+        <div class="card"><div class="t">Harlequin reveal bloom</div><div class="meta"><span class="chip"><span class="pip" style="background:var(--g-green)"></span>L</span><span>#11</span></div></div>
+      </div>
+    </div>
+    <button class="back" id="back">&larr; Back outside</button>
+  </div>
+
+  <div class="controls">
+    <span class="lbl">DEMO STATES — variant A</span>
+    <button data-act="type">Type</button>
+    <button data-act="wrong">Wrong</button>
+    <button data-act="lockout">Lockout</button>
+    <button data-act="correct">Correct &rarr; enter</button>
+    <button data-act="reset">Reset</button>
+  </div>
+
+<script>
+(function () {
+  var PASSWORD = "OPEN5";
+  var scene = document.getElementById("scene");
+  var lock = document.getElementById("lock");
+  var pinsEl = document.getElementById("pins");
+  var pinNodes = pinsEl.querySelectorAll(".pin");
+  var input = document.getElementById("codeInput");
+  var hint = document.getElementById("hint");
+  var lockLabel = document.getElementById("lockLabel");
+  var halftone = document.getElementById("halftone");
+  var ink = document.getElementById("ink");
+  var crossfade = document.getElementById("crossfade");
+  var arrived = document.getElementById("arrived");
+  var lockoutFill = document.getElementById("lockoutFill");
+  var attempts = 3;
+  var locked = false;
+
+  // clicking the window focuses the hidden input
+  document.getElementById("window").addEventListener("click", function () {
+    if (!locked) input.focus();
+  });
+
+  function render() {
+    var v = input.value.toUpperCase();
+    pinNodes.forEach(function (p, i) {
+      var s = p.querySelector("span");
+      p.classList.toggle("filled", i < v.length);
+      p.classList.toggle("active", i === v.length && !locked);
+      s.textContent = i < v.length ? "◆" : "";
+    });
+  }
+
+  input.addEventListener("input", function () {
+    if (locked) { input.value = ""; return; }
+    input.value = input.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 5).toUpperCase();
+    setHint("");
+    render();
+    if (input.value.length === 5) check();
+  });
+
+  function setHint(msg, cls) {
+    hint.className = "hint" + (cls ? " " + cls : "");
+    hint.textContent = msg || (locked ? "Locked. Step back." : 'Click to type · password is "OPEN5"');
+  }
+
+  function check() {
+    if (input.value.toUpperCase() === PASSWORD) { correct(); }
+    else { wrong(); }
+  }
+
+  function wrong() {
+    attempts -= 1;
+    lock.classList.remove("wrong"); void lock.offsetWidth; lock.classList.add("wrong");
+    halftone.classList.remove("go"); void halftone.offsetWidth; halftone.classList.add("go");
+    ink.classList.remove("go"); void ink.offsetWidth; ink.classList.add("go");
+    input.value = ""; render();
+    if (attempts <= 0) { lockout(); return; }
+    setHint(attempts + " attempt" + (attempts === 1 ? "" : "s") + " left", "bad");
+    setTimeout(function () { if (!locked) input.focus(); }, 460);
+  }
+
+  function lockout() {
+    locked = true;
+    lock.classList.add("locked");
+    lockLabel.textContent = "Too many tries";
+    setHint("Locked for a beat…", "bad");
+    lockoutFill.style.animation = "none"; void lockoutFill.offsetWidth;
+    lockoutFill.style.animation = "lockout-drain 6s linear 1 forwards";
+    setTimeout(function () { reset(); }, 6000);
+  }
+
+  function correct() {
+    setHint("Right. Hold still—", "");
+    lockLabel.textContent = "Stepping through…";
+    crossfade.classList.remove("go"); void crossfade.offsetWidth; crossfade.classList.add("go");
+    scene.classList.add("through");
+    setTimeout(function () {
+      arrived.classList.add("show");
+    }, 1000);
+  }
+
+  function reset() {
+    locked = false; attempts = 3;
+    input.value = "";
+    lock.classList.remove("locked", "wrong");
+    scene.classList.remove("through");
+    arrived.classList.remove("show");
+    crossfade.classList.remove("go");
+    halftone.classList.remove("go");
+    ink.classList.remove("go");
+    lockLabel.textContent = "Enter the passphrase";
+    render(); setHint("");
+  }
+
+  document.getElementById("back").addEventListener("click", reset);
+
+  // demo controls
+  var typer = null;
+  function autoType(text, done) {
+    if (typer) clearInterval(typer);
+    input.value = ""; render(); setHint("");
+    var i = 0;
+    typer = setInterval(function () {
+      if (i >= text.length) { clearInterval(typer); typer = null; if (done) done(); return; }
+      input.value += text[i++]; render();
+    }, 170);
+  }
+
+  document.querySelector(".controls").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    var act = b.dataset.act;
+    if (act === "reset") return reset();
+    reset();
+    if (act === "type") setTimeout(function(){ autoType("OP"); }, 60);
+    if (act === "wrong") setTimeout(function(){ autoType("WRONG", check); }, 60);
+    if (act === "lockout") setTimeout(function(){
+      autoType("NOPE1", function(){ setTimeout(function(){ autoType("NOPE2", function(){ setTimeout(function(){ autoType("NOPE3", check); }, 500); }); }, 500); });
+    }, 60);
+    if (act === "correct") setTimeout(function(){ autoType("OPEN5", check); }, 60);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
