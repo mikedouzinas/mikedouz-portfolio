@@ -58,9 +58,9 @@ In `overnight/design-ideas/`. Each has 2-3 distinct directions, ASCII wireframes
 
 ---
 
-## 4. Vault — ⚠️ blocker for #74
+## 4. Vault — material for #74 (corrected)
 
-The Apollo vault (`~/Downloads/Dev/apollo-vault`) is an **empty, un-bootstrapped** Claudesidian starter — `/init-bootstrap` was never run; every PARA folder is empty. **There is no personal material to seed "moments" yet.** Before #74 can be real, you'll need to populate it (photos in `05_Attachments/`, a few dated notes, the per-summer songs). Working notes (kept OUT of this public repo): `~/Downloads/Dev/_overnight_private/vault-notes/moments-material.md`.
+The real vault is **`the-mv-vault`** (iCloud; `~/Downloads/Dev/apollo-vault` was the wrong, empty one I hit first). It's **rich**. The standout asset is a **531-entry Music Timeline** mapping specific songs to dated life-moments — so the *audio* half of every "moment" is authentic and well-sourced. The **photo/video** half is the gap: there are no curated per-experience stills, so you'd supply those. Most to draw on: **Veson Nautical, Parsons, Google, Olympus** (Lilie / VesselsValue are name-only). Recommendation: "one image + one real track per experience" memory card, opt-in audio, bucket-stored media. Private working notes (kept OUT of this public repo): `~/Downloads/Dev/_overnight_private/vault-notes/moments-material.md`.
 
 ---
 

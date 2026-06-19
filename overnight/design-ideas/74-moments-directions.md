@@ -5,14 +5,28 @@
 experience — a small visual/audio window into what each one *felt* like. Should
 read like a reel or a memory, not a portfolio slide.
 
-> **Source-material note:** the raw personal material for these moments (photos,
-> songs, anecdotes, emotional texture) is intended to come from Mike's private
-> Apollo vault. As of this survey that vault is an empty starter kit, so no media
-> exists yet — see the external private working file
-> `_overnight_private/vault-notes/moments-material.md` (outside this repo) for the
-> survey and what needs to be populated before the feature has real content. The
-> directions below are deliberately content-agnostic so they hold regardless of
-> what media eventually lands.
+> **Source-material note (updated):** real source material exists. A survey of
+> Mike's private notes confirms there is genuine per-experience narrative and
+> emotional texture to draw on, and — crucially — an existing, sizable
+> *song-per-moment* record: a living timeline that already associates specific
+> tracks with specific life-moments going back several years. So the **audio half
+> of every moment is well-sourced**: most experiences already have an authentic,
+> Mike-chosen song with a real memory attached (one experience even has an
+> explicit "this was the song I drove to work to that summer"). The shape of the
+> material, at a high level: rich written context, strong music associations,
+> distinct moods per experience, and a couple of natural through-lines (a
+> maritime thread across the shipping-adjacent roles; a recurring "prove it fast"
+> instinct; an introspective founder/mission register that contrasts the rest).
+>
+> The **photo/video half is the gap**: there are essentially no curated personal
+> stills or clips per experience in the source material yet, so Mike will need to
+> supply one image (or a short clip) per experience. This makes the realistic
+> content budget "one good image + one real track per experience," which the
+> recommended direction is built around.
+>
+> (Specifics, song titles, and file paths live only in the external private file
+> `_overnight_private/vault-notes/moments-material.md`, outside this repo. Nothing
+> private appears in this committed doc.)
 
 ---
 
@@ -126,11 +140,14 @@ press play to hear it). Closing returns you to the row. No looping video require
   gentle drift only; respect `prefers-reduced-motion`).
 - **Cons:** less kinetic than B; one still can't tell as layered a story as a
   montage.
-- **Why recommended:** it matches the realistic content budget (the vault is
-  currently empty, so anything requiring full montages would block the feature),
-  delivers the "evocative image + track" option called out in the ticket itself,
-  and is the safest fit with the existing design system. Direction B is the
-  upgrade path if/when rich montage material exists.
+- **Why recommended:** it matches the realistic content budget. The audio side is
+  already there (each experience has a real, Mike-chosen track with a memory
+  behind it), but curated per-experience photos/clips don't exist yet — so
+  anything requiring full montages would block the feature on media Mike still has
+  to gather. "One evocative image + one real track" is exactly the option the
+  ticket calls out, ships now on the material that exists, and is the safest fit
+  with the existing design system. Direction B is the upgrade path once real
+  montage footage per experience exists.
 
 ---
 
@@ -179,38 +196,46 @@ scarce.
 ## About-me idea directions (high-level, for Mike to consider)
 
 Inspired by surveying how the site presents Mike today (very capability- and
-project-forward) versus the more personal, reflective register of the Olympus /
-self-knowledge work. None of these require private detail to start; they're
-framing directions.
+project-forward) versus the much more personal, reflective register that exists
+in his own notes (a self-knowledge / Olympus voice, and a striking habit of
+remembering his life through *music* — specific songs tied to specific seasons).
+None of these require disclosing any private detail; they're framing directions.
 
-1. **A thin "story" spine, not just a grid.** The site is strong at *what* Mike
-   built; it's lighter on *the through-line* — the maritime/shipping thread, the
-   "prove it fast" instinct, the pull toward helping people flourish. A short,
-   honestly-written narrative running alongside the work would make the portfolio
-   feel authored rather than catalogued. Moments (#74) is the first beat of this.
+1. **Music as the spine of the personal story.** The single most authentic and
+   already-existing thread is song-per-moment: Mike genuinely experiences his own
+   life as a soundtrack, with a real track attached to each season. That's a
+   distinctive, ownable organizing idea for "about me" — far more him than a bio
+   paragraph. #74 is the first beat; the homepage could lean into music as the
+   connective tissue of the whole personal layer.
 
-2. **Let the mission voice show, carefully.** The introspective Olympus framing is
-   the most distinctive thing about Mike and currently lives mostly inside Iris.
-   A small, tasteful "why I build" surface on the homepage — one or two sentences
-   in Mike's own voice — would differentiate the site from a standard SWE
-   portfolio without turning it into a manifesto.
+2. **A thin "story" spine, not just a grid.** The site is strong at *what* Mike
+   built; it's lighter on *the through-line* — the maritime/shipping thread across
+   the early roles, the "prove it fast" instinct, the pull toward helping people
+   flourish. A short, honestly-written narrative alongside the work would make the
+   portfolio feel authored rather than catalogued.
 
-3. **Consistent personal motifs as connective tissue.** Reuse one or two recurring
-   visual motifs (e.g. the accent-glow language, a water/horizon motif tied to the
-   maritime years) so the personal sections feel of-a-piece with the rest of the
-   site rather than bolted on.
+3. **Let the mission voice show, carefully.** The introspective Olympus framing is
+   the most distinctive thing about Mike and currently lives mostly inside Iris
+   and his essays. A small, tasteful "why I build" surface on the homepage — one
+   or two sentences in his own voice — would differentiate the site from a
+   standard SWE portfolio without turning it into a manifesto.
 
-4. **Make Iris the guided-tour host of the personal side.** Iris already answers
-   "tell me about Mike." A gentle prompt ("ask about a moment", "what was X
-   like?") that ties the moments section into Iris would let visitors explore the
-   personal material conversationally — playing to the site's strongest, most
-   unique component.
+4. **Consistent personal motifs as connective tissue.** Reuse one or two recurring
+   visual motifs (the accent-glow language already in the system; a water/horizon
+   motif tied to the maritime years) so the personal sections feel of-a-piece with
+   the rest of the site rather than bolted on.
 
-5. **Time + place as a quiet organizing idea.** The experiences naturally form a
-   timeline across cities/years. A light chronological framing for the personal
-   content (without dates dominating) would give visitors a sense of trajectory —
-   where Mike has been heading — which is exactly the register an "about me"
-   wants, versus a flat list.
+5. **Make Iris the guided-tour host of the personal side.** Iris already answers
+   "tell me about Mike," and a music→moment data pipeline already feeds the site.
+   A gentle prompt ("ask about a moment", "what was X like?", "what was on repeat
+   that summer?") that ties moments + music into Iris would let visitors explore
+   the personal material conversationally — playing to the site's strongest,
+   most unique component.
+
+6. **Time + place as a quiet organizing idea.** The experiences naturally form a
+   timeline across cities/years. A light chronological framing (without dates
+   dominating) gives visitors a sense of trajectory — where Mike has been
+   heading — which is exactly the register an "about me" wants, versus a flat list.
 
 _These are directions, not commitments — each can be adopted independently and at
 whatever level of personal disclosure Mike is comfortable with._
