@@ -28,6 +28,8 @@ import {
   createIssue,
   updateIssue,
   isOwnedRepo,
+  upsertReviewBlock,
+  previewUrlForBranch,
   type DevIssue,
   type Priority,
   type Status,
@@ -185,12 +187,35 @@ async function cmdDone(flags: Flags): Promise<void> {
   console.log(`✓ #${number} marked Done (checklist completed).`);
 }
 
+async function cmdHandoff(flags: Flags): Promise<void> {
+  const repo = await requireRepo(flags);
+  const number = Number(str(flags, 'number'));
+  if (!Number.isInteger(number) || number <= 0) fail('--number <N> is required.');
+  const test = str(flags, 'test');
+  if (!test) fail('--test "<what to test>" is required.');
+
+  let preview = str(flags, 'preview');
+  if (!preview && flags['auto']) {
+    const branch = str(flags, 'branch');
+    if (!branch) fail('--auto needs --branch <name> (or pass --preview <url>).');
+    preview = previewUrlForBranch(branch!);
+  }
+  if (!preview) fail('Provide --preview <url> or --auto --branch <name>.');
+
+  const [issue] = await listIssues([repo], 'all').then((all) => all.filter((i) => i.number === number));
+  if (!issue) fail(`#${number} not found in ${repo}.`);
+  const body = upsertReviewBlock(issue.body, { preview: preview!, test });
+  await updateIssue(repo, number, { status: 'awaiting review', body });
+  console.log(`✓ handoff #${number} → awaiting review\n  Preview: ${preview!}`);
+}
+
 const HELP = `THE HARLEQUIN board CLI
 
   npm run board -- list   [--repo <slug>] [--state open|closed|all] [--json]
   npm run board -- file   --repo <slug> --title "..." [--priority p3] [--status todo] [--size M] [--body "..."] [--subtask "..."]...
   npm run board -- update --repo <slug> --number N [--title] [--body] [--priority] [--status] [--size] [--add-subtask "..."]...
-  npm run board -- done   --repo <slug> --number N --yes
+  npm run board -- done    --repo <slug> --number N --yes
+  npm run board -- handoff --repo <slug> --number N (--preview <url> | --auto --branch <name>) --test "<what to test>"
 
 Conventions: priority p1–p5 · status todo|"in progress" · size S|M|L · subtasks "- [ ]" in the body · Done = closed.
 Policy: file/update freely; closing (done) needs Mike's OK + --yes.`;
@@ -207,6 +232,8 @@ async function main(): Promise<void> {
       return cmdUpdate(flags);
     case 'done':
       return cmdDone(flags);
+    case 'handoff':
+      return cmdHandoff(flags);
     default:
       console.log(HELP);
   }
