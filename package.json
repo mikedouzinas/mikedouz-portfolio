@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "npm run kb:prebuild && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "postinstall": "if [ -z \"$CI\" ] && [ -z \"$VERCEL\" ]; then npm run build:typeahead && npm run build:rankings; fi",
     "kb:prebuild": "npm run build:typeahead && npm run build:rankings",
     "build:typeahead": "tsx scripts/build_typeahead.ts && tsx scripts/build_typeahead_v2.ts",
