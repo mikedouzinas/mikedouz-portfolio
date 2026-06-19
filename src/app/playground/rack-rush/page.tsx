@@ -47,6 +47,10 @@ export default function RackRushPage() {
     };
   }, []);
 
+  // Ref indirection so the loop can re-schedule itself without referencing the
+  // `gameLoop` binding before it's declared (and without a stale closure).
+  const gameLoopRef = useRef<(timestamp: number) => void>(() => {});
+
   const gameLoop = useCallback((timestamp: number) => {
     if (!isPlaying) return;
 
@@ -57,14 +61,18 @@ export default function RackRushPage() {
     }
 
     // Update letter positions and remove off-screen letters
-    setLetters(prev => 
+    setLetters(prev =>
       prev
         .map(letter => ({ ...letter, y: letter.y + letter.speed }))
         .filter(letter => letter.y < 400) // Remove letters that fall off screen
     );
 
-    animationRef.current = requestAnimationFrame(gameLoop);
+    animationRef.current = requestAnimationFrame((t) => gameLoopRef.current(t));
   }, [isPlaying, generateLetter]);
+
+  useEffect(() => {
+    gameLoopRef.current = gameLoop;
+  }, [gameLoop]);
 
   useEffect(() => {
     if (isPlaying) {

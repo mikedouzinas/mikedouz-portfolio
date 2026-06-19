@@ -1,8 +1,10 @@
 # CLAUDE.md
 
 **Project**: mikeveson.com — portfolio, Iris AI assistant, and "the web" blog
-**Stack**: Next.js 15 (App Router), React 19, TypeScript, Anthropic Claude Sonnet 4.6, Upstash Redis, Supabase, Resend
-**Last updated**: 2026-04-20
+**Stack**: Next.js 16 (App Router), React 19, TypeScript, Anthropic Claude Sonnet 4.6, Upstash Redis, Supabase, Resend
+**Last updated**: 2026-06-19
+
+> Lint: `next lint` was removed in Next 16. `npm run lint` runs ESLint directly (`eslint .`) against the flat `eslint.config.mjs` (native `eslint-config-next` flat configs). `next build` does NOT run ESLint — run `npm run lint` separately.
 
 ---
 
@@ -129,7 +131,19 @@ Common tags: `ethics`, `technology`, `philosophy`, `flourishing`, `relationships
 </div>
 ```
 
-Auto-disabled on touch. Card colors: green=projects, purple=blogs, blue=experience.
+Auto-disabled on touch.
+
+**Accent-by-area (actual code mapping, RGB strings):**
+- Projects = indigo `99, 102, 241` (`project_card.tsx`)
+- Blogs / "the web" = teal `45, 212, 191` (`blog_card.tsx`, `the_web_card.tsx`, `WebBanner.tsx`)
+- Experience = default light blue `147, 197, 253` (BaseCard default; experience cards pass no `glowColor`)
+- In-progress card = green `34, 197, 94` (`InProgressCard.tsx`)
+- Iris bubble tones = teal `45, 212, 191` / champagne `231, 226, 212` (`IrisBubble.tsx`); Iris composer/CTA = light blue `147, 197, 253`
+- `/dev` (HARLEQUIN) = champagne `231, 226, 212`
+
+`ContainedMouseGlow` default color is `147, 197, 253` (light blue).
+
+> Note: an earlier version of this doc claimed purple/blue accents. The code uses the mapping above (teal/indigo/green/champagne). If purple/blue was the intended design, that's a separate design change for Mike — code colors were not modified.
 
 ---
 

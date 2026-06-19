@@ -22,7 +22,7 @@ import type { DevIssue, DevRepo, Priority, Size, Status } from './github';
 export const CERE_MODEL = 'claude-sonnet-4-6';
 
 const PRIORITY = z.enum(['p1', 'p2', 'p3', 'p4', 'p5']);
-const STATUS = z.enum(['todo', 'in progress']);
+const STATUS = z.enum(['todo', 'in progress', 'awaiting review']);
 const SIZE = z.enum(['S', 'M', 'L']);
 
 export const CREATE_ISSUE_TOOL: Anthropic.Tool = {
@@ -37,7 +37,7 @@ export const CREATE_ISSUE_TOOL: Anthropic.Tool = {
       title: { type: 'string' },
       body: { type: 'string', description: 'Optional description / context.' },
       priority: { type: 'string', enum: ['p1', 'p2', 'p3', 'p4', 'p5'], description: 'Default p3.' },
-      status: { type: 'string', enum: ['todo', 'in progress'], description: 'Default todo.' },
+      status: { type: 'string', enum: ['todo', 'in progress', 'awaiting review'], description: 'Default todo.' },
       size: {
         type: 'string',
         enum: ['S', 'M', 'L'],
@@ -65,7 +65,7 @@ export const UPDATE_ISSUE_TOOL: Anthropic.Tool = {
       repo: { type: 'string', description: 'Exact repo slug (owner/name).' },
       number: { type: 'integer', description: 'The issue number.' },
       priority: { type: 'string', enum: ['p1', 'p2', 'p3', 'p4', 'p5'] },
-      status: { type: 'string', enum: ['todo', 'in progress'] },
+      status: { type: 'string', enum: ['todo', 'in progress', 'awaiting review'] },
       size: { type: 'string', enum: ['S', 'M', 'L'] },
       state: { type: 'string', enum: ['open', 'closed'] },
       body: {
@@ -156,6 +156,7 @@ Mike talks to you in plain language and you propose ticket changes. You don't ch
 If the message is a genuine question or needs clarification (not a filing request), just reply in text without calling tools.
 
 Sizing — every new ticket needs one: S = quick (<~1h), M = a feature / half-day, L = large or conversation-heavy / multi-day. Infer it from the work described.
+The "awaiting review" status is set exclusively by the handoff flow (board CLI or agent), not by you — never set status to "awaiting review" yourself.
 Subtasks: if the work has clear steps, pass them as subtasks; they render as a checklist in the body.
 
 Repos you can file to (use the EXACT slug):

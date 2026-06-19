@@ -1,9 +1,21 @@
 "use client";
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useSyncExternalStore } from 'react';
 
 // Final margin: stop the reverse animation this many px short of exact center
 // This allows us to restore the base gradient under a faint green band, masking the handoff
 const FINAL_MARGIN_PX = 2;
+
+const noopSubscribe = () => () => {};
+// Server renders the ⌘ tile (default Mac); the client corrects after mount via
+// the client snapshot. Read once and memoize so the snapshot stays referentially
+// stable across renders (useSyncExternalStore requires a cached value).
+let cachedIsMac: boolean | null = null;
+function getIsMacClient(): boolean {
+  if (cachedIsMac === null) {
+    cachedIsMac = /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
+  }
+  return cachedIsMac;
+}
 
 /**
  * Interactive button component for Iris AI assistant
@@ -26,12 +38,7 @@ export default function IrisButton() {
   const isPaletteOpen = useRef(false);
   // Track hover state to switch between default gradient and pure blue
   const isHovering = useRef(false);
-  const [isMac, setIsMac] = useState(true);
-  
-  // Detect OS on mount
-  useEffect(() => {
-    setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.userAgent));
-  }, []);
+  const isMac = useSyncExternalStore(noopSubscribe, getIsMacClient, () => true);
 
   /**
    * Handle mouse enter event

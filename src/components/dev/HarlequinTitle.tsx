@@ -17,6 +17,7 @@ export function HarlequinTitle() {
   return (
     <h1 className="flex items-center gap-2 select-none">
       {/* Full navigation (not client-side) so home loads completely. */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional full page load on leaving /dev, not a client-side route transition */}
       <a
         href="/"
         aria-label="Back to mikeveson.com"

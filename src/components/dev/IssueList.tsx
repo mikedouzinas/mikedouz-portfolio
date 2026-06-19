@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -19,12 +19,15 @@ import {
   type DraftSubtask,
 } from '@/lib/dev/subtasks';
 import { buildClaudePrompt } from '@/lib/dev/copy';
+import { parseReviewBlock } from '@/lib/dev/github';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
 import { CopyForClaude } from './CopyForClaude';
 
 export type GroupBy = 'status' | 'repo';
 export type SortBy = 'priority' | 'recent' | 'size';
+
+const emptySubscribe = () => () => {};
 
 // Priority shows just the code (P1…P5) — the descriptive word ("· Medium") was
 // confusable with the t-shirt size's "M · Medium". The color dot carries severity.
@@ -33,7 +36,7 @@ const PRIORITY_OPTS = (['p1', 'p2', 'p3', 'p4', 'p5'] as Priority[]).map((p) => 
   label: PRIORITY_META[p].short,
   color: PRIORITY_META[p].color,
 }));
-const STATUS_OPTS = (['todo', 'in progress'] as Status[]).map((s) => ({
+const STATUS_OPTS = (['todo', 'in progress', 'awaiting review'] as Status[]).map((s) => ({
   value: s,
   label: STATUS_META[s].label,
   color: STATUS_META[s].color,
@@ -57,12 +60,13 @@ type PatchBody = {
 const DONE_GREEN = '#1DB954';
 
 // Expanded-card tint keyed by status, so the lift colour tells you where a
-// ticket stands at a glance: blue = todo, amber = in progress, and the
-// original Spotify-panel green = done. Same dark-tint-of-the-accent recipe.
+// ticket stands at a glance: blue = todo, amber = in progress, champagne = awaiting review,
+// and the original Spotify-panel green = done. Same dark-tint-of-the-accent recipe.
 // Translucent so the harlequin argyle whispers through the glass card.
-const STATUS_EXPAND: Record<'todo' | 'in progress' | 'done', { bg: string; border: string }> = {
+const STATUS_EXPAND: Record<Status | 'done', { bg: string; border: string }> = {
   todo: { bg: 'rgba(11, 19, 34, 0.66)', border: 'rgba(66, 133, 244, 0.45)' }, // blue
   'in progress': { bg: 'rgba(26, 22, 7, 0.66)', border: 'rgba(251, 188, 5, 0.45)' }, // amber
+  'awaiting review': { bg: 'rgba(26, 22, 7, 0.66)', border: 'rgba(231, 179, 74, 0.45)' }, // champagne-amber
   done: { bg: 'rgba(10, 26, 19, 0.66)', border: 'rgba(29, 185, 84, 0.45)' }, // Spotify green
 };
 
@@ -127,17 +131,20 @@ function IssueCard({
   issue,
   repoName,
   onPatch,
+  inReview = false,
 }: {
   issue: DevIssue;
   repoName: string;
   onPatch: (issue: DevIssue, body: PatchBody) => void;
+  inReview?: boolean;
 }) {
   const [open, setOpen] = useState(false); // true === detached + centered
   // The vacated-slot placeholder lives on its own flag so it can OUTLAST the
   // collapse: it stays mounted while the card morphs back and only unmounts
   // once the inline card's layout animation lands (onLayoutAnimationComplete).
   const [placeholderVisible, setPlaceholderVisible] = useState(false);
-  const [mounted, setMounted] = useState(false); // portal target ready (client only)
+  // portal target ready (client only) — true only after mount, SSR-safe
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [addText, setAddText] = useState('');
   const [copiedSub, setCopiedSub] = useState<number | null>(null);
   const [editing, setEditing] = useState(false);
@@ -150,7 +157,7 @@ function IssueCard({
   const closed = issue.state === 'closed';
   // Closed items read as "Done" (green) regardless of their lingering status label.
   const st = closed ? { label: 'Done', color: DONE_GREEN } : STATUS_META[issue.status ?? 'todo'];
-  const expandKey: 'todo' | 'in progress' | 'done' = closed ? 'done' : issue.status ?? 'todo';
+  const expandKey: Status | 'done' = closed ? 'done' : issue.status ?? 'todo';
   const tint = STATUS_EXPAND[expandKey];
   const subs = parseSubtasks(issue.body);
   const prog = subtaskProgress(issue.body);
@@ -160,8 +167,6 @@ function IssueCard({
   // slot and the detached centered panel, so the morph reads as one element
   // lifting out and flying back — the detach effect.
   const layoutId = `ticket-${issue.repo}-${issue.number}`;
-
-  useEffect(() => setMounted(true), []);
 
   // Lock body scroll while a ticket is detached so the centered panel is the
   // sole focus (and the backdrop scrim can't be scrolled past).
@@ -174,6 +179,16 @@ function IssueCard({
     };
   }, [open]);
 
+  function detach() {
+    setPlaceholderVisible(true); // show the placeholder immediately on detach
+    setOpen(true);
+  }
+  const collapse = useCallback(() => {
+    // Keep the placeholder up; it's cleared by the inline card's
+    // onLayoutAnimationComplete once the card has contracted back into its slot.
+    setOpen(false);
+  }, []);
+
   // Esc collapses the detached panel back into its slot.
   useEffect(() => {
     if (!open) return;
@@ -182,17 +197,7 @@ function IssueCard({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  function detach() {
-    setPlaceholderVisible(true); // show the placeholder immediately on detach
-    setOpen(true);
-  }
-  function collapse() {
-    // Keep the placeholder up; it's cleared by the inline card's
-    // onLayoutAnimationComplete once the card has contracted back into its slot.
-    setOpen(false);
-  }
+  }, [open, collapse]);
 
   async function copySubtask(text: string, index: number) {
     try {
@@ -239,10 +244,25 @@ function IssueCard({
     if (!t) return;
     const patch: PatchBody = {};
     if (t !== issue.title) patch.title = t;
-    const newBody = composeBody(editProse, editSubs);
+    // Save-absorbs-pending: a half-typed subtask sitting in the add input is
+    // committed into the draft as part of Save, so it can never be silently lost.
+    const pending = addText.trim();
+    const subsToSave = pending ? [...editSubs, { text: pending, done: false }] : editSubs;
+    const newBody = composeBody(editProse, subsToSave);
     if (newBody !== issue.body) patch.body = newBody;
     if (patch.title || patch.body) onPatch(issue, patch); // reload remounts with fresh props
+    setAddText('');
     setEditing(false);
+  }
+
+  // Shared close/complete action — used by both the Complete button and the
+  // card-level checkbox so the two paths behave identically. Marking the ticket
+  // Done completes its checklist too.
+  function completeIssue() {
+    onPatch(issue, {
+      state: 'closed',
+      ...(prog.total > 0 ? { body: checkAllSubtasks(issue.body) } : {}),
+    });
   }
 
   // The card header — the always-visible summary. Shared between the inline
@@ -254,6 +274,34 @@ function IssueCard({
       className={`relative z-10 block w-full p-4 text-left ${detached ? 'pr-12' : ''}`}
     >
       <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
+        {/* Complete checkbox — sits to the LEFT of the priority badge and fires
+            the SAME close/complete action as the Complete button. It must not
+            also expand the ticket, so its click/keydown stop propagation to the
+            surrounding header button. Hidden once closed (then it reads Done). */}
+        {!closed && !inReview && (
+          <span
+            role="checkbox"
+            aria-checked={false}
+            aria-label="Mark ticket complete"
+            tabIndex={0}
+            title="Mark complete"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              completeIssue();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.stopPropagation();
+                e.preventDefault();
+                completeIssue();
+              }
+            }}
+            className="-my-1 inline-flex shrink-0 cursor-pointer items-center text-white/45 transition-colors hover:text-emerald-300"
+          >
+            <Square className="h-3.5 w-3.5" />
+          </span>
+        )}
         <span style={{ color: pr.color }}>{pr.short}</span>
         <span className="inline-flex items-center gap-1">
           <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: st.color }} />
@@ -469,23 +517,17 @@ function IssueCard({
                   >
                     Reopen
                   </Button>
-                ) : (
+                ) : !inReview ? (
                   <Button
                     variant="ghost"
                     glowColor="52, 211, 153"
-                    onClick={() =>
-                      onPatch(issue, {
-                        state: 'closed',
-                        // Marking the ticket Done completes its checklist too.
-                        ...(prog.total > 0 ? { body: checkAllSubtasks(issue.body) } : {}),
-                      })
-                    }
+                    onClick={completeIssue}
                     className="text-xs text-emerald-300/85"
                   >
                     <Check className="h-3.5 w-3.5" />
-                    Done
+                    Complete
                   </Button>
-                )}
+                ) : null}
               </div>
             </div>
       )}
@@ -639,6 +681,9 @@ const STATUS_LANES: { key: string; label: string; color: string }[] = [
   { key: 'done', label: 'Done', color: DONE_GREEN },
 ];
 
+/** True when an issue lives in the pinned Awaiting Review section. */
+const isAwaiting = (i: DevIssue) => i.state === 'open' && i.status === 'awaiting review';
+
 function laneOf(i: DevIssue): string {
   if (i.state === 'closed') return 'done';
   return i.status ?? 'todo';
@@ -654,18 +699,67 @@ function LaneHeader({ color, label, count }: { color: string; label: string; cou
   );
 }
 
+function ReviewActions({
+  issue,
+  onApprove,
+  onSendBack,
+}: {
+  issue: DevIssue;
+  onApprove: (i: DevIssue) => void | Promise<void>;
+  onSendBack: (i: DevIssue, feedback: string) => void | Promise<void>;
+}) {
+  const review = parseReviewBlock(issue.body);
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState('');
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] p-2 text-xs">
+      {review?.test && <p className="mb-2 text-white/70"><span className="text-white/40">Test: </span>{review.test}</p>}
+      {review?.feedback && <p className="mb-2 text-amber-300/80">↩ {review.feedback}</p>}
+      <div className="flex flex-wrap items-center gap-2">
+        {review?.preview && (
+          <a href={review.preview} target="_blank" rel="noreferrer"
+             className="rounded bg-white/10 px-2 py-1 hover:bg-white/20">Test ↗</a>
+        )}
+        <button
+          disabled={busy}
+          onClick={async () => { setBusy(true); await onApprove(issue); setBusy(false); }}
+          className="rounded bg-emerald-600/80 px-2 py-1 hover:bg-emerald-600 disabled:opacity-40"
+        >Approve → Done</button>
+        <button onClick={() => setOpen((v) => !v)} className="rounded bg-white/10 px-2 py-1 hover:bg-white/20">Send back</button>
+      </div>
+      {open && (
+        <div className="mt-2">
+          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2}
+            placeholder="What needs fixing?"
+            className="w-full rounded bg-black/30 p-2 text-white outline-none" />
+          <button
+            disabled={!text.trim() || busy}
+            onClick={async () => { setBusy(true); await onSendBack(issue, text.trim()); setOpen(false); setText(''); setBusy(false); }}
+            className="mt-1 rounded bg-amber-600/80 px-2 py-1 disabled:opacity-40"
+          >Send back to In progress</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function IssueList({
   issues,
   repos,
   groupBy,
   sort,
   onChanged,
+  onApprove,
+  onSendBack,
 }: {
   issues: DevIssue[];
   repos: DevRepo[];
   groupBy: GroupBy;
   sort: SortBy;
   onChanged: () => void;
+  onApprove: (i: DevIssue) => void | Promise<void>;
+  onSendBack: (i: DevIssue, feedback: string) => void | Promise<void>;
 }) {
   const [error, setError] = useState('');
 
@@ -704,14 +798,43 @@ export function IssueList({
     />
   );
 
+  // Pinned awaiting-review items — shown above BOTH grouping views so they never
+  // appear in a lane or repo section (excluded below via !isAwaiting).
+  const awaiting = sortIssues(issues.filter(isAwaiting), sort);
+
+  const awaitingSection = awaiting.length > 0 ? (
+    <div className="mb-5 rounded-xl border border-[#e7b34a]/30 bg-[#e7b34a]/[0.06] p-3">
+      <LaneHeader color="#E7B34A" label="Awaiting review" count={awaiting.length} />
+      <div className="flex flex-col gap-3">
+        {awaiting.map((i) => (
+          <div key={`${i.repo}#${i.number}`}>
+            <IssueCard
+              key={`${i.repo}#${i.number}`}
+              issue={i}
+              repoName={repoName(i.repo)}
+              onPatch={patch}
+              inReview
+            />
+            <ReviewActions issue={i} onApprove={onApprove} onSendBack={onSendBack} />
+          </div>
+        ))}
+      </div>
+    </div>
+  ) : null;
+
   // STATUS → a real Kanban: three columns, each a vertical stack.
+  // Awaiting-review items are excluded — they live only in the pinned section.
   if (groupBy === 'status') {
     return (
       <div>
         {error && <p className="mb-3 text-xs text-red-400">{error}</p>}
+        {awaitingSection}
         <div className="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-3">
           {STATUS_LANES.map((lane) => {
-            const items = sortIssues(issues.filter((i) => laneOf(i) === lane.key), sort);
+            const items = sortIssues(
+              issues.filter((i) => laneOf(i) === lane.key && !isAwaiting(i)),
+              sort,
+            );
             return (
               <div key={lane.key}>
                 <LaneHeader color={lane.color} label={lane.label} count={items.length} />
@@ -734,8 +857,9 @@ export function IssueList({
 
   // REPO → vertical sections per repo (too many to be columns). Closed items
   // only surface in the Status Kanban's Done lane, so filter to open here.
+  // Awaiting-review items are excluded — they live only in the pinned section.
   // Within each section, the active sort (incl. Size) decides the order.
-  const openItems = issues.filter((i) => i.state === 'open');
+  const openItems = issues.filter((i) => i.state === 'open' && !isAwaiting(i));
   const sections = repos
     .map((r) => ({
       key: r.slug,
@@ -748,6 +872,7 @@ export function IssueList({
   return (
     <div>
       {error && <p className="mb-3 text-xs text-red-400">{error}</p>}
+      {awaitingSection}
       {sections.map((sec) => (
         <section key={sec.key} className="mb-6 last:mb-0">
           <LaneHeader color={sec.color} label={sec.label} count={sec.items.length} />

@@ -4,6 +4,7 @@
 // Runs through test cases and prompts for manual verification
 
 import * as readline from 'readline';
+import { execSync } from 'child_process';
 
 // ANSI color codes for terminal output
 const colors = {
@@ -866,7 +867,7 @@ async function makeRequest(query: string): Promise<string> {
             if (parsed.text) {
               fullText += parsed.text;
             }
-          } catch (e) {
+          } catch {
             // Ignore parse errors for partial chunks
           }
         }
@@ -993,7 +994,6 @@ async function runBuildCheck(): Promise<boolean> {
   print('\n⏳ Running build...');
   
   try {
-    const { execSync } = require('child_process');
     execSync('npm run build', { stdio: 'inherit' });
     print('\n✅ Build PASSED', 'green');
     return true;

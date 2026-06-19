@@ -30,7 +30,6 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
     duration,
     isLoading,
     togglePlay,
-    stop,
     containerRef: embedContainerRef,
   } = useSpotifyEmbed();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -90,10 +89,6 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
     [filteredMoments],
   );
 
-  useEffect(() => {
-    if (!expanded) setVisibleMonths(INITIAL_MONTHS);
-  }, [expanded]);
-
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -116,9 +111,13 @@ export default function SpotifyBubble({ parentSelector }: SpotifyBubbleProps) {
 
   if (!deepMode) return null;
 
-  // Toggle expand without stopping playback
+  // Toggle expand without stopping playback. Reset the visible-months window
+  // when collapsing so reopening starts at the initial slice.
   const handleToggleExpand = () => {
-    setExpanded((prev) => !prev);
+    setExpanded((prev) => {
+      if (prev) setVisibleMonths(INITIAL_MONTHS);
+      return !prev;
+    });
   };
 
   return (

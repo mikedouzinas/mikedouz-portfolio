@@ -51,10 +51,15 @@ export default function WebLoader() {
   const [mounted, setMounted] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
+  // Randomize the message/animation only after mount (server renders the first
+  // entry; the `mounted` gate keeps the random choice out of SSR to avoid a
+  // hydration mismatch), so these initial setState calls must run in the effect.
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- post-mount randomization, kept two-phase to avoid SSR mismatch */
     setMessage(getRandom(WEB_LOADING_MESSAGES));
     setAnimIndex(Math.floor(Math.random() * LOTTIE_ANIMATIONS.length));
     setMounted(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     intervalRef.current = setInterval(() => {
       setMessage((prev) => {

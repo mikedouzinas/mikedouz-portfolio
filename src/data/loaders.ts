@@ -217,8 +217,8 @@ function formatDateRange(dates: { start: string; end?: string }): string {
 export const blogs: Blog[] = blogsData.blog_posts.map((post, index) => ({
   id: `blog_${index}`, // Match backend ID generation (0-based index)
   title: post.title,
-  description: (post as any).description || post.context || "",
-  imageUrl: (post as any).image || "/blog1.png",
+  description: (post as { description?: string }).description || post.context || "",
+  imageUrl: (post as { image?: string }).image || "/blog1.png",
   date: post.published_date.includes("2026") ? `est. ${new Date(post.published_date).getFullYear()}` : new Date(post.published_date).getFullYear().toString(),
   link: post.url,
   publishedDate: post.published_date,
@@ -234,7 +234,7 @@ export const projects: Project[] = projectsData.map((proj) => ({
   imageUrl: proj.links.image,
   title: proj.title,
   // Use short_title if available in JSON (e.g., "Knight Life" for "BB&N's Knight Life")
-  shortTitle: (proj as any).short_title,
+  shortTitle: (proj as { short_title?: string }).short_title,
   description: proj.summary, // Using summary as requested, not specifics
   githubLink: proj.links.github,
   // Prefer app_store link, fall back to demo if available

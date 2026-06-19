@@ -19,13 +19,14 @@ export function GoogleText({
   className?: string;
   overrides?: Record<number, string>;
 }) {
-  let i = 0;
+  const chars = text.split('');
   return (
     <span className={className}>
-      {text.split('').map((ch, idx) => {
+      {chars.map((ch, idx) => {
         if (ch === ' ') return <span key={idx}>&nbsp;</span>;
+        // Visible-letter index (spaces don't count) computed without mutation.
+        const i = chars.slice(0, idx).filter((c) => c !== ' ').length;
         const color = overrides?.[i] ?? GOOGLE_COLORS[i % GOOGLE_COLORS.length];
-        i += 1;
         return (
           <span key={idx} style={{ color }}>
             {ch}

@@ -125,7 +125,7 @@ async function main() {
           cleared: apiResult.stats.cleared,
           stats: apiResult.stats
         };
-      } catch (apiError) {
+      } catch {
         console.warn('⚠️  API endpoint failed (server may not be running)');
         console.warn('   Falling back to direct cache clearing (Upstash Redis only)\n');
         result = await clearDirectly(pattern);

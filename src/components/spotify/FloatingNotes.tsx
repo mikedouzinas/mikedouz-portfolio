@@ -72,15 +72,20 @@ export default function FloatingNotes({ size = 'sm' }: { size?: 'sm' | 'md' }) {
   }, [size]);
 
   const cleanup = useCallback(() => {
-    const now = Date.now();
-    notesRef.current = notesRef.current.filter((n) => {
-      if (now - n.born > NOTE_LIFETIME + 100) {
-        n.el.remove();
-        return false;
-      }
-      return true;
-    });
-    rafRef.current = requestAnimationFrame(cleanup);
+    // Named hoisted function so the rAF loop can re-schedule itself without
+    // referencing the useCallback binding before it is declared.
+    function loop() {
+      const now = Date.now();
+      notesRef.current = notesRef.current.filter((n) => {
+        if (now - n.born > NOTE_LIFETIME + 100) {
+          n.el.remove();
+          return false;
+        }
+        return true;
+      });
+      rafRef.current = requestAnimationFrame(loop);
+    }
+    loop();
   }, []);
 
   const spawnBurst = useCallback(() => {

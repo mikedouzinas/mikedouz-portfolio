@@ -1,7 +1,7 @@
 /**
  * GitHub access for the dev-console board.
  * - Repos are DISCOVERED live (no hardcoded list); owned repos are the security boundary.
- * - Priority = label p1..p5. Status = label "status: todo" | "status: in progress".
+ * - Priority = label p1..p5. Status = label "status: todo" | "status: in progress" | "status: awaiting review".
  *   Size = label "size: S" | "size: M" | "size: L". Done = a closed issue (no Done label).
  * - Priority/status/size labels are ensured WITH COLORS (idempotent) per repo.
  * Uses GITHUB_TOKEN (server-only).
@@ -9,15 +9,16 @@
 const GH = 'https://api.github.com';
 
 export type Priority = 'p1' | 'p2' | 'p3' | 'p4' | 'p5';
-export type Status = 'todo' | 'in progress';
+export type Status = 'todo' | 'in progress' | 'awaiting review';
 export type Size = 'S' | 'M' | 'L';
 
 const PRIORITY_RE = /^p[1-5]$/;
-const STATUS_RE = /^status:\s*(todo|in progress)$/i;
+const STATUS_RE = /^status:\s*(todo|in progress|awaiting review)$/i;
 const SIZE_RE = /^size:\s*([SML])$/i;
 const STATUS_LABEL: Record<Status, string> = {
   todo: 'status: todo',
   'in progress': 'status: in progress',
+  'awaiting review': 'status: awaiting review',
 };
 const SIZE_LABEL: Record<Size, string> = {
   S: 'size: S',
@@ -34,6 +35,7 @@ const LABEL_DEFS: { name: string; color: string }[] = [
   { name: 'p5', color: 'c5def5' }, // light blue — lowest
   { name: 'status: todo', color: 'ededed' }, // gray
   { name: 'status: in progress', color: 'd4a72c' }, // amber
+  { name: 'status: awaiting review', color: 'e7b34a' }, // champagne-amber
   { name: 'size: S', color: '4285f4' }, // blue — small / quick
   { name: 'size: M', color: 'fbca04' }, // yellow — medium
   { name: 'size: L', color: 'fb923c' }, // orange — large / deep
@@ -122,10 +124,74 @@ function sizeOf(labels: GhLabel[]): Size | null {
   return null;
 }
 
+// ---- Review-block helpers (pure, no network) ----
+
+export interface ReviewBlock { preview?: string; test?: string; feedback?: string }
+
+const REVIEW_START = '<!-- awaiting-review:start -->';
+const REVIEW_END = '<!-- awaiting-review:end -->';
+const REVIEW_RE = /<!-- awaiting-review:start -->[\s\S]*?<!-- awaiting-review:end -->/;
+
+/** Idempotently insert or replace the awaiting-review marker block in an issue body. */
+export function upsertReviewBlock(body: string, fields: ReviewBlock): string {
+  const existing = parseReviewBlock(body) ?? {};
+  const merged: ReviewBlock = { ...existing, ...fields };
+  const lines = [REVIEW_START];
+  if (merged.preview) lines.push(`**Preview:** ${merged.preview}`);
+  if (merged.test) lines.push(`**What to test:** ${merged.test}`);
+  if (merged.feedback) lines.push(`**Last feedback:** ${merged.feedback}`);
+  lines.push(REVIEW_END);
+  const block = lines.join('\n');
+  if (REVIEW_RE.test(body)) return body.replace(REVIEW_RE, block);
+  const sep = body.trim().length ? `${body.trimEnd()}\n\n` : '';
+  return `${sep}${block}\n`;
+}
+
+/** Parse the review block out of an issue body; returns null when absent. */
+export function parseReviewBlock(body: string): ReviewBlock | null {
+  const m = body.match(REVIEW_RE);
+  if (!m) return null;
+  const seg = m[0];
+  const pick = (label: string) => {
+    const r = new RegExp(`\\*\\*${label}:\\*\\*\\s*(.+)`);
+    const hit = seg.match(r);
+    return hit ? hit[1].trim() : undefined;
+  };
+  return { preview: pick('Preview'), test: pick('What to test'), feedback: pick('Last feedback') };
+}
+
+/**
+ * Derive the Vercel branch-preview URL for a given branch name.
+ * Pattern: <project>-git-<branch-slug>-<team>.vercel.app (max 63 chars).
+ * Project: mikedouz-portfolio, team: mikedouzinas.
+ *
+ * IMPORTANT: verify this alias against the live Vercel project dashboard
+ * (Settings → Git → Preview Deployments) before relying on --auto mode.
+ * Use --preview <url> (Task 3) as the guaranteed fallback.
+ */
+export function previewUrlForBranch(branch: string): string {
+  const slug = branch
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  const host = `mikedouz-portfolio-git-${slug}-mikedouzinas.vercel.app`.slice(0, 63);
+  return `https://${host.replace(/-+$/, '')}`;
+}
+
+// ---- Issue comment helpers ----
+
+export async function postComment(repo: string, number: number, body: string): Promise<void> {
+  const res = await fetch(`${GH}/repos/${repo}/issues/${number}/comments`, {
+    method: 'POST',
+    headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ body }),
+  });
+  if (!res.ok) throw new Error(`GitHub comment ${repo}#${number}: ${res.status}`);
+}
+
 // ---- Repo discovery (cached) ----
 interface RepoCache { data: DevRepo[]; expiry: number }
 declare global {
-  // eslint-disable-next-line no-var
   var __devRepoCache: RepoCache | undefined;
 }
 const REPO_TTL_MS = 10 * 60 * 1000;

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>#62 — Entry Flow · dot → portal-window → vault</title>
+<!-- Limelight (display, marquee) — the ONLY display face. No Marcellus. Space Mono = utility. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0d0b11;
+    --champagne:#e7e2d4;
+    --champagne-2:#ede6d6;
+    --red:#b3122b;
+    /* Google flicker hues — used ONLY for the footlight-snuff in the vault, nowhere else. */
+    --g-blue:#4285f4; --g-red:#ea4335; --g-yellow:#fbbc05; --g-green:#34a853;
+    --seam-rest:rgba(231,226,212,0.10);
+    --frame:rgba(231,226,212,0.78);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    background-color:var(--ink);
+    color:var(--champagne);
+    font-family:"Space Mono",ui-monospace,monospace;
+    /* The grid — copied conceptually from .dev-workpad: warm top vignette + layered champagne lines. */
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(140,20,40,0.08), transparent 60%),
+      linear-gradient(rgba(231,226,212,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.04) 1px, transparent 1px),
+      linear-gradient(rgba(231,226,212,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,0.02) 1px, transparent 1px);
+    background-size:100% 100%, 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+    background-position:0 0,-1px -1px,-1px -1px,-1px -1px,-1px -1px;
+    background-attachment:fixed;
+    overflow:hidden;
+  }
+  /* feTurbulence film grain over the whole page — copied from .dev-workpad::after */
+  body::after{
+    content:"";position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.30;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ===== Mock "page" so the seam sits in a footer, like the real homepage ===== */
+  .page{position:relative;height:100%;display:flex;flex-direction:column;}
+  .page-body{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;padding:24px;}
+  .page-body h1{font-family:"Limelight",serif;font-weight:400;font-size:clamp(28px,6vw,54px);letter-spacing:.04em;margin:0;color:rgba(231,226,212,.85);}
+  .page-body p{max-width:42ch;color:rgba(231,226,212,.42);font-size:13px;line-height:1.7;margin:0;}
+  .footer{position:relative;display:flex;justify-content:center;align-items:center;height:64px;border-top:1px solid rgba(231,226,212,.06);}
+  .footer-note{position:absolute;left:50%;transform:translateX(-50%);bottom:6px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(231,226,212,.18);}
+
+  /* ===== THE SEAM (resting affordance) ===== */
+  .seam-slot{position:relative;width:34px;height:34px;display:grid;place-items:center;cursor:default;}
+  .seam{
+    width:1px;height:14px;background:var(--seam-rest);
+    box-shadow:0 0 6px 0 rgba(179,18,43,0);
+    transition:height 120ms steps(3), background 120ms steps(3), box-shadow 160ms ease, width 120ms ease;
+  }
+  /* WARM: seam brightens, warms red, grows — ratcheting via steps() */
+  .seam-slot[data-warm="1"] .seam{height:28px;width:1.5px;background:rgba(231,226,212,.55);box-shadow:0 0 9px 0 rgba(179,18,43,.35);}
+  /* 5-tap ramp brightness notches (mobile gesture made visible) */
+  .seam-slot[data-tap="1"] .seam{background:rgba(231,226,212,.20);}
+  .seam-slot[data-tap="2"] .seam{background:rgba(231,226,212,.30);}
+  .seam-slot[data-tap="3"] .seam{background:rgba(231,226,212,.42);}
+  .seam-slot[data-tap="4"] .seam{background:rgba(231,226,212,.55);box-shadow:0 0 9px 0 rgba(179,18,43,.35);}
+
+  /* ===== THE WINDOW / VAULT (shared element the seam morphs into) ===== */
+  /* Scrim removed: no full-screen dimming — the portal opens without darkening the page behind it. */
+  .scrim{display:none;}
+
+  .stage{position:fixed;inset:0;z-index:80;pointer-events:none;display:grid;place-items:end center;padding-bottom:46px;}
+  .stage[data-state]:not([data-state="rest"]):not([data-state="dimmed"]){pointer-events:auto;}
+
+  /* The window starts at the seam's footprint and grows. */
+  .window{
+    position:relative;width:1.5px;height:28px;pointer-events:auto;
+    transform-origin:center bottom;
+    transition:width 200ms steps(4), height 200ms steps(4), transform 700ms steps(6);
+    will-change:transform;
+  }
+  /* SPLIT -> FRAME : window opens to its little-window size, anchored above the footer. */
+  .stage[data-state="peer"] .window,
+  .stage[data-state="knock"] .window,
+  .stage[data-state="error"] .window,
+  .stage[data-state="lockout"] .window{width:min(86vw,360px);height:min(86vw,360px);}
+
+  /* CROSS: camera scales INTO the aperture, frame flies past the viewer. */
+  .stage[data-state="cross"] .window{width:min(86vw,360px);height:min(86vw,360px);transform:scale(6);opacity:0;}
+  .stage[data-state="cross"] .scrim{opacity:0;}
+
+  /* The two leaves (the seam split apart). At rest they meet; on open they part. */
+  .leaf{position:absolute;top:0;bottom:0;width:50%;background:linear-gradient(180deg,rgba(20,16,22,.9),rgba(8,6,11,.96));z-index:4;transition:transform 180ms steps(4);}
+  .leaf.left{left:0;transform-origin:left center;}
+  .leaf.right{right:0;transform-origin:right center;}
+  .stage[data-state="peer"] .leaf.left,
+  .stage[data-state="knock"] .leaf.left,
+  .stage[data-state="error"] .leaf.left,
+  .stage[data-state="lockout"] .leaf.left{transform:translateX(-104%);}
+  .stage[data-state="peer"] .leaf.right,
+  .stage[data-state="knock"] .leaf.right,
+  .stage[data-state="error"] .leaf.right,
+  .stage[data-state="lockout"] .leaf.right{transform:translateX(104%);}
+
+  /* Through the glass: the board beyond (argyle + grid + warm glow), blurred + drifting. */
+  .glass{position:absolute;inset:0;overflow:hidden;background:var(--ink);}
+  .board{
+    position:absolute;inset:-12% -12%;
+    background-color:var(--ink);
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(140,20,40,.10), transparent 60%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpolygon points='28,2 54,28 28,54 2,28' fill='%23B3122B' stroke='%23EDE6D6' stroke-width='1'/%3E%3C/svg%3E"),
+      linear-gradient(rgba(231,226,212,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231,226,212,.05) 1px, transparent 1px);
+    background-size:100% 100%, 56px 56px, 80px 80px, 80px 80px;
+    background-position:0 0;
+    opacity:0;filter:blur(4px);
+    transition:opacity 220ms ease 120ms, filter 320ms steps(4);
+    animation:board-drift 14s linear infinite;
+  }
+  @keyframes board-drift{from{background-position:0 0,0 0,0 0,0 0;}to{background-position:0 0,56px 56px,80px 80px,80px 80px;}}
+  .stage[data-state="peer"] .board,
+  .stage[data-state="knock"] .board,
+  .stage[data-state="error"] .board,
+  .stage[data-state="lockout"] .board{opacity:.5;}
+  .stage[data-state="knock"] .board{filter:blur(3px);opacity:.62;}
+  .stage[data-state="cross"] .board{opacity:1;filter:blur(0);}
+
+  /* Limelight ghost of the wordmark, deep in the blur. */
+  .ghost{
+    position:absolute;inset:0;display:grid;place-items:center;z-index:2;
+    font-family:"Limelight",serif;font-size:clamp(13px,3.4vw,20px);letter-spacing:.18em;
+    color:rgba(231,226,212,.16);text-align:center;line-height:1.4;pointer-events:none;opacity:0;
+    transition:opacity 240ms ease 220ms;
+  }
+  .stage[data-state="peer"] .ghost,
+  .stage[data-state="knock"] .ghost,
+  .stage[data-state="error"] .ghost,
+  .stage[data-state="lockout"] .ghost{opacity:1;}
+  .stage[data-state="knock"] .ghost{color:rgba(231,226,212,.30);}
+
+  /* Hand-inked champagne frame (offset double-stroke). */
+  .frame{position:absolute;inset:0;z-index:6;pointer-events:none;}
+  .frame .ink{position:absolute;inset:0;}
+  .frame rect{fill:none;}
+  .frame .ink-1 rect{stroke:var(--frame);stroke-width:2;}
+  .frame .ink-2{transform:translate(3px,3px);opacity:.45;}
+  .frame .ink-2 rect{stroke:var(--champagne-2);stroke-width:1;}
+  .frame rect{stroke-dasharray:1400;stroke-dashoffset:1400;transition:stroke-dashoffset 360ms steps(3) 120ms;}
+  .stage[data-state="peer"] .frame rect,
+  .stage[data-state="knock"] .frame rect,
+  .stage[data-state="error"] .frame rect,
+  .stage[data-state="lockout"] .frame rect{stroke-dashoffset:0;}
+
+  /* The sill: etched input + footlights, on the lower frame. */
+  .sill{position:absolute;left:0;right:0;bottom:0;z-index:7;padding:12px 16px 14px;display:flex;flex-direction:column;gap:8px;
+    background:linear-gradient(180deg, rgba(5,4,8,0), rgba(5,4,8,.55));opacity:0;transition:opacity 200ms ease 320ms;}
+  .stage[data-state="peer"] .sill,
+  .stage[data-state="knock"] .sill,
+  .stage[data-state="error"] .sill,
+  .stage[data-state="lockout"] .sill{opacity:1;}
+  .knock-row{display:flex;align-items:baseline;gap:10px;justify-content:center;}
+  .knock-label{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:rgba(231,226,212,.5);}
+  .knock-input{
+    background:transparent;border:none;outline:none;color:var(--champagne);
+    font-family:"Space Mono",monospace;font-size:18px;letter-spacing:.42em;text-align:left;width:7ch;caret-color:var(--red);
+  }
+  .knock-input::placeholder{color:rgba(231,226,212,.28);}
+  .footlights{display:flex;gap:9px;justify-content:center;}
+  .footlights .d{width:8px;height:8px;transform:rotate(45deg);background:var(--champagne);box-shadow:0 0 5px rgba(231,226,212,.4);transition:background 120ms steps(1),box-shadow 120ms steps(1);}
+  .footlights .d.snuffing{animation:snuff .42s steps(1,end) forwards;}
+  @keyframes snuff{0%{background:var(--g-blue);}25%{background:var(--g-red);}50%{background:var(--g-yellow);}75%{background:var(--g-green);}100%{background:#3a3530;box-shadow:none;}}
+  .footlights .d.out{background:#3a3530;box-shadow:none;}
+  .sill-msg{text-align:center;font-size:10px;letter-spacing:.08em;min-height:13px;color:rgba(231,226,212,.55);}
+  .sill-msg.bad{color:#e58;}
+
+  /* WRONG: rattle the window + red ink bloom across the glass. */
+  .stage[data-state="error"] .window{animation:rattle .4s steps(5,jump-none);}
+  @keyframes rattle{0%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(7px);}60%{transform:translateX(-5px);}80%{transform:translateX(4px);}100%{transform:translateX(0);}}
+  .bloom{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 50%, rgba(179,18,43,.55), transparent 60%);mix-blend-mode:screen;}
+  .stage[data-state="error"] .bloom{animation:bloom .42s ease-out;}
+  @keyframes bloom{0%{opacity:0;}25%{opacity:1;}100%{opacity:0;}}
+  /* hairline crack */
+  .crack{position:absolute;inset:0;z-index:6;pointer-events:none;opacity:0;}
+  .crack path{stroke:rgba(231,226,212,.7);stroke-width:1;fill:none;stroke-dasharray:260;stroke-dashoffset:260;}
+  .stage[data-state="error"] .crack{opacity:1;}
+  .stage[data-state="error"] .crack path{transition:stroke-dashoffset .3s steps(3);stroke-dashoffset:0;}
+
+  /* LOCKOUT: fog creeps in, board hidden, countdown on the sill. */
+  .fog{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;background:linear-gradient(135deg, rgba(231,226,212,.16), rgba(231,226,212,.32));backdrop-filter:blur(2px);transition:opacity 500ms ease;}
+  .stage[data-state="lockout"] .fog{opacity:1;}
+  .stage[data-state="lockout"] .knock-input{pointer-events:none;opacity:.4;}
+
+  /* Ink-splash wipe on CROSS (champagne, hides the page swap). */
+  .splash{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;display:grid;place-items:center;}
+  .splash svg{width:160vmax;height:160vmax;transform:scale(0);}
+  .stage[data-state="cross"] .splash{animation:splash .7s steps(4,end) forwards;}
+  @keyframes splash{0%{opacity:0;}55%{opacity:0;}70%{opacity:1;}100%{opacity:1;}}
+  .stage[data-state="cross"] .splash svg{animation:splash-grow .7s steps(4,end) forwards;}
+  @keyframes splash-grow{0%,55%{transform:scale(0);}100%{transform:scale(1.4);}}
+
+  /* The arrived board behind everything (the destination, mock /dev). */
+  .arrived{position:fixed;inset:0;z-index:65;opacity:0;pointer-events:none;display:grid;place-items:center;transition:opacity 200ms ease;}
+  .arrived.show{opacity:1;}
+  .arrived .arrived-inner{text-align:center;}
+  .arrived h2{font-family:"Limelight",serif;font-weight:400;font-size:clamp(30px,7vw,64px);letter-spacing:.06em;margin:0;color:var(--champagne);}
+  .arrived h2 .dia{color:var(--g-green);}
+  .arrived p{color:rgba(231,226,212,.45);font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-top:10px;}
+  .arrived-grid{position:fixed;inset:0;z-index:-1;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpolygon points='28,2 54,28 28,54 2,28' fill='%23B3122B' stroke='%23EDE6D6' stroke-width='1'/%3E%3C/svg%3E");
+    background-size:56px 56px;opacity:.18;}
+
+  /* ===== DEMO controls ===== */
+  .demo{position:fixed;left:14px;bottom:14px;z-index:120;display:flex;flex-direction:column;gap:6px;font-size:10px;letter-spacing:.1em;}
+  .demo .demo-title{color:rgba(231,226,212,.4);text-transform:uppercase;letter-spacing:.22em;font-size:9px;margin-bottom:2px;}
+  .demo-row{display:flex;flex-wrap:wrap;gap:6px;max-width:300px;}
+  .demo button{
+    background:rgba(231,226,212,.05);border:1px solid rgba(231,226,212,.18);color:rgba(231,226,212,.78);
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;padding:5px 9px;cursor:pointer;border-radius:3px;
+    transition:background .15s ease,border-color .15s ease;
+  }
+  .demo button:hover{background:rgba(231,226,212,.11);border-color:rgba(231,226,212,.32);}
+  .demo button:focus-visible{outline:2px solid var(--g-blue);outline-offset:1px;}
+  .hint{position:fixed;right:14px;bottom:14px;z-index:120;max-width:260px;text-align:right;font-size:10px;line-height:1.6;color:rgba(231,226,212,.34);letter-spacing:.04em;}
+  .hint b{color:rgba(231,226,212,.6);font-weight:700;}
+
+  /* Suppress focus ring on the stage overlay itself — it's a click-outside trap, not a focusable. */
+  .stage:focus{outline:none;}
+  /* Only show focus rings on truly interactive elements inside the portal. */
+  .knock-input:focus-visible{outline:1px solid rgba(231,226,212,.35);outline-offset:2px;}
+  .demo button:focus-visible{outline:2px solid var(--g-blue);outline-offset:1px;}
+
+  /* ===== prefers-reduced-motion: no morph/drift/rattle; cross-fade only ===== */
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;}
+    .seam,.window,.leaf,.board,.frame rect,.ghost,.sill,.scrim,.crack path{transition:opacity 160ms ease !important;}
+    .window{width:min(86vw,360px) !important;height:auto;}
+    .stage[data-state="rest"] .window,.stage[data-state="dimmed"] .window{width:1.5px !important;height:28px;}
+    .leaf{display:none;}
+    .board{filter:none !important;}
+    .stage[data-state="cross"] .window{transform:none;opacity:0;}
+  }
+</style>
+</head>
+<body>
+  <!-- Mock homepage so the seam lives in a real footer context -->
+  <div class="page">
+    <div class="page-body">
+      <h1>mikeveson.com</h1>
+      <p>A window into Mike's life. Somewhere in this footer there's a seam of light — a door behind the page, shut but not flush. Hover near it. (Lockup of ticket&nbsp;#62, Take&nbsp;1 — "THE SEAM".)</p>
+    </div>
+    <div class="footer">
+      <!-- THE SEAM — the public, hidden resting affordance -->
+      <span class="seam-slot" id="seam-slot" role="button" tabindex="0"
+            aria-label="Hidden entrance" title="(hover · ⌘⇧K · long-press · 5 taps)">
+        <span class="seam" aria-hidden="true"></span>
+      </span>
+      <span class="footer-note">© mikeveson</span>
+    </div>
+  </div>
+
+  <!-- The arrived destination (mock /dev), revealed under the splash on CROSS -->
+  <div class="arrived" id="arrived" aria-hidden="true">
+    <div class="arrived-grid"></div>
+    <div class="arrived-inner">
+      <h2>THE HARLEQUIN<span class="dia"> ◆</span></h2>
+      <p>you crossed through the window</p>
+    </div>
+  </div>
+
+  <!-- The stage: morphing window/vault. data-state drives the whole sequence. tabindex=-1 to prevent blue focus ring on click-outside. -->
+  <div class="stage" id="stage" data-state="rest" tabindex="-1" style="outline:none">
+    <div class="scrim"></div>
+    <div class="window" id="window">
+      <div class="glass">
+        <div class="board"></div>
+        <div class="ghost">THE<br/>HARLEQUIN</div>
+        <div class="bloom"></div>
+        <div class="fog"></div>
+        <svg class="crack" viewBox="0 0 360 360" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M300 20 L286 60 L312 78 L292 120" />
+        </svg>
+      </div>
+      <!-- two leaves: the seam split apart -->
+      <div class="leaf left"></div>
+      <div class="leaf right"></div>
+      <!-- hand-inked double-stroke frame -->
+      <svg class="frame" viewBox="0 0 360 360" preserveAspectRatio="none" aria-hidden="true">
+        <g class="ink ink-2"><rect x="6" y="6" width="348" height="348" rx="2"/></g>
+        <g class="ink ink-1"><rect x="4" y="4" width="352" height="352" rx="3"/></g>
+      </svg>
+      <!-- sill: knock input + footlights + message -->
+      <div class="sill">
+        <div class="knock-row">
+          <span class="knock-label">Knock</span>
+          <input class="knock-input" id="knock" type="text" inputmode="text"
+                 autocomplete="off" data-1p-ignore data-lpignore="true" data-bwignore="true"
+                 data-form-type="other" aria-autocomplete="none" placeholder="·····"
+                 aria-label="Password" maxlength="12" />
+        </div>
+        <div class="footlights" id="footlights" aria-hidden="true">
+          <span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span>
+        </div>
+        <div class="sill-msg" id="sill-msg" aria-live="polite"><span class="sr-count">5 of 5 tries left</span></div>
+      </div>
+    </div>
+    <!-- ink-splash wipe -->
+    <div class="splash">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <path fill="#e7e2d4" d="M100 4c14 30 36 22 52 42s-2 38 10 58-22 28-30 50-34 6-54 18-30-22-52-28-22-34-30-54 22-30 22-54-18-36 2-56 38 4 58-2 8-30 22-14z"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- DEMO controls -->
+  <div class="demo">
+    <span class="demo-title">Demo states</span>
+    <div class="demo-row">
+      <button data-act="rest">Reset</button>
+      <button data-act="warm">Warm (hover)</button>
+      <button data-act="peer">Peer (window)</button>
+      <button data-act="type">Type</button>
+      <button data-act="wrong">Wrong</button>
+      <button data-act="lockout">Lockout</button>
+      <button data-act="cross">Correct → cross</button>
+    </div>
+  </div>
+  <div class="hint">
+    <b>Try the real triggers:</b><br/>
+    hover the footer seam · press <b>⌘⇧K</b> / Ctrl+Shift+K · <b>long-press</b> the seam · <b>5 quick taps</b>.<br/>
+    Password is <b>OPEN5</b>. Esc closes.
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var stage = document.getElementById('stage');
+  var slot  = document.getElementById('seam-slot');
+  var input = document.getElementById('knock');
+  var msg   = document.getElementById('sill-msg');
+  var lights= document.getElementById('footlights').querySelectorAll('.d');
+  var arrived = document.getElementById('arrived');
+  var PASSWORD = 'OPEN5';
+  var tries = 5;
+  var lockTimer = null;
+
+  function setState(s){ stage.setAttribute('data-state', s); }
+  function getState(){ return stage.getAttribute('data-state'); }
+
+  function resetLights(){
+    tries = 5;
+    lights.forEach(function(d){ d.classList.remove('out','snuffing'); });
+    setMsg('5 of 5 tries left', false);
+  }
+  function setMsg(text, bad){
+    msg.innerHTML = '<span class="sr-count">'+text+'</span>';
+    msg.classList.toggle('bad', !!bad);
+  }
+
+  // ---- WARM: the seam comes alive in place (hover / hold / tap-ramp) ----
+  function warm(){ if(getState()==='rest'||getState()==='dimmed'){ slot.setAttribute('data-warm','1'); } }
+  function unwarm(){ slot.removeAttribute('data-warm'); slot.removeAttribute('data-tap'); }
+
+  // ---- PEER: morph the seam into the little window ----
+  function openPortal(){
+    input.value = '';            // never reopen pre-filled (mirrors setPassword('') in DevPortal.tsx)
+    unwarm();
+    resetLights();
+    if (lockTimer){ clearInterval(lockTimer); lockTimer = null; }
+    arrived.classList.remove('show');
+    setState('peer');
+    setTimeout(function(){ try{ input.focus(); }catch(e){} }, 560);
+  }
+  function closePortal(){
+    setState('rest');
+    unwarm();
+    input.value = '';
+  }
+
+  // ---- KNOCK / submit ----
+  function submit(){
+    if (getState()==='lockout') return;
+    var val = input.value.trim().toUpperCase();
+    if (!val) return;
+    if (val === PASSWORD){ cross(); return; }
+    // wrong
+    tries = Math.max(0, tries - 1);
+    var snuffIdx = 5 - tries - 1; // 0-based index of the one going out now
+    if (lights[snuffIdx]){
+      lights[snuffIdx].classList.add('snuffing');
+      (function(el){ setTimeout(function(){ el.classList.remove('snuffing'); el.classList.add('out'); }, 430); })(lights[snuffIdx]);
+    }
+    setState('error');
+    setMsg('Wrong knock. ' + tries + ' of 5 tries left', true);
+    input.value = '';
+    setTimeout(function(){ if(getState()==='error'){ setState('peer'); input.focus(); } }, 460);
+    if (tries <= 0){ setTimeout(lockout, 470); }
+  }
+
+  // ---- LOCKOUT (429): fog + countdown ----
+  function lockout(){
+    setState('lockout');
+    lights.forEach(function(d){ d.classList.remove('snuffing'); d.classList.add('out'); });
+    var remain = 8; // demo cooldown (real: Retry-After seconds)
+    function tick(){
+      var m = String(Math.floor(remain/60)).padStart(2,'0');
+      var s = String(remain%60).padStart(2,'0');
+      setMsg('Locked. Knock again in '+m+':'+s, true);
+      if (remain <= 0){ clearInterval(lockTimer); lockTimer=null; resetLights(); setState('peer'); input.focus(); return; }
+      remain--;
+    }
+    tick();
+    lockTimer = setInterval(tick, 1000);
+  }
+
+  // ---- CROSS: through the window into the board ----
+  function cross(){
+    setState('cross');
+    setTimeout(function(){ arrived.classList.add('show'); arrived.setAttribute('aria-hidden','false'); }, 380);
+    // real: window.location.href = '/dev' hidden behind the splash
+  }
+
+  // ===== Real triggers (mirroring DevPortal.tsx) =====
+  // Desktop hover: warm -> open
+  slot.addEventListener('mouseenter', function(){ warm(); setTimeout(function(){ if(slot.hasAttribute('data-warm')) openPortal(); }, 180); });
+  slot.addEventListener('mouseleave', function(){ if(getState()==='rest') unwarm(); });
+  // reverse-on-leave from the window (graceful, not a hard close)
+  stage.addEventListener('mouseleave', function(){ if(getState()==='peer'){ closePortal(); } });
+
+  // Click outside the window (on the stage backdrop) → close cleanly, no blue highlight
+  stage.addEventListener('mousedown', function(e){
+    // only close if clicking the stage itself, not any child element of the window
+    if (e.target === stage || e.target.classList.contains('scrim')){
+      e.preventDefault(); // suppress focus-ring from mousedown
+      if(getState()!=='rest' && getState()!=='dimmed'){
+        if(lockTimer){clearInterval(lockTimer);lockTimer=null;}
+        closePortal();
+      }
+    }
+  });
+
+  // keyboard activate on the seam
+  slot.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openPortal(); } });
+
+  // ⌘⇧K / Ctrl+Shift+K from anywhere
+  window.addEventListener('keydown', function(e){
+    var mod = e.metaKey || e.ctrlKey;
+    if (mod && e.shiftKey && e.code === 'KeyK'){ e.preventDefault(); e.stopPropagation(); openPortal(); }
+    if (e.key === 'Escape'){ if(getState()!=='rest'){ if(lockTimer){clearInterval(lockTimer);lockTimer=null;} closePortal(); } }
+  });
+
+  // Mobile: long-press (~600ms) warms during the hold, then opens. 5 quick taps ramp brightness.
+  var pressTimer=null, longFired=false, tapTimes=[];
+  var LONG=600, TAPN=5, TAPWIN=1500;
+  slot.addEventListener('touchstart', function(){
+    longFired=false; warm();
+    if(pressTimer) clearTimeout(pressTimer);
+    pressTimer=setTimeout(function(){ longFired=true; openPortal(); }, LONG);
+  }, {passive:true});
+  function cancelPress(){ if(pressTimer){clearTimeout(pressTimer);pressTimer=null;} }
+  slot.addEventListener('touchmove', cancelPress, {passive:true});
+  slot.addEventListener('touchcancel', cancelPress, {passive:true});
+  slot.addEventListener('touchend', function(){
+    cancelPress();
+    if(longFired){ longFired=false; return; }
+    var now=Date.now();
+    tapTimes=tapTimes.concat(now).filter(function(t){return now-t<=TAPWIN;});
+    slot.setAttribute('data-tap', String(Math.min(4, tapTimes.length))); // visible ramp
+    if(tapTimes.length>=TAPN){ tapTimes=[]; openPortal(); }
+    else { setTimeout(function(){ if(getState()==='rest') unwarm(); }, TAPWIN); }
+  });
+
+  // Submit on Enter, or when 5 chars typed (matches lockup convention).
+  input.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); submit(); } });
+  input.addEventListener('input', function(){
+    if (getState()==='peer') setState('knock');
+    if (input.value.replace(/\s/g,'').length >= 5){ submit(); }
+  });
+
+  // ===== DEMO controls =====
+  document.querySelector('.demo').addEventListener('click', function(e){
+    var b = e.target.closest('button'); if(!b) return;
+    var act = b.getAttribute('data-act');
+    if(act==='rest'){ if(lockTimer){clearInterval(lockTimer);lockTimer=null;} closePortal(); arrived.classList.remove('show'); }
+    else if(act==='warm'){ closePortal(); warm(); }
+    else if(act==='peer'){ openPortal(); }
+    else if(act==='type'){ if(getState()==='rest') openPortal(); setTimeout(function(){ input.focus(); input.value='OP'; setState('knock'); }, 580); }
+    else if(act==='wrong'){ if(getState()==='rest'||getState()==='dimmed'){ openPortal(); setTimeout(function(){ input.value='WRONG'; submit(); }, 600);} else { input.value='WRONG'; submit(); } }
+    else if(act==='lockout'){ if(getState()==='rest'){ openPortal(); setTimeout(lockout, 600);} else lockout(); }
+    else if(act==='cross'){ if(getState()==='rest'){ openPortal(); setTimeout(cross, 600);} else cross(); }
+  });
+})();
+</script>
+</body>
+</html>

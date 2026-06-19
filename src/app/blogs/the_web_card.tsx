@@ -1,6 +1,7 @@
 "use client";
 import React, { useMemo } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ExternalLink, ChevronRight } from "lucide-react";
 import ContainedWebPattern from "@/components/ContainedWebPattern";
@@ -75,13 +76,13 @@ export default function TheWebCard({ umbrella, posts, visibleCount = 3 }: TheWeb
           <div className="flex flex-col w-full">
             {/* Header row: title + top-right action stack (Ask Iris on hover, arrow always) */}
             <div className="flex items-start justify-between gap-2 mb-1">
-              <a
+              <Link
                 href="/the-web"
                 onClick={(e) => e.stopPropagation()}
                 className="text-xl font-semibold text-gray-900 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-300 transition-colors"
               >
                 {umbrella.title}
-              </a>
+              </Link>
 
               <div className="flex items-center gap-2 flex-shrink-0">
                 <div className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-150">
@@ -90,14 +91,14 @@ export default function TheWebCard({ umbrella, posts, visibleCount = 3 }: TheWeb
                     type="blog"
                   />
                 </div>
-                <a
+                <Link
                   href="/the-web"
                   aria-label="Visit the web"
                   onClick={(e) => e.stopPropagation()}
                   className="inline-block hover:scale-110 transition-transform duration-200 ease-out"
                 >
                   <ExternalLink className="w-5 h-5 text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-orange-500" />
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -110,13 +111,13 @@ export default function TheWebCard({ umbrella, posts, visibleCount = 3 }: TheWeb
 
             <div className="flex flex-col">
               {hasMore && (
-                <a
+                <Link
                   href="/the-web"
                   onClick={(e) => e.stopPropagation()}
                   className="self-start mb-1.5 text-[10px] uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-300 transition-colors"
                 >
                   more posts &rarr;
-                </a>
+                </Link>
               )}
 
               <ul className="flex flex-col">

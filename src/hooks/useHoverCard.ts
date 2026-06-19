@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useSyncExternalStore } from "react";
 
 interface Position {
   x: number;
@@ -23,16 +23,31 @@ const CARD_WIDTH = 280;
 const CARD_HEIGHT = 200;
 const OFFSET_Y = 12;
 
+const COARSE_POINTER_QUERY = "(pointer: coarse)";
+
+function subscribeToPointer(callback: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  const mql = window.matchMedia(COARSE_POINTER_QUERY);
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+
+function getIsTouchDevice(): boolean {
+  return window.matchMedia(COARSE_POINTER_QUERY).matches;
+}
+
 export function useHoverCard(): UseHoverCardReturn {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState<Position | null>(null);
   const triggerRef = useRef<HTMLSpanElement | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-  useEffect(() => {
-    setIsTouchDevice(window.matchMedia("(pointer: coarse)").matches);
-  }, []);
+  // Read the pointer type from an external store. SSR snapshot is `false`,
+  // matching the previous initial state and avoiding state-in-effect churn.
+  const isTouchDevice = useSyncExternalStore(
+    subscribeToPointer,
+    getIsTouchDevice,
+    () => false
+  );
 
   const calculatePosition = useCallback(() => {
     if (!triggerRef.current) return null;

@@ -124,7 +124,7 @@ function autoLinkText(input: string): string {
 
 export default function IrisPalette({ open: controlledOpen, onOpenChange }: IrisPaletteProps) {
   const router = useRouter();
-  const { deepMode, toggleDeepMode } = useDeepMode();
+  const { deepMode } = useDeepMode();
   // View mode state machine: 'suggestions' = show suggestions, 'answer' = show answer only
   const [viewMode, setViewMode] = useState<'suggestions' | 'answer'>('suggestions');
 

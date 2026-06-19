@@ -17,7 +17,7 @@ below, so anything you file is indistinguishable from a UI-filed ticket.
 | Field | Encoding |
 |---|---|
 | Priority | label `p1`…`p5` (p1 = highest). Default `p3`. |
-| Status | label `status: todo` or `status: in progress`. Default `todo`. |
+| Status | label `status: todo`, `status: in progress`, or `status: awaiting review`. Default `todo`. |
 | **Done** | the issue is **closed** (there is no "done" label). |
 | Size | label `size: S` / `size: M` / `size: L`. Default `M`. S ≈ <1h, M ≈ a feature/half-day, L ≈ large/multi-day. **Always set one.** |
 | Subtasks | a `- [ ]` / `- [x]` task list inside the issue body. |
@@ -41,6 +41,11 @@ npm run board -- file --repo <owner/name> --title "…" \
 npm run board -- update --repo <owner/name> --number N \
   [--title "…"] [--priority p1] [--status "in progress"] [--size L] \
   [--body "…"] [--add-subtask "…"]
+
+# Hand a finished ticket to Mike for review: set status to "awaiting review" + attach a
+# live preview link + what-to-test. Push your feature branch first so the preview exists.
+npm run board -- handoff --repo <owner/name> --number N \
+  --test "what Mike should test" --auto --branch <branch>   # or: --preview <url>
 
 # Mark Done = close + tick the whole checklist. GATED (see Policy).
 npm run board -- done --repo <owner/name> --number N --yes
@@ -71,4 +76,13 @@ CLI for *filing/updating* so labels and subtask formatting stay consistent.
 1. `npm run board -- list --repo <repo>` to find the number.
 2. If subtasks were completed, tick them: `update --add-subtask` is for *adding*;
    to check items off, pass an edited `--body` (or just close, which ticks all).
-3. Tell Mike it's ready and give him the exact `done --repo … --number … --yes`.
+3. **Push your feature branch, then hand it off for review** (the default for agent work —
+   sets `status: awaiting review` and attaches a live preview link + what-to-test so it
+   lands in the board's Awaiting Review section):
+
+   ```bash
+   npm run board -- handoff --repo <repo> --number N \
+     --test "what Mike should test" --auto --branch <branch>   # or: --preview <url>
+   ```
+4. Closing/Done stays **gated** — Mike approves from the board (or run
+   `done --repo … --number … --yes` only with his explicit OK).

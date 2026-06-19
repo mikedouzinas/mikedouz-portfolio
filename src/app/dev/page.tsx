@@ -54,7 +54,9 @@ export default function DevConsolePage() {
       const url = selected
         ? `/api/dev/issues?state=open&repo=${encodeURIComponent(selected)}`
         : '/api/dev/issues?state=open';
-      const res = await fetch(url);
+      // no-store: GitHub's list endpoint is eventually-consistent and the
+      // browser/Next caches make freshly-filed tickets lag further (ticket #71).
+      const res = await fetch(url, { cache: 'no-store' });
       if (res.ok) {
         const data = (await res.json()) as { issues: DevIssue[] };
         setIssues(data.issues);
@@ -66,20 +68,58 @@ export default function DevConsolePage() {
 
   const refreshIssues = useCallback(() => loadIssues(true), [loadIssues]);
 
+  const patchIssue = useCallback(async (repo: string, number: number, patch: Record<string, unknown>) => {
+    await fetch('/api/dev/issues', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repo, number, ...patch }),
+    });
+    await loadIssues(true);
+  }, [loadIssues]);
+
+  const onApprove = useCallback((i: DevIssue) => patchIssue(i.repo, i.number, { state: 'closed' }), [patchIssue]);
+  const onSendBack = useCallback((i: DevIssue, feedback: string) => patchIssue(i.repo, i.number, { feedback }), [patchIssue]);
+
+  // Optimistic insert: merge issues Cere just created into the board immediately
+  // (deduped on the card key repo#number), then silent-refetch to reconcile —
+  // GitHub's list endpoint takes several reloads to surface a new issue (#71).
+  const onCereApplied = useCallback(
+    (created: DevIssue[]) => {
+      if (created.length) {
+        setIssues((prev) => {
+          const seen = new Set(prev.map((i) => `${i.repo}#${i.number}`));
+          const fresh = created.filter((i) => !seen.has(`${i.repo}#${i.number}`));
+          return fresh.length ? [...fresh, ...prev] : prev;
+        });
+      }
+      void loadIssues(true);
+    },
+    [loadIssues],
+  );
+
+  // Data fetching on mount / when the selected repo changes. This is the
+  // canonical use of an effect (sync React with an external system — the API);
+  // the setState inside the loaders runs after the fetch resolves, not as
+  // render-derived state. The rule can't see across the async loader boundary.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- on-mount data fetch, not derived state
     loadRepos();
   }, [loadRepos]);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on selected-repo change, not derived state
     loadIssues();
   }, [loadIssues]);
 
-  // Mount the loader immediately when loading starts; keep it mounted for one
-  // fade duration after loading ends so it can fade out over the board.
+  // Mount the loader immediately when loading starts (handled during render via
+  // prev-tracking so it's never a frame late), then keep it mounted for one fade
+  // duration after loading ends so it can fade out over the board.
+  const [prevLoading, setPrevLoading] = useState(loading);
+  if (prevLoading !== loading) {
+    setPrevLoading(loading);
+    if (loading) setShowLoader(true);
+  }
   useEffect(() => {
-    if (loading) {
-      setShowLoader(true);
-      return;
-    }
+    if (loading) return;
     const id = setTimeout(() => setShowLoader(false), 300);
     return () => clearTimeout(id);
   }, [loading]);
@@ -196,6 +236,8 @@ export default function DevConsolePage() {
                 groupBy={groupBy}
                 sort={sort}
                 onChanged={refreshIssues}
+                onApprove={onApprove}
+                onSendBack={onSendBack}
               />
             )}
           </div>
@@ -214,7 +256,8 @@ export default function DevConsolePage() {
       <CerePanel
         open={composerOpen}
         onClose={() => setComposerOpen(false)}
-        onApplied={refreshIssues}
+        onApplied={onCereApplied}
+        issues={issues}
       />
     </div>
   );

@@ -99,7 +99,7 @@ const depthTestChains: DepthTestChain[] = [
         // Product requirement: When showing a list, provide actions to explore related content
         // Users should be able to naturally flow from projects → experiences → specific items
         actionIndex: 0, // Click first exploration action
-        validateResponse: (r, prev) => {
+        validateResponse: (r) => {
           // Product requirement: Quick actions should lead to relevant, detailed information
           // Not just lists, but actual content that helps users understand Mike's work
           const isRelevant = r.text.length > 150 && (
@@ -118,7 +118,7 @@ const depthTestChains: DepthTestChain[] = [
         // Product requirement: After exploring one area, suggest related areas or specific items
         // This creates a natural conversation flow
         actionIndex: 0, // Click first specific action
-        validateResponse: (r, prev) => {
+        validateResponse: (r) => {
           // Product requirement: Specific item queries should provide comprehensive details
           // Users clicked to learn more, so give them full information
           const isDetailed = r.text.length > 200;
@@ -145,7 +145,7 @@ const depthTestChains: DepthTestChain[] = [
         // Product requirement: Quick actions should enable natural exploration across categories
         // Users should be able to flow from experiences → projects → skills seamlessly
         actionIndex: 0, // Click first cross-category action
-        validateResponse: (r, prev) => {
+        validateResponse: (r) => {
           // Product requirement: When exploring related content, provide relevant information
           // The response should connect to what was shown before (experiences → related projects)
           const isRelevant = r.text.length > 150 && (
@@ -163,7 +163,7 @@ const depthTestChains: DepthTestChain[] = [
         // Product requirement: After exploring related content, provide specific item details
         // Users want to dive deeper into individual items
         actionIndex: 0, // Click first specific item action
-        validateResponse: (r, prev) => {
+        validateResponse: (r) => {
           // Product requirement: Specific item responses should be comprehensive
           // Users clicked to learn more, so provide full details
           return r.text.length > 200;
@@ -180,7 +180,7 @@ const depthTestChains: DepthTestChain[] = [
       {
         atDepth: 0,
         actionIndex: 0, // Click first skill-related action
-        validateResponse: (r, prev) => {
+        validateResponse: (r) => {
           // Should show work using those skills
           return r.text.length > 100 && (
             r.text.toLowerCase().includes('project') ||
@@ -201,7 +201,7 @@ const depthTestChains: DepthTestChain[] = [
         atDepth: 0,
         actionLabel: 'Work using these skills',
         expectedQuery: /we just showed.*class.*now show me.*work.*using/i,
-        validateResponse: (r, prev) => {
+        validateResponse: (r) => {
           // Should show projects/experiences using skills from the class
           return r.text.length > 100 && (
             r.text.toLowerCase().includes('project') ||
@@ -222,7 +222,7 @@ const depthTestChains: DepthTestChain[] = [
         atDepth: 0,
         actionLabel: 'Related projects',
         expectedQuery: /we just showed.*portfolio.*now show me.*projects.*using/i,
-        validateResponse: (r, prev) => {
+        validateResponse: (r) => {
           // Should show related projects using similar skills
           return r.text.length > 100 && r.text.toLowerCase().includes('project');
         },
@@ -230,7 +230,7 @@ const depthTestChains: DepthTestChain[] = [
       {
         atDepth: 1,
         actionIndex: 0, // Click a related project
-        validateResponse: (r, prev) => {
+        validateResponse: (r) => {
           // Should show another project detail
           return r.text.length > 150;
         },
@@ -246,7 +246,7 @@ const depthTestChains: DepthTestChain[] = [
       {
         atDepth: 0,
         actionIndex: 0, // Click first specific action
-        validateResponse: (r, prev) => {
+        validateResponse: (r) => {
           // Product requirement: Clicking a quick action should show detailed information about that specific item
           // Not a list, not minimal info - full details about the item
           const isDetailed = r.text.length > 250; // Full detail responses are substantial
@@ -305,7 +305,7 @@ const depthTestChains: DepthTestChain[] = [
       {
         atDepth: 0,
         actionIndex: 0, // Click first specific experience action
-        validateResponse: (r, prev) => {
+        validateResponse: (r) => {
           // Product requirement: When clicking a quick action with a specific item identifier,
           // the system should show THAT exact item, not a different one or a list
           // This ensures accuracy and prevents confusion
@@ -328,7 +328,7 @@ const depthTestChains: DepthTestChain[] = [
         atDepth: 1,
         // Product requirement: After viewing a specific item, suggest related items or follow-ups
         // But don't suggest the same item again
-        validateResponse: (r, prev) => {
+        validateResponse: (r) => {
           // Should have follow-up options
           const hasActions = Array.isArray(r.quickActions) && r.quickActions.length > 0;
           
@@ -1084,7 +1084,7 @@ async function makeRequest(
   const startTime = Date.now();
   
   try {
-    const body: any = { query, signals: {} };
+    const body: Record<string, unknown> = { query, signals: {} };
     
     // Add conversation context if provided (matches IrisPalette behavior)
     if (previousQuery) body.previousQuery = previousQuery;
@@ -1155,7 +1155,7 @@ async function makeRequest(
             if (parsed.debug?.intent) {
               responseIntent = parsed.debug.intent;
             }
-          } catch (e) {
+          } catch {
             // Ignore parse errors for partial chunks
           }
         }
@@ -1201,7 +1201,7 @@ async function runDepthTestChain(chain: DepthTestChain, chainNum: number, totalC
   let currentQuery = chain.initialQuery;
   let previousQuery: string | undefined;
   let previousAnswer: string | undefined;
-  let visitedNodes: string[] = []; // Track visited nodes to test prevention
+  const visitedNodes: string[] = []; // Track visited nodes to test prevention
   let skipClassification = false;
   let quickActionIntent: string | undefined;
   let quickActionFilters: Record<string, unknown> | undefined;
@@ -1450,7 +1450,7 @@ async function runDepthTestChain(chain: DepthTestChain, chainNum: number, totalC
   }
 
   // Create test results for each depth
-  conversation.forEach((turn, idx) => {
+  conversation.forEach((turn) => {
     results.push({
       category: `${chain.category} [Depth ${turn.depth}]`,
       query: turn.query,

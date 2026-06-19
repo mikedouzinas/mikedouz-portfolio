@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { listIssues, listBoardIssues, createIssue, updateIssue, listRepos, isOwnedRepo } from '@/lib/dev/github';
+import { listIssues, listBoardIssues, createIssue, updateIssue, listRepos, isOwnedRepo, postComment, upsertReviewBlock } from '@/lib/dev/github';
 import { getHiddenRepos } from '@/lib/dev/hidden';
 
 export const runtime = 'nodejs';
 
 const PRIORITY = z.enum(['p1', 'p2', 'p3', 'p4', 'p5']);
-const STATUS = z.enum(['todo', 'in progress']);
+const STATUS = z.enum(['todo', 'in progress', 'awaiting review']);
 const SIZE = z.enum(['S', 'M', 'L']);
 
 async function visibleRepoSlugs(): Promise<string[]> {
@@ -35,7 +35,9 @@ export async function GET(req: NextRequest) {
     // The default board view (state=open) also includes recently-closed issues
     // so the Kanban's Done column has content; explicit closed/all bypass that.
     const issues = state === 'open' ? await listBoardIssues(repos) : await listIssues(repos, state);
-    return NextResponse.json({ issues });
+    // no-store: a freshly-filed ticket must not be masked by a cached list
+    // response (ticket #71).
+    return NextResponse.json({ issues }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 502 });
   }
@@ -80,6 +82,7 @@ const PatchSchema = z.object({
   state: z.enum(['open', 'closed']).optional(),
   title: z.string().min(1).optional(),
   body: z.string().optional(),
+  feedback: z.string().min(1).optional(), // send-back review feedback
 });
 
 export async function PATCH(req: NextRequest) {
@@ -89,6 +92,14 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'repo not allowed' }, { status: 400 });
   }
   try {
+    const { repo, number, feedback } = parsed.data;
+    if (feedback) {
+      await postComment(repo, number, `**Review feedback (sent back):**\n\n${feedback}`);
+      const [issue] = (await listIssues([repo], 'all')).filter((i) => i.number === number);
+      const body = issue ? upsertReviewBlock(issue.body ?? '', { feedback }) : undefined;
+      await updateIssue(repo, number, { status: 'in progress', body });
+      return NextResponse.json({ ok: true });
+    }
     await updateIssue(parsed.data.repo, parsed.data.number, {
       priority: parsed.data.priority,
       status: parsed.data.status,

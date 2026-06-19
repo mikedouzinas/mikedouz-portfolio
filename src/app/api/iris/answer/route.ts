@@ -532,9 +532,6 @@ export async function POST(req: NextRequest) {
     let _githubActivityRequest: { project_id: string } | null = null;
     let selectedSlateIds: string[] = [];
 
-    // Tool input buffering
-    const toolInputBuffers: Record<number, { name: string; jsonStr: string }> = {};
-
     const readable = new ReadableStream({
       async start(controller) {
         try {
