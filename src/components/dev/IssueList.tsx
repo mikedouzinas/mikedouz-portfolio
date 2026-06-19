@@ -239,10 +239,25 @@ function IssueCard({
     if (!t) return;
     const patch: PatchBody = {};
     if (t !== issue.title) patch.title = t;
-    const newBody = composeBody(editProse, editSubs);
+    // Save-absorbs-pending: a half-typed subtask sitting in the add input is
+    // committed into the draft as part of Save, so it can never be silently lost.
+    const pending = addText.trim();
+    const subsToSave = pending ? [...editSubs, { text: pending, done: false }] : editSubs;
+    const newBody = composeBody(editProse, subsToSave);
     if (newBody !== issue.body) patch.body = newBody;
     if (patch.title || patch.body) onPatch(issue, patch); // reload remounts with fresh props
+    setAddText('');
     setEditing(false);
+  }
+
+  // Shared close/complete action — used by both the Complete button and the
+  // card-level checkbox so the two paths behave identically. Marking the ticket
+  // Done completes its checklist too.
+  function completeIssue() {
+    onPatch(issue, {
+      state: 'closed',
+      ...(prog.total > 0 ? { body: checkAllSubtasks(issue.body) } : {}),
+    });
   }
 
   // The card header — the always-visible summary. Shared between the inline
@@ -254,6 +269,34 @@ function IssueCard({
       className={`relative z-10 block w-full p-4 text-left ${detached ? 'pr-12' : ''}`}
     >
       <div className="mb-1.5 flex items-center gap-2.5 text-[11px] text-white/40">
+        {/* Complete checkbox — sits to the LEFT of the priority badge and fires
+            the SAME close/complete action as the Complete button. It must not
+            also expand the ticket, so its click/keydown stop propagation to the
+            surrounding header button. Hidden once closed (then it reads Done). */}
+        {!closed && (
+          <span
+            role="checkbox"
+            aria-checked={false}
+            aria-label="Mark ticket complete"
+            tabIndex={0}
+            title="Mark complete"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              completeIssue();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.stopPropagation();
+                e.preventDefault();
+                completeIssue();
+              }
+            }}
+            className="-my-1 inline-flex shrink-0 cursor-pointer items-center text-white/45 transition-colors hover:text-emerald-300"
+          >
+            <Square className="h-3.5 w-3.5" />
+          </span>
+        )}
         <span style={{ color: pr.color }}>{pr.short}</span>
         <span className="inline-flex items-center gap-1">
           <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: st.color }} />
@@ -473,17 +516,11 @@ function IssueCard({
                   <Button
                     variant="ghost"
                     glowColor="52, 211, 153"
-                    onClick={() =>
-                      onPatch(issue, {
-                        state: 'closed',
-                        // Marking the ticket Done completes its checklist too.
-                        ...(prog.total > 0 ? { body: checkAllSubtasks(issue.body) } : {}),
-                      })
-                    }
+                    onClick={completeIssue}
                     className="text-xs text-emerald-300/85"
                   >
                     <Check className="h-3.5 w-3.5" />
-                    Done
+                    Complete
                   </Button>
                 )}
               </div>
