@@ -1,7 +1,7 @@
 /**
  * GitHub access for the dev-console board.
  * - Repos are DISCOVERED live (no hardcoded list); owned repos are the security boundary.
- * - Priority = label p1..p5. Status = label "status: todo" | "status: in progress".
+ * - Priority = label p1..p5. Status = label "status: todo" | "status: in progress" | "status: awaiting review".
  *   Size = label "size: S" | "size: M" | "size: L". Done = a closed issue (no Done label).
  * - Priority/status/size labels are ensured WITH COLORS (idempotent) per repo.
  * Uses GITHUB_TOKEN (server-only).
@@ -9,15 +9,16 @@
 const GH = 'https://api.github.com';
 
 export type Priority = 'p1' | 'p2' | 'p3' | 'p4' | 'p5';
-export type Status = 'todo' | 'in progress';
+export type Status = 'todo' | 'in progress' | 'awaiting review';
 export type Size = 'S' | 'M' | 'L';
 
 const PRIORITY_RE = /^p[1-5]$/;
-const STATUS_RE = /^status:\s*(todo|in progress)$/i;
+const STATUS_RE = /^status:\s*(todo|in progress|awaiting review)$/i;
 const SIZE_RE = /^size:\s*([SML])$/i;
 const STATUS_LABEL: Record<Status, string> = {
   todo: 'status: todo',
   'in progress': 'status: in progress',
+  'awaiting review': 'status: awaiting review',
 };
 const SIZE_LABEL: Record<Size, string> = {
   S: 'size: S',
@@ -34,6 +35,7 @@ const LABEL_DEFS: { name: string; color: string }[] = [
   { name: 'p5', color: 'c5def5' }, // light blue — lowest
   { name: 'status: todo', color: 'ededed' }, // gray
   { name: 'status: in progress', color: 'd4a72c' }, // amber
+  { name: 'status: awaiting review', color: 'e7b34a' }, // champagne-amber
   { name: 'size: S', color: '4285f4' }, // blue — small / quick
   { name: 'size: M', color: 'fbca04' }, // yellow — medium
   { name: 'size: L', color: 'fb923c' }, // orange — large / deep

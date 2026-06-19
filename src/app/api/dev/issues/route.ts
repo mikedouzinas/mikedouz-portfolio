@@ -6,7 +6,7 @@ import { getHiddenRepos } from '@/lib/dev/hidden';
 export const runtime = 'nodejs';
 
 const PRIORITY = z.enum(['p1', 'p2', 'p3', 'p4', 'p5']);
-const STATUS = z.enum(['todo', 'in progress']);
+const STATUS = z.enum(['todo', 'in progress', 'awaiting review']);
 const SIZE = z.enum(['S', 'M', 'L']);
 
 async function visibleRepoSlugs(): Promise<string[]> {

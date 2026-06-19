@@ -35,7 +35,7 @@ const PRIORITY_OPTS = (['p1', 'p2', 'p3', 'p4', 'p5'] as Priority[]).map((p) => 
   label: PRIORITY_META[p].short,
   color: PRIORITY_META[p].color,
 }));
-const STATUS_OPTS = (['todo', 'in progress'] as Status[]).map((s) => ({
+const STATUS_OPTS = (['todo', 'in progress', 'awaiting review'] as Status[]).map((s) => ({
   value: s,
   label: STATUS_META[s].label,
   color: STATUS_META[s].color,
@@ -59,12 +59,13 @@ type PatchBody = {
 const DONE_GREEN = '#1DB954';
 
 // Expanded-card tint keyed by status, so the lift colour tells you where a
-// ticket stands at a glance: blue = todo, amber = in progress, and the
-// original Spotify-panel green = done. Same dark-tint-of-the-accent recipe.
+// ticket stands at a glance: blue = todo, amber = in progress, champagne = awaiting review,
+// and the original Spotify-panel green = done. Same dark-tint-of-the-accent recipe.
 // Translucent so the harlequin argyle whispers through the glass card.
-const STATUS_EXPAND: Record<'todo' | 'in progress' | 'done', { bg: string; border: string }> = {
+const STATUS_EXPAND: Record<'todo' | 'in progress' | 'awaiting review' | 'done', { bg: string; border: string }> = {
   todo: { bg: 'rgba(11, 19, 34, 0.66)', border: 'rgba(66, 133, 244, 0.45)' }, // blue
   'in progress': { bg: 'rgba(26, 22, 7, 0.66)', border: 'rgba(251, 188, 5, 0.45)' }, // amber
+  'awaiting review': { bg: 'rgba(26, 22, 7, 0.66)', border: 'rgba(231, 179, 74, 0.45)' }, // champagne-amber
   done: { bg: 'rgba(10, 26, 19, 0.66)', border: 'rgba(29, 185, 84, 0.45)' }, // Spotify green
 };
 
@@ -153,7 +154,7 @@ function IssueCard({
   const closed = issue.state === 'closed';
   // Closed items read as "Done" (green) regardless of their lingering status label.
   const st = closed ? { label: 'Done', color: DONE_GREEN } : STATUS_META[issue.status ?? 'todo'];
-  const expandKey: 'todo' | 'in progress' | 'done' = closed ? 'done' : issue.status ?? 'todo';
+  const expandKey: 'todo' | 'in progress' | 'awaiting review' | 'done' = closed ? 'done' : issue.status ?? 'todo';
   const tint = STATUS_EXPAND[expandKey];
   const subs = parseSubtasks(issue.body);
   const prog = subtaskProgress(issue.body);
@@ -674,6 +675,7 @@ function sortIssues(items: DevIssue[], sort: SortBy): DevIssue[] {
 const STATUS_LANES: { key: string; label: string; color: string }[] = [
   { key: 'todo', label: 'Todo', color: STATUS_META.todo.color },
   { key: 'in progress', label: 'In progress', color: STATUS_META['in progress'].color },
+  { key: 'awaiting review', label: 'Awaiting review', color: STATUS_META['awaiting review'].color },
   { key: 'done', label: 'Done', color: DONE_GREEN },
 ];
 

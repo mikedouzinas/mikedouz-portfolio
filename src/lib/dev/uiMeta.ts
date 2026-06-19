@@ -19,6 +19,7 @@ export const PRIORITY_META: Record<Priority, { short: string; label: string; col
 export const STATUS_META: Record<Status, { label: string; color: string }> = {
   todo: { label: 'Todo', color: '#4285F4' }, // blue
   'in progress': { label: 'In progress', color: '#FBBC05' }, // amber
+  'awaiting review': { label: 'Awaiting review', color: '#E7B34A' }, // champagne-amber
 };
 
 export const SIZE_META: Record<Size, { short: string; label: string; color: string }> = {

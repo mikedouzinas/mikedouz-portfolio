@@ -22,7 +22,7 @@ import type { DevIssue, DevRepo, Priority, Size, Status } from './github';
 export const CERE_MODEL = 'claude-sonnet-4-6';
 
 const PRIORITY = z.enum(['p1', 'p2', 'p3', 'p4', 'p5']);
-const STATUS = z.enum(['todo', 'in progress']);
+const STATUS = z.enum(['todo', 'in progress', 'awaiting review']);
 const SIZE = z.enum(['S', 'M', 'L']);
 
 export const CREATE_ISSUE_TOOL: Anthropic.Tool = {
@@ -37,7 +37,7 @@ export const CREATE_ISSUE_TOOL: Anthropic.Tool = {
       title: { type: 'string' },
       body: { type: 'string', description: 'Optional description / context.' },
       priority: { type: 'string', enum: ['p1', 'p2', 'p3', 'p4', 'p5'], description: 'Default p3.' },
-      status: { type: 'string', enum: ['todo', 'in progress'], description: 'Default todo.' },
+      status: { type: 'string', enum: ['todo', 'in progress', 'awaiting review'], description: 'Default todo.' },
       size: {
         type: 'string',
         enum: ['S', 'M', 'L'],
@@ -65,7 +65,7 @@ export const UPDATE_ISSUE_TOOL: Anthropic.Tool = {
       repo: { type: 'string', description: 'Exact repo slug (owner/name).' },
       number: { type: 'integer', description: 'The issue number.' },
       priority: { type: 'string', enum: ['p1', 'p2', 'p3', 'p4', 'p5'] },
-      status: { type: 'string', enum: ['todo', 'in progress'] },
+      status: { type: 'string', enum: ['todo', 'in progress', 'awaiting review'] },
       size: { type: 'string', enum: ['S', 'M', 'L'] },
       state: { type: 'string', enum: ['open', 'closed'] },
       body: {
