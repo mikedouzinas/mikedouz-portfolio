@@ -1,5 +1,100 @@
 [
   {
+    "id": "60161e4870497d2bf3e32aa554baddf2",
+    "trackName": "Beverly Laurel",
+    "artist": "Tame Impala",
+    "album": "Lonerism B-Sides & Remixes",
+    "trackUri": "spotify:track:1JpcqmUlzNlK7lpFOkszzv",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e025efbb161bf5b66c862a6f5ae",
+    "spotifyUrl": "https://open.spotify.com/track/1JpcqmUlzNlK7lpFOkszzv",
+    "dateRange": {
+      "start": "2026-06-09",
+      "end": "2026-06-13"
+    },
+    "playCount": 9,
+    "weeksCount": 1,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-06-09",
+    "peakDayPlays": 6,
+    "hotDays": [
+      {
+        "date": "2026-06-09",
+        "plays": 6
+      },
+      {
+        "date": "2026-06-13",
+        "plays": 3
+      }
+    ]
+  },
+  {
+    "id": "e1c12cb601da8ac37a1b09c4271c857d",
+    "trackName": "Retina Show - Unreleased Demo",
+    "artist": "Tame Impala",
+    "album": "Lonerism (10 Year Anniversary Edition / Unreleased Demos)",
+    "trackUri": "spotify:track:5uDdyVU0jDST7xmuOqpnC3",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02d9b0e0948149c59a9bf5bc76",
+    "spotifyUrl": "https://open.spotify.com/track/5uDdyVU0jDST7xmuOqpnC3",
+    "dateRange": {
+      "start": "2026-06-09",
+      "end": "2026-06-18"
+    },
+    "playCount": 9,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-06-14",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-06-14",
+        "plays": 3
+      },
+      {
+        "date": "2026-06-15",
+        "plays": 2
+      }
+    ]
+  },
+  {
+    "id": "f41570d37467230058dafa5d97d4ffdc",
+    "trackName": "It Won't Always Be Like This",
+    "artist": "Inhaler",
+    "album": "It Won't Always Be Like This",
+    "trackUri": "spotify:track:61YcJKRn2y1si5jGc7LUIN",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e024feece63eddc48ba8c528e0b",
+    "spotifyUrl": "https://open.spotify.com/track/61YcJKRn2y1si5jGc7LUIN",
+    "dateRange": {
+      "start": "2026-06-08",
+      "end": "2026-06-18"
+    },
+    "playCount": 12,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-06-12",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2026-06-12",
+        "plays": 3
+      },
+      {
+        "date": "2026-06-13",
+        "plays": 3
+      },
+      {
+        "date": "2026-06-16",
+        "plays": 2
+      },
+      {
+        "date": "2026-06-18",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "156b3ce0307342f1e9d976ca6886fe28",
     "trackName": "Plot Twist",
     "artist": "Drake",
@@ -1033,8 +1128,8 @@
     },
     "playCount": 10,
     "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2026-03-27",
     "peakDayPlays": 5,
     "hotDays": [
@@ -2983,8 +3078,8 @@
     },
     "playCount": 10,
     "weeksCount": 3,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-12-04",
     "peakDayPlays": 2,
     "hotDays": [
@@ -3544,8 +3639,8 @@
     },
     "playCount": 8,
     "weeksCount": 3,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-10-26",
     "peakDayPlays": 2,
     "hotDays": [
@@ -6238,8 +6333,8 @@
     },
     "playCount": 11,
     "weeksCount": 4,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-07-03",
     "peakDayPlays": 2,
     "hotDays": [
@@ -6891,40 +6986,6 @@
     ]
   },
   {
-    "id": "20ec9aa0f34ab74cfa6563d906be392b",
-    "trackName": "PELIGROSA",
-    "artist": "FloyyMenor",
-    "album": "EL COMIENZO",
-    "trackUri": "spotify:track:42wdz3j7gstgUuhoFLCXqd",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02200e2b6526846c59789c92e6",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/42wdz3j7gstgUuhoFLCXqd",
-    "dateRange": {
-      "start": "2025-05-05",
-      "end": "2025-05-16"
-    },
-    "playCount": 11,
-    "weeksCount": 2,
-    "intensity": 3,
-    "maxState": 3,
-    "peakDay": "2025-05-16",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2025-05-16",
-        "plays": 3
-      },
-      {
-        "date": "2025-05-07",
-        "plays": 2
-      },
-      {
-        "date": "2025-05-15",
-        "plays": 2
-      }
-    ]
-  },
-  {
     "id": "30f8cb4c7278ea28439d33ed97505a6b",
     "trackName": "Shake Body",
     "artist": "Skales",
@@ -6954,6 +7015,40 @@
     ]
   },
   {
+    "id": "20ec9aa0f34ab74cfa6563d906be392b",
+    "trackName": "PELIGROSA",
+    "artist": "FloyyMenor",
+    "album": "EL COMIENZO",
+    "trackUri": "spotify:track:42wdz3j7gstgUuhoFLCXqd",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02200e2b6526846c59789c92e6",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/42wdz3j7gstgUuhoFLCXqd",
+    "dateRange": {
+      "start": "2025-05-05",
+      "end": "2025-05-16"
+    },
+    "playCount": 11,
+    "weeksCount": 2,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2025-05-16",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2025-05-16",
+        "plays": 3
+      },
+      {
+        "date": "2025-05-07",
+        "plays": 2
+      },
+      {
+        "date": "2025-05-15",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "ea3b6b49b4cfa231d27f0fe87b0d6be6",
     "trackName": "PELIGROSA",
     "artist": "FloyyMenor",
@@ -6968,8 +7063,8 @@
     },
     "playCount": 6,
     "weeksCount": 1,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-04-25",
     "peakDayPlays": 4,
     "hotDays": [
@@ -11286,40 +11381,6 @@
     ]
   },
   {
-    "id": "da35940da5bd6d7801fde1a65448ea6f",
-    "trackName": "No Pole",
-    "artist": "Don Toliver",
-    "album": "Love Sick",
-    "trackUri": "spotify:track:0eaVIYo2zeOaGJeqZ5TwYz",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02307323fa550564b0201b1d76",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/0eaVIYo2zeOaGJeqZ5TwYz",
-    "dateRange": {
-      "start": "2023-10-14",
-      "end": "2023-10-22"
-    },
-    "playCount": 9,
-    "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2023-10-14",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-10-14",
-        "plays": 2
-      },
-      {
-        "date": "2023-10-19",
-        "plays": 2
-      },
-      {
-        "date": "2023-10-22",
-        "plays": 2
-      }
-    ]
-  },
-  {
     "id": "2d0a423e303cf233e31ef0b5eb5b83e8",
     "trackName": "Around Me (feat. Don Toliver)",
     "artist": "Metro Boomin",
@@ -11342,6 +11403,40 @@
       {
         "date": "2023-10-14",
         "plays": 3
+      }
+    ]
+  },
+  {
+    "id": "da35940da5bd6d7801fde1a65448ea6f",
+    "trackName": "No Pole",
+    "artist": "Don Toliver",
+    "album": "Love Sick",
+    "trackUri": "spotify:track:0eaVIYo2zeOaGJeqZ5TwYz",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02307323fa550564b0201b1d76",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/0eaVIYo2zeOaGJeqZ5TwYz",
+    "dateRange": {
+      "start": "2023-10-14",
+      "end": "2023-10-22"
+    },
+    "playCount": 9,
+    "weeksCount": 2,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2023-10-14",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-10-14",
+        "plays": 2
+      },
+      {
+        "date": "2023-10-19",
+        "plays": 2
+      },
+      {
+        "date": "2023-10-22",
+        "plays": 2
       }
     ]
   },
@@ -11747,8 +11842,8 @@
     },
     "playCount": 13,
     "weeksCount": 4,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2023-09-14",
     "peakDayPlays": 2,
     "hotDays": [
@@ -14030,6 +14125,44 @@
     ]
   },
   {
+    "id": "96bc78f1a86f1a98511ad8a541c925bc",
+    "trackName": "Best I Ever Had",
+    "artist": "Drake",
+    "album": "So Far Gone",
+    "trackUri": "spotify:track:3QLjDkgLh9AOEHlhQtDuhs",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0254ef13c30a024a7f1ba79efd",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/3QLjDkgLh9AOEHlhQtDuhs",
+    "dateRange": {
+      "start": "2023-04-24",
+      "end": "2023-05-13"
+    },
+    "playCount": 17,
+    "weeksCount": 3,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2023-04-30",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2023-04-30",
+        "plays": 3
+      },
+      {
+        "date": "2023-04-24",
+        "plays": 2
+      },
+      {
+        "date": "2023-04-28",
+        "plays": 2
+      },
+      {
+        "date": "2023-05-05",
+        "plays": 2
+      }
+    ]
+  },
+  {
     "id": "f36101e0fb668042dd4d69f1bc2296be",
     "trackName": "Fluorescent Adolescent",
     "artist": "Arctic Monkeys",
@@ -14067,44 +14200,6 @@
       },
       {
         "date": "2023-05-28",
-        "plays": 2
-      }
-    ]
-  },
-  {
-    "id": "96bc78f1a86f1a98511ad8a541c925bc",
-    "trackName": "Best I Ever Had",
-    "artist": "Drake",
-    "album": "So Far Gone",
-    "trackUri": "spotify:track:3QLjDkgLh9AOEHlhQtDuhs",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0254ef13c30a024a7f1ba79efd",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/3QLjDkgLh9AOEHlhQtDuhs",
-    "dateRange": {
-      "start": "2023-04-24",
-      "end": "2023-05-13"
-    },
-    "playCount": 17,
-    "weeksCount": 3,
-    "intensity": 2,
-    "maxState": 2,
-    "peakDay": "2023-04-30",
-    "peakDayPlays": 3,
-    "hotDays": [
-      {
-        "date": "2023-04-30",
-        "plays": 3
-      },
-      {
-        "date": "2023-04-24",
-        "plays": 2
-      },
-      {
-        "date": "2023-04-28",
-        "plays": 2
-      },
-      {
-        "date": "2023-05-05",
         "plays": 2
       }
     ]
