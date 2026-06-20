@@ -239,7 +239,11 @@ export function WindowFace({ passcode, spin, revealed, onLeave, onReveal }: Face
         <div className="glass-frost" aria-hidden />
 
         {/* canvas etched "THE HARLEQUIN" gold-leaf signage */}
-        <canvas ref={etchCanvasRef} className="glass-etch-canvas" aria-hidden />
+        <canvas
+          ref={etchCanvasRef}
+          className={`glass-etch-canvas${revealed ? ' hidden' : ''}`}
+          aria-hidden
+        />
 
         {/* cursor-tracking inner glow */}
         <div className="window-glow" aria-hidden>
@@ -377,6 +381,13 @@ export function WindowFace({ passcode, spin, revealed, onLeave, onReveal }: Face
           pointer-events: none;
           width: 100%;
           height: 100%;
+          opacity: 1;
+          transition: opacity 300ms ease;
+        }
+        /* hide the etched wordmark when the passcode shows (flip, like the
+           circle/diamond ghost wordmarks) */
+        .glass-etch-canvas.hidden {
+          opacity: 0;
         }
 
         .glass-veil {

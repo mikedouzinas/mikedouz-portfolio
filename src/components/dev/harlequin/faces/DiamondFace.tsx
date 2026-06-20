@@ -135,12 +135,13 @@ export function DiamondFace({ passcode, spin, revealed, onLeave, onReveal }: Fac
           flex-shrink: 0;
           cursor: crosshair;
           outline: none;
-          transition: width 280ms cubic-bezier(0.34, 1.56, 0.64, 1),
-            height 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+          transform-origin: center;
+          transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .diamond-portal.hov {
-          width: 166px;
-          height: 166px;
+          /* scale from center (no reflow) so it expands uniformly like the circle
+             and never pushes siblings down — the 148px box is the tallest in the row */
+          transform: scale(1.094);
         }
         .diamond-portal:focus-visible {
           box-shadow: 0 0 0 2px rgba(231, 226, 212, 0.6);
@@ -150,12 +151,6 @@ export function DiamondFace({ passcode, spin, revealed, onLeave, onReveal }: Fac
           width: 104px;
           height: 104px;
           transform: rotate(45deg);
-          transition: width 280ms cubic-bezier(0.34, 1.56, 0.64, 1),
-            height 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .diamond-portal.hov .portal-diamond {
-          width: 116px;
-          height: 116px;
         }
         .diamond-ring {
           position: absolute;
