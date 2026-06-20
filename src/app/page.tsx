@@ -36,11 +36,16 @@ function HomeContent() {
   const { deepMode, toggleDeepMode } = useDeepMode();
 
   // The secret portal circle appears in exactly ONE random slot per page load.
-  const [portalSlot] = useState(() => Math.floor(Math.random() * 3));
+  // Picked post-mount (null on the server) so SSR and client agree — no hydration mismatch.
+  const [portalSlot, setPortalSlot] = useState<number | null>(null);
   // Slot B lives in the desktop-only sidebar; on mobile, fall back to Slot A so
   // the circle always renders somewhere.
   const [isDesktop, setIsDesktop] = useState(true);
   useEffect(() => {
+    // Deliberate post-mount one-time random pick — a two-phase render to avoid an
+    // SSR/client hydration mismatch from Math.random(); not derived render state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPortalSlot(Math.floor(Math.random() * 3));
     const mq = window.matchMedia('(min-width: 768px)');
     const update = () => setIsDesktop(mq.matches);
     update();
