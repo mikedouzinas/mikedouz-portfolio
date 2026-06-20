@@ -159,6 +159,7 @@ const FRAG = /* glsl */ `
 
 export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const coverRef = useRef<HTMLDivElement>(null);
   const [hidden, setHidden] = useState(false);
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
@@ -179,7 +180,18 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
     let cleanup: (() => void) | null = null;
 
     void (async () => {
-      const THREE = await import('three');
+      let THREE: typeof import('three');
+      try {
+        THREE = await import('three');
+      } catch {
+        // three.js failed to load — fail OPEN so the opaque cover never traps
+        // the board: clear the entrance and reveal it.
+        if (!disposed) {
+          setHidden(true);
+          onDoneRef.current?.();
+        }
+        return;
+      }
       if (disposed || !canvas) return;
 
       const rand = (a: number, b: number) => a + Math.random() * (b - a);
@@ -369,6 +381,7 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
         if (finished) return;
         finished = true;
         canvas!.style.opacity = '0';
+        if (coverRef.current) coverRef.current.style.opacity = '0';
         setHidden(true);
         onDoneRef.current?.();
       }
@@ -388,7 +401,14 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
           material.uniforms.uProgress.value = 1;
           const dn = Math.min((t - T_HOLD) / DURATION_DISSOLVE, 1);
           // ease (in-out) into a hard ease-out so the field clears fast & clean.
-          material.uniforms.uDissolve.value = easeOut(ease(dn));
+          const dv = easeOut(ease(dn));
+          material.uniforms.uDissolve.value = dv;
+          // Clear the opaque cover IN STEP with the WebGL burn so the board is
+          // revealed only here — never visible during the build. Lead slightly
+          // so the burning diamonds read against the board, not the flat cover.
+          if (coverRef.current) {
+            coverRef.current.style.opacity = String(Math.max(0, 1 - dv * 1.25));
+          }
         }
 
         renderer.render(scene, camera);
@@ -424,10 +444,24 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
   if (hidden) return null;
 
   return (
-    <canvas
-      ref={canvasRef}
+    <div
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-[120] block h-full w-full"
-    />
+      className="pointer-events-none fixed inset-0 z-[120]"
+    >
+      {/* Instant opaque cover — present on the VERY FIRST paint via plain CSS,
+          before three.js loads, so the real board is hidden from frame 1. The
+          diamond weave (the transparent WebGL canvas above) knits in on top of
+          this; only at the dissolve does the cover fade out IN STEP with the
+          WebGL burn to reveal the board underneath. */}
+      <div
+        ref={coverRef}
+        className="absolute inset-0"
+        style={{ background: '#0e0c12' }}
+      />
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 block h-full w-full"
+      />
+    </div>
   );
 }

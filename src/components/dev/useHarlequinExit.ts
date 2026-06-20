@@ -18,8 +18,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  * Failsafe: a hard timeout guarantees navigation even if the snapshot or anim
  * fails / onDone never fires. `navigate` is idempotent (guarded so a
  * double-trigger can't double-assign).
+ *
+ * The failsafe is a TRUE last-resort backstop, not the normal exit path. With
+ * three.js + html2canvas PRELOADED on /dev mount (see page.tsx), the snapshot +
+ * ~1.3s disintegration comfortably finishes inside this window, so normal
+ * navigation is anim-driven (HarlequinExit.onDone). The failsafe only trips on
+ * genuine failure. (Earlier it was 2600ms — shorter than the first cold load of
+ * those libs, so it navigated BEFORE the animation ever showed.)
  */
-const FAILSAFE_MS = 2600;
+const FAILSAFE_MS = 4500;
 
 export function useHarlequinExit() {
   const [exiting, setExiting] = useState(false);

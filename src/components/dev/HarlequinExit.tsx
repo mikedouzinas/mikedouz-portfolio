@@ -19,17 +19,23 @@ import { useEffect, useRef, useState } from 'react';
  * never enter the homepage bundle.
  *
  * Reliability:
- *   - onDone fires on its own timer regardless of how the parent unwinds, and
- *     the parent (useHarlequinExit) arms an additional hard failsafe. onDone is
- *     idempotent (a single window.location assign).
- *   - If the snapshot or WebGL setup throws, we fail OPEN: brief fade, onDone.
+ *   - onDone fires when the sweep finishes (the normal, anim-driven path), and
+ *     a self failsafe (armed at animation START, not mount, so a slow snapshot
+ *     can't pre-empt the sweep) backs it up. The parent (useHarlequinExit) arms
+ *     an additional hard failsafe. onDone is idempotent (a single
+ *     window.location assign).
+ *   - If the html2canvas snapshot throws OR returns empty, we DON'T abort: we
+ *     play the SAME dissolve on a flat board-colored (#0e0c12) fallback texture,
+ *     so the user always sees the diamond-ash dissolve.
+ *   - Only a genuine WebGL/setup failure fails OPEN (onDone via failsafe).
  *
  * Reduced motion: a brief dark fade, then onDone — no shader.
  */
 
 const DURATION = 1.35; // s — the L→R sweep
 const REDUCED_MS = 220;
-const SELF_DONE_MS = (DURATION + 0.25) * 1000; // self failsafe past the sweep
+// Self failsafe past the sweep, armed when the animation actually STARTS.
+const SELF_DONE_MS = (DURATION + 0.4) * 1000;
 const BASE = '#0e0c12';
 
 const VERT = /* glsl */ `
@@ -199,7 +205,12 @@ export function HarlequinExit({ onDone }: { onDone: () => void }) {
       onDoneRef.current();
     };
     // Self failsafe: navigate after the sweep even if onDone path is missed.
-    const selfTimer = setTimeout(fireOnce, SELF_DONE_MS);
+    // Armed when the animation STARTS (not at mount) so a slow snapshot can't
+    // pre-empt the sweep. Falls back to mount-time only if we never get there.
+    let selfTimer: ReturnType<typeof setTimeout> | null = null;
+    const armSelfFailsafe = () => {
+      if (selfTimer === null) selfTimer = setTimeout(fireOnce, SELF_DONE_MS);
+    };
 
     void (async () => {
       try {
@@ -213,25 +224,53 @@ export function HarlequinExit({ onDone }: { onDone: () => void }) {
           (document.querySelector('[data-board-root]') as HTMLElement | null) ??
           document.body;
 
-        const snapshot = await html2canvas(root, {
-          backgroundColor: BASE,
-          scale: Math.min(window.devicePixelRatio || 1, 2),
-          logging: false,
-          useCORS: true,
-          // Capture the visible viewport region of the (possibly scrolled) board.
-          x: window.scrollX,
-          y: window.scrollY,
-          width: window.innerWidth,
-          height: window.innerHeight,
-          windowWidth: document.documentElement.scrollWidth,
-          windowHeight: document.documentElement.scrollHeight,
-        });
+        // Snapshot the live board. If html2canvas throws OR yields an empty
+        // (0-sized) canvas — e.g. a WebGL surface it can't read — we DON'T abort
+        // the exit; we fall back to a flat board-colored texture so the user
+        // always sees the diamond-ash dissolve, never a hard cut to navigate.
+        const W0 = Math.max(window.innerWidth, 1);
+        const H0 = Math.max(window.innerHeight, 1);
+
+        const makeFallbackTexture = (): HTMLCanvasElement => {
+          const fb = document.createElement('canvas');
+          fb.width = W0;
+          fb.height = H0;
+          const ctx = fb.getContext('2d');
+          if (ctx) {
+            ctx.fillStyle = BASE;
+            ctx.fillRect(0, 0, fb.width, fb.height);
+          }
+          return fb;
+        };
+
+        let source: HTMLCanvasElement;
+        try {
+          const snapshot = await html2canvas(root, {
+            backgroundColor: BASE,
+            scale: Math.min(window.devicePixelRatio || 1, 2),
+            logging: false,
+            useCORS: true,
+            // Capture the visible viewport region of the (possibly scrolled) board.
+            x: window.scrollX,
+            y: window.scrollY,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            windowWidth: document.documentElement.scrollWidth,
+            windowHeight: document.documentElement.scrollHeight,
+          });
+          source =
+            snapshot && snapshot.width > 0 && snapshot.height > 0
+              ? snapshot
+              : makeFallbackTexture();
+        } catch {
+          source = makeFallbackTexture();
+        }
         if (disposed) return;
 
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const tex = new THREE.CanvasTexture(snapshot);
+        const tex = new THREE.CanvasTexture(source);
         tex.colorSpace = THREE.SRGBColorSpace;
         tex.minFilter = THREE.LinearFilter;
         tex.magFilter = THREE.LinearFilter;
@@ -353,6 +392,7 @@ export function HarlequinExit({ onDone }: { onDone: () => void }) {
           rafId = requestAnimationFrame(frame);
         }
         startTime = performance.now();
+        armSelfFailsafe();
         rafId = requestAnimationFrame(frame);
 
         cleanup = () => {
@@ -366,14 +406,15 @@ export function HarlequinExit({ onDone }: { onDone: () => void }) {
           renderer.dispose();
         };
       } catch {
-        // Fail open: the snapshot or WebGL set-up failed; navigate via failsafe.
+        // Genuine WebGL/setup failure (the snapshot itself already has a flat
+        // fallback). Nothing can render — fail OPEN so we still navigate.
         fireOnce();
       }
     })();
 
     return () => {
       disposed = true;
-      clearTimeout(selfTimer);
+      if (selfTimer !== null) clearTimeout(selfTimer);
       cleanup?.();
     };
   }, []);

@@ -130,6 +130,17 @@ export default function DevConsolePage() {
     return () => clearTimeout(id);
   }, [loading]);
 
+  // Warm the exit's heavy deps the moment the board mounts. HarlequinExit lazy-
+  // imports three.js (~708KB) + html2canvas (~194KB); on a cold first exit that
+  // load alone outran the failsafe, so the disintegration never showed. Firing
+  // the SAME dynamic imports here caches them, so by the time the user hits
+  // back/logout the exit can snapshot + animate immediately. These imports stay
+  // out of the homepage bundle — they only run on /dev.
+  useEffect(() => {
+    void import('three');
+    void import('html2canvas');
+  }, []);
+
   // ⌘K (the main-site Iris is suppressed on /dev) opens Cere instead. Ignore
   // Shift so ⌘⇧K stays reserved for the portal twin and doesn't also open Cere.
   useEffect(() => {
