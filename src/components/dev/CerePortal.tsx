@@ -74,7 +74,15 @@ export function CerePortal({ onClick }: { onClick: () => void }) {
       onMouseLeave={() => { setHovered(false); setGlowPos(null); }}
       onMouseMove={handleMouseMove}
       className="relative grid shrink-0 cursor-pointer place-items-center self-stretch overflow-hidden rounded-full border-0 bg-transparent p-0"
-      style={{ transformOrigin: '50% 50%', width: diameter ? `${diameter}px` : undefined }}
+      style={{
+        transformOrigin: '50% 50%',
+        width: diameter ? `${diameter}px` : undefined,
+        // Champagne double-stroke ring on the BUTTON itself — an element's own
+        // box-shadow is NOT clipped by its overflow-hidden (which only clips
+        // children), so the border is actually visible. Matches the home circle.
+        boxShadow:
+          '0 0 0 1.5px rgba(231,226,212,0.6), 0 0 0 3px rgba(6,22,18,0.95), 0 0 0 4.5px rgba(231,226,212,0.22)',
+      }}
     >
       {/* swirl fill (absolute, contained by this relative+overflow-hidden circle) */}
       <CereSwirlCanvas variant={variant} />
@@ -102,33 +110,21 @@ export function CerePortal({ onClick }: { onClick: () => void }) {
           opacity: hovered ? 1 : 0,
           transition: 'opacity 280ms ease-out',
           zIndex: 2,
+          // A radial-gradient BACKGROUND (no filter:blur) clips cleanly to the
+          // circle — a blurred child bleeds past an overflow:hidden border-radius,
+          // which made the highlight appear OUTSIDE the circle. This keeps it inside.
+          background: glowPos
+            ? `radial-gradient(circle 72px at ${glowPos.x}px ${glowPos.y}px, rgba(110,225,185,0.32) 0%, rgba(60,160,140,0.13) 45%, transparent 72%)`
+            : 'none',
         }}
-      >
-        {glowPos && (
-          <span
-            style={{
-              position: 'absolute',
-              width: 120,
-              height: 120,
-              left: glowPos.x,
-              top: glowPos.y,
-              transform: 'translate(-50%, -50%)',
-              background:
-                'radial-gradient(circle, rgba(100,220,180,0.24) 0%, rgba(60,160,140,0.10) 40%, transparent 70%)',
-              filter: 'blur(24px)',
-              pointerEvents: 'none',
-            }}
-          />
-        )}
-      </span>
+      />
 
       {/* champagne double-stroke ring — on top of glow */}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-0 rounded-full"
         style={{
-          boxShadow:
-            '0 0 0 1.5px rgba(231,226,212,0.55), 0 0 0 3px rgba(6,22,18,0.95), 0 0 0 4px rgba(231,226,212,0.18), inset 0 0 28px 8px rgba(0,0,0,0.55)',
+          boxShadow: 'inset 0 0 28px 8px rgba(0,0,0,0.55)',
           zIndex: 3,
         }}
       />
