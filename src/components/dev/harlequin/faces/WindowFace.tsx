@@ -434,13 +434,12 @@ export function WindowFace({ passcode, spin, revealed, onLeave, onReveal }: Face
         /* passcode panel — positioning only; inner-element styles live in PasscodeFields.tsx */
         .passcode-panel {
           position: absolute;
-          left: 50%;
-          bottom: 22%;
-          transform: translateX(-50%);
+          inset: 0;
           z-index: 12;
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: center;
           gap: 8px;
           pointer-events: none;
           opacity: 0;
