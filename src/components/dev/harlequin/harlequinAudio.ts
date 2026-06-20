@@ -40,8 +40,14 @@ function pickRandomAudio(): string {
  * 1:1 (volume 0.18, 600ms fades, gesture arming on first click/keydown/touch).
  */
 export function createHoverAudio() {
+  // `audioEl` is the active track (playing / fading in). `fadingEl` is a track
+  // currently fading out on leave. Keeping them separate — each with its own
+  // timer — means a fast re-hover can't orphan the previous track: start() always
+  // hard-stops whatever is still sounding, so two clips can never overlap.
   let audioEl: HTMLAudioElement | null = null;
-  let audioFadeTimer: ReturnType<typeof setTimeout> | null = null;
+  let fadingEl: HTMLAudioElement | null = null;
+  let fadeInTimer: ReturnType<typeof setTimeout> | null = null;
+  let fadeOutTimer: ReturnType<typeof setTimeout> | null = null;
   let audioGestured = false;
 
   function recordGesture() {
@@ -57,9 +63,27 @@ export function createHoverAudio() {
     document.addEventListener('touchend', recordGesture);
   }
 
+  // Immediately + fully silence an element (no fade), releasing its network use.
+  function hardStop(a: HTMLAudioElement | null) {
+    if (!a) return;
+    try {
+      a.pause();
+    } catch {
+      /* ignore */
+    }
+    a.src = '';
+  }
+
   function start() {
     if (!audioGestured) return; // browser gate: need a prior gesture
-    if (audioEl) return; // already playing
+    // Kill anything still fading out so it can never keep playing under a new clip.
+    if (fadeOutTimer) {
+      clearTimeout(fadeOutTimer);
+      fadeOutTimer = null;
+    }
+    hardStop(fadingEl);
+    fadingEl = null;
+    if (audioEl) return; // active track already playing — don't restart on re-hover
     const url = pickRandomAudio();
     const a = new Audio(url);
     a.volume = 0;
@@ -67,40 +91,55 @@ export function createHoverAudio() {
     audioEl = a;
     a.play()
       .then(() => {
-        // Fade in to target volume.
-        if (audioFadeTimer) clearTimeout(audioFadeTimer);
+        if (audioEl !== a) {
+          // superseded while the clip was loading — make sure it stays silent
+          hardStop(a);
+          return;
+        }
+        if (fadeInTimer) clearTimeout(fadeInTimer);
         const startTime = Date.now();
         function fadeIn() {
-          if (!audioEl || audioEl !== a) return;
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / AUDIO_FADE_MS, 1);
+          if (audioEl !== a) return;
+          const progress = Math.min((Date.now() - startTime) / AUDIO_FADE_MS, 1);
           a.volume = progress * AUDIO_VOLUME;
-          if (progress < 1) audioFadeTimer = setTimeout(fadeIn, 20);
+          if (progress < 1) fadeInTimer = setTimeout(fadeIn, 20);
         }
         fadeIn();
       })
       .catch(() => {
         // Autoplay blocked — clear reference, no error surfaced to the user.
-        audioEl = null;
+        if (audioEl === a) audioEl = null;
       });
   }
 
   function stop() {
+    if (fadeInTimer) {
+      clearTimeout(fadeInTimer);
+      fadeInTimer = null;
+    }
     if (!audioEl) return;
     const a = audioEl;
     audioEl = null;
-    if (audioFadeTimer) clearTimeout(audioFadeTimer);
+    // Hand the active track to `fadingEl` and fade it out; a later start() can
+    // still reach and hard-stop it. Cancel any prior fade-out first.
+    if (fadeOutTimer) {
+      clearTimeout(fadeOutTimer);
+      fadeOutTimer = null;
+    }
+    hardStop(fadingEl);
+    fadingEl = a;
     const startVol = a.volume;
     const startTime = Date.now();
     function fadeOut() {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / AUDIO_FADE_MS, 1);
+      if (fadingEl !== a) return; // superseded — start() already hard-stopped it
+      const progress = Math.min((Date.now() - startTime) / AUDIO_FADE_MS, 1);
       a.volume = startVol * (1 - progress);
       if (progress < 1) {
-        audioFadeTimer = setTimeout(fadeOut, 20);
+        fadeOutTimer = setTimeout(fadeOut, 20);
       } else {
-        a.pause();
-        a.src = ''; // release network resources
+        hardStop(a);
+        fadingEl = null;
+        fadeOutTimer = null;
       }
     }
     fadeOut();
@@ -110,12 +149,12 @@ export function createHoverAudio() {
     document.removeEventListener('click', recordGesture);
     document.removeEventListener('keydown', recordGesture);
     document.removeEventListener('touchend', recordGesture);
-    if (audioFadeTimer) clearTimeout(audioFadeTimer);
-    if (audioEl) {
-      audioEl.pause();
-      audioEl.src = '';
-      audioEl = null;
-    }
+    if (fadeInTimer) clearTimeout(fadeInTimer);
+    if (fadeOutTimer) clearTimeout(fadeOutTimer);
+    hardStop(audioEl);
+    hardStop(fadingEl);
+    audioEl = null;
+    fadingEl = null;
   }
 
   return { arm, start, stop, dispose };

@@ -114,12 +114,13 @@ export function CircleFace({ passcode, spin, revealed, onLeave, onReveal }: Face
           flex-shrink: 0;
           cursor: crosshair;
           outline: none;
-          transition: width 280ms cubic-bezier(0.34, 1.56, 0.64, 1),
-            height 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+          transform-origin: center;
+          transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .circle-portal.hov {
-          width: calc(144px + 12px);
-          height: calc(144px + 12px);
+          /* scale from center (no reflow) so it expands uniformly and never grows
+             the card/row height — same fix as the diamond */
+          transform: scale(1.094);
         }
         .circle-portal:focus-visible {
           box-shadow: 0 0 0 2px rgba(231, 226, 212, 0.6);
