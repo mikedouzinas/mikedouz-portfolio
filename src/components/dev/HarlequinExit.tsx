@@ -9,8 +9,10 @@ import { useEffect, useRef, useState } from 'react';
  * `[data-board-root]`) into a texture, then runs a WebGL dissolve on that exact
  * snapshot: the board's own pixels erode left→right into harlequin DIAMOND ash
  * (green burn front #27b06f cooling to navy #143a6b, a blue rim glint #5aa6e6,
- * red #B3122B flecks where the source is reddish). The page beneath shows
- * through as the field clears, then `onDone` navigates.
+ * red #B3122B flecks where the source is reddish). The board erodes into a
+ * DARK void (#0e0c12) — not into the live board beneath — and that dark cover
+ * is HELD briefly before `onDone` navigates, so the homepage loads from under a
+ * dark screen with no board reflash.
  *
  * This is the "drive off the REAL board, not a mock" requirement: the texture is
  * the live DOM, captured at the instant of leaving.
@@ -33,9 +35,10 @@ import { useEffect, useRef, useState } from 'react';
  */
 
 const DURATION = 1.35; // s — the L→R sweep
+const DARK_HOLD = 0.32; // s — hold the dark cover after the dissolve, before nav
 const REDUCED_MS = 220;
-// Self failsafe past the sweep, armed when the animation actually STARTS.
-const SELF_DONE_MS = (DURATION + 0.4) * 1000;
+// Self failsafe past the sweep + dark hold, armed when the animation STARTS.
+const SELF_DONE_MS = (DURATION + DARK_HOLD + 0.4) * 1000;
 const BASE = '#0e0c12';
 
 const VERT = /* glsl */ `
@@ -175,9 +178,11 @@ export function HarlequinExit({ onDone }: { onDone: () => void }) {
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
 
-  // While the shader runs we paint a dark base behind the canvas so the page
-  // beneath isn't visible until the dissolve reveals it. Reduced motion just
-  // fades this veil.
+  // While the shader runs we paint a dark base behind the canvas. As the
+  // snapshot dissolves, cleared pixels reveal this dark base — so the board
+  // erodes into a dark void (#0e0c12), NOT into the live board beneath. The
+  // dark cover then HOLDS while we navigate, so the homepage loads from under
+  // it with no board reflash. Reduced motion just fades this veil.
   const [reduced, setReduced] = useState(false);
   // Gate the dark base + canvas until the snapshot is captured and the first
   // frame is painted, so the live board never flashes to black before the
@@ -208,6 +213,7 @@ export function HarlequinExit({ onDone }: { onDone: () => void }) {
     // Armed when the animation STARTS (not at mount) so a slow snapshot can't
     // pre-empt the sweep. Falls back to mount-time only if we never get there.
     let selfTimer: ReturnType<typeof setTimeout> | null = null;
+    let holdTimer: ReturnType<typeof setTimeout> | null = null;
     const armSelfFailsafe = () => {
       if (selfTimer === null) selfTimer = setTimeout(fireOnce, SELF_DONE_MS);
     };
@@ -392,8 +398,14 @@ export function HarlequinExit({ onDone }: { onDone: () => void }) {
           }
 
           if (tn >= 1) {
-            canvas!.style.opacity = '0';
-            fireOnce();
+            // The field has fully dissolved to the dark base (#0e0c12) showing
+            // through behind the canvas. Do NOT clear the canvas/cover — that
+            // would reveal the still-mounted live board and cause a reflash.
+            // Instead HOLD the dark cover, then navigate from under it so the
+            // homepage loads beneath a dark screen (no board reflash).
+            if (holdTimer === null) {
+              holdTimer = setTimeout(fireOnce, DARK_HOLD * 1000);
+            }
             return;
           }
           rafId = requestAnimationFrame(frame);
@@ -422,6 +434,7 @@ export function HarlequinExit({ onDone }: { onDone: () => void }) {
     return () => {
       disposed = true;
       if (selfTimer !== null) clearTimeout(selfTimer);
+      if (holdTimer !== null) clearTimeout(holdTimer);
       cleanup?.();
     };
   }, []);
@@ -443,10 +456,11 @@ export function HarlequinExit({ onDone }: { onDone: () => void }) {
 
   return (
     <>
-      {/* Dark base behind the canvas: covers the live board so the dissolving
-          snapshot erodes into the dark void (then we navigate to `/`). Gated on
-          `ready` so the live board never flashes black before the (identical)
-          intact snapshot is painted over it. */}
+      {/* Dark base behind the canvas: the dissolving snapshot erodes into this
+          dark void (#0e0c12) — never revealing the live board — and it stays put
+          through the dark hold + navigate. Gated on `ready` so the live board
+          never flashes black before the (identical) intact snapshot is painted
+          over it. */}
       {ready && (
         <div
           aria-hidden

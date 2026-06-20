@@ -14,25 +14,26 @@ import { useEffect, useRef, useState } from 'react';
  * time. Diamonds are placed in CONNECTED order — a BFS flood-fill from a seed
  * cell with a shuffled frontier — so each new diamond grows off the already-laid
  * cluster along a wandering front. A small rolling set is ever in flight, so the
- * eye follows individual diamonds being set. ~5s deliberate build, then a fast,
- * clean dissolve (green→navy fbm burn) clears the field to reveal the dark board.
+ * eye follows individual diamonds being set. ~2.6s build (total entrance ~3s),
+ * then a smooth ~0.5s FADE-OUT of the whole overlay (cover + diamonds) to reveal
+ * the dark board — a clean fade, not a cut.
  *
  * Tweaks vs. the standalone lockup:
  *   - 56px tile (matches the live HarlequinReveal background exactly: the same
  *     diamond polygon, fill #B3122B, edge #EDE6D6, on #0e0c12) so the build
  *     lands seamlessly on the real /dev background — fewer, bigger diamonds,
  *     even clearer one-at-a-time.
- *   - faster + cleaner reveal: the dissolve is short and eases out hard so the
- *     curtain clears quickly to the board.
+ *   - faster build + a clean fade-out: once the weave is laid, the whole overlay
+ *     (cover + diamonds) fades out smoothly (~0.5s) to reveal the board.
  *
  * three.js is loaded lazily (dynamic import) ONLY here so it never enters the
  * homepage bundle. Reduced motion: mounts nothing, fires onDone immediately.
  */
 
-// Slow & deliberate build, then a fast clean clear.
-const DURATION_ASSEMBLE = 5.0; // s — diamonds knit in one-by-one to full coverage
-const HOLD = 0.18; // s — brief full-coverage beat
-const DURATION_DISSOLVE = 0.62; // s — fast, clean clear to the board
+// Quicker deliberate build, then a smooth fade-out. Total ~3s.
+const DURATION_ASSEMBLE = 2.6; // s — diamonds knit in one-by-one to full coverage
+const HOLD = 0.12; // s — brief full-coverage beat
+const DURATION_FADE = 0.5; // s — smooth fade-out of the whole overlay to the board
 
 // Match the live HarlequinReveal tile exactly.
 const TILE = 56; // px per argyle cell
@@ -159,7 +160,7 @@ const FRAG = /* glsl */ `
 
 export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const coverRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const [hidden, setHidden] = useState(false);
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
@@ -364,14 +365,13 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
       resize();
       window.addEventListener('resize', resize);
 
-      const ease = (t: number) =>
+      // Smooth ease-in-out for the fade-out opacity so it visibly fades, no cut.
+      const easeInOut = (t: number) =>
         t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      // fast clean clear — easeOutQuart so the reveal snaps open then settles.
-      const easeOut = (t: number) => 1 - Math.pow(1 - t, 4);
 
       const T_ASSEMBLE = DURATION_ASSEMBLE;
       const T_HOLD = DURATION_ASSEMBLE + HOLD;
-      const T_END = DURATION_ASSEMBLE + HOLD + DURATION_DISSOLVE;
+      const T_END = DURATION_ASSEMBLE + HOLD + DURATION_FADE;
 
       let startTime = performance.now();
       let rafId = 0;
@@ -380,8 +380,7 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
       function finish() {
         if (finished) return;
         finished = true;
-        canvas!.style.opacity = '0';
-        if (coverRef.current) coverRef.current.style.opacity = '0';
+        if (rootRef.current) rootRef.current.style.opacity = '0';
         setHidden(true);
         onDoneRef.current?.();
       }
@@ -390,24 +389,21 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
         if (disposed || !material) return;
         const t = (now - startTime) / 1000;
         material.uniforms.uTime.value = t;
+        // No shader burn — the reveal is a clean overlay fade-out (below).
+        material.uniforms.uDissolve.value = 0;
 
         if (t <= T_ASSEMBLE) {
           material.uniforms.uProgress.value = Math.min(t / DURATION_ASSEMBLE, 1);
-          material.uniforms.uDissolve.value = 0;
-        } else if (t <= T_HOLD) {
-          material.uniforms.uProgress.value = 1;
-          material.uniforms.uDissolve.value = 0;
         } else {
           material.uniforms.uProgress.value = 1;
-          const dn = Math.min((t - T_HOLD) / DURATION_DISSOLVE, 1);
-          // ease (in-out) into a hard ease-out so the field clears fast & clean.
-          const dv = easeOut(ease(dn));
-          material.uniforms.uDissolve.value = dv;
-          // Clear the opaque cover IN STEP with the WebGL burn so the board is
-          // revealed only here — never visible during the build. Lead slightly
-          // so the burning diamonds read against the board, not the flat cover.
-          if (coverRef.current) {
-            coverRef.current.style.opacity = String(Math.max(0, 1 - dv * 1.25));
+          if (t > T_HOLD) {
+            // Once the weave is fully laid (+ a brief hold), fade the WHOLE
+            // overlay (opaque cover + diamond canvas) out smoothly to reveal the
+            // board beneath. A visible fade, not a cut.
+            const fn = Math.min((t - T_HOLD) / DURATION_FADE, 1);
+            if (rootRef.current) {
+              rootRef.current.style.opacity = String(1 - easeInOut(fn));
+            }
           }
         }
 
@@ -445,16 +441,17 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
 
   return (
     <div
+      ref={rootRef}
       aria-hidden
       className="pointer-events-none fixed inset-0 z-[120]"
+      style={{ willChange: 'opacity' }}
     >
       {/* Instant opaque cover — present on the VERY FIRST paint via plain CSS,
           before three.js loads, so the real board is hidden from frame 1. The
           diamond weave (the transparent WebGL canvas above) knits in on top of
-          this; only at the dissolve does the cover fade out IN STEP with the
-          WebGL burn to reveal the board underneath. */}
+          this; once the weave is laid the WHOLE overlay (this cover + the
+          canvas) fades out smoothly to reveal the board underneath. */}
       <div
-        ref={coverRef}
         className="absolute inset-0"
         style={{ background: '#0e0c12' }}
       />
