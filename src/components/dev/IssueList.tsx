@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { Check, CheckSquare, Copy, Maximize2, Minimize2, Pencil, Square, X } from 'lucide-react';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
@@ -72,6 +72,13 @@ const STATUS_EXPAND: Record<Status | 'done', { bg: string; border: string }> = {
 
 /** Size sort order — largest first, matching "most demanding first" like priority. */
 const SIZE_RANK: Record<Size, number> = { L: 0, M: 1, S: 2 };
+
+// #63 — Morph spring tokens. Expand overshoots slightly (springy/bouncy);
+// collapse is near-critical (decisive, no bounce on the way home).
+const MORPH_SPRING_EXPAND = { type: 'spring', stiffness: 420, damping: 32, mass: 1.1 } as const;
+const MORPH_SPRING_COLLAPSE = { type: 'spring', stiffness: 480, damping: 40 } as const;
+// Reduced-motion fallback: a plain short tween, no overshoot.
+const MORPH_TWEEN_REDUCED = { duration: 0.2, ease: 'easeOut' } as const;
 
 /** Compact markdown for a ticket description — tuned for the dark card, no images/headings sprawl. */
 function IssueBodyMarkdown({ children }: { children: string }) {
@@ -145,6 +152,9 @@ function IssueCard({
   const [placeholderVisible, setPlaceholderVisible] = useState(false);
   // portal target ready (client only) — true only after mount, SSR-safe
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  // #63 — animation controls for the press-in beat on the inline card.
+  const inlineControls = useAnimationControls();
+  const prefersReducedMotion = useReducedMotion();
   const [addText, setAddText] = useState('');
   const [copiedSub, setCopiedSub] = useState<number | null>(null);
   const [editing, setEditing] = useState(false);
@@ -179,8 +189,12 @@ function IssueCard({
     };
   }, [open]);
 
-  function detach() {
-    setPlaceholderVisible(true); // show the placeholder immediately on detach
+  async function detach() {
+    if (!prefersReducedMotion) {
+      // #63 — press-in beat: dip scale + tiny y before the shared-layout morph fires.
+      await inlineControls.start({ scale: 0.96, y: 2, transition: { duration: 0.09, ease: 'easeIn' } });
+    }
+    setPlaceholderVisible(true);
     setOpen(true);
   }
   const collapse = useCallback(() => {
@@ -543,10 +557,7 @@ function IssueCard({
         // PLACEHOLDER — the vacated slot. A dashed champagne outline with a
         // little "Be right back." note + a softly pulsing dot, so the gap reads
         // as intentional ("this ticket stepped out") rather than broken.
-        // Driven by `placeholderVisible` (NOT `open`) so it persists through the
-        // collapse and only vanishes when the card has landed back in its slot.
-        // No z-index: it sits behind the morphing inline card (later in the DOM)
-        // so the card animating home reads clearly on top of the placeholder.
+        // (#64 spotlight-pool treatment was reverted — sent back for a rethink.)
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e7e2d4]/20 bg-white/[0.015] text-center">
           <motion.span
             aria-hidden
@@ -571,6 +582,7 @@ function IssueCard({
           data-suppress-reveal
           data-has-contained-glow="true"
           initial={false}
+          animate={inlineControls}
           onLayoutAnimationComplete={() => {
             // The card finished morphing. If we're collapsed, it has now
             // contracted into its slot — drop the placeholder exactly here.
@@ -581,7 +593,9 @@ function IssueCard({
             backgroundColor: tint.bg,
             borderColor: tint.border,
           }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
+          // #63 — layout transition: spring on collapse (expand is handled by the
+          // detached node's transition since it's the layout-driving node when open).
+          transition={prefersReducedMotion ? MORPH_TWEEN_REDUCED : MORPH_SPRING_COLLAPSE}
           style={{
             backgroundColor: 'rgba(12, 17, 24, 0.52)',
             borderColor: 'rgba(255, 255, 255, 0.10)',
@@ -631,7 +645,10 @@ function IssueCard({
                     backgroundColor: tint.bg,
                     borderColor: tint.border,
                   }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  // #63 — expand spring: slight overshoot gives the "grows up/out past
+                  // target then settles" pop. Collapse spring (near-critical) applied on
+                  // the inline node. Reduced-motion: plain short tween.
+                  transition={prefersReducedMotion ? MORPH_TWEEN_REDUCED : MORPH_SPRING_EXPAND}
                   className="relative z-10 my-auto overflow-y-auto rounded-2xl border shadow-[0_0_80px_40px_rgba(0,0,0,0.45),0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl"
                 >
                   <ContainedMouseGlow color="231, 226, 212" intensity={0.16} size={320} />
