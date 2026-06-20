@@ -554,30 +554,19 @@ function IssueCard({
     // has flown out to the centered panel (rendered in a portal below).
     <div ref={slotRef} className="relative h-32">
       {placeholderVisible && (
-        // #64 — "Center stage." spotlight pool placeholder.
-        // Driven by `placeholderVisible` (NOT `open`) so it persists through the
-        // collapse and only vanishes when the card has landed back in its slot.
-        // No z-index: sits behind the morphing inline card (later in the DOM).
+        // PLACEHOLDER — the vacated slot. A dashed champagne outline with a
+        // little "Be right back." note + a softly pulsing dot, so the gap reads
+        // as intentional ("this ticket stepped out") rather than broken.
+        // (#64 spotlight-pool treatment was reverted — sent back for a rethink.)
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e7e2d4]/20 bg-white/[0.015] text-center">
-          {/* Breathing spotlight pool — champagne radial glow at center. */}
-          <motion.div
+          <motion.span
             aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-xl"
-            style={{
-              background: 'radial-gradient(circle at 50% 50%, rgba(231,226,212,0.10) 0%, transparent 70%)',
-            }}
-            animate={prefersReducedMotion ? undefined : {
-              scale: [0.9, 1.05, 0.9],
-              opacity: [0.7, 1, 0.7],
-            }}
-            transition={{
-              duration: 2.4,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
+            className="h-1.5 w-1.5 rounded-full bg-[#e7e2d4]/50"
+            animate={{ opacity: [0.25, 0.9, 0.25], scale: [0.85, 1.15, 0.85] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <span className="relative text-[11px] italic text-[#e7e2d4]/50">Center stage.</span>
-          <span className="relative text-[10px] text-white/25">
+          <span className="text-[11px] italic text-[#e7e2d4]/45">Be right back.</span>
+          <span className="text-[10px] text-white/25">
             {repoName} #{issue.number}
           </span>
         </div>
