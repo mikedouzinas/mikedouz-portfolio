@@ -323,43 +323,51 @@ export function WindowFace({ passcode, spin, revealed, onLeave, onReveal }: Face
           background-size: cover;
           background-position: center;
           opacity: 0;
-          transition: opacity 1.4s ease;
-          transform: scale(1.06);
+          transition: opacity 1.4s ease, filter 600ms ease;
+          /* Blur the image layer directly so the frost effect is strong at rest
+             regardless of backdrop-filter browser support. Scale is bumped up so
+             blur's soft edge stays within the overflow:hidden glass boundary. */
+          filter: blur(9px);
+          transform: scale(1.16);
           animation: img-breathe 18s ease-in-out infinite;
         }
         .glass-img.active {
           opacity: 1;
         }
+        /* On hover: slightly clearer but still obscured — still reads as frosted. */
+        .win-portal.hov .glass-img {
+          filter: blur(4px);
+        }
         @keyframes img-breathe {
           0% {
-            transform: scale(1.06) translate(0, 0);
+            transform: scale(1.16) translate(0, 0);
           }
           33% {
-            transform: scale(1.08) translate(-6px, -4px);
+            transform: scale(1.18) translate(-6px, -4px);
           }
           66% {
-            transform: scale(1.07) translate(4px, -2px);
+            transform: scale(1.17) translate(4px, -2px);
           }
           100% {
-            transform: scale(1.06) translate(0, 0);
+            transform: scale(1.16) translate(0, 0);
           }
         }
 
-        /* frost layer — blur 8px rest / 3px hover, champagne tint (verbatim) */
+        /* frost layer — additive sheen on top of the blurred image; strengthened tint + blur */
         .glass-frost {
           position: absolute;
           inset: 0;
-          backdrop-filter: blur(8px) saturate(0.85) brightness(0.95);
-          -webkit-backdrop-filter: blur(8px) saturate(0.85) brightness(0.95);
-          background: rgba(237, 228, 205, 0.2);
+          backdrop-filter: blur(14px) saturate(0.85) brightness(0.95);
+          -webkit-backdrop-filter: blur(14px) saturate(0.85) brightness(0.95);
+          background: rgba(237, 228, 205, 0.30);
           transition: backdrop-filter 600ms ease,
             -webkit-backdrop-filter 600ms ease, background 600ms ease;
           z-index: 2;
         }
         .win-portal.hov .glass-frost {
-          backdrop-filter: blur(3px) saturate(0.9) brightness(0.98);
-          -webkit-backdrop-filter: blur(3px) saturate(0.9) brightness(0.98);
-          background: rgba(237, 228, 205, 0.06);
+          backdrop-filter: blur(6px) saturate(0.9) brightness(0.98);
+          -webkit-backdrop-filter: blur(6px) saturate(0.9) brightness(0.98);
+          background: rgba(237, 228, 205, 0.14);
         }
 
         .glass-etch-canvas {
@@ -412,7 +420,7 @@ export function WindowFace({ passcode, spin, revealed, onLeave, onReveal }: Face
           pointer-events: none;
         }
 
-        /* passcode panel — bottom 22% (verbatim from window-frost) */
+        /* passcode panel — positioning only; inner-element styles live in PasscodeFields.tsx */
         .passcode-panel {
           position: absolute;
           left: 50%;
@@ -422,7 +430,7 @@ export function WindowFace({ passcode, spin, revealed, onLeave, onReveal }: Face
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 9px;
+          gap: 8px;
           pointer-events: none;
           opacity: 0;
           transition: opacity 300ms ease;
@@ -432,45 +440,6 @@ export function WindowFace({ passcode, spin, revealed, onLeave, onReveal }: Face
         .passcode-panel.visible {
           opacity: 1;
           pointer-events: all;
-        }
-        .passcode-dots {
-          display: flex;
-          gap: 10px;
-        }
-        .passcode-dot {
-          width: 9px;
-          height: 9px;
-          border-radius: 50%;
-          border: 1px solid rgba(231, 226, 212, 0.55);
-          background: transparent;
-          transition: background 120ms;
-        }
-        .passcode-dot.filled {
-          background: rgba(231, 226, 212, 0.72);
-        }
-        .passcode-input {
-          position: absolute;
-          opacity: 0;
-          width: 1px;
-          height: 1px;
-          pointer-events: all;
-        }
-        .passcode-label {
-          font-size: 7px;
-          letter-spacing: 0.24em;
-          color: rgba(231, 226, 212, 0.4);
-          text-transform: uppercase;
-        }
-        .hq-sr-only {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: -1px;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border: 0;
         }
 
         @media (prefers-reduced-motion: reduce) {
