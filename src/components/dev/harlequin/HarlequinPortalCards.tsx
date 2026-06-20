@@ -1,32 +1,39 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { HarlequinPortalCard } from './HarlequinPortalCard';
 import { HARLEQUIN_SHAPES } from './shapes';
 
 /**
- * Renders THE HARLEQUIN portal as project card(s) in the Projects list.
+ * Renders THE HARLEQUIN portal as ONE project card in the Projects list, showing
+ * a RANDOM shape (circle / diamond / window) per page load.
  *
- * ── STAGE 1 (current): render ALL THREE shapes (circle, diamond, window),
- *    grouped together so Mike can compare them live on the homepage.
- *
- * ── STAGE 2 (seam): swap to ONE random entry per load. The registry is already
- *    ordered and the card is shape-agnostic, so Stage 2 is a one-line change —
- *    replace the map below with the commented pick. Kept here (not in page.tsx)
- *    so the projects list wiring never changes between stages.
- *
- *    // STAGE 2 — render one random shape per page load:
- *    // const [shape] = useState(
- *    //   () => HARLEQUIN_SHAPES[Math.floor(Math.random() * HARLEQUIN_SHAPES.length)],
- *    // );
- *    // return <HarlequinPortalCard shape={shape.id} />;
+ * The random shape MUST be chosen post-mount, never in a useState initializer or
+ * during render: that code runs on the server and the client independently, so a
+ * random pick there produces different shapes → a hydration mismatch (the same
+ * class of bug as the loader's). So: SSR and the first client render agree
+ * (shape index null → a stable default, kept invisible), then the client picks a
+ * random shape and fades it in. The card is always present in the DOM, so the
+ * list layout stays put; only the chosen shape is ever visible.
  */
 export function HarlequinPortalCards() {
-  // STAGE 1 — all three, in registry order.
+  const [shapeIndex, setShapeIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional post-mount randomization to avoid an SSR/client hydration mismatch
+    setShapeIndex(Math.floor(Math.random() * HARLEQUIN_SHAPES.length));
+  }, []);
+
+  const shape = HARLEQUIN_SHAPES[shapeIndex ?? 0];
+
   return (
-    <>
-      {HARLEQUIN_SHAPES.map((shape) => (
-        <HarlequinPortalCard key={shape.id} shape={shape.id} />
-      ))}
-    </>
+    <div
+      style={{
+        opacity: shapeIndex === null ? 0 : 1,
+        transition: 'opacity 220ms ease',
+      }}
+    >
+      <HarlequinPortalCard key={shape.id} shape={shape.id} />
+    </div>
   );
 }
