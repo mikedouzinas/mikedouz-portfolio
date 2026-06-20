@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Limelight, Space_Mono } from 'next/font/google';
 
 // Faces from the approved lockup. Limelight = THE HARLEQUIN wordmark,
-// Space Mono = the "enter code" label and the spin hint.
+// Space Mono = the "enter code" label.
 const limelight = Limelight({ weight: '400', subsets: ['latin'], display: 'swap' });
 const spaceMono = Space_Mono({ weight: '400', subsets: ['latin'], display: 'swap' });
 
@@ -29,8 +29,8 @@ const SPIN_RESET_MS = 1800; // reset if idle > this
  * a circle with the harlequin argyle fill, a double-stroke champagne ring, a
  * centered Limelight "THE HARLEQUIN" wordmark, a hover that GROWS the circle in
  * place (no upward jump) and reveals a cursor-tracking champagne glow, and a
- * SPIN-to-open gesture (~680° clockwise) that fills the progress arc, flickers
- * the Google rainbow, and reveals a passcode panel.
+ * SPIN-to-open gesture (~680° clockwise) that reveals the passcode panel with
+ * no on-screen progress indicator.
  *
  * The only thing changed from the lockup is the open action: entering the
  * passcode submits to the real server auth (`POST /api/dev/auth`) and, on
@@ -51,7 +51,6 @@ export function PortalCircle({
 
   // ── auth / passcode state ──
   const [revealed, setRevealed] = useState(false); // passcode panel visible
-  const [opened, setOpened] = useState(false); // spin completed (arc flicker)
   const [hovered, setHovered] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -59,8 +58,6 @@ export function PortalCircle({
 
   // ── refs to imperative DOM (ported from the lockup's vanilla JS) ──
   const wrapRef = useRef<HTMLDivElement | null>(null);
-  const arcSvgRef = useRef<SVGSVGElement | null>(null);
-  const arcPathRef = useRef<SVGCircleElement | null>(null);
   const glowInnerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -75,9 +72,6 @@ export function PortalCircle({
   const spinResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const openedRef = useRef(false);
 
-  // Arc circumference: 2π·79 (matches the lockup's r=79 on a 162 viewBox).
-  const ARC_CIRC = 2 * Math.PI * 79;
-
   const reveal = useCallback(() => {
     setPassword(''); // never reopen pre-filled (browser/password-manager autofill)
     setError('');
@@ -89,14 +83,11 @@ export function PortalCircle({
   const resetSpinState = useCallback(() => {
     lastAngle.current = null;
     spinAccumulated.current = 0;
-    if (arcPathRef.current) arcPathRef.current.style.strokeDashoffset = String(ARC_CIRC);
-    arcSvgRef.current?.classList.remove('visible');
     if (spinResetTimer.current) clearTimeout(spinResetTimer.current);
-  }, [ARC_CIRC]);
+  }, []);
 
   const resetPortal = useCallback(() => {
     openedRef.current = false;
-    setOpened(false);
     setRevealed(false);
     setPassword('');
     setError('');
@@ -107,11 +98,6 @@ export function PortalCircle({
   const openPortal = useCallback(() => {
     if (openedRef.current) return;
     openedRef.current = true;
-    setOpened(true);
-    arcSvgRef.current?.classList.add('visible');
-    if (arcPathRef.current) arcPathRef.current.style.strokeDashoffset = '0';
-    // hide the arc after the rainbow flicker plays
-    setTimeout(() => arcSvgRef.current?.classList.remove('visible'), 700);
     reveal();
     resetSpinState();
   }, [reveal, resetSpinState]);
@@ -139,12 +125,6 @@ export function PortalCircle({
       }
       lastAngle.current = angle;
 
-      const pct = Math.min(spinAccumulated.current / SPIN_THRESHOLD, 1);
-      if (arcPathRef.current) {
-        arcPathRef.current.style.strokeDashoffset = String(ARC_CIRC * (1 - pct));
-      }
-      if (pct > 0.02) arcSvgRef.current?.classList.add('visible');
-
       if (spinResetTimer.current) clearTimeout(spinResetTimer.current);
       spinResetTimer.current = setTimeout(resetSpinState, SPIN_RESET_MS);
 
@@ -152,7 +132,7 @@ export function PortalCircle({
         openPortal();
       }
     },
-    [ARC_CIRC, openPortal, resetSpinState],
+    [openPortal, resetSpinState],
   );
 
   // cursor-tracking glow + spin detection (lockup's mousemove handler)
@@ -287,7 +267,7 @@ export function PortalCircle({
     <div className={`portal-root flex justify-center ${className}`}>
       <div
         ref={wrapRef}
-        className={`portal-wrap${hovered ? ' hovered' : ''}${opened ? ' opened' : ''}`}
+        className={`portal-wrap${hovered ? ' hovered' : ''}`}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onMouseMove={onMouseMove}
@@ -297,7 +277,7 @@ export function PortalCircle({
         onTouchMove={cancelPress}
         role="button"
         tabIndex={0}
-        aria-label="Enter THE HARLEQUIN — spin to open"
+        aria-label="Enter THE HARLEQUIN"
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -305,9 +285,6 @@ export function PortalCircle({
           }
         }}
       >
-        {/* spin hint — only visible on hover via CSS */}
-        <div className={`spin-hint ${spaceMono.className}`}>spin cursor to open</div>
-
         {/* circle fill + ring */}
         <div className="portal-ring">
           <div className="portal-fill" aria-hidden />
@@ -316,19 +293,6 @@ export function PortalCircle({
             <div ref={glowInnerRef} className="portal-glow-inner" />
           </div>
         </div>
-
-        {/* spin progress arc */}
-        <svg ref={arcSvgRef} className="portal-arc-svg" viewBox="0 0 162 162" aria-hidden>
-          <circle
-            ref={arcPathRef}
-            className="portal-arc-path"
-            cx="81"
-            cy="81"
-            r="79"
-            transform="rotate(-90 81 81)"
-            style={{ strokeDasharray: ARC_CIRC, strokeDashoffset: ARC_CIRC }}
-          />
-        </svg>
 
         {/* ghost wordmark — Harlequin, centered */}
         <div className={`portal-ghost${revealed ? ' hidden' : ''}`} aria-hidden>
@@ -513,47 +477,6 @@ export function PortalCircle({
           opacity: 0;
         }
 
-        /* spin progress arc */
-        .portal-arc-svg {
-          position: absolute;
-          inset: -6px;
-          z-index: 6;
-          pointer-events: none;
-          opacity: 0;
-          transition: opacity 200ms;
-        }
-        .portal-arc-svg.visible {
-          opacity: 1;
-        }
-        .portal-arc-path {
-          fill: none;
-          stroke: #e7e2d4;
-          stroke-width: 1.5;
-          stroke-linecap: round;
-          transition: stroke-dashoffset 0.1s linear;
-        }
-        .portal-wrap.opened .portal-arc-path {
-          animation: rainbow-flicker 0.6s steps(3, end) both;
-        }
-        @keyframes rainbow-flicker {
-          0% {
-            stroke: #4285f4;
-          }
-          25% {
-            stroke: #ea4335;
-          }
-          50% {
-            stroke: #fbbc05;
-          }
-          75% {
-            stroke: #34a853;
-          }
-          100% {
-            stroke: #e7e2d4;
-            opacity: 0;
-          }
-        }
-
         /* passcode entry */
         .passcode-panel {
           position: absolute;
@@ -603,28 +526,6 @@ export function PortalCircle({
           color: rgba(231, 226, 212, 0.35);
           text-transform: uppercase;
           margin-top: 2px;
-        }
-
-        /* spin instruction hint — only on hover */
-        .spin-hint {
-          position: absolute;
-          top: -26px;
-          left: 50%;
-          transform: translateX(-50%);
-          font-size: 7px;
-          letter-spacing: 0.16em;
-          color: rgba(231, 226, 212, 0);
-          white-space: nowrap;
-          text-transform: uppercase;
-          transition: color 400ms ease 600ms;
-          pointer-events: none;
-          z-index: 20;
-        }
-        .portal-wrap.hovered .spin-hint {
-          color: rgba(231, 226, 212, 0.28);
-        }
-        .portal-wrap.opened .spin-hint {
-          color: rgba(231, 226, 212, 0) !important;
         }
 
         .sr-only {
