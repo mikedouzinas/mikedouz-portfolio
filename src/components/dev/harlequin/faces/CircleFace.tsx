@@ -107,8 +107,8 @@ export function CircleFace({ passcode, spin, revealed, onLeave, onReveal }: Face
         /* ── verbatim from card-comparison.html (Option 1 — Circle) ── */
         .circle-portal {
           position: relative;
-          width: 128px;
-          height: 128px;
+          width: 144px;
+          height: 144px;
           display: grid;
           place-items: center;
           flex-shrink: 0;
@@ -118,8 +118,8 @@ export function CircleFace({ passcode, spin, revealed, onLeave, onReveal }: Face
             height 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .circle-portal.hov {
-          width: calc(128px + 12px);
-          height: calc(128px + 12px);
+          width: calc(144px + 12px);
+          height: calc(144px + 12px);
         }
         .circle-portal:focus-visible {
           box-shadow: 0 0 0 2px rgba(231, 226, 212, 0.6);
