@@ -198,7 +198,8 @@
       "Ask Mike Inbox: Contact system where Iris can draft messages on behalf of visitors. Smart contact field auto-detects email vs phone. Honeypot spam detection, rate limiting, rich HTML email notifications via Resend.",
       "Interactive UI: Global mouse glow effects, contained card glows with per-section colors, hover cards with rich previews, dark mode throughout, mobile-responsive with sheet-based navigation.",
       "Production infrastructure: Redis caching (1hr TTL), IP-based rate limiting, Supabase PostgreSQL with RLS, Vercel deployment with cron jobs for Spotify data refresh, pre-computed importance rankings at build time.",
-      "Includes a hidden, password-protected dev console (secret animated portal login with a server-enforced session) featuring a cross-repo GitHub Issues board that auto-discovers Mike's repos and tracks work with priority and status labels, plus one-click export of tasks to Claude Code."
+      "Includes a hidden, password-protected dev console (secret animated portal login with a server-enforced session) featuring a cross-repo GitHub Issues board that auto-discovers Mike's repos and tracks work with priority and status labels, plus one-click export of tasks to Claude Code.",
+      "THE HARLEQUIN Portal (project card): The dev-console entrance now lives in the Projects list as a project card titled \"The Harlequin.\" Three champagne-duotone faces — a harlequin-argyle circle, a rotated argyle diamond, and a frosted-glass shop window — each hide a secret entrance. Spinning the cursor clockwise (~680°) over a face reveals a passcode field that authenticates to the dev console. The window face cycles Mike's personal vibe photos behind frosted glass with canvas-etched gold-leaf \"THE HARLEQUIN\" signage, and plays a soft iTunes preview clip on hover. Built as a reusable shape registry so any face can be rendered or chosen at random."
     ],
     "skills": [
       "api_integration",

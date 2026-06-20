@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CereBlackjack } from './CereBlackjack';
 import { CereWar } from './CereWar';
 
@@ -14,7 +14,15 @@ const GAMES = [
 ] as const;
 
 export function CereGameLoader() {
-  const [game] = useState(() => GAMES[Math.floor(Math.random() * GAMES.length)]);
+  // Pick the game AFTER mount, not in the useState initializer: that initializer
+  // runs on the server and the client independently, so Math.random() yields
+  // different games → hydration mismatch ("Blackjack" vs "War"). Start with a
+  // fixed game so SSR and the first client render agree, then randomize client-side.
+  const [game, setGame] = useState<(typeof GAMES)[number]>(GAMES[0]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional post-mount randomization to avoid an SSR/client hydration mismatch
+    setGame(GAMES[Math.floor(Math.random() * GAMES.length)]);
+  }, []);
   const { name, Comp } = game;
   return (
     <div className="flex flex-col items-center gap-1.5">
