@@ -312,7 +312,6 @@ export function PortalCircle({
         <div className="portal-ring">
           <div className="portal-fill" aria-hidden />
           <div className="portal-veil" aria-hidden />
-          <div className="portal-glint" aria-hidden />
           <div className="portal-glow" aria-hidden>
             <div ref={glowInnerRef} className="portal-glow-inner" />
           </div>
@@ -356,7 +355,7 @@ export function PortalCircle({
             ref={inputRef}
             className="passcode-input"
             type="password"
-            inputMode="numeric"
+            inputMode="text"
             id="dev-portal-code"
             name="dev-portal-code"
             autoComplete="off"
@@ -364,14 +363,14 @@ export function PortalCircle({
             data-lpignore="true"
             data-bwignore="true"
             data-form-type="other"
-            aria-label="Enter 6-digit passcode"
+            aria-label="Enter passcode"
             value={password}
             disabled={busy}
             maxLength={6}
             onChange={(e) => {
-              // Accept only digits, cap at 6
-              const digits = e.target.value.replace(/\D/g, '').slice(0, 6);
-              setPassword(digits);
+              // The real passcode is alphanumeric — accept letters AND numbers, cap at 6.
+              const next = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 6);
+              setPassword(next);
             }}
           />
           <div className={`passcode-label ${spaceMono.className}`}>
@@ -461,23 +460,6 @@ export function PortalCircle({
             rgba(13, 11, 17, 0.88) 100%
           );
           z-index: 2;
-        }
-
-        /* glass glint */
-        .portal-glint {
-          position: absolute;
-          top: 12%;
-          left: 18%;
-          width: 44%;
-          height: 22%;
-          background: linear-gradient(
-            135deg,
-            rgba(231, 226, 212, 0.07) 0%,
-            transparent 100%
-          );
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 3;
         }
 
         /* cursor-tracking glow */
