@@ -239,16 +239,15 @@ export function PortalCircle({
     [],
   );
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!password) return;
+  async function submitPassword(pw: string) {
+    if (!pw || busy) return;
     setBusy(true);
     setError('');
     try {
       const res = await fetch('/api/dev/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password: pw }),
       });
       if (res.ok) {
         window.location.href = '/dev';
@@ -264,8 +263,25 @@ export function PortalCircle({
     }
   }
 
-  // four dots fill for the first chars typed — a discreet length indicator
-  const filledDots = Math.min(password.length, 4);
+  // Enter key / explicit form submit
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    void submitPassword(password);
+  }
+
+  // 6 dots fill as digits are typed — a discreet length indicator
+  const filledDots = Math.min(password.length, 6);
+
+  // Auto-submit when the 6th digit lands (post-render, state is committed).
+  // `submitPassword` is a plain function declaration — recreated every render —
+  // so listing it as a dep would create an infinite loop (submit → setPassword('')
+  // → re-render → new fn ref → effect re-runs). Intentionally narrow dep array.
+  useEffect(() => {
+    if (password.length === 6) {
+      void submitPassword(password);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [password]); // intentionally omit submitPassword — see comment above
 
   return (
     <div className={`portal-root flex justify-center ${className}`}>
@@ -332,7 +348,7 @@ export function PortalCircle({
           onClick={() => revealed && inputRef.current?.focus()}
         >
           <div className="passcode-dots" aria-hidden>
-            {[0, 1, 2, 3].map((i) => (
+            {[0, 1, 2, 3, 4, 5].map((i) => (
               <div key={i} className={`passcode-dot${i < filledDots ? ' filled' : ''}`} />
             ))}
           </div>
@@ -340,6 +356,7 @@ export function PortalCircle({
             ref={inputRef}
             className="passcode-input"
             type="password"
+            inputMode="numeric"
             id="dev-portal-code"
             name="dev-portal-code"
             autoComplete="off"
@@ -347,10 +364,15 @@ export function PortalCircle({
             data-lpignore="true"
             data-bwignore="true"
             data-form-type="other"
-            aria-label="Enter passcode"
+            aria-label="Enter 6-digit passcode"
             value={password}
             disabled={busy}
-            onChange={(e) => setPassword(e.target.value)}
+            maxLength={6}
+            onChange={(e) => {
+              // Accept only digits, cap at 6
+              const digits = e.target.value.replace(/\D/g, '').slice(0, 6);
+              setPassword(digits);
+            }}
           />
           <div className={`passcode-label ${spaceMono.className}`}>
             {error ? error : 'enter code'}
