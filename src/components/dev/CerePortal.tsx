@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Playfair_Display } from 'next/font/google';
 import { CereSwirlCanvas } from './CereSwirlCanvas';
@@ -9,73 +8,76 @@ import { CereSwirlCanvas } from './CereSwirlCanvas';
 const playfair = Playfair_Display({ weight: '500', subsets: ['latin'], display: 'swap' });
 
 /**
- * The Cere trigger — the /dev header's tall right-rail element. A green/navy
- * swirl (CereSwirlCanvas) fills a tall rounded pill spanning both header rows,
- * behind a champagne double-stroke ring, a depth veil, and the centered
+ * The Cere trigger — the /dev header's tall right-rail element. A circle whose
+ * diameter equals the two-row header height (via `aspect-ratio: 1 / 1` +
+ * `align-self: stretch`). A green/navy swirl (CereSwirlCanvas) fills the
+ * circle behind a champagne double-stroke ring, a depth veil, and the centered
  * non-italic "Cere" wordmark.
  *
- * Hover: spring bounce that grows the pill in-place — matching PortalCircle's
- * cubic-bezier(0.34, 1.56, 0.64, 1) character via Framer Motion's spring.
+ * Layout: the parent `<div class="flex items-stretch gap-4">` gives this button
+ * its height. `aspect-ratio: 1 / 1` makes width equal height automatically,
+ * yielding a true circle. `flex-shrink: 0` and NO flex-grow prevent it from
+ * taking up bar width.
+ *
+ * Hover: Framer `whileHover={{ scale }}` spring on transform only — no
+ * width/height animation, so there's zero layout thrash or glitch.
  * No ContainedMouseGlow, no spin gesture. onClick opens the Cere panel.
  */
 export function CerePortal({ onClick }: { onClick: () => void }) {
-  const [hovered, setHovered] = useState(false);
-
   return (
     <motion.button
       type="button"
       onClick={onClick}
       aria-label="Open Cere"
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-      animate={hovered ? { scale: 1.055 } : { scale: 1 }}
+      whileHover={{ scale: 1.06 }}
+      whileTap={{ scale: 0.97 }}
       transition={{
         type: 'spring',
         stiffness: 260,
         damping: 18,
         mass: 0.8,
       }}
-      whileTap={{ scale: 0.97 }}
-      className={`cere-portal-tall ${playfair.className}`}
+      className={`cere-portal-circle ${playfair.className}`}
       style={{ originX: '50%', originY: '50%' }}
     >
-      {/* swirl fill */}
-      <span className="cere-tall-ring" aria-hidden>
+      {/* swirl fill + double-stroke ring */}
+      <span className="cere-ring" aria-hidden>
         <CereSwirlCanvas />
-        <span className="cere-tall-veil" aria-hidden />
+        <span className="cere-veil" aria-hidden />
       </span>
 
       {/* wordmark */}
-      <span className={`cere-tall-mark ${playfair.className}`} aria-hidden>
+      <span className={`cere-mark ${playfair.className}`} aria-hidden>
         Cere
       </span>
 
       <style jsx>{`
-        .cere-portal-tall {
+        .cere-portal-circle {
+          /* Circle sizing: stretch to the flex row height, aspect-ratio keeps
+             width == height so it's always a perfect circle.            */
+          align-self: stretch;
+          aspect-ratio: 1 / 1;
+          flex-shrink: 0;
+          /* NO flex-grow — must not fill the bar */
           position: relative;
-          /* width is fixed; height is set to 100% so it stretches with the parent */
-          width: 64px;
-          height: 100%;
-          min-height: 56px;
           display: grid;
           place-items: center;
-          border-radius: 18px;
+          border-radius: 9999px;
           border: none;
           background: none;
           padding: 0;
           cursor: pointer;
-          /* filter glow on hover handled inline via filter style below */
           filter: drop-shadow(0 0 0px rgba(60, 168, 120, 0));
           transition: filter 220ms ease;
-          flex-shrink: 0;
+          /* transform-origin is set via Framer style prop above */
         }
-        .cere-portal-tall:hover {
-          filter: drop-shadow(0 0 12px rgba(60, 168, 120, 0.5));
+        .cere-portal-circle:hover {
+          filter: drop-shadow(0 0 14px rgba(60, 168, 120, 0.5));
         }
-        .cere-tall-ring {
+        .cere-ring {
           position: absolute;
           inset: 0;
-          border-radius: 18px;
+          border-radius: 9999px;
           overflow: hidden;
           background-color: #061612;
           box-shadow:
@@ -84,10 +86,10 @@ export function CerePortal({ onClick }: { onClick: () => void }) {
             0 0 0 4px rgba(231, 226, 212, 0.18),
             inset 0 0 28px 8px rgba(0, 0, 0, 0.55);
         }
-        .cere-tall-veil {
+        .cere-veil {
           position: absolute;
           inset: 0;
-          border-radius: 18px;
+          border-radius: 9999px;
           background: radial-gradient(
             ellipse at 50% 45%,
             transparent 0%,
@@ -96,7 +98,7 @@ export function CerePortal({ onClick }: { onClick: () => void }) {
           );
           z-index: 2;
         }
-        .cere-tall-mark {
+        .cere-mark {
           position: relative;
           z-index: 3;
           font-size: 13px;

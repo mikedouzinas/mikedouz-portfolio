@@ -8,6 +8,11 @@ import { useEffect, useRef } from 'react';
  * (`drawCereSwirl` / `startCereSwirl`): soft gradient blobs that drift over time
  * plus faint green arc streaks. Used by the portal's Cere mode and by the
  * top-right Cere trigger on /dev.
+ *
+ * Canvas sizing: a ResizeObserver keeps canvas.width/height in sync with the
+ * element's real rendered pixel size (devicePixelRatio-adjusted) so the swirl
+ * fills the circle at any size and always animates — the rAF loop reads the
+ * live canvas dimensions each frame.
  */
 export function CereSwirlCanvas({ className = '' }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -24,11 +29,29 @@ export function CereSwirlCanvas({ className = '' }: { className?: string }) {
 
     let t = 0;
     let animId = 0;
+    let running = true;
+
+    /** Resize canvas backing store to match real rendered size × dpr. */
+    function syncSize() {
+      const dpr = window.devicePixelRatio ?? 1;
+      const rect = canvas!.getBoundingClientRect();
+      const w = Math.round(rect.width * dpr);
+      const h = Math.round(rect.height * dpr);
+      if (w > 0 && h > 0 && (canvas!.width !== w || canvas!.height !== h)) {
+        canvas!.width = w;
+        canvas!.height = h;
+        ctx!.scale(dpr, dpr);
+      }
+    }
 
     function drawCereSwirl(time: number) {
       if (!ctx) return;
-      const w = canvas!.width;
-      const h = canvas!.height;
+      // Use the CSS pixel size (undone from dpr) for coordinate calculations.
+      const dpr = window.devicePixelRatio ?? 1;
+      const w = canvas!.width / dpr;
+      const h = canvas!.height / dpr;
+      if (w <= 0 || h <= 0) return;
+
       // Dark base
       ctx.fillStyle = '#061612';
       ctx.fillRect(0, 0, w, h);
@@ -62,40 +85,56 @@ export function CereSwirlCanvas({ className = '' }: { className?: string }) {
       ctx.lineWidth = 0.8;
       for (let i = 0; i < 6; i++) {
         const ang = time * 0.08 + i * ((Math.PI * 2) / 6);
-        const cx2 = w / 2 + 60 * Math.cos(ang);
-        const cy2 = h / 2 + 60 * Math.sin(ang);
+        const cx2 = w / 2 + Math.min(w, h) * 0.27 * Math.cos(ang);
+        const cy2 = h / 2 + Math.min(w, h) * 0.27 * Math.sin(ang);
         ctx.beginPath();
-        ctx.arc(cx2, cy2, 30 + i * 8, ang, ang + Math.PI * 0.9);
+        ctx.arc(cx2, cy2, Math.min(w, h) * 0.14 + i * 3, ang, ang + Math.PI * 0.9);
         ctx.stroke();
       }
       ctx.restore();
     }
+
+    // Sync canvas size on mount and whenever the element resizes.
+    syncSize();
 
     if (reduce) {
       drawCereSwirl(0);
       return;
     }
 
+    // ResizeObserver keeps the canvas backing store matched to rendered size.
+    const ro = new ResizeObserver(() => {
+      syncSize();
+    });
+    ro.observe(canvas);
+
     function tick() {
+      if (!running) return;
       t += 0.012;
       drawCereSwirl(t);
       animId = requestAnimationFrame(tick);
     }
-    tick();
+    animId = requestAnimationFrame(tick);
 
     return () => {
+      running = false;
       if (animId) cancelAnimationFrame(animId);
+      ro.disconnect();
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      width={200}
-      height={200}
       aria-hidden
       className={className}
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', borderRadius: '50%' }}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        display: 'block',
+      }}
     />
   );
 }
