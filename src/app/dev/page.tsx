@@ -11,6 +11,9 @@ import { CerePortal } from '@/components/dev/CerePortal';
 import { CerePanel } from '@/components/dev/CerePanel';
 import { CereGameLoader } from '@/components/dev/CereGameLoader';
 import { HarlequinReveal } from '@/components/dev/HarlequinReveal';
+import { HarlequinEntrance } from '@/components/dev/HarlequinEntrance';
+import { HarlequinExit } from '@/components/dev/HarlequinExit';
+import { useHarlequinExit } from '@/components/dev/useHarlequinExit';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
 
@@ -34,6 +37,9 @@ export default function DevConsolePage() {
   const [groupBy, setGroupBy] = useState<GroupBy>('status');
   const [sort, setSort] = useState<SortBy>('priority');
   const [composerOpen, setComposerOpen] = useState(false);
+  // Shared diamond-ash exit for both the back-diamond (session kept) and logout
+  // (session ended). Snapshots the real board, disintegrates it, navigates to /.
+  const { exiting, start: startExit, navigate: exitNavigate } = useHarlequinExit();
 
   const loadRepos = useCallback(async () => {
     const res = await fetch('/api/dev/repos');
@@ -157,16 +163,26 @@ export default function DevConsolePage() {
     await loadIssues();
   }
 
-  async function logout() {
+  function logout() {
     setLoggingOut(true);
-    await fetch('/api/dev/auth', { method: 'DELETE' });
-    window.location.href = '/';
+    // Play the diamond-ash exit while the session-ending DELETE runs in
+    // parallel. The shared hook navigates to `/` when the animation finishes (or
+    // its failsafe trips), so the session is always ended before we leave.
+    void startExit(async () => {
+      await fetch('/api/dev/auth', { method: 'DELETE' });
+    });
   }
 
   const openCount = issues.filter((i) => i.state === 'open').length;
 
   return (
-    <div className="min-h-screen dev-workpad text-white">
+    <div data-board-root className="min-h-screen dev-workpad text-white">
+      {/* Magician's reveal INTO the board — knits the argyle one diamond at a
+          time on mount, then dissolves to reveal the real board, and unmounts. */}
+      <HarlequinEntrance />
+      {/* Diamond-ash disintegration OUT — snapshots the real board and erodes it
+          L→R, then navigates to /. Mounts only while leaving. */}
+      {exiting && <HarlequinExit onDone={exitNavigate} />}
       <HarlequinReveal />
       <header
         data-suppress-reveal
@@ -187,7 +203,7 @@ export default function DevConsolePage() {
             <div className="flex flex-1 flex-col gap-3 min-w-0">
               {/* Row 1: title left, group-by right */}
               <div className="flex items-center justify-between gap-4">
-                <HarlequinTitle />
+                <HarlequinTitle onBack={() => void startExit()} />
                 <div className="hidden md:block">
                   <GroupByToggle value={groupBy} onChange={setGroupBy} />
                 </div>
