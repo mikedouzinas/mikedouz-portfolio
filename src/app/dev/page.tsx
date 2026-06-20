@@ -176,35 +176,48 @@ export default function DevConsolePage() {
         {/* Contained champagne light within the header bar (self-clips). */}
         <ContainedMouseGlow color="231, 226, 212" intensity={0.12} size={260} />
         <div className="relative z-10 mx-auto max-w-6xl px-6 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <HarlequinTitle />
-            <div className="flex items-center gap-3">
-              <div className="hidden md:block">
-                <GroupByToggle value={groupBy} onChange={setGroupBy} />
+          {/*
+            Header layout: left column holds both control rows; CerePortal is a
+            tall right sibling. `items-stretch` makes CerePortal fill the full
+            height of the left column — spanning from the group-by row top all
+            the way down to the gear icon row bottom.
+          */}
+          <div className="flex items-stretch gap-4">
+            {/* ── left column: title + controls ── */}
+            <div className="flex flex-1 flex-col gap-3 min-w-0">
+              {/* Row 1: title left, group-by right */}
+              <div className="flex items-center justify-between gap-4">
+                <HarlequinTitle />
+                <div className="hidden md:block">
+                  <GroupByToggle value={groupBy} onChange={setGroupBy} />
+                </div>
               </div>
-              <CerePortal onClick={() => setComposerOpen(true)} />
-            </div>
-          </div>
 
-          <div className="mt-3 flex items-center justify-between gap-3">
-            <RepoChips repos={repos} selected={selected} onSelect={setSelected} />
-            <div className="flex shrink-0 items-center gap-2">
-              <div className="md:hidden">
-                <GroupByToggle value={groupBy} onChange={setGroupBy} />
+              {/* Row 2: repo chips left, sort + gear right */}
+              <div className="flex items-center justify-between gap-3">
+                <RepoChips repos={repos} selected={selected} onSelect={setSelected} />
+                <div className="flex shrink-0 items-center gap-2">
+                  <div className="md:hidden">
+                    <GroupByToggle value={groupBy} onChange={setGroupBy} />
+                  </div>
+                  <Dropdown
+                    ariaLabel="Sort"
+                    value={sort}
+                    options={SORT_OPTS}
+                    onChange={(v) => setSort(v as SortBy)}
+                  />
+                  <GearMenu
+                    onManage={() => setManaging((m) => !m)}
+                    onInbox={() => { window.location.href = '/admin/inbox'; }}
+                    onLogout={logout}
+                    loggingOut={loggingOut}
+                  />
+                </div>
               </div>
-              <Dropdown
-                ariaLabel="Sort"
-                value={sort}
-                options={SORT_OPTS}
-                onChange={(v) => setSort(v as SortBy)}
-              />
-              <GearMenu
-                onManage={() => setManaging((m) => !m)}
-                onInbox={() => { window.location.href = '/admin/inbox'; }}
-                onLogout={logout}
-                loggingOut={loggingOut}
-              />
             </div>
+
+            {/* ── right: tall Cere trigger spanning both rows ── */}
+            <CerePortal onClick={() => setComposerOpen(true)} />
           </div>
 
           {managing && repos.length > 0 && (
