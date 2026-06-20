@@ -172,11 +172,11 @@ export function CereSwirlCanvas({
     ro.observe(canvas);
 
     // ── Animation loop ──────────────────────────────────────────────────────
-    // Time increment 0.009 — clearly moving but graceful (0.005 read as static;
-    // the lockup uses 0.012). A visible, slow drift.
+    // Time increment 0.025 — constantly, clearly moving (Mike wanted it noticeably
+    // fast; 0.009 was still too subtle).
     function tick() {
       if (!running) return;
-      t += 0.009;
+      t += 0.025;
       drawCereSwirl(t);
       animId = requestAnimationFrame(tick);
     }
