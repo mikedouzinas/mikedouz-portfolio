@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Playfair_Display } from 'next/font/google';
-import { CereSwirlCanvas } from './CereSwirlCanvas';
+import { CereSwirlCanvas, type CereSwirlVariant } from './CereSwirlCanvas';
 
 // The Cere wordmark face from the approved lockup (non-italic Playfair Display).
 const playfair = Playfair_Display({ weight: '500', subsets: ['latin'], display: 'swap' });
@@ -22,7 +22,12 @@ const playfair = Playfair_Display({ weight: '500', subsets: ['latin'], display: 
  * full-page width. `relative` here keeps the swirl/ring/veil contained.
  *
  * Hover: Framer `whileHover` spring on transform only — no width/height
- * animation, so zero layout thrash. No glow, no spin. onClick opens Cere.
+ * animation, so zero layout thrash. Cursor position is tracked inside the circle
+ * and drives a teal radial glow that fades in (opacity 0→1) on mouseenter —
+ * matching the lockup's `.cere-mode .portal-glow-inner` behavior. onClick opens Cere.
+ *
+ * Swirl variant: one of three color moods (0=Forest Deep, 1=Teal Drift,
+ * 2=Midnight Moss) is chosen once at random per page load for visual variety.
  */
 export function CerePortal({ onClick }: { onClick: () => void }) {
   const ref = useRef<HTMLButtonElement | null>(null);
@@ -30,6 +35,19 @@ export function CerePortal({ onClick }: { onClick: () => void }) {
   // to content-based width in a flex row, so measure the height and set width to
   // match. setState only inside the ResizeObserver callback (external signal).
   const [diameter, setDiameter] = useState<number | null>(null);
+
+  // Hover state — drives inside glow opacity.
+  const [hovered, setHovered] = useState(false);
+
+  // Cursor position relative to the button, for glow tracking.
+  const [glowPos, setGlowPos] = useState<{ x: number; y: number } | null>(null);
+
+  // Random swirl variant chosen once per page load (lives in state so it's
+  // stable across re-renders but varies session-to-session for visual variety).
+  const [variant] = useState<CereSwirlVariant>(
+    () => (Math.floor(Math.random() * 3) as CereSwirlVariant),
+  );
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -37,6 +55,11 @@ export function CerePortal({ onClick }: { onClick: () => void }) {
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  function handleMouseMove(e: React.MouseEvent<HTMLButtonElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setGlowPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  }
 
   return (
     <motion.button
@@ -47,42 +70,80 @@ export function CerePortal({ onClick }: { onClick: () => void }) {
       whileHover={{ scale: 1.06 }}
       whileTap={{ scale: 0.97 }}
       transition={{ type: 'spring', stiffness: 260, damping: 18, mass: 0.8 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => { setHovered(false); setGlowPos(null); }}
+      onMouseMove={handleMouseMove}
       className="relative grid shrink-0 cursor-pointer place-items-center self-stretch overflow-hidden rounded-full border-0 bg-transparent p-0"
       style={{ transformOrigin: '50% 50%', width: diameter ? `${diameter}px` : undefined }}
     >
       {/* swirl fill (absolute, contained by this relative+overflow-hidden circle) */}
-      <CereSwirlCanvas />
+      <CereSwirlCanvas variant={variant} />
 
-      {/* champagne double-stroke ring */}
+      {/* depth veil — matches lockup's .cere-mode .portal-veil */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-full"
+        style={{
+          background:
+            'radial-gradient(circle at 50% 45%, transparent 0%, rgba(6,22,18,0.45) 52%, rgba(6,22,18,0.85) 100%)',
+          zIndex: 1,
+        }}
+      />
+
+      {/*
+       * Cursor-tracking inside glow — matches lockup's .portal-glow + .cere-mode .portal-glow-inner.
+       * Clipped to the circle by parent overflow-hidden. Fades opacity 0→1 on hover.
+       * The radial spot follows the mouse within the circle.
+       */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-full"
+        style={{
+          opacity: hovered ? 1 : 0,
+          transition: 'opacity 280ms ease-out',
+          zIndex: 2,
+        }}
+      >
+        {glowPos && (
+          <span
+            style={{
+              position: 'absolute',
+              width: 120,
+              height: 120,
+              left: glowPos.x,
+              top: glowPos.y,
+              transform: 'translate(-50%, -50%)',
+              background:
+                'radial-gradient(circle, rgba(100,220,180,0.24) 0%, rgba(60,160,140,0.10) 40%, transparent 70%)',
+              filter: 'blur(24px)',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+      </span>
+
+      {/* champagne double-stroke ring — on top of glow */}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-0 rounded-full"
         style={{
           boxShadow:
             '0 0 0 1.5px rgba(231,226,212,0.55), 0 0 0 3px rgba(6,22,18,0.95), 0 0 0 4px rgba(231,226,212,0.18), inset 0 0 28px 8px rgba(0,0,0,0.55)',
-        }}
-      />
-
-      {/* depth veil */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-full"
-        style={{
-          background:
-            'radial-gradient(ellipse at 50% 45%, transparent 0%, rgba(6,22,18,0.38) 52%, rgba(6,22,18,0.78) 100%)',
+          zIndex: 3,
         }}
       />
 
       {/* wordmark */}
       <span
         aria-hidden
-        className={`relative z-[3] leading-none ${playfair.className}`}
+        className={`relative leading-none ${playfair.className}`}
         style={{
           fontSize: 13,
           letterSpacing: '0.05em',
           color: 'rgba(180,230,210,0.9)',
           textShadow: '0 0 10px rgba(80,200,160,0.25)',
           userSelect: 'none',
+          zIndex: 4,
         }}
       >
         Cere
