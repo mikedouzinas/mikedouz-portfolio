@@ -14,7 +14,7 @@ import DeepModeBorder from '@/components/DeepModeBorder';
 import ExpandableSection from '@/components/ExpandableSection';
 import InProgressSection from '@/components/InProgressSection';
 import WebBanner from '@/components/WebBanner';
-import { PortalCircle } from '@/components/dev/PortalCircle';
+import { HarlequinPortalCards } from '@/components/dev/harlequin/HarlequinPortalCards';
 import { workExperiences, projects, blogs } from '@/data/loaders';
 
 /**
@@ -42,9 +42,17 @@ function HomeContent() {
     <ExperienceCard key={exp.id} item={exp} />
   ));
 
-  const projectCards = projects.map((proj) => (
-    <ProjectCard key={proj.id} project={proj} />
-  ));
+  // Project cards, with THE HARLEQUIN portal card(s) injected between the
+  // "euros-predictor" and "momentum" projects (their order in @/data/loaders).
+  // HarlequinPortalCards renders all three shapes in Stage 1; flip to one random
+  // in Stage 2 (seam documented inside that component).
+  const projectCards: React.ReactNode[] = [];
+  projects.forEach((proj) => {
+    projectCards.push(<ProjectCard key={proj.id} project={proj} />);
+    if (proj.id === 'proj_euros') {
+      projectCards.push(<HarlequinPortalCards key="harlequin-portal" />);
+    }
+  });
 
   // Group blogs: The Web umbrella + its posts render as one composite card.
   // External blogs (e.g., Rice Discovery) render as standalone BlogCards.
@@ -213,10 +221,9 @@ function HomeContent() {
             <InProgressSection section="blueprints" title="Blueprints" visible={deepMode} />
           </section>
 
-          {/* Secret HARLEQUIN portal — always at the bottom of main */}
-          <div className="!mt-2 md:!mt-4 flex justify-center">
-            <PortalCircle size="md" />
-          </div>
+          {/* THE HARLEQUIN portal now lives in the Projects list (above) as a
+              project card. The bottom <PortalCircle /> was removed; ⌘⇧K remains
+              the global fallback (wired in HarlequinPortalCard). */}
         </main>
       </div>
 
