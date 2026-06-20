@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import SidebarHome from './sidebar_content';
 import About from './about/about_section';
 import ExperienceCard from './work_experience/experience_card';
@@ -17,15 +17,6 @@ import WebBanner from '@/components/WebBanner';
 import { PortalCircle } from '@/components/dev/PortalCircle';
 import { workExperiences, projects, blogs } from '@/data/loaders';
 
-// Slots for the random single placement of the secret portal circle:
-//   0 = Slot A (below the page content, mobile + desktop)
-//   1 = Slot B (inline with the desktop-only social icons in the sidebar)
-//   2 = Slot C (below the desktop Media cards)
-const PORTAL_SLOT_A = 0;
-const PORTAL_SLOT_B = 1;
-const PORTAL_SLOT_C = 2;
-
-
 /**
  * Inner component that consumes DeepModeContext.
  * Separated from Home so useDeepMode() is called inside DeepModeProvider.
@@ -34,27 +25,6 @@ function HomeContent() {
   const mainRef = useRef<HTMLDivElement>(null);
   const [aboutSheetOpen, setAboutSheetOpen] = useState(false);
   const { deepMode, toggleDeepMode } = useDeepMode();
-
-  // The secret portal circle appears in exactly ONE random slot per page load.
-  // Picked post-mount (null on the server) so SSR and client agree — no hydration mismatch.
-  const [portalSlot, setPortalSlot] = useState<number | null>(null);
-  // Slot B lives in the desktop-only sidebar; on mobile, fall back to Slot A so
-  // the circle always renders somewhere.
-  const [isDesktop, setIsDesktop] = useState(true);
-  useEffect(() => {
-    // Deliberate post-mount one-time random pick — a two-phase render to avoid an
-    // SSR/client hydration mismatch from Math.random(); not derived render state.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPortalSlot(Math.floor(Math.random() * 3));
-    const mq = window.matchMedia('(min-width: 768px)');
-    const update = () => setIsDesktop(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-  const showSlotA = portalSlot === PORTAL_SLOT_A || (portalSlot === PORTAL_SLOT_B && !isDesktop);
-  const showSlotB = portalSlot === PORTAL_SLOT_B && isDesktop;
-  const showSlotC = portalSlot === PORTAL_SLOT_C;
 
   const handleSidebarWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (mainRef.current) {
@@ -106,7 +76,7 @@ function HomeContent() {
 
       <div className="flex">
         <aside onWheel={handleSidebarWheel} className="hidden md:block fixed inset-y-0 left-0 w-1/3">
-          <SidebarHome scrollToTop={scrollToTop} showPortal={showSlotB} />
+          <SidebarHome scrollToTop={scrollToTop} />
         </aside>
 
         <main ref={mainRef} className="ml-0 md:ml-[33.3333%] w-full px-4 md:px-8 pt-1 md:pt-8 pb-20 overflow-y-auto md:h-screen space-y-6 md:space-y-32">
@@ -225,12 +195,6 @@ function HomeContent() {
               <div className="hidden md:block">
                 <div className="max-w-3xl mx-auto space-y-6">
                   {mediaItems}
-                  {/* Slot C — secret HARLEQUIN portal below the desktop Media cards */}
-                  {showSlotC && (
-                    <div className="pt-4">
-                      <PortalCircle size="md" />
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -249,12 +213,10 @@ function HomeContent() {
             <InProgressSection section="blueprints" title="Blueprints" visible={deepMode} />
           </section>
 
-          {/* Slot A — secret HARLEQUIN portal as the last item in the list */}
-          {showSlotA && (
-            <div className="!mt-2 md:!mt-4 flex justify-center">
-              <PortalCircle size="md" />
-            </div>
-          )}
+          {/* Secret HARLEQUIN portal — always at the bottom of main */}
+          <div className="!mt-2 md:!mt-4 flex justify-center">
+            <PortalCircle size="md" />
+          </div>
         </main>
       </div>
 
