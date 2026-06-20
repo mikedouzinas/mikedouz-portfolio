@@ -174,14 +174,19 @@ export default function DevConsolePage() {
     await loadIssues();
   }
 
-  function logout() {
+  async function logout() {
     setLoggingOut(true);
-    // Play the diamond-ash exit while the session-ending DELETE runs in
-    // parallel. The shared hook navigates to `/` when the animation finishes (or
-    // its failsafe trips), so the session is always ended before we leave.
-    void startExit(async () => {
+    // Clear the session FIRST and await it, so the cookie is definitely gone
+    // before we leave. Running it in parallel with the exit animation raced the
+    // navigate — the page could reload to `/` before the DELETE's Set-Cookie
+    // applied, leaving the session intact (you'd still be "logged in", so /dev
+    // re-opened without a passcode). Clear, THEN play the exit → navigate.
+    try {
       await fetch('/api/dev/auth', { method: 'DELETE' });
-    });
+    } catch {
+      /* leave anyway — being unable to reach the endpoint shouldn't trap you */
+    }
+    void startExit();
   }
 
   const openCount = issues.filter((i) => i.state === 'open').length;
