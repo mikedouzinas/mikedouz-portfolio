@@ -257,6 +257,13 @@ export function HarlequinExit({ onDone }: { onDone: () => void }) {
             height: window.innerHeight,
             windowWidth: document.documentElement.scrollWidth,
             windowHeight: document.documentElement.scrollHeight,
+            // Skip ALL <canvas> elements. html2canvas calls getContext('2d') on
+            // every canvas it renders — including our OWN WebGL exit canvas,
+            // which lives inside [data-board-root] — which poisons it with a 2D
+            // context so THREE.WebGLRenderer then fails ("Canvas has an existing
+            // context of a different type"). WebGL canvases (Cere swirl, etc.)
+            // don't render usefully in html2canvas anyway.
+            ignoreElements: (el: Element) => el.tagName === 'CANVAS',
           });
           source =
             snapshot && snapshot.width > 0 && snapshot.height > 0
