@@ -23,6 +23,17 @@ const EMPTY: CereState = {
   error: null,
 };
 
+/** Best-effort extraction of a server error message from a failed response. */
+async function readError(res: Response): Promise<string> {
+  try {
+    const data = (await res.json()) as { error?: unknown };
+    if (typeof data?.error === 'string' && data.error) return data.error;
+  } catch {
+    // non-JSON body; fall through to the status
+  }
+  return `HTTP ${res.status}`;
+}
+
 function summarize(actions: CereAction[]): string {
   const creates = actions.filter((a) => a.kind === 'create').length;
   const updates = actions.length - creates;
@@ -79,13 +90,20 @@ export function useCere(
         throw new Error(e?.error || 'Cere hit a problem. Try again.');
       }
       const data = (await res.json()) as { reply: string; actions: CereAction[]; warnings: string[] };
-      const reply = data.reply || (data.actions.length ? summarize(data.actions) : '…');
+      const warnings = data.warnings ?? [];
+      const reply =
+        data.reply ||
+        (data.actions.length
+          ? summarize(data.actions)
+          : warnings.length
+            ? "I couldn't turn that into a change to file — see the note below."
+            : "I couldn't turn that into a concrete change. Want to clarify and I'll draft it?");
       setState((s) => ({
         ...s,
         busy: false,
         messages: [...next, { role: 'assistant', content: reply }],
         actions: data.actions,
-        warnings: data.warnings ?? [],
+        warnings,
       }));
     } catch (err) {
       setState((s) => ({
@@ -128,7 +146,7 @@ export function useCere(
               size: a.size,
             }),
           });
-          if (!res.ok) throw new Error();
+          if (!res.ok) throw new Error(await readError(res));
           const data = (await res.json()) as { issue: DevIssue };
           created.push(data.issue);
           lines.push(`#${data.issue.number} — ${title}: filed`);
@@ -145,12 +163,15 @@ export function useCere(
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(patch),
           });
-          if (!res.ok) throw new Error();
+          if (!res.ok) throw new Error(await readError(res));
           lines.push(`#${a.number} — ${title}: updated`);
           ok++;
         }
-      } catch {
-        lines.push(`#${a.kind === 'create' ? '?' : a.number} — ${title}: failed`);
+      } catch (err) {
+        const reason = (err as Error).message;
+        lines.push(
+          `#${a.kind === 'create' ? '?' : a.number} — ${title}: failed${reason ? ` (${reason})` : ''}`,
+        );
         fail++;
       }
     }

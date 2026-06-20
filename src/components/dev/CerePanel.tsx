@@ -259,7 +259,13 @@ export function CerePanel({
               </div>
             }
             belowMessages={
-              actions.length > 0 ? (
+              actions.length === 0 && warnings.length > 0 && !busy ? (
+                // Honest surface for dropped/invalid proposals when there's no
+                // card to attach them to — never let a skip stay silent (#77/#80).
+                <div className="mt-3 rounded-lg border border-amber-400/20 bg-amber-500/[0.06] p-2.5">
+                  <p className="text-[11px] text-amber-300/80">{warnings.join(' ')}</p>
+                </div>
+              ) : actions.length > 0 ? (
                 <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
                   <p className="mb-2 text-[11px] uppercase tracking-[0.15em] text-white/45">
                     Proposed · {actions.length}

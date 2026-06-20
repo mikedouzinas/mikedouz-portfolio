@@ -10,6 +10,7 @@ import {
   buildCereSystem,
   parseActions,
   resolveActionRepos,
+  reconcileReply,
 } from '@/lib/dev/cere';
 
 // Claude tool-calling can outlast Vercel's default timeout; match the other
@@ -54,10 +55,24 @@ export async function POST(req: NextRequest) {
 
     const parsedOut = parseActions(res.content, issues);
     const resolved = resolveActionRepos(parsedOut.actions, repos);
+
+    // A tool call was emitted but dropped if the model produced any create/update
+    // tool_use block yet the final, resolved action list is empty. Drives the
+    // honest "couldn't apply that" wording instead of a silent "no changes".
+    const toolBlocks = res.content.filter(
+      (b) => b.type === 'tool_use' && (b.name === 'create_issue' || b.name === 'update_issue'),
+    ).length;
+    const dropped = toolBlocks > 0 && resolved.actions.length === 0;
+
+    // Phantom-completion guard (#77/#80): if the reply claims a change but nothing
+    // actionable survived, replace the misleading prose so the UI never shows a
+    // "done" without a proposal card.
+    const guarded = reconcileReply(parsedOut.reply, resolved.actions.length, dropped);
+
     return NextResponse.json({
-      reply: parsedOut.reply,
+      reply: guarded.reply,
       actions: resolved.actions,
-      warnings: [...parsedOut.warnings, ...resolved.warnings],
+      warnings: [...parsedOut.warnings, ...resolved.warnings, ...guarded.warnings],
     });
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 502 });
