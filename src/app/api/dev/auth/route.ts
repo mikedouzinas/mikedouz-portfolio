@@ -11,6 +11,7 @@ import {
   checkGlobalLockout,
   recordGlobalFailure,
   resetGlobalFailures,
+  resetAuthRateLimit,
   type RateLimitResult,
 } from '@/lib/dev/rateLimit';
 import { getClientIp } from '@/lib/rateLimit';
@@ -63,8 +64,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid credentials' }, { status: 401 });
   }
 
-  // Successful login clears the global failure counter.
+  // Successful login clears the failure counters so legitimate sign-ins — and
+  // repeated login/logout cycles — never trip the brute-force caps.
   await resetGlobalFailures();
+  await resetAuthRateLimit(ip);
 
   const token = await signSession(Date.now());
   const res = NextResponse.json({ ok: true });
