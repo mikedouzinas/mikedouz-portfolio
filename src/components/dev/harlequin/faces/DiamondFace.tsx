@@ -255,7 +255,7 @@ export function DiamondFace({ passcode, spin, revealed, onLeave, onReveal }: Fac
           pointer-events: none;
         }
 
-        /* passcode entry — counter-rotated -45° inside diamond (from variant-c2) */
+        /* passcode panel — positioning + counter-rotation only; inner-element styles live in PasscodeFields.tsx */
         .passcode-panel {
           position: absolute;
           inset: 0;
@@ -263,7 +263,7 @@ export function DiamondFace({ passcode, spin, revealed, onLeave, onReveal }: Fac
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 10px;
+          gap: 8px;
           z-index: 7;
           pointer-events: none;
           opacity: 0;
@@ -275,46 +275,6 @@ export function DiamondFace({ passcode, spin, revealed, onLeave, onReveal }: Fac
         .passcode-panel.visible {
           opacity: 1;
           pointer-events: all;
-        }
-        .passcode-dots {
-          display: flex;
-          gap: 8px;
-        }
-        .passcode-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          border: 1px solid rgba(231, 226, 212, 0.5);
-          background: transparent;
-          transition: background 150ms;
-        }
-        .passcode-dot.filled {
-          background: rgba(231, 226, 212, 0.55);
-        }
-        .passcode-input {
-          position: absolute;
-          opacity: 0;
-          width: 1px;
-          height: 1px;
-          pointer-events: all;
-        }
-        .passcode-label {
-          font-size: 7px;
-          letter-spacing: 0.22em;
-          color: rgba(231, 226, 212, 0.35);
-          text-transform: uppercase;
-          margin-top: 2px;
-        }
-        .hq-sr-only {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: -1px;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border: 0;
         }
         @media (prefers-reduced-motion: reduce) {
           .diamond-fill {

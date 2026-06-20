@@ -224,7 +224,7 @@ export function CircleFace({ passcode, spin, revealed, onLeave, onReveal }: Face
           pointer-events: none;
         }
 
-        /* passcode entry (verbatim from PortalCircle) */
+        /* passcode panel — positioning only; inner-element styles live in PasscodeFields.tsx */
         .passcode-panel {
           position: absolute;
           inset: 0;
@@ -244,46 +244,6 @@ export function CircleFace({ passcode, spin, revealed, onLeave, onReveal }: Face
         .passcode-panel.visible {
           opacity: 1;
           pointer-events: all;
-        }
-        .passcode-dots {
-          display: flex;
-          gap: 8px;
-        }
-        .passcode-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          border: 1px solid rgba(231, 226, 212, 0.5);
-          background: transparent;
-          transition: background 150ms;
-        }
-        .passcode-dot.filled {
-          background: rgba(231, 226, 212, 0.55);
-        }
-        .passcode-input {
-          position: absolute;
-          opacity: 0;
-          width: 1px;
-          height: 1px;
-          pointer-events: all;
-        }
-        .passcode-label {
-          font-size: 7px;
-          letter-spacing: 0.22em;
-          color: rgba(231, 226, 212, 0.35);
-          text-transform: uppercase;
-          margin-top: 2px;
-        }
-        .hq-sr-only {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: -1px;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border: 0;
         }
         @media (prefers-reduced-motion: reduce) {
           .circle-fill {
