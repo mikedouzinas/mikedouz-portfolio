@@ -329,66 +329,6 @@ html {
   display: none; /* Chrome/Safari */
 }
 
-/* THE HARLEQUIN — Cere "portal" trigger. Nested diamonds frame a Google-palette
-   core that pulses inside a slowly spinning ring: the AI entry point, alive. */
-.cere-portal {
-  position: relative;
-  height: 28px; /* matches the gear/sort controls so the right column aligns */
-  width: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  border: 1px solid rgba(231, 226, 212, 0.18);
-  background: rgba(231, 226, 212, 0.05);
-  cursor: pointer;
-  /* same hover/active scale as the app's <Button> */
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-}
-.cere-portal:hover {
-  background: rgba(231, 226, 212, 0.09);
-  box-shadow: 0 0 14px rgba(160, 110, 210, 0.45);
-  transform: scale(1.03);
-}
-.cere-portal:active {
-  transform: scale(0.98);
-}
-.cere-portal-ring {
-  position: absolute;
-  width: 19px;
-  height: 19px;
-  transform: rotate(45deg);
-  border-radius: 5px;
-  border: 1.5px solid rgba(231, 226, 212, 0.5);
-}
-.cere-portal-ring2 {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  transform: rotate(45deg);
-  border-radius: 3px;
-  border: 1px solid rgba(231, 226, 212, 0.3);
-  animation: cere-portal-spin 6s linear infinite;
-}
-.cere-portal-core {
-  width: 7px;
-  height: 7px;
-  transform: rotate(45deg);
-  border-radius: 2px;
-  background: conic-gradient(from 0deg, #4285f4, #ea4335, #fbbc05, #34a853, #4285f4);
-  animation: cere-portal-pulse 2s ease-in-out infinite;
-}
-@keyframes cere-portal-spin {
-  to { transform: rotate(405deg); }
-}
-@keyframes cere-portal-pulse {
-  0%, 100% { box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.25); opacity: 0.85; }
-  50% { box-shadow: 0 0 12px 5px rgba(150, 180, 255, 0.5); opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .cere-portal-ring2,
-  .cere-portal-core { animation: none; }
-}
-
 /* THE HARLEQUIN — Cere's blackjack "thinking" loader. A quick hand dealt against
    you, looping until the answer arrives. Cards deal in; a result flashes. */
 .cere-bj {
