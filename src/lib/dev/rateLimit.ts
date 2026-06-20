@@ -66,6 +66,23 @@ export async function checkAuthRateLimit(ip: string): Promise<RateLimitResult> {
 }
 
 /**
+ * Clear the per-IP attempt counter. Call on a successful login so a legitimate
+ * sign-in doesn't count toward the brute-force cap — only *failed* attempts
+ * should accumulate. Without this, an owner logging in/out repeatedly (or
+ * fat-fingering then getting it right) burns the 5-attempt window and locks
+ * themselves out even with the correct passcode.
+ */
+export async function resetAuthRateLimit(ip: string): Promise<void> {
+  const redis = getRedis();
+  if (!redis) return; // dev, no redis
+  try {
+    await redis.del(`dev:auth:rl:${ip}`);
+  } catch {
+    // fail open
+  }
+}
+
+/**
  * Read-only check of the global lockout. Does NOT increment — call this on
  * every login attempt BEFORE verifying credentials so a locked window rejects
  * all comers. The counter is advanced only by {@link recordGlobalFailure} on an
