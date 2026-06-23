@@ -163,6 +163,7 @@ export async function addItem(
       size: input.size ?? null,
       vault_ref: input.vaultRef ?? null,
       closed_at: status === 'done' ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString(),
     })
     .select('*')
     .single();

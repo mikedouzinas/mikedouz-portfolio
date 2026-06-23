@@ -36,6 +36,10 @@ async function main() {
     const updated = await updateItemStatus(a.id, 'done');
     assert.equal(updated.status, 'done', 'status updated to done');
     assert.ok(updated.closedAt, 'closed_at set when moved to done');
+    assert.ok(
+      Date.parse(updated.updatedAt) >= Date.parse(a.updatedAt),
+      'updated_at advances on status update',
+    );
     const reopened = await updateItemStatus(a.id, 'todo');
     assert.equal(reopened.closedAt, null, 'closed_at cleared when leaving done');
 
