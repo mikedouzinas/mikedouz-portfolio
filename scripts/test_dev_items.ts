@@ -1,4 +1,6 @@
 // scripts/test_dev_items.ts — CRUD round-trip against the real Supabase tables.
+// Items mirror the GitHub ticket model: priority, status (todo/in progress/
+// awaiting review), size, and "done" = a closed item (closed_at).
 import assert from 'node:assert';
 import { config } from 'dotenv';
 config({ path: '.env.local' });
@@ -11,8 +13,9 @@ async function main() {
   const {
     createProject,
     addItem,
+    getItem,
     getItemsForProject,
-    updateItemStatus,
+    updateItem,
     listProjectsWithItems,
     deleteProject,
   } = await import('../src/lib/dev/items');
@@ -23,25 +26,38 @@ async function main() {
     assert.equal(proj.id, id, 'project created with id');
     assert.equal(proj.irisVisible, false, 'iris_visible defaults false');
 
-    const a = await addItem({ projectId: id, title: 'item A', size: 'M' });
+    const a = await addItem({ projectId: id, title: 'item A', size: 'M', priority: 'p2' });
     assert.equal(a.status, 'todo', 'item defaults to todo');
-    assert.equal(a.closedAt, null, 'non-done item has null closed_at');
+    assert.equal(a.state, 'open', 'new item is open');
+    assert.equal(a.priority, 'p2', 'priority stored');
 
-    const b = await addItem({ projectId: id, title: 'item B', status: 'done' });
-    assert.ok(b.closedAt, 'done item gets closed_at on insert');
+    const b = await addItem({ projectId: id, title: 'item B', status: 'in progress' });
+    assert.equal(b.status, 'in progress', 'status stored on insert');
 
     const items = await getItemsForProject(id);
     assert.equal(items.length, 2, 'two items fetched for project');
 
-    const updated = await updateItemStatus(a.id, 'done');
-    assert.equal(updated.status, 'done', 'status updated to done');
-    assert.ok(updated.closedAt, 'closed_at set when moved to done');
-    assert.ok(
-      Date.parse(updated.updatedAt) >= Date.parse(a.updatedAt),
-      'updated_at advances on status update',
-    );
-    const reopened = await updateItemStatus(a.id, 'todo');
-    assert.equal(reopened.closedAt, null, 'closed_at cleared when leaving done');
+    // priority + status + size patch (mirrors the board card's dropdowns)
+    const a2 = await updateItem(a.id, { status: 'awaiting review', priority: 'p1', size: 'L' });
+    assert.equal(a2.status, 'awaiting review', 'status updated');
+    assert.equal(a2.priority, 'p1', 'priority updated');
+    assert.equal(a2.size, 'L', 'size updated');
+    assert.ok(Date.parse(a2.updatedAt) >= Date.parse(a.updatedAt), 'updated_at advances on update');
+
+    // close (done) then reopen — done is the closed state, not a status value
+    const closed = await updateItem(a.id, { state: 'closed' });
+    assert.equal(closed.state, 'closed', 'state closed = done');
+    assert.ok(closed.closedAt, 'closed_at set on close');
+    const reopened = await updateItem(a.id, { state: 'open' });
+    assert.equal(reopened.state, 'open', 'item reopened');
+    assert.equal(reopened.closedAt, null, 'closed_at cleared on reopen');
+
+    // body edit (subtasks live in the body markdown)
+    const withBody = await updateItem(a.id, { body: '- [ ] sub one\n- [x] sub two' });
+    assert.ok(withBody.body.includes('sub one'), 'body updated');
+
+    const got = await getItem(a.id);
+    assert.ok(got && got.id === a.id, 'getItem returns the item');
 
     const all = await listProjectsWithItems();
     const mine = all.find((p) => p.id === id);

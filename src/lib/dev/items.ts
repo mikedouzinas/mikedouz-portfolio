@@ -3,12 +3,13 @@
  * Stored in Supabase (dev_projects, dev_items), accessed via the service-role
  * client (RLS deny-by-default — only this key can read/write). The vault is a
  * SEPARATE access point that talks to the same tables directly.
+ *
+ * dev_items mirror the GitHub ticket model (Priority/Status/Size from github.ts)
+ * so they render through the SAME board card. "Done" = a closed item (closed_at).
  */
 import { z } from 'zod';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
-
-export type DevItemStatus = 'todo' | 'in_progress' | 'done';
-export type DevItemSize = 'S' | 'M' | 'L';
+import type { Priority, Size, Status } from '@/lib/dev/github';
 
 export interface DevProject {
   id: string;
@@ -24,9 +25,11 @@ export interface DevItem {
   projectId: string;
   title: string;
   body: string;
-  status: DevItemStatus;
-  size: DevItemSize | null;
+  priority: Priority | null;
+  status: Status;
+  size: Size | null;
   vaultRef: string | null;
+  state: 'open' | 'closed'; // derived: closed === done
   createdAt: string;
   updatedAt: string;
   closedAt: string | null;
@@ -35,6 +38,10 @@ export interface DevItem {
 export interface DevProjectWithItems extends DevProject {
   items: DevItem[];
 }
+
+const PRIORITY = z.enum(['p1', 'p2', 'p3', 'p4', 'p5']);
+const STATUS = z.enum(['todo', 'in progress', 'awaiting review']);
+const SIZE = z.enum(['S', 'M', 'L']);
 
 export const createProjectSchema = z.object({
   id: z.string().min(1).regex(/^[a-z0-9-]+$/, 'id must be a kebab-case slug'),
@@ -47,13 +54,20 @@ export const addItemSchema = z.object({
   projectId: z.string().min(1),
   title: z.string().min(1),
   body: z.string().optional(),
-  status: z.enum(['todo', 'in_progress', 'done']).optional(),
-  size: z.enum(['S', 'M', 'L']).optional(),
+  priority: PRIORITY.optional(),
+  status: STATUS.optional(),
+  size: SIZE.optional(),
   vaultRef: z.string().optional(),
 });
 
-export const updateItemStatusSchema = z.object({
-  status: z.enum(['todo', 'in_progress', 'done']),
+/** Mutations the board card emits, mirroring the GitHub issues PATCH shape. */
+export const updateItemSchema = z.object({
+  priority: PRIORITY.optional(),
+  status: STATUS.optional(),
+  size: SIZE.optional(),
+  state: z.enum(['open', 'closed']).optional(),
+  title: z.string().min(1).optional(),
+  body: z.string().optional(),
 });
 
 interface ProjectRow {
@@ -69,8 +83,9 @@ interface ItemRow {
   project_id: string;
   title: string;
   body: string;
-  status: DevItemStatus;
-  size: DevItemSize | null;
+  priority: Priority | null;
+  status: Status;
+  size: Size | null;
   vault_ref: string | null;
   created_at: string;
   updated_at: string;
@@ -93,9 +108,11 @@ function toItem(r: ItemRow): DevItem {
     projectId: r.project_id,
     title: r.title,
     body: r.body,
+    priority: r.priority,
     status: r.status,
     size: r.size,
     vaultRef: r.vault_ref,
+    state: r.closed_at ? 'closed' : 'open',
     createdAt: r.created_at,
     updatedAt: r.updated_at,
     closedAt: r.closed_at,
@@ -152,23 +169,29 @@ export async function addItem(
   input: z.infer<typeof addItemSchema>,
 ): Promise<DevItem> {
   const db = getSupabaseAdmin();
-  const status = input.status ?? 'todo';
   const { data, error } = await db
     .from('dev_items')
     .insert({
       project_id: input.projectId,
       title: input.title,
       body: input.body ?? '',
-      status,
+      priority: input.priority ?? null,
+      status: input.status ?? 'todo',
       size: input.size ?? null,
       vault_ref: input.vaultRef ?? null,
-      closed_at: status === 'done' ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     })
     .select('*')
     .single();
   if (error) throw new Error(error.message);
   return toItem(data as ItemRow);
+}
+
+export async function getItem(id: string): Promise<DevItem | null> {
+  const db = getSupabaseAdmin();
+  const { data, error } = await db.from('dev_items').select('*').eq('id', id).maybeSingle();
+  if (error) throw new Error(error.message);
+  return data ? toItem(data as ItemRow) : null;
 }
 
 export async function getItemsForProject(projectId: string): Promise<DevItem[]> {
@@ -182,18 +205,24 @@ export async function getItemsForProject(projectId: string): Promise<DevItem[]> 
   return ((data ?? []) as ItemRow[]).map(toItem);
 }
 
-export async function updateItemStatus(
+/** Patch a virtual item. `state` toggles closed_at (done = closed). */
+export async function updateItem(
   id: string,
-  status: DevItemStatus,
+  patch: z.infer<typeof updateItemSchema>,
 ): Promise<DevItem> {
   const db = getSupabaseAdmin();
+  const upd: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  if (patch.priority !== undefined) upd.priority = patch.priority;
+  if (patch.status !== undefined) upd.status = patch.status;
+  if (patch.size !== undefined) upd.size = patch.size;
+  if (patch.title !== undefined) upd.title = patch.title;
+  if (patch.body !== undefined) upd.body = patch.body;
+  if (patch.state !== undefined) {
+    upd.closed_at = patch.state === 'closed' ? new Date().toISOString() : null;
+  }
   const { data, error } = await db
     .from('dev_items')
-    .update({
-      status,
-      updated_at: new Date().toISOString(),
-      closed_at: status === 'done' ? new Date().toISOString() : null,
-    })
+    .update(upd)
     .eq('id', id)
     .select('*')
     .single();

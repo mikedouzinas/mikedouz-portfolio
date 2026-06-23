@@ -67,6 +67,11 @@ export interface DevIssue {
   state: 'open' | 'closed';
   url: string;
   updatedAt: string;
+  // Set for Supabase-backed virtual-project items so the board can route their
+  // mutations to /api/dev/items/[itemId] instead of GitHub. Undefined === a real
+  // GitHub issue. `number` is unused (0) for virtual items; `itemId` is the key.
+  source?: 'github' | 'virtual';
+  itemId?: string;
 }
 
 function ghHeaders(): Record<string, string> {

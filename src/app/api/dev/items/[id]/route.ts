@@ -1,8 +1,17 @@
 // src/app/api/dev/items/[id]/route.ts
+// Mutations for a virtual project's item. Accepts the SAME body shape the board
+// card sends to /api/dev/issues (priority/status/size/state/title/body/feedback),
+// so the card routes here by source with no translation. Middleware-gated.
 import { NextRequest, NextResponse } from 'next/server';
-import { updateItemStatus, updateItemStatusSchema } from '@/lib/dev/items';
+import { z } from 'zod';
+import { getItem, updateItem, updateItemSchema } from '@/lib/dev/items';
+import { upsertReviewBlock } from '@/lib/dev/github';
 
 export const dynamic = 'force-dynamic';
+
+const PatchSchema = updateItemSchema.extend({
+  feedback: z.string().min(1).optional(), // send-back review feedback
+});
 
 export async function PATCH(
   req: NextRequest,
@@ -15,13 +24,22 @@ export async function PATCH(
   } catch {
     return NextResponse.json({ error: 'invalid JSON' }, { status: 400 });
   }
-  const parsed = updateItemStatusSchema.safeParse(json);
+  const parsed = PatchSchema.safeParse(json);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.message }, { status: 400 });
   }
   try {
-    const item = await updateItemStatus(id, parsed.data.status);
-    return NextResponse.json({ item });
+    const { feedback, ...fields } = parsed.data;
+    if (feedback) {
+      // Send-back: record the feedback in a review block and move to in progress —
+      // same effect as the GitHub path, written into the item body.
+      const cur = await getItem(id);
+      const body = upsertReviewBlock(cur?.body ?? '', { feedback });
+      await updateItem(id, { status: 'in progress', body });
+      return NextResponse.json({ ok: true });
+    }
+    await updateItem(id, fields);
+    return NextResponse.json({ ok: true });
   } catch (e) {
     const message = e instanceof Error ? e.message : 'unknown error';
     return NextResponse.json({ error: message }, { status: 500 });

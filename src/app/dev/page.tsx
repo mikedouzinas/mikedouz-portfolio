@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { DevIssue, DevRepo } from '@/lib/dev/github';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { HarlequinTitle } from '@/components/dev/HarlequinTitle';
@@ -13,14 +13,48 @@ import { CereGameLoader } from '@/components/dev/CereGameLoader';
 import { HarlequinReveal } from '@/components/dev/HarlequinReveal';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
-import { VirtualProjectBoard } from '@/components/dev/VirtualProjectBoard';
-import type { DevProjectWithItems, DevItemStatus } from '@/lib/dev/items';
+import type { DevItem, DevProjectWithItems } from '@/lib/dev/items';
 
 const SORT_OPTS: { value: SortBy; label: string }[] = [
   { value: 'priority', label: 'Priority' },
   { value: 'recent', label: 'Recent' },
   { value: 'size', label: 'Size' },
 ];
+
+// Virtual (vault) projects appear on the board exactly like a code repo: they
+// become a DevRepo (so they get a chip + a group section) and their items become
+// DevIssues tagged source:'virtual' (so they render in the SAME card/lanes and
+// route their mutations to /api/dev/items). Champagne accent marks them as vault.
+const VIRTUAL_ACCENT = '231, 226, 212';
+
+function projectToRepo(p: DevProjectWithItems): DevRepo {
+  return {
+    slug: p.id,
+    name: p.name,
+    accent: VIRTUAL_ACCENT,
+    pushedAt: p.createdAt,
+    archived: false,
+    fork: false,
+    private: true,
+  };
+}
+
+function itemToIssue(it: DevItem): DevIssue {
+  return {
+    repo: it.projectId,
+    number: 0, // unused for virtual items; itemId is the identity
+    title: it.title,
+    body: it.body,
+    priority: it.priority,
+    status: it.status,
+    size: it.size,
+    state: it.state,
+    url: '',
+    updatedAt: it.updatedAt,
+    source: 'virtual',
+    itemId: it.id,
+  };
+}
 
 export default function DevConsolePage() {
   const [repos, setRepos] = useState<DevRepo[]>([]);
@@ -38,6 +72,10 @@ export default function DevConsolePage() {
   const [sort, setSort] = useState<SortBy>('priority');
   const [composerOpen, setComposerOpen] = useState(false);
 
+  // Latest projects, read inside loadIssues without making it a dependency (which
+  // would re-trigger the loader on every projects refresh).
+  const projectsRef = useRef<DevProjectWithItems[]>([]);
+
   const loadRepos = useCallback(async () => {
     const res = await fetch('/api/dev/repos');
     if (res.ok) {
@@ -54,6 +92,13 @@ export default function DevConsolePage() {
   const loadIssues = useCallback(
     async (silent = false) => {
       if (!silent) setLoading(true);
+      // A virtual (vault) project isn't a GitHub repo — when one is selected,
+      // skip the issues API (it'd 400) and let the virtual items carry the view.
+      if (selected && projectsRef.current.some((p) => p.id === selected)) {
+        setIssues([]);
+        if (!silent) setLoading(false);
+        return;
+      }
       const url = selected
         ? `/api/dev/issues?state=open&repo=${encodeURIComponent(selected)}`
         : '/api/dev/issues?state=open';
@@ -69,40 +114,61 @@ export default function DevConsolePage() {
     [selected],
   );
 
-  const refreshIssues = useCallback(() => loadIssues(true), [loadIssues]);
-
   const loadProjects = useCallback(async () => {
     const res = await fetch('/api/dev/projects', { cache: 'no-store' });
     if (res.ok) {
       const data = (await res.json()) as { projects: DevProjectWithItems[] };
+      projectsRef.current = data.projects;
       setProjects(data.projects);
     }
   }, []);
 
-  const onItemStatusChange = useCallback(
-    async (itemId: string, status: DevItemStatus) => {
-      const res = await fetch(`/api/dev/items/${itemId}`, {
+  // Refresh both sources after any mutation — a card change may have hit either
+  // the GitHub issues API or the Supabase items API.
+  const refreshBoard = useCallback(() => {
+    void loadIssues(true);
+    void loadProjects();
+  }, [loadIssues, loadProjects]);
+
+  const patchIssue = useCallback(
+    async (repo: string, number: number, patch: Record<string, unknown>) => {
+      await fetch('/api/dev/issues', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ repo, number, ...patch }),
       });
-      if (!res.ok) console.warn(`Failed to update item ${itemId} status (${res.status})`);
+      await loadIssues(true);
+    },
+    [loadIssues],
+  );
+
+  const patchItem = useCallback(
+    async (itemId: string, body: Record<string, unknown>) => {
+      await fetch(`/api/dev/items/${itemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
       await loadProjects();
     },
     [loadProjects],
   );
 
-  const patchIssue = useCallback(async (repo: string, number: number, patch: Record<string, unknown>) => {
-    await fetch('/api/dev/issues', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ repo, number, ...patch }),
-    });
-    await loadIssues(true);
-  }, [loadIssues]);
-
-  const onApprove = useCallback((i: DevIssue) => patchIssue(i.repo, i.number, { state: 'closed' }), [patchIssue]);
-  const onSendBack = useCallback((i: DevIssue, feedback: string) => patchIssue(i.repo, i.number, { feedback }), [patchIssue]);
+  // Awaiting-review actions route by source: virtual items → items API, GitHub → issues API.
+  const onApprove = useCallback(
+    (i: DevIssue) =>
+      i.source === 'virtual' && i.itemId
+        ? patchItem(i.itemId, { state: 'closed' })
+        : patchIssue(i.repo, i.number, { state: 'closed' }),
+    [patchItem, patchIssue],
+  );
+  const onSendBack = useCallback(
+    (i: DevIssue, feedback: string) =>
+      i.source === 'virtual' && i.itemId
+        ? patchItem(i.itemId, { feedback })
+        : patchIssue(i.repo, i.number, { feedback }),
+    [patchItem, patchIssue],
+  );
 
   // Optimistic insert: merge issues Cere just created into the board immediately
   // (deduped on the card key repo#number), then silent-refetch to reconcile —
@@ -119,6 +185,24 @@ export default function DevConsolePage() {
       void loadIssues(true);
     },
     [loadIssues],
+  );
+
+  // Virtual projects → board repos + issues, merged with the GitHub board.
+  const virtualRepos = useMemo(() => projects.map(projectToRepo), [projects]);
+  const virtualIssues = useMemo(
+    () => projects.flatMap((p) => p.items.map(itemToIssue)),
+    [projects],
+  );
+  // When a specific repo is selected, only its items show: a virtual project's
+  // items match by repo===slug; selecting a GitHub repo yields none of them.
+  const visibleVirtualIssues = useMemo(
+    () => (selected === null ? virtualIssues : virtualIssues.filter((i) => i.repo === selected)),
+    [virtualIssues, selected],
+  );
+  const allRepos = useMemo(() => [...repos, ...virtualRepos], [repos, virtualRepos]);
+  const allIssues = useMemo(
+    () => [...issues, ...visibleVirtualIssues],
+    [issues, visibleVirtualIssues],
   );
 
   // Data fetching on mount / when the selected repo changes. This is the
@@ -191,7 +275,7 @@ export default function DevConsolePage() {
     window.location.href = '/';
   }
 
-  const openCount = issues.filter((i) => i.state === 'open').length;
+  const openCount = allIssues.filter((i) => i.state === 'open').length;
 
   return (
     <div className="min-h-screen dev-workpad text-white">
@@ -223,7 +307,7 @@ export default function DevConsolePage() {
 
               {/* Row 2: repo chips left, sort + gear right */}
               <div className="flex items-center justify-between gap-3">
-                <RepoChips repos={repos} selected={selected} onSelect={setSelected} />
+                <RepoChips repos={allRepos} selected={selected} onSelect={setSelected} />
                 <div className="flex shrink-0 items-center gap-2">
                   <div className="md:hidden">
                     <GroupByToggle value={groupBy} onChange={setGroupBy} />
@@ -256,7 +340,7 @@ export default function DevConsolePage() {
 
       <main className="relative z-10 mx-auto max-w-6xl px-6 py-6">
         <p className="mb-4 text-[11px] uppercase tracking-[0.2em] text-[#e7e2d4]/55">
-          {loading ? ' ' : `${openCount} open`}
+          {loading ? ' ' : `${openCount} open`}
         </p>
         {/*
           Loader → board transition. The CereGameLoader plays a quick card game
@@ -268,18 +352,15 @@ export default function DevConsolePage() {
           frame happens to be live. `showLoader` keeps the loader mounted for
           the fade, then unmounts it.
         */}
-        {!loading && (
-          <VirtualProjectBoard projects={projects} onStatusChange={onItemStatusChange} />
-        )}
         <div className={`relative ${showLoader ? 'min-h-[180px]' : ''}`}>
           <div className={`transition-opacity duration-300 ${loading ? 'opacity-0' : 'opacity-100'}`}>
             {!loading && (
               <IssueList
-                issues={issues}
-                repos={repos}
+                issues={allIssues}
+                repos={allRepos}
                 groupBy={groupBy}
                 sort={sort}
-                onChanged={refreshIssues}
+                onChanged={refreshBoard}
                 onApprove={onApprove}
                 onSendBack={onSendBack}
               />

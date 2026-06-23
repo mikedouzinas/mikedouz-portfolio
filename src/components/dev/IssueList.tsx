@@ -29,6 +29,9 @@ export type SortBy = 'priority' | 'recent' | 'size';
 
 const emptySubscribe = () => () => {};
 
+/** Stable card identity: virtual items have number 0, so they key on itemId. */
+const issueKey = (i: DevIssue) => (i.source === 'virtual' ? `v:${i.itemId}` : `${i.repo}#${i.number}`);
+
 // Priority shows just the code (P1…P5) — the descriptive word ("· Medium") was
 // confusable with the t-shirt size's "M · Medium". The color dot carries severity.
 const PRIORITY_OPTS = (['p1', 'p2', 'p3', 'p4', 'p5'] as Priority[]).map((p) => ({
@@ -176,7 +179,7 @@ function IssueCard({
   // Stable shared-layout id: framer animates the SAME card between its inline
   // slot and the detached centered panel, so the morph reads as one element
   // lifting out and flying back — the detach effect.
-  const layoutId = `ticket-${issue.repo}-${issue.number}`;
+  const layoutId = `ticket-${issue.repo}-${issue.source === 'virtual' ? issue.itemId : issue.number}`;
 
   // Lock body scroll while a ticket is detached so the centered panel is the
   // sole focus (and the backdrop scrim can't be scrolled past).
@@ -322,8 +325,13 @@ function IssueCard({
           {st.label}
         </span>
         <SizeChip size={size} />
+        {issue.source === 'virtual' && (
+          <span className="rounded bg-[#e7e2d4]/10 px-1 text-[9px] uppercase tracking-wide text-[#e7e2d4]/70 ring-1 ring-[#e7e2d4]/25">
+            vault
+          </span>
+        )}
         <span className="ml-auto truncate">
-          {repoName} #{issue.number}
+          {issue.source === 'virtual' ? repoName : `${repoName} #${issue.number}`}
         </span>
         {detached ? (
           <Minimize2 className="h-3.5 w-3.5 shrink-0" aria-label="Collapse ticket" />
@@ -567,7 +575,7 @@ function IssueCard({
           />
           <span className="text-[11px] italic text-[#e7e2d4]/45">Be right back.</span>
           <span className="text-[10px] text-white/25">
-            {repoName} #{issue.number}
+            {issue.source === 'virtual' ? repoName : `${repoName} #${issue.number}`}
           </span>
         </div>
       )}
@@ -787,18 +795,32 @@ export function IssueList({
   async function patch(issue: DevIssue, body: PatchBody) {
     setError('');
     try {
-      const res = await fetch('/api/dev/issues', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ repo: issue.repo, number: issue.number, ...body }),
-      });
+      // Virtual-project items route to the Supabase items API (keyed by itemId);
+      // real GitHub issues route to the issues API (keyed by repo + number). The
+      // body shape is identical, so only the endpoint/identity differs.
+      const res =
+        issue.source === 'virtual'
+          ? await fetch(`/api/dev/items/${issue.itemId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+            })
+          : await fetch('/api/dev/issues', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ repo: issue.repo, number: issue.number, ...body }),
+            });
       if (!res.ok) {
-        setError(`Couldn't update #${issue.number} — check the GitHub token's Issues write permission.`);
+        setError(
+          issue.source === 'virtual'
+            ? `Couldn't update "${issue.title}".`
+            : `Couldn't update #${issue.number} — check the GitHub token's Issues write permission.`,
+        );
         return;
       }
       onChanged();
     } catch {
-      setError('Network error updating the issue.');
+      setError('Network error updating the item.');
     }
   }
 
@@ -808,7 +830,7 @@ export function IssueList({
 
   const card = (issue: DevIssue) => (
     <IssueCard
-      key={`${issue.repo}#${issue.number}`}
+      key={issueKey(issue)}
       issue={issue}
       repoName={repoName(issue.repo)}
       onPatch={patch}
@@ -824,9 +846,9 @@ export function IssueList({
       <LaneHeader color="#E7B34A" label="Awaiting review" count={awaiting.length} />
       <div className="flex flex-col gap-3">
         {awaiting.map((i) => (
-          <div key={`${i.repo}#${i.number}`}>
+          <div key={issueKey(i)}>
             <IssueCard
-              key={`${i.repo}#${i.number}`}
+              key={issueKey(i)}
               issue={i}
               repoName={repoName(i.repo)}
               onPatch={patch}
