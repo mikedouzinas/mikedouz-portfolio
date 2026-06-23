@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { requestHarlequinTransition } from '@/components/dev/transition/store';
 import { markEntrance } from '@/components/dev/transition/entranceSignal';
+import { captureHomeSnapshot } from '@/components/dev/transition/homeSnapshot';
 
 /**
  * Passcode entry + real server auth — extracted from `PortalCircle.tsx` (which
@@ -41,6 +42,7 @@ export function usePasscodeAuth() {
         });
         if (res.ok) {
           // Arm the sequential board reveal, then navigate to /dev.
+          void captureHomeSnapshot(); // best-effort; overlay no-ops if absent
           markEntrance();
           requestHarlequinTransition('enter');
           return;

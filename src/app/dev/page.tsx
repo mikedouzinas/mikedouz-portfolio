@@ -19,6 +19,7 @@ import {
 } from '@/components/dev/transition/boardSnapshot';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
+import { HomeFadeOverlay } from '@/components/dev/entrance/HomeFadeOverlay';
 
 const SORT_OPTS: { value: SortBy; label: string }[] = [
   { value: 'priority', label: 'Priority' },
@@ -42,6 +43,7 @@ export default function DevConsolePage() {
   const [sort, setSort] = useState<SortBy>('priority');
   const [composerOpen, setComposerOpen] = useState(false);
   const [entrance, setEntrance] = useState(false);
+  const [homeFaded, setHomeFaded] = useState(false);
 
   const loadRepos = useCallback(async () => {
     const res = await fetch('/api/dev/repos');
@@ -218,6 +220,7 @@ export default function DevConsolePage() {
 
   return (
     <div data-board-root className="min-h-screen dev-workpad text-white">
+      {entrance && !homeFaded && <HomeFadeOverlay onDone={() => setHomeFaded(true)} />}
       {/* The diamond-ash disintegration EXIT is played by HarlequinTransitionHost
           (root layout) so the WebGL overlay survives the /dev → home route change.
           This page only tags its root [data-board-root] (the exit snapshots it).
