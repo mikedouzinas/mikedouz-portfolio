@@ -745,11 +745,20 @@ function laneOf(i: DevIssue): string {
 function LaneHeader({ color, label, count, entrance }: { color: string; label: string; count: number; entrance?: { active: boolean; t: number } }) {
   const headT = entrance?.active ? sub(entrance.t, ENTRANCE_PHASES.heads[0], ENTRANCE_PHASES.heads[1]) : 1;
   const reveal = entrance?.active && headT > 0;
+  // During the entrance, the WHOLE header (dot, label, count) stays hidden until
+  // the heads phase begins — which is after the banner wipe — so nothing in the
+  // columns appears before the top bar.
+  const hidden = entrance?.active && !reveal;
   return (
     <div className="mb-2 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.15em] text-[#e7e2d4]/70">
-      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color, opacity: reveal ? Math.min(1, headT * 1.5) : 1 }} />
-      {entrance?.active ? <TypeIn text={label} active durationMs={360} caret={false} /> : label}
-      <span className="text-[#e7e2d4]/40">· {entrance?.active ? Math.round(headT * count) : count}</span>
+      <span
+        className="h-2 w-2 rounded-full"
+        style={{ backgroundColor: color, opacity: hidden ? 0 : entrance?.active ? Math.min(1, headT * 1.5) : 1 }}
+      />
+      {hidden ? null : entrance?.active ? <TypeIn text={label} active durationMs={360} caret={false} /> : label}
+      {hidden ? null : (
+        <span className="text-[#e7e2d4]/40">· {entrance?.active ? Math.round(headT * count) : count}</span>
+      )}
     </div>
   );
 }

@@ -7,7 +7,7 @@ export const ENTRANCE_PHASES = {
   home:   [0.00, 0.16] as const, // homepage crossfade (handled by HomeFadeOverlay timing)
   banner: [0.14, 0.42] as const, // bar wipes FULL WIDTH left→right (slow, deliberate)
   cere:   [0.34, 0.52] as const, // Cere jumps in
-  heads:  [0.40, 0.60] as const, // lane headers + counts type
+  heads:  [0.44, 0.62] as const, // lane headers + counts type — AFTER the banner wipe (0.42)
   cards:  [0.56, 1.00] as const, // cards box→type (also gated on data being present)
 };
 
