@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { requestHarlequinTransition } from '@/components/dev/transition/store';
+import { markEntrance } from '@/components/dev/transition/entranceSignal';
 
 /**
  * Passcode entry + real server auth — extracted from `PortalCircle.tsx` (which
@@ -39,9 +40,8 @@ export function usePasscodeAuth() {
           body: JSON.stringify({ password: pw }),
         });
         if (res.ok) {
-          // Enter the board. The old argyle reveal is retired (a Mark-42 assemble
-          // will replace it); for now the host navigates to /dev directly. Falls
-          // back to a hard nav if the host isn't mounted.
+          // Arm the sequential board reveal, then navigate to /dev.
+          markEntrance();
           requestHarlequinTransition('enter');
           return;
         }

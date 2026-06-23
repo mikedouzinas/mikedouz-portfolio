@@ -12,6 +12,7 @@ import { CerePortal } from '@/components/dev/CerePortal';
 import { CerePanel } from '@/components/dev/CerePanel';
 import { CereGameLoader } from '@/components/dev/CereGameLoader';
 import { requestHarlequinTransition } from '@/components/dev/transition/store';
+import { consumeEntrance } from '@/components/dev/transition/entranceSignal';
 import {
   captureBoardSnapshot,
   scheduleBoardSnapshot,
@@ -40,6 +41,7 @@ export default function DevConsolePage() {
   const [groupBy, setGroupBy] = useState<GroupBy>('status');
   const [sort, setSort] = useState<SortBy>('priority');
   const [composerOpen, setComposerOpen] = useState(false);
+  const [entrance, setEntrance] = useState(false);
 
   const loadRepos = useCallback(async () => {
     const res = await fetch('/api/dev/repos');
@@ -111,6 +113,11 @@ export default function DevConsolePage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- on-mount data fetch, not derived state
     loadRepos();
   }, [loadRepos]);
+  useEffect(() => {
+    // Read-once: did we just unlock? If so, play the reveal.
+    if (consumeEntrance()) setEntrance(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on selected-repo change, not derived state
     loadIssues();
