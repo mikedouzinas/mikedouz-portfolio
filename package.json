@@ -17,6 +17,7 @@
     "test:iris:automated": "tsx scripts/test_iris_comprehensive.ts",
     "test:dev": "tsx scripts/test_dev_console.ts",
     "test:dev:items": "tsx scripts/test_dev_items.ts",
+    "seed:dwq": "tsx scripts/seed_dwq.ts",
     "board": "tsx scripts/board.ts",
     "test:iris:help": "cat TESTING.md",
     "spotify:analyze": "tsx scripts/analyze_spotify.ts",
