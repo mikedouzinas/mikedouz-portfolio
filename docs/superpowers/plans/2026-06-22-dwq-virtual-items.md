@@ -8,6 +8,20 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript (strict), `@supabase/supabase-js` (service-role admin client), Zod, `tsx` assertion scripts for verification.
 
+> **REVISION (2026-06-22, post-review):** Task 4's separate `VirtualProjectBoard`
+> component was the wrong call — per Mike, a virtual project must appear as *just
+> another project on the board*, its items rendered as **normal tickets** in the
+> same lanes/repo-sections, distinguished only by name + a `vault` tag. The build
+> was reworked: `dev_items` reconcile to the GitHub ticket model (priority, status
+> `todo|in progress|awaiting review`, size, **done = closed_at**); items map to
+> `DevIssue` (with `source:'virtual'`/`itemId`) and render through the existing
+> `IssueCard`/`IssueList`; the card's single `onPatch` routes virtual items to
+> `/api/dev/items/[id]` by source; `page.tsx` merges virtual projects into `repos`
+> + `issues`. `VirtualProjectBoard` was deleted. Verified live (status + repo
+> grouping, full PATCH parity incl. complete/reopen, 400 on bad status). The task
+> bodies below describe the original separate-section design; the shipped code
+> follows this revision.
+
 ## Global Constraints
 
 - **TypeScript strict mode, no `any`.** Zod validation at every API boundary. (CLAUDE.md)
