@@ -635,7 +635,7 @@ function IssueCard({
               backgroundColor: 'rgba(12, 17, 24, 0.52)',
               borderColor: 'rgba(255, 255, 255, 0.10)',
             }}
-            className={`absolute inset-x-0 top-0 h-32 cursor-pointer overflow-hidden rounded-xl border backdrop-blur-md hover:shadow-2xl hover:shadow-black/60 ${
+            className={`absolute inset-0 cursor-pointer overflow-hidden rounded-xl border backdrop-blur-md hover:shadow-2xl hover:shadow-black/60 ${
               closed ? 'opacity-70' : ''
             }`}
           >
