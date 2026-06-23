@@ -35,7 +35,11 @@ function ItemCard({
           ariaLabel="Status"
           value={item.status}
           options={STATUS_OPTS}
-          onChange={(v) => onStatusChange(item.id, v as DevItemStatus)}
+          onChange={(v) => {
+            if (v === 'todo' || v === 'in_progress' || v === 'done') {
+              onStatusChange(item.id, v);
+            }
+          }}
         />
       </div>
     </div>

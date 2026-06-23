@@ -81,11 +81,12 @@ export default function DevConsolePage() {
 
   const onItemStatusChange = useCallback(
     async (itemId: string, status: DevItemStatus) => {
-      await fetch(`/api/dev/items/${itemId}`, {
+      const res = await fetch(`/api/dev/items/${itemId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       });
+      if (!res.ok) console.warn(`Failed to update item ${itemId} status (${res.status})`);
       await loadProjects();
     },
     [loadProjects],
