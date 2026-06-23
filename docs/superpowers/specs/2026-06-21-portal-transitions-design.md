@@ -59,6 +59,10 @@ One persistent overlay canvas lives in the **root layout** (`HarlequinTransition
 
 The board's real UI pieces (header/wordmark, columns, cards) fly in from scattered offscreen positions and snap together to form the board. Mechanical/metallic, precise easing with slight overshoot/settle, staggered arrival order, champagne glint as each piece locks. **Real board pieces, not abstract confetti.** Same persistent-host plumbing as the exit (build over the homepage, navigate to `/dev` under the cover, reveal). Prototype: `overnight/portal-lockups/entry/entry-assemble.html` (in progress).
 
+### Shipped implementation
+
+The entrance shipped as a **DOM reveal of the real board** — no WebGL, no texture-based effect. A one-shot unlock signal (produced when the passcode succeeds) arms a sequential reveal: the homepage crossfades into the workpad backdrop, then the banner wipes in full-width left-to-right, Cere jumps into place, lane headers and open-counts type in, and each ticket card animates box-first then title-types in (`box→type`), staggered in reading order as GitHub issues load. No cover canvas or persistent host is involved on the way in — the board renders normally and the reveal is driven entirely by CSS/JS animation phases triggered from the unlock event.
+
 ---
 
 ## Verification
