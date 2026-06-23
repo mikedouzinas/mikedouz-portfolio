@@ -256,6 +256,7 @@ export default function DevConsolePage() {
                     void captureBoardSnapshot();
                     void import('@/components/dev/HarlequinExit');
                   }}
+                  entrance={entrance}
                 />
                 <div className="hidden md:block">
                   <GroupByToggle value={groupBy} onChange={setGroupBy} />
@@ -322,6 +323,7 @@ export default function DevConsolePage() {
                 onChanged={refreshIssues}
                 onApprove={onApprove}
                 onSendBack={onSendBack}
+                entrance={entrance ? { active: true, t } : undefined}
               />
             )}
           </div>

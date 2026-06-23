@@ -3,6 +3,7 @@
 import { Limelight } from 'next/font/google';
 import { ArrowLeft } from 'lucide-react';
 import { GOOGLE_COLORS } from '@/lib/dev/uiMeta';
+import { TypeIn } from '@/components/dev/entrance/TypeIn';
 
 // Art Deco / 1930s-marquee display face for the wordmark only.
 const marquee = Limelight({ weight: '400', subsets: ['latin'], display: 'swap' });
@@ -16,9 +17,11 @@ const marquee = Limelight({ weight: '400', subsets: ['latin'], display: 'swap' }
 export function HarlequinTitle({
   onBack,
   onBackHover,
+  entrance = false,
 }: {
   onBack?: () => void;
   onBackHover?: () => void;
+  entrance?: boolean;
 }) {
   return (
     <h1 className="flex items-center gap-2 select-none">
@@ -47,7 +50,7 @@ export function HarlequinTitle({
         />
       </button>
       <span className={`${marquee.className} text-3xl tracking-[0.18em] text-[#E7E2D4]`}>
-        THE HARLEQUIN
+        {entrance ? <TypeIn text="THE HARLEQUIN" active durationMs={520} startDelayMs={260} caret={false} /> : 'THE HARLEQUIN'}
       </span>
       <span aria-hidden className="harlequin-diamond-flicker text-base">
         ◆

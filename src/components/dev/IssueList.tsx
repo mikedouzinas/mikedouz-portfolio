@@ -23,6 +23,8 @@ import { parseReviewBlock } from '@/lib/dev/github';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
 import { CopyForClaude } from './CopyForClaude';
+import { TypeIn } from '@/components/dev/entrance/TypeIn';
+import { ENTRANCE_PHASES, sub } from '@/components/dev/entrance/useEntranceReveal';
 
 export type GroupBy = 'status' | 'repo';
 export type SortBy = 'priority' | 'recent' | 'size';
@@ -706,12 +708,14 @@ function laneOf(i: DevIssue): string {
   return i.status ?? 'todo';
 }
 
-function LaneHeader({ color, label, count }: { color: string; label: string; count: number }) {
+function LaneHeader({ color, label, count, entrance }: { color: string; label: string; count: number; entrance?: { active: boolean; t: number } }) {
+  const headT = entrance?.active ? sub(entrance.t, ENTRANCE_PHASES.heads[0], ENTRANCE_PHASES.heads[1]) : 1;
+  const reveal = entrance?.active && headT > 0;
   return (
     <div className="mb-2 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.15em] text-[#e7e2d4]/70">
-      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
-      {label}
-      <span className="text-[#e7e2d4]/40">· {count}</span>
+      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color, opacity: reveal ? Math.min(1, headT * 1.5) : 1 }} />
+      {entrance?.active ? <TypeIn text={label} active durationMs={360} caret={false} /> : label}
+      <span className="text-[#e7e2d4]/40">· {entrance?.active ? Math.round(headT * count) : count}</span>
     </div>
   );
 }
@@ -769,6 +773,7 @@ export function IssueList({
   onChanged,
   onApprove,
   onSendBack,
+  entrance,
 }: {
   issues: DevIssue[];
   repos: DevRepo[];
@@ -777,6 +782,7 @@ export function IssueList({
   onChanged: () => void;
   onApprove: (i: DevIssue) => void | Promise<void>;
   onSendBack: (i: DevIssue, feedback: string) => void | Promise<void>;
+  entrance?: { active: boolean; t: number };
 }) {
   const [error, setError] = useState('');
 
@@ -821,7 +827,7 @@ export function IssueList({
 
   const awaitingSection = awaiting.length > 0 ? (
     <div className="mb-5 rounded-xl border border-[#e7b34a]/30 bg-[#e7b34a]/[0.06] p-3">
-      <LaneHeader color="#E7B34A" label="Awaiting review" count={awaiting.length} />
+      <LaneHeader color="#E7B34A" label="Awaiting review" count={awaiting.length} entrance={entrance} />
       <div className="flex flex-col gap-3">
         {awaiting.map((i) => (
           <div key={`${i.repo}#${i.number}`}>
@@ -854,7 +860,7 @@ export function IssueList({
             );
             return (
               <div key={lane.key}>
-                <LaneHeader color={lane.color} label={lane.label} count={items.length} />
+                <LaneHeader color={lane.color} label={lane.label} count={items.length} entrance={entrance} />
                 <div className="flex flex-col gap-3">
                   {items.length === 0 ? (
                     <p className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-xs text-white/25">
@@ -892,7 +898,7 @@ export function IssueList({
       {awaitingSection}
       {sections.map((sec) => (
         <section key={sec.key} className="mb-6 last:mb-0">
-          <LaneHeader color={sec.color} label={sec.label} count={sec.items.length} />
+          <LaneHeader color={sec.color} label={sec.label} count={sec.items.length} entrance={entrance} />
           <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {sortIssues(sec.items, sort).map(card)}
           </div>
