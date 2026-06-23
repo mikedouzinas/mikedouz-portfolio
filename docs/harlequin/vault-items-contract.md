@@ -28,6 +28,8 @@ await db.from('dev_items').insert({ project_id: 'deep-work-queue', title: '...',
 const { data } = await db.from('dev_items').select('*').eq('project_id', 'deep-work-queue');
 ```
 
+> When updating a `dev_items` row via raw SQL, also set `updated_at` (and set/clear `closed_at` when moving into/out of `done`) — the site's data lib does this automatically, but raw writers from the vault must set them explicitly.
+
 ## Rules
 - **Projects: vault-only.** Never create projects from the board UI.
 - **Items: either side.** Write `vault_ref` back so the note ↔ item point at each other.

@@ -15,7 +15,9 @@ async function main() {
     '../src/lib/dev/items'
   );
 
-  // Idempotent: clear any prior seed so re-runs are clean.
+  // DESTRUCTIVE: deletes the project and cascade-deletes ALL its items before
+  // reseeding. Safe for sample data, but do NOT run this once the vault has
+  // written real Deep Work Queue items under this project id — it will erase them.
   await deleteProject(PROJECT_ID).catch(() => {});
 
   await createProject({

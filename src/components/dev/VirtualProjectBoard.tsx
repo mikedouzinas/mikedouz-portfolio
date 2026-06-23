@@ -80,7 +80,9 @@ export function VirtualProjectBoard({
               >
                 {p.irisVisible ? 'iris' : 'private'}
               </span>
-              <span className="ml-auto text-xs text-white/40">{p.items.length} items</span>
+              <span className="ml-auto text-xs text-white/40">
+                {p.items.filter((i) => i.status !== 'done').length} open
+              </span>
             </button>
 
             {!isCollapsed && (
