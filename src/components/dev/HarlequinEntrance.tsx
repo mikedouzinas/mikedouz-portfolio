@@ -5,35 +5,34 @@ import { useEffect, useRef, useState } from 'react';
 /**
  * HarlequinEntrance — the magician's reveal INTO the board.
  *
- * Plays once on /dev mount, on top of everything, then dissolves away and
- * unmounts so it never blocks interaction. The real board (and its real
- * HarlequinReveal cursor-bloom argyle) loads BEHIND this overlay; the entrance
- * is a pure WebGL curtain that reveals it.
+ * Played by HarlequinTransitionHost (root layout) so it can build over the
+ * CURRENT page (the homepage) and survive the client-navigation to /dev.
  *
  * Rhythm (the validated look): a fine harlequin weave is KNIT one diamond at a
- * time. Diamonds are placed in CONNECTED order — a BFS flood-fill from a seed
- * cell with a shuffled frontier — so each new diamond grows off the already-laid
- * cluster along a wandering front. A small rolling set is ever in flight, so the
- * eye follows individual diamonds being set. ~2.6s build (total entrance ~3s),
- * then a smooth ~0.5s FADE-OUT of the whole overlay (cover + diamonds) to reveal
- * the dark board — a clean fade, not a cut.
+ * time, in CONNECTED order (a BFS flood-fill from a seed cell with a shuffled
+ * frontier) so each new diamond grows off the laid cluster along a wandering
+ * front. The diamonds are DIM and semi-transparent — a dimmer version of the
+ * resting board argyle (HarlequinReveal) — so the page underneath shows THROUGH
+ * the build instead of the screen slamming to black. ~2.6s assemble.
  *
- * Tweaks vs. the standalone lockup:
- *   - 56px tile (matches the live HarlequinReveal background exactly: the same
- *     diamond polygon, fill #B3122B, edge #EDE6D6, on #0e0c12) so the build
- *     lands seamlessly on the real /dev background — fewer, bigger diamonds,
- *     even clearer one-at-a-time.
- *   - faster build + a clean fade-out: once the weave is laid, the whole overlay
- *     (cover + diamonds) fades out smoothly (~0.5s) to reveal the board.
+ * When the weave reaches full coverage we fire `onAssembled`: the host then
+ * client-navigates to /dev underneath. A dark backing ramps in at that moment to
+ * mask the route swap (the homepage → the dark board). Once the host reports the
+ * board has committed (`revealReady`) the WHOLE overlay fades out (~0.5s) to
+ * reveal it. A clean fade, then `onDone`.
  *
- * three.js is loaded lazily (dynamic import) ONLY here so it never enters the
- * homepage bundle. Reduced motion: mounts nothing, fires onDone immediately.
+ * three.js is loaded lazily (dynamic import) so it never enters the homepage
+ * bundle. Reduced motion: no build — fire onAssembled (host navigates) then done.
  */
 
-// Quicker deliberate build, then a smooth fade-out. Total ~3s.
 const DURATION_ASSEMBLE = 2.6; // s — diamonds knit in one-by-one to full coverage
-const HOLD = 0.12; // s — brief full-coverage beat
-const DURATION_FADE = 0.5; // s — smooth fade-out of the whole overlay to the board
+const BACKING_RAMP = 0.18; // s — dark backing ramps in once assembled (masks swap)
+const BACKING_MAX = 0.96; // dark backing peak opacity
+const MIN_HOLD = 0.35; // s — keep the full argyle up briefly before it dims away
+const DURATION_DIM = 0.9; // s — the argyle dims down, settling into the background
+
+// A dimmer version of the resting argyle — the page shows through the build.
+const DIM = 0.46; // canvas opacity
 
 // Match the live HarlequinReveal tile exactly.
 const TILE = 56; // px per argyle cell
@@ -49,7 +48,6 @@ const VERT = /* glsl */ `
   attribute float aSeed;
 
   uniform float uProgress;
-  uniform float uDissolve;
   uniform float uSpan;
   uniform vec2  uTileClip;
 
@@ -83,9 +81,6 @@ const VERT = /* glsl */ `
 
     vFill = s;
 
-    center.y += uDissolve * (0.04 + 0.10 * aSeed) * smoothstep(0.0, 1.0, uDissolve);
-    center.x += (aSeed - 0.5) * 0.05 * uDissolve;
-
     gl_Position = vec4(center + rq, 0.0, 1.0);
   }
 `;
@@ -99,25 +94,7 @@ const FRAG = /* glsl */ `
 
   uniform vec3  uRed;
   uniform vec3  uChampagne;
-  uniform vec3  uBurn;
-  uniform vec3  uNavy;
-  uniform float uDissolve;
   uniform float uInset;
-  uniform float uTime;
-
-  vec2 hash2(vec2 p){
-    p = vec2(dot(p, vec2(127.1,311.7)), dot(p, vec2(269.5,183.3)));
-    return -1.0 + 2.0*fract(sin(p)*43758.5453123);
-  }
-  float vnoise(vec2 p){
-    vec2 i = floor(p); vec2 f = fract(p);
-    vec2 u = f*f*(3.0-2.0*f);
-    return mix(mix(dot(hash2(i+vec2(0,0)), f-vec2(0,0)),
-                   dot(hash2(i+vec2(1,0)), f-vec2(1,0)), u.x),
-               mix(dot(hash2(i+vec2(0,1)), f-vec2(0,1)),
-                   dot(hash2(i+vec2(1,1)), f-vec2(1,1)), u.x), u.y);
-  }
-  float fbm(vec2 p){ float v=0.0,a=0.5; for(int i=0;i<4;i++){v+=a*vnoise(p);p*=2.03;a*=0.5;} return v; }
 
   void main(){
     float dia = abs(vLocal.x) + abs(vLocal.y);
@@ -137,33 +114,31 @@ const FRAG = /* glsl */ `
 
     float alpha = soft * smoothstep(0.0, 0.35, vFill);
 
-    if (uDissolve > 0.0) {
-      float grain = fbm(vSlot * vec2(7.0, 5.0) + vec2(uTime * 0.05, 0.0));
-      float n = vSeed * 0.55 + grain * 0.30 + 0.15;
-      float front = uDissolve * 1.35 - 0.20;
-      float band = 0.22;
-      float burn = smoothstep(front - band, front, n) *
-                   (1.0 - smoothstep(front, front + band, n));
-      float gone = smoothstep(front, front - band, n);
-
-      vec3 burnCol = mix(uBurn, uNavy, fbm(vSlot * 12.0) * 0.5 + 0.25);
-      col = mix(col, burnCol, burn);
-      col += uBurn * burn * 0.7;
-      alpha *= (1.0 - gone);
-      alpha = max(alpha, burn * soft * 0.8);
-    }
-
     if (alpha < 0.004) discard;
     gl_FragColor = vec4(col, alpha);
   }
 `;
 
-export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
+export function HarlequinEntrance({
+  revealReady,
+  onAssembled,
+  onDone,
+}: {
+  revealReady: boolean;
+  onAssembled: () => void;
+  onDone: () => void;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const backingRef = useRef<HTMLDivElement>(null);
   const [hidden, setHidden] = useState(false);
+
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
+  const onAssembledRef = useRef(onAssembled);
+  onAssembledRef.current = onAssembled;
+  const revealReadyRef = useRef(revealReady);
+  revealReadyRef.current = revealReady;
 
   useEffect(() => {
     const reduced =
@@ -172,9 +147,13 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
 
     const canvas = canvasRef.current;
     if (!canvas || reduced) {
-      setHidden(true);
-      onDoneRef.current?.();
-      return;
+      // No build — let the host navigate to /dev, then finish.
+      onAssembledRef.current();
+      const t = setTimeout(() => {
+        setHidden(true);
+        onDoneRef.current();
+      }, 60);
+      return () => clearTimeout(t);
     }
 
     let disposed = false;
@@ -185,11 +164,11 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
       try {
         THREE = await import('three');
       } catch {
-        // three.js failed to load — fail OPEN so the opaque cover never traps
-        // the board: clear the entrance and reveal it.
+        // three.js failed to load — don't trap the user: navigate + finish.
         if (!disposed) {
+          onAssembledRef.current();
           setHidden(true);
-          onDoneRef.current?.();
+          onDoneRef.current();
         }
         return;
       }
@@ -199,8 +178,6 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
 
       const RED = new THREE.Color('#b3122b');
       const CHAMPAGNE = new THREE.Color('#ede6d6');
-      const BURN = new THREE.Color('#27b06f');
-      const NAVY = new THREE.Color('#143a6b');
 
       const renderer = new THREE.WebGLRenderer({
         canvas,
@@ -238,12 +215,12 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
         // CONNECTED PLACEMENT ORDER — BFS flood-fill from a seed cell, shuffling
         // each frontier wave so the weave grows outward off the laid cluster.
         const idx = (c: number, r: number) => r * cols + c;
-        const rank = new Int32Array(count).fill(-1);
+        const rankArr = new Int32Array(count).fill(-1);
         const seedC = Math.floor(cols * rand(0.18, 0.38));
         const seedR = Math.floor(rows * rand(0.18, 0.42));
         let frontier = [idx(seedC, seedR)];
         let placed = 0;
-        rank[frontier[0]] = placed++;
+        rankArr[frontier[0]] = placed++;
         const NB = [
           [1, 0], [-1, 0], [0, 1], [0, -1],
           [1, 1], [-1, -1], [1, -1], [-1, 1],
@@ -259,7 +236,7 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
               const nr = cr + dr;
               if (nc < 0 || nc >= cols || nr < 0 || nr >= rows) continue;
               const ni = idx(nc, nr);
-              if (rank[ni] !== -1 || seen.has(ni)) continue;
+              if (rankArr[ni] !== -1 || seen.has(ni)) continue;
               seen.add(ni);
               next.push(ni);
             }
@@ -268,7 +245,7 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
             const j = Math.floor(Math.random() * (i + 1));
             [next[i], next[j]] = [next[j], next[i]];
           }
-          for (const ni of next) rank[ni] = placed++;
+          for (const ni of next) rankArr[ni] = placed++;
           frontier = next;
         }
         const denom = Math.max(placed - 1, 1);
@@ -292,7 +269,7 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
             aSpin[k] = rand(-0.5, 0.5);
             aSeed[k] = Math.random();
 
-            const rk = rank[k] < 0 ? denom : rank[k];
+            const rk = rankArr[k] < 0 ? denom : rankArr[k];
             aDelay[k] = Math.min(1, rk / denom + (Math.random() - 0.5) * (0.6 / denom));
 
             k++;
@@ -322,15 +299,11 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
           depthWrite: false,
           uniforms: {
             uProgress: { value: 0 },
-            uDissolve: { value: 0 },
             uSpan: { value: spanValue },
             uTileClip: { value: new THREE.Vector2(tileClipX, tileClipY) },
             uRed: { value: RED },
             uChampagne: { value: CHAMPAGNE },
-            uBurn: { value: BURN },
-            uNavy: { value: NAVY },
             uInset: { value: 1.0 - RHOMBUS_INSET },
-            uTime: { value: 0 },
           },
         });
 
@@ -349,15 +322,11 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
         const newRows = Math.ceil(H / TILE) + 1;
         if (mesh && material && (newCols !== cols || newRows !== rows)) {
           const p = material.uniforms.uProgress.value;
-          const dv = material.uniforms.uDissolve.value;
           mesh.geometry.dispose();
           (mesh.material as import('three').Material).dispose();
           scene.remove(mesh);
           buildInstances();
-          if (material) {
-            material.uniforms.uProgress.value = p;
-            material.uniforms.uDissolve.value = dv;
-          }
+          if (material) material.uniforms.uProgress.value = p;
         }
       }
 
@@ -365,54 +334,73 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
       resize();
       window.addEventListener('resize', resize);
 
-      // Smooth ease-in-out for the fade-out opacity so it visibly fades, no cut.
       const easeInOut = (t: number) =>
         t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
       const T_ASSEMBLE = DURATION_ASSEMBLE;
-      const T_HOLD = DURATION_ASSEMBLE + HOLD;
-      const T_END = DURATION_ASSEMBLE + HOLD + DURATION_FADE;
 
       let startTime = performance.now();
       let rafId = 0;
       let finished = false;
+      let assembled = false;
+      let assembleAt = 0;
+      let revealAt = -1;
+      let backingAtReveal = BACKING_MAX;
 
       function finish() {
         if (finished) return;
         finished = true;
         if (rootRef.current) rootRef.current.style.opacity = '0';
         setHidden(true);
-        onDoneRef.current?.();
+        onDoneRef.current();
       }
 
       function frame(now: number) {
         if (disposed || !material) return;
         const t = (now - startTime) / 1000;
-        material.uniforms.uTime.value = t;
-        // No shader burn — the reveal is a clean overlay fade-out (below).
-        material.uniforms.uDissolve.value = 0;
 
         if (t <= T_ASSEMBLE) {
+          // Build the weave over the page (dim diamonds, page shows through).
           material.uniforms.uProgress.value = Math.min(t / DURATION_ASSEMBLE, 1);
         } else {
           material.uniforms.uProgress.value = 1;
-          if (t > T_HOLD) {
-            // Once the weave is fully laid (+ a brief hold), fade the WHOLE
-            // overlay (opaque cover + diamond canvas) out smoothly to reveal the
-            // board beneath. A visible fade, not a cut.
-            const fn = Math.min((t - T_HOLD) / DURATION_FADE, 1);
-            if (rootRef.current) {
-              rootRef.current.style.opacity = String(1 - easeInOut(fn));
+          if (!assembled) {
+            assembled = true;
+            assembleAt = t;
+            onAssembledRef.current(); // host: client-navigate to /dev underneath
+          }
+          // The full argyle STAYS through the page transfer. Once the board has
+          // painted underneath (revealReady) and a brief beat has passed, the
+          // argyle DIMS away and the dark backing lifts together — the weave
+          // settles into the board's own faint background, rather than the whole
+          // overlay curtain-fading.
+          const canReveal = revealReadyRef.current && t - assembleAt >= MIN_HOLD;
+          if (!canReveal) {
+            // Hold: ramp the dark backing in to mask the homepage → board swap.
+            const bk = Math.min((t - assembleAt) / BACKING_RAMP, 1) * BACKING_MAX;
+            if (backingRef.current) backingRef.current.style.opacity = String(bk);
+          } else {
+            if (revealAt < 0) {
+              revealAt = t;
+              backingAtReveal = backingRef.current
+                ? parseFloat(backingRef.current.style.opacity || '0') || BACKING_MAX
+                : BACKING_MAX;
+            }
+            const fn = Math.min((t - revealAt) / DURATION_DIM, 1);
+            const e = easeInOut(fn);
+            if (canvasRef.current) canvasRef.current.style.opacity = String(DIM * (1 - e));
+            if (backingRef.current) {
+              backingRef.current.style.opacity = String(backingAtReveal * (1 - e));
+            }
+            if (fn >= 1) {
+              renderer.render(scene, camera);
+              finish();
+              return;
             }
           }
         }
 
         renderer.render(scene, camera);
-
-        if (t >= T_END) {
-          finish();
-          return;
-        }
         rafId = requestAnimationFrame(frame);
       }
 
@@ -446,18 +434,20 @@ export function HarlequinEntrance({ onDone }: { onDone?: () => void }) {
       className="pointer-events-none fixed inset-0 z-[120]"
       style={{ willChange: 'opacity' }}
     >
-      {/* Instant opaque cover — present on the VERY FIRST paint via plain CSS,
-          before three.js loads, so the real board is hidden from frame 1. The
-          diamond weave (the transparent WebGL canvas above) knits in on top of
-          this; once the weave is laid the WHOLE overlay (this cover + the
-          canvas) fades out smoothly to reveal the board underneath. */}
+      {/* Dark backing — transparent during the build (the page shows through the
+          dim weave), then ramps in once assembled to mask the homepage → board
+          route swap, and fades out with the overlay to reveal the board. */}
       <div
+        ref={backingRef}
         className="absolute inset-0"
-        style={{ background: '#0e0c12' }}
+        style={{ background: '#0e0c12', opacity: 0 }}
       />
+      {/* The dim diamond weave knits in on top — a dimmer version of the resting
+          argyle, so the page underneath stays visible as it builds. */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 block h-full w-full"
+        style={{ opacity: DIM }}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { DeepModeProvider } from "@/components/DeepModeContext";
 import { AdminModeProvider } from "@/components/AdminModeProvider";
 import GlobalOverlays from "@/components/GlobalOverlays";
+import { HarlequinTransitionHost } from "@/components/dev/transition/HarlequinTransitionHost";
 import "../styles/globals.css";
 
 export const metadata: Metadata = {
@@ -75,6 +76,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <AdminModeProvider>
               {children}
               <GlobalOverlays />
+              {/* HARLEQUIN page transitions (enter/exit). Mounted at the root so
+                  the WebGL overlay survives the home ↔ /dev route change; renders
+                  nothing until a transition fires (three.js loads only then). */}
+              <HarlequinTransitionHost />
             </AdminModeProvider>
           </DeepModeProvider>
         </ThemeProvider>

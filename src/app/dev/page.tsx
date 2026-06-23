@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import type { DevIssue, DevRepo } from '@/lib/dev/github';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { HarlequinTitle } from '@/components/dev/HarlequinTitle';
@@ -10,10 +11,11 @@ import { GearMenu } from '@/components/dev/GearMenu';
 import { CerePortal } from '@/components/dev/CerePortal';
 import { CerePanel } from '@/components/dev/CerePanel';
 import { CereGameLoader } from '@/components/dev/CereGameLoader';
-import { HarlequinReveal } from '@/components/dev/HarlequinReveal';
-import { HarlequinEntrance } from '@/components/dev/HarlequinEntrance';
-import { HarlequinExit } from '@/components/dev/HarlequinExit';
-import { useHarlequinExit } from '@/components/dev/useHarlequinExit';
+import { requestHarlequinTransition } from '@/components/dev/transition/store';
+import {
+  captureBoardSnapshot,
+  scheduleBoardSnapshot,
+} from '@/components/dev/transition/boardSnapshot';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
 
@@ -24,6 +26,7 @@ const SORT_OPTS: { value: SortBy; label: string }[] = [
 ];
 
 export default function DevConsolePage() {
+  const router = useRouter();
   const [repos, setRepos] = useState<DevRepo[]>([]);
   const [hidden, setHidden] = useState<DevRepo[]>([]);
   const [issues, setIssues] = useState<DevIssue[]>([]);
@@ -37,9 +40,6 @@ export default function DevConsolePage() {
   const [groupBy, setGroupBy] = useState<GroupBy>('status');
   const [sort, setSort] = useState<SortBy>('priority');
   const [composerOpen, setComposerOpen] = useState(false);
-  // Shared diamond-ash exit for both the back-diamond (session kept) and logout
-  // (session ended). Snapshots the real board, disintegrates it, navigates to /.
-  const { exiting, start: startExit, navigate: exitNavigate } = useHarlequinExit();
 
   const loadRepos = useCallback(async () => {
     const res = await fetch('/api/dev/repos');
@@ -116,6 +116,20 @@ export default function DevConsolePage() {
     loadIssues();
   }, [loadIssues]);
 
+  // Eagerly pre-capture the board once it has settled, so the disintegration
+  // EXIT cover is ready instantly on click (no html2canvas stall at click time —
+  // that delay was the main reason the old exit "felt wrong"). Debounced, so
+  // silent issue refreshes coalesce into one capture. Back-button hover refreshes
+  // it again for the freshest possible frame.
+  useEffect(() => {
+    if (loading) return;
+    scheduleBoardSnapshot(1200);
+    // Warm the exit overlay chunk ahead of the click so the cover appears
+    // instantly (not after a ~0.4s lazy-chunk fetch). Runtime import() keeps it
+    // a separate chunk — it never enters the homepage bundle.
+    void import('@/components/dev/HarlequinExit');
+  }, [loading, issues]);
+
   // Mount the loader immediately when loading starts (handled during render via
   // prev-tracking so it's never a frame late), then keep it mounted for one fade
   // duration after loading ends so it can fade out over the board.
@@ -139,7 +153,11 @@ export default function DevConsolePage() {
   useEffect(() => {
     void import('three');
     void import('html2canvas');
-  }, []);
+    // Warm the homepage RSC so the exit's reveal (which client-navigates to /)
+    // has it painted underneath almost immediately — keeps the dissolve's start
+    // snappy instead of holding the board cover while / loads.
+    router.prefetch('/');
+  }, [router]);
 
   // ⌘K (the main-site Iris is suppressed on /dev) opens Cere instead. Ignore
   // Shift so ⌘⇧K stays reserved for the portal twin and doesn't also open Cere.
@@ -186,20 +204,19 @@ export default function DevConsolePage() {
     } catch {
       /* leave anyway — being unable to reach the endpoint shouldn't trap you */
     }
-    void startExit();
+    requestHarlequinTransition('exit');
   }
 
   const openCount = issues.filter((i) => i.state === 'open').length;
 
   return (
     <div data-board-root className="min-h-screen dev-workpad text-white">
-      {/* Magician's reveal INTO the board — knits the argyle one diamond at a
-          time on mount, then dissolves to reveal the real board, and unmounts. */}
-      <HarlequinEntrance />
-      {/* Diamond-ash disintegration OUT — snapshots the real board and erodes it
-          L→R, then navigates to /. Mounts only while leaving. */}
-      {exiting && <HarlequinExit onDone={exitNavigate} />}
-      <HarlequinReveal />
+      {/* The diamond-ash disintegration EXIT is played by HarlequinTransitionHost
+          (root layout) so the WebGL overlay survives the /dev → home route change.
+          This page only tags its root [data-board-root] (the exit snapshots it).
+          The cursor-follow argyle bloom (HarlequinReveal) was removed — it popped
+          up under the cursor right as you reached for the back-diamond and
+          conflated with the exit. */}
       <header
         data-suppress-reveal
         data-has-contained-glow="true"
@@ -219,7 +236,13 @@ export default function DevConsolePage() {
             <div className="flex flex-1 flex-col gap-3 min-w-0">
               {/* Row 1: title left, group-by right */}
               <div className="flex items-center justify-between gap-4">
-                <HarlequinTitle onBack={() => void startExit()} />
+                <HarlequinTitle
+                  onBack={() => requestHarlequinTransition('exit')}
+                  onBackHover={() => {
+                    void captureBoardSnapshot();
+                    void import('@/components/dev/HarlequinExit');
+                  }}
+                />
                 <div className="hidden md:block">
                   <GroupByToggle value={groupBy} onChange={setGroupBy} />
                 </div>

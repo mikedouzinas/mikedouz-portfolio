@@ -1,432 +1,381 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { captureBoardSnapshot, getBoardSnapshot } from './transition/boardSnapshot';
 
 /**
  * HarlequinExit — the diamond-ash disintegration OUT of the board.
  *
- * On mount it html2canvas-snapshots the REAL /dev board DOM (the element tagged
- * `[data-board-root]`) into a texture, then runs a WebGL dissolve on that exact
- * snapshot: the board's own pixels erode left→right into harlequin DIAMOND ash
- * (green burn front #27b06f cooling to navy #143a6b, a blue rim glint #5aa6e6,
- * red #B3122B flecks where the source is reddish). The board erodes into a
- * DARK void (#0e0c12) — not into the live board beneath — and that dark cover
- * is HELD briefly before `onDone` navigates, so the homepage loads from under a
- * dark screen with no board reflash.
+ * Played by HarlequinTransitionHost (root layout) so the overlay survives the
+ * /dev → / route change. Reads the EAGERLY-captured board snapshot (see
+ * `boardSnapshot.ts`) and renders it as a grid of opaque chips that, at
+ * progress 0, perfectly reconstruct the live board — a pristine, instant COVER.
  *
- * This is the "drive off the REAL board, not a mock" requirement: the texture is
- * the live DOM, captured at the instant of leaving.
+ * Timeline (the whole point — no delay, no dimmed board, no flip):
+ *   1. mount → snapshot already cached → draw chips @ progress 0 = opaque board
+ *      cover, on screen on the FIRST frame. Fire `onSnapshotReady`.
+ *   2. host client-navigates home UNDER the opaque cover (invisible).
+ *   3. host reports home painted (`armed`) → chips ignite L-of-sweep first and
+ *      peel into harlequin DIAMONDS (green burn front #27b06f cooling to navy
+ *      #143a6b, blue #5aa6e6 / red #B3122B flecks), each chip fading to
+ *      TRANSPARENT — so the LIVE homepage behind this transparent canvas is
+ *      revealed through the gaps. No home texture, nothing to swap to.
+ *   4. last chip gone → `onDone` → overlay unmounts; nothing visually changes
+ *      because home was already fully revealed.
  *
- * three.js and html2canvas are loaded lazily (dynamic import) ONLY here so they
- * never enter the homepage bundle.
- *
- * Reliability:
- *   - onDone fires when the sweep finishes (the normal, anim-driven path), and
- *     a self failsafe (armed at animation START, not mount, so a slow snapshot
- *     can't pre-empt the sweep) backs it up. The parent (useHarlequinExit) arms
- *     an additional hard failsafe. onDone is idempotent (a single
- *     window.location assign).
- *   - If the html2canvas snapshot throws OR returns empty, we DON'T abort: we
- *     play the SAME dissolve on a flat board-colored (#0e0c12) fallback texture,
- *     so the user always sees the diamond-ash dissolve.
- *   - Only a genuine WebGL/setup failure fails OPEN (onDone via failsafe).
- *
- * Reduced motion: a brief dark fade, then onDone — no shader.
+ * Raw WebGL2 (no three.js here) keeps this overlay tiny. A genuine GL failure or
+ * missing snapshot fails OPEN (ready + done) so the host still navigates.
+ * Reduced motion: no overlay, instant nav.
  */
 
-const DURATION = 1.35; // s — the L→R sweep
-const DARK_HOLD = 0.32; // s — hold the dark cover after the dissolve, before nav
-const REDUCED_MS = 220;
-// Self failsafe past the sweep + dark hold, armed when the animation STARTS.
-const SELF_DONE_MS = (DURATION + DARK_HOLD + 0.4) * 1000;
+const BREAK_S = 0.42; // s — the de-rez "screen breaking" wind-up
+const DISS_S = 1.5; // s — the diagonal diamond disintegration
+const OVERLAP = 0.1; // s — dissolve starts just before the break fully peaks
+const SELF_DONE_MS = (BREAK_S + DISS_S + 0.5) * 1000;
+const CELL = 14; // px (logical) — chip size; finer = more refined ash
 const BASE = '#0e0c12';
 
-const VERT = /* glsl */ `
-  varying vec2 vUv;
-  void main() {
-    vUv = uv;
-    gl_Position = vec4(position.xy, 0.0, 1.0);
-  }
-`;
+const VERT = `#version 300 es
+precision highp float;
+layout(location=0) in vec2 aCorner;
+layout(location=1) in vec2 aCell;
+layout(location=2) in float aSeed;
+uniform vec2  uRes;
+uniform float uProgress;
+uniform float uTime;
+uniform float uBand;
+uniform float uCell;
+uniform vec2  uSweep;
+out vec2  vUV;
+out float vLocal;
+out float vSeed;
+float hash(vec2 p){ return fract(sin(dot(p, vec2(41.3,289.1)))*43758.5453); }
+void main(){
+  vec2 dir = normalize(uSweep);
+  float sMax = dot(dir, vec2(1.0,1.0));
+  vec2 cellUV = aCell / uRes;
+  float s = dot(dir, cellUV) / sMax;
+  s += (hash(aCell*0.013) - 0.5) * 0.14;   // jitter range ±0.07 → ragged front
+  // Bias so progress 0 leaves EVERY chip intact (front below min s) — a pristine
+  // opaque cover — and progress 1 takes every chip past its threshold.
+  float front = uProgress * (1.0 + uBand + 0.16) - 0.08;
+  float local = clamp((front - s) / uBand, 0.0, 1.0);
 
-const FRAG = /* glsl */ `
-  precision highp float;
-  varying vec2 vUv;
-  uniform sampler2D uTex;
-  uniform float uProgress;
-  uniform float uTime;
-  uniform vec3  uEmber;
-  uniform vec3  uAsh;
-  uniform vec3  uRed;
+  vUV = (aCell + aCorner * uCell) / uRes;
+  vLocal = local;
+  vSeed = aSeed;
 
-  vec2 hash2(vec2 p){
-    p = vec2(dot(p, vec2(127.1,311.7)), dot(p, vec2(269.5,183.3)));
-    return -1.0 + 2.0*fract(sin(p)*43758.5453123);
-  }
-  float noise(vec2 p){
-    vec2 i = floor(p); vec2 f = fract(p);
-    vec2 u = f*f*(3.0-2.0*f);
-    return mix(mix(dot(hash2(i+vec2(0,0)), f-vec2(0,0)),
-                   dot(hash2(i+vec2(1,0)), f-vec2(1,0)), u.x),
-               mix(dot(hash2(i+vec2(0,1)), f-vec2(0,1)),
-                   dot(hash2(i+vec2(1,1)), f-vec2(1,1)), u.x), u.y);
-  }
-  float fbm(vec2 p){ float v=0.0,a=0.5; for(int i=0;i<5;i++){ v+=a*noise(p); p*=2.03; a*=0.5; } return v; }
+  float e = local;
+  float dia = smoothstep(0.0, 0.22, local);          // snap to a 45° diamond fast
+  float angle = dia * 0.785398 + e*e * (aSeed - 0.5) * 4.0;
+  float scale = 1.0 - smoothstep(0.45, 1.0, e);
+  scale *= 1.0 + 0.06*e;
 
-  void main(){
-    vec2 uv = vUv;
+  vec2 outward = normalize(vec2(aSeed-0.5, -(0.4+aSeed*0.6)));
+  float sway = sin(uTime*2.0 + aSeed*6.28) * 6.0 * e;
+  vec2 grav = vec2(0.0, e*e * 40.0);
+  vec2 offset = outward * (e*150.0) + vec2(0.0, -e*150.0) + vec2(sway,0.0) + grav;
 
-    float grain = fbm(uv * vec2(9.0, 6.0) + vec2(0.0, uTime*0.05));
-    float fine  = fbm(uv * 38.0);
+  vec2 corner = aCorner * uCell * scale;
+  corner.y *= mix(1.0, 1.32, dia);                   // elongate into a harlequin rhombus
+  float c = cos(angle), sN = sin(angle);
+  vec2 rc = vec2(corner.x*c - corner.y*sN, corner.x*sN + corner.y*c);
+  vec2 posPx = aCell + rc + offset;
 
-    float front = uProgress * 1.18 - 0.09;
-    float edge  = uv.x + grain * 0.16;
-    float band  = 0.13;
+  vec2 clip = (posPx / uRes) * 2.0 - 1.0;
+  clip.y = -clip.y;
+  gl_Position = vec4(clip, 0.0, 1.0);
+}`;
 
-    float past = smoothstep(front + 0.01, front - band, edge);
-    float burn = smoothstep(front - band, front, edge) *
-                 (1.0 - smoothstep(front, front + band*0.55, edge));
+const FRAG = `#version 300 es
+precision highp float;
+in vec2 vUV; in float vLocal; in float vSeed;
+uniform sampler2D uBoard;
+uniform float uBreak;   // 0→1 de-rez wind-up
+uniform float uTime;
+out vec4 frag;
+float h(vec2 p){ return fract(sin(dot(p, vec2(12.99,78.23)))*43758.5453); }
+void main(){
+  float local = vLocal;
 
-    float lift = burn;
-    vec2 disp = vec2(0.0);
-    disp.y += lift * (0.05 + 0.10 * fine);
-    disp.x += lift * (fbm(uv*18.0 + uTime) * 0.06);
-    vec2 suv = uv - disp;
+  // ---- B · DE-REZ wind-up: the board glitches/corrupts before it disintegrates.
+  // Row-tear + RGB channel split + scanlines, modulated by uBreak.
+  vec2 uv = vUV;
+  float g = uBreak;
+  float row = floor(uv.y * 90.0);
+  float tear = step(0.6, h(vec2(row, floor(uTime*9.0)+3.0)));
+  uv.x += (h(vec2(row, floor(uTime*18.0))) - 0.5) * 0.06 * g * tear;
+  float sp = 0.004*g + 0.002*g*sin(uTime*40.0);
+  vec3 board = vec3(
+    texture(uBoard, uv + vec2(sp,0.0)).r,
+    texture(uBoard, uv).g,
+    texture(uBoard, uv - vec2(sp,0.0)).b);
+  float bAlpha = texture(uBoard, uv).a;
+  board *= 1.0 - 0.25*g*step(0.5, fract(uv.y*220.0));   // scanlines
 
-    vec4 tex = texture2D(uTex, suv);
+  // Tone-match: html2canvas can't render the board's grain/backdrop-blur, so the
+  // snapshot comes out ~2x too bright (mean luma 42 vs the live board's 21) — it
+  // looked "grayed out." This gamma darkens the washed midtones back to live tone.
+  board = pow(max(board, 0.0), vec3(1.3));
+  vec3 green = vec3(0.153,0.690,0.435);
+  vec3 navy  = vec3(0.078,0.227,0.420);
+  vec3 red   = vec3(0.702,0.071,0.169);
+  vec3 blue  = vec3(0.353,0.651,0.902);
+  float ignite = smoothstep(0.0,0.12,local) * (1.0 - smoothstep(0.12,0.5,local));
+  vec3 burn = mix(green, navy, smoothstep(0.1,0.6,local));
+  if (vSeed > 0.90) burn = red;
+  else if (vSeed > 0.78) burn = blue;
+  vec3 col = mix(board, burn, ignite * 0.8);
+  float edge = (1.0 - smoothstep(0.0, 0.10, local)) * step(0.0006, local);
+  vec3 hot = mix(green, vec3(0.92,1.0,0.86), edge*edge);
+  col += hot * edge * 2.0;
+  col += burn * ignite * 0.5;
+  float a = (1.0 - smoothstep(0.5, 1.0, local)) * bAlpha;
+  if (a <= 0.003) discard;
+  frag = vec4(col, a);
+}`;
 
-    float keep = 1.0 - smoothstep(front - band, front - band*0.35, edge);
-
-    float redness = clamp((tex.r - max(tex.g, tex.b)) * 3.0, 0.0, 1.0);
-    vec3 emberCol = mix(uEmber, uRed, redness * 0.85);
-    vec3 col = mix(tex.rgb, mix(emberCol, uAsh, fine*0.4 + 0.15), burn);
-
-    float ridge = burn * smoothstep(0.45, 1.0, burn);
-    col += emberCol * ridge * 1.6;
-
-    float alpha = keep;
-    alpha = max(alpha, burn * (0.85 - fine*0.3));
-    alpha *= (1.0 - past*0.0);
-    alpha *= tex.a;
-
-    if (alpha < 0.004) discard;
-    gl_FragColor = vec4(col, alpha);
-  }
-`;
-
-// Particle layer: a sparse grid seeded FROM the snapshot, each lifting off as
-// the front passes — drifting harlequin-diamond ash of real board pixels.
-const PVERT = /* glsl */ `
-  precision highp float;
-  attribute vec2 aUv;
-  attribute float aSeed;
-  uniform float uProgress;
-  uniform float uTime;
-  uniform sampler2D uTex;
-  uniform float uPixel;
-  varying vec3 vCol;
-  varying float vAlpha;
-
-  void main(){
-    vec4 src = texture2D(uTex, aUv);
-    float front = uProgress * 1.18 - 0.09;
-    float n = fract(sin(dot(aUv, vec2(91.7, 47.3))) * 7841.3);
-    float edge = aUv.x + (n - 0.5) * 0.10;
-    float life = clamp((front - edge) / 0.32, 0.0, 1.0);
-
-    vec2 pos = aUv * 2.0 - 1.0;
-    pos.y = -pos.y;
-
-    pos.y += life * (0.18 + 0.5*aSeed);
-    pos.x += (sin(uTime*2.0 + aSeed*30.0) * 0.04 + (aSeed-0.5)*0.10) * life;
-
-    float window = life * (1.0 - smoothstep(0.55, 1.0, life));
-    float lum = dot(src.rgb, vec3(0.299, 0.587, 0.114));
-    float weight = 0.08 + 0.92 * smoothstep(0.06, 0.45, lum);
-    vAlpha = window * weight;
-
-    vCol = src.rgb;
-    gl_Position = vec4(pos, 0.0, 1.0);
-    gl_PointSize = uPixel * (1.0 + life * 1.4) * (0.6 + aSeed);
-  }
-`;
-const PFRAG = /* glsl */ `
-  precision highp float;
-  varying vec3 vCol;
-  varying float vAlpha;
-  uniform vec3 uEmber;
-  uniform vec3 uChampagne;
-  void main(){
-    vec2 uv = gl_PointCoord;
-    float dia = abs(uv.x - 0.5) + abs(uv.y - 0.5);
-    if (dia > 0.5) discard;
-
-    float aa = fwidth(dia) + 0.02;
-    float soft = smoothstep(0.5, 0.5 - aa - 0.10, dia);
-    float rim = smoothstep(0.5 - aa - 0.14, 0.5 - aa, dia)
-              * (1.0 - smoothstep(0.5 - aa, 0.5, dia));
-
-    vec3 col = mix(vCol, uEmber, 0.45);
-    col = mix(col, uChampagne, rim * 0.55);
-
-    gl_FragColor = vec4(col, soft * vAlpha);
-  }
-`;
-
-export function HarlequinExit({ onDone }: { onDone: () => void }) {
+export function HarlequinExit({
+  armed,
+  onSnapshotReady,
+  onDone,
+}: {
+  armed: boolean;
+  onSnapshotReady: () => void;
+  onDone: () => void;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
+  const onReadyRef = useRef(onSnapshotReady);
+  onReadyRef.current = onSnapshotReady;
+  const armedRef = useRef(armed);
+  armedRef.current = armed;
 
-  // While the shader runs we paint a dark base behind the canvas. As the
-  // snapshot dissolves, cleared pixels reveal this dark base — so the board
-  // erodes into a dark void (#0e0c12), NOT into the live board beneath. The
-  // dark cover then HOLDS while we navigate, so the homepage loads from under
-  // it with no board reflash. Reduced motion just fades this veil.
   const [reduced, setReduced] = useState(false);
-  // Gate the dark base + canvas until the snapshot is captured and the first
-  // frame is painted, so the live board never flashes to black before the
-  // (identical) intact snapshot covers it.
-  const [ready, setReady] = useState(false);
-  const readyRef = useRef(false);
 
   useEffect(() => {
     const isReduced =
       typeof window !== 'undefined' &&
       window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-
     if (isReduced) {
       setReduced(true);
-      const t = setTimeout(() => onDoneRef.current(), REDUCED_MS);
+      onReadyRef.current();
+      const t = setTimeout(() => onDoneRef.current(), 60);
       return () => clearTimeout(t);
     }
 
     let disposed = false;
     let cleanup: (() => void) | null = null;
     let fired = false;
+    let selfTimer: ReturnType<typeof setTimeout> | null = null;
     const fireOnce = () => {
       if (fired) return;
       fired = true;
       onDoneRef.current();
     };
-    // Self failsafe: navigate after the sweep even if onDone path is missed.
-    // Armed when the animation STARTS (not at mount) so a slow snapshot can't
-    // pre-empt the sweep. Falls back to mount-time only if we never get there.
-    let selfTimer: ReturnType<typeof setTimeout> | null = null;
-    let holdTimer: ReturnType<typeof setTimeout> | null = null;
-    const armSelfFailsafe = () => {
-      if (selfTimer === null) selfTimer = setTimeout(fireOnce, SELF_DONE_MS);
-    };
 
     void (async () => {
       try {
-        const [{ default: html2canvas }, THREE] = await Promise.all([
-          import('html2canvas'),
-          import('three'),
-        ]);
-        if (disposed) return;
-
-        const root =
-          (document.querySelector('[data-board-root]') as HTMLElement | null) ??
-          document.body;
-
-        // Snapshot the live board. If html2canvas throws OR yields an empty
-        // (0-sized) canvas — e.g. a WebGL surface it can't read — we DON'T abort
-        // the exit; we fall back to a flat board-colored texture so the user
-        // always sees the diamond-ash dissolve, never a hard cut to navigate.
-        const W0 = Math.max(window.innerWidth, 1);
-        const H0 = Math.max(window.innerHeight, 1);
-
-        const makeFallbackTexture = (): HTMLCanvasElement => {
+        // Prefer the eager snapshot; fall back to a click-time capture; finally
+        // a flat board-coloured texture so the dissolve always plays.
+        let snap = getBoardSnapshot();
+        if (!snap) {
+          await captureBoardSnapshot();
+          if (disposed) return;
+          snap = getBoardSnapshot();
+        }
+        const W = Math.max(window.innerWidth, 1);
+        const H = Math.max(window.innerHeight, 1);
+        let source: TexImageSource;
+        if (snap) {
+          source = snap.canvas;
+        } else {
           const fb = document.createElement('canvas');
-          fb.width = W0;
-          fb.height = H0;
+          fb.width = W;
+          fb.height = H;
           const ctx = fb.getContext('2d');
           if (ctx) {
             ctx.fillStyle = BASE;
-            ctx.fillRect(0, 0, fb.width, fb.height);
+            ctx.fillRect(0, 0, W, H);
           }
-          return fb;
-        };
-
-        let source: HTMLCanvasElement;
-        try {
-          const snapshot = await html2canvas(root, {
-            backgroundColor: BASE,
-            scale: Math.min(window.devicePixelRatio || 1, 2),
-            logging: false,
-            useCORS: true,
-            // Capture the visible viewport region of the (possibly scrolled) board.
-            x: window.scrollX,
-            y: window.scrollY,
-            width: window.innerWidth,
-            height: window.innerHeight,
-            windowWidth: document.documentElement.scrollWidth,
-            windowHeight: document.documentElement.scrollHeight,
-            // Skip ALL <canvas> elements. html2canvas calls getContext('2d') on
-            // every canvas it renders — including our OWN WebGL exit canvas,
-            // which lives inside [data-board-root] — which poisons it with a 2D
-            // context so THREE.WebGLRenderer then fails ("Canvas has an existing
-            // context of a different type"). WebGL canvases (Cere swirl, etc.)
-            // don't render usefully in html2canvas anyway.
-            ignoreElements: (el: Element) => el.tagName === 'CANVAS',
-          });
-          source =
-            snapshot && snapshot.width > 0 && snapshot.height > 0
-              ? snapshot
-              : makeFallbackTexture();
-        } catch {
-          source = makeFallbackTexture();
+          source = fb;
         }
-        if (disposed) return;
 
         const canvas = canvasRef.current;
         if (!canvas) return;
-
-        const tex = new THREE.CanvasTexture(source);
-        tex.colorSpace = THREE.SRGBColorSpace;
-        tex.minFilter = THREE.LinearFilter;
-        tex.magFilter = THREE.LinearFilter;
-        tex.needsUpdate = true;
-
-        const renderer = new THREE.WebGLRenderer({
-          canvas,
+        const gl = canvas.getContext('webgl2', {
           alpha: true,
-          antialias: true,
           premultipliedAlpha: false,
+          antialias: true,
         });
-        renderer.setClearColor(0x000000, 0);
-        const scene = new THREE.Scene();
-        const camera = new THREE.Camera();
+        if (!gl) {
+          onReadyRef.current();
+          fireOnce();
+          return;
+        }
 
-        const EMBER = new THREE.Color('#27b06f'); // hot green burn front
-        const ASH = new THREE.Color('#143a6b'); // navy cooling ash
-        const RED = new THREE.Color('#B3122B'); // harlequin red flecks
-        const RIM = new THREE.Color('#5aa6e6'); // blue diamond rim glint
+        const compile = (type: number, src: string) => {
+          const s = gl.createShader(type)!;
+          gl.shaderSource(s, src);
+          gl.compileShader(s);
+          return s;
+        };
+        const prog = gl.createProgram()!;
+        gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
+        gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+        gl.linkProgram(prog);
+        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+          onReadyRef.current();
+          fireOnce();
+          return;
+        }
 
-        const planeGeo = new THREE.PlaneGeometry(2, 2);
-        const material = new THREE.ShaderMaterial({
-          vertexShader: VERT,
-          fragmentShader: FRAG,
-          transparent: true,
-          depthTest: false,
-          depthWrite: false,
-          uniforms: {
-            uTex: { value: tex },
-            uProgress: { value: 0 },
-            uTime: { value: 0 },
-            uEmber: { value: EMBER },
-            uAsh: { value: ASH },
-            uRed: { value: RED },
-          },
-        });
-        const plane = new THREE.Mesh(planeGeo, material);
-        scene.add(plane);
-
-        const COLS = 200;
-        const ROWS = 125;
-        const count = COLS * ROWS;
-        const uvs = new Float32Array(count * 2);
+        // Geometry: instanced quads, corners at ±0.54 so opaque chips overlap
+        // ~8% at rest → the progress-0 cover has zero seams (no home bleed-through).
+        const quad = new Float32Array([
+          -0.54, -0.54, 0.54, -0.54, 0.54, 0.54, -0.54, -0.54, 0.54, 0.54, -0.54, 0.54,
+        ]);
+        const cols = Math.ceil(W / CELL);
+        const rows = Math.ceil(H / CELL);
+        const count = cols * rows;
+        const cells = new Float32Array(count * 2);
         const seeds = new Float32Array(count);
-        let k = 0;
-        for (let j = 0; j < ROWS; j++) {
-          for (let i = 0; i < COLS; i++) {
-            uvs[k * 2] = (i + 0.5) / COLS;
-            uvs[k * 2 + 1] = (j + 0.5) / ROWS;
-            seeds[k] = Math.random();
-            k++;
+        let idx = 0;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            cells[idx * 2] = (c + 0.5) * CELL;
+            cells[idx * 2 + 1] = (r + 0.5) * CELL;
+            seeds[idx] = ((Math.sin(c * 12.9898 + r * 78.233) * 43758.5453) % 1 + 1) % 1;
+            idx++;
           }
         }
-        const pgeo = new THREE.BufferGeometry();
-        pgeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
-        pgeo.setAttribute('aUv', new THREE.BufferAttribute(uvs, 2));
-        pgeo.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
 
-        const pointsMat = new THREE.ShaderMaterial({
-          vertexShader: PVERT,
-          fragmentShader: PFRAG,
-          transparent: true,
-          depthTest: false,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          uniforms: {
-            uTex: { value: tex },
-            uProgress: { value: 0 },
-            uTime: { value: 0 },
-            uPixel: { value: 3 },
-            uEmber: { value: EMBER },
-            uChampagne: { value: RIM },
-          },
-        });
-        const points = new THREE.Points(pgeo, pointsMat);
-        scene.add(points);
+        const vao = gl.createVertexArray();
+        gl.bindVertexArray(vao);
+        const qb = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, qb);
+        gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(0);
+        gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+        const cb = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cb);
+        gl.bufferData(gl.ARRAY_BUFFER, cells, gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(1);
+        gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribDivisor(1, 1);
+        const sb = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, sb);
+        gl.bufferData(gl.ARRAY_BUFFER, seeds, gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(2);
+        gl.vertexAttribPointer(2, 1, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribDivisor(2, 1);
+        gl.bindVertexArray(null);
 
-        function resize() {
-          const W = window.innerWidth;
-          const H = window.innerHeight;
-          const dpr = Math.min(window.devicePixelRatio || 1, 2);
-          renderer.setPixelRatio(dpr);
-          renderer.setSize(W, H, false);
-          pointsMat.uniforms.uPixel.value = 3.1 * dpr;
-        }
+        const tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+        const U = {
+          res: gl.getUniformLocation(prog, 'uRes'),
+          progress: gl.getUniformLocation(prog, 'uProgress'),
+          time: gl.getUniformLocation(prog, 'uTime'),
+          band: gl.getUniformLocation(prog, 'uBand'),
+          cell: gl.getUniformLocation(prog, 'uCell'),
+          sweep: gl.getUniformLocation(prog, 'uSweep'),
+          board: gl.getUniformLocation(prog, 'uBoard'),
+          brk: gl.getUniformLocation(prog, 'uBreak'),
+        };
+
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const resize = () => {
+          canvas.width = Math.round(W * dpr);
+          canvas.height = Math.round(H * dpr);
+          gl.viewport(0, 0, canvas.width, canvas.height);
+        };
         resize();
-        window.addEventListener('resize', resize);
 
-        const ease = (t: number) =>
-          t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const draw = (progress: number, breakAmt: number, time: number) => {
+          gl.clearColor(0, 0, 0, 0);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.useProgram(prog);
+          gl.bindVertexArray(vao);
+          gl.enable(gl.BLEND);
+          gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, tex);
+          gl.uniform1i(U.board, 0);
+          gl.uniform2f(U.res, W, H);
+          gl.uniform1f(U.progress, progress);
+          gl.uniform1f(U.brk, breakAmt);
+          gl.uniform1f(U.time, time);
+          gl.uniform1f(U.band, 0.26);
+          gl.uniform1f(U.cell, CELL);
+          gl.uniform2f(U.sweep, 0.85, 1.0);
+          gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, count);
+          gl.disable(gl.BLEND);
+          gl.bindVertexArray(null);
+        };
 
-        let startTime = performance.now();
-        let rafId = 0;
+        const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-        function frame(now: number) {
+        let startTime = 0;
+        let raf = 0;
+        let started = false;
+        const frame = (now: number) => {
           if (disposed) return;
-          const t = (now - startTime) / 1000;
-          const tn = Math.min(t / DURATION, 1);
-          const p = ease(tn);
-
-          material.uniforms.uProgress.value = p;
-          material.uniforms.uTime.value = t;
-          pointsMat.uniforms.uProgress.value = p;
-          pointsMat.uniforms.uTime.value = t;
-
-          renderer.render(scene, camera);
-
-          if (!readyRef.current) {
-            readyRef.current = true;
-            canvas!.style.opacity = '1';
-            setReady(true);
-          }
-
-          if (tn >= 1) {
-            // The field has fully dissolved to the dark base (#0e0c12) showing
-            // through behind the canvas. Do NOT clear the canvas/cover — that
-            // would reveal the still-mounted live board and cause a reflash.
-            // Instead HOLD the dark cover, then navigate from under it so the
-            // homepage loads beneath a dark screen (no board reflash).
-            if (holdTimer === null) {
-              holdTimer = setTimeout(fireOnce, DARK_HOLD * 1000);
+          if (armedRef.current) {
+            if (!started) {
+              started = true;
+              startTime = now;
+              if (selfTimer === null) selfTimer = setTimeout(fireOnce, SELF_DONE_MS);
             }
-            return;
+            const t = (now - startTime) / 1000;
+            // Phase 1: the board de-rezzes (break). Phase 2: it disintegrates,
+            // starting just before the break peaks so the two flow together.
+            const breakAmt = Math.min(t / BREAK_S, 1);
+            const dn = Math.min(Math.max(t - (BREAK_S - OVERLAP), 0) / DISS_S, 1);
+            draw(ease(dn), breakAmt, t);
+            if (dn >= 1) {
+              fireOnce();
+              return;
+            }
+          } else {
+            draw(0, 0, now / 1000); // hold the pristine opaque cover (no break yet)
           }
-          rafId = requestAnimationFrame(frame);
-        }
-        startTime = performance.now();
-        armSelfFailsafe();
-        rafId = requestAnimationFrame(frame);
+          raf = requestAnimationFrame(frame);
+        };
+
+        // First frame = the tone-matched cover, crossfaded IN over the live board
+        // (~90ms) so the swap blends instead of hard-cutting (hides any residual
+        // shift). Navigation fires immediately, but home doesn't paint for
+        // ~hundreds of ms — long after the 90ms fade completes — so the cover is
+        // fully opaque before home could ever peek through. Blend for free, no
+        // added latency.
+        draw(0, 0, 0);
+        canvas.style.transition = 'opacity 90ms linear';
+        requestAnimationFrame(() => {
+          canvas.style.opacity = '1';
+        });
+        onReadyRef.current();
+        raf = requestAnimationFrame(frame);
 
         cleanup = () => {
-          if (rafId) cancelAnimationFrame(rafId);
-          window.removeEventListener('resize', resize);
-          plane.geometry.dispose();
-          material.dispose();
-          points.geometry.dispose();
-          pointsMat.dispose();
-          tex.dispose();
-          renderer.dispose();
+          if (raf) cancelAnimationFrame(raf);
+          gl.deleteTexture(tex);
+          gl.deleteBuffer(qb);
+          gl.deleteBuffer(cb);
+          gl.deleteBuffer(sb);
+          gl.deleteVertexArray(vao);
+          gl.deleteProgram(prog);
         };
       } catch {
-        // Genuine WebGL/setup failure (the snapshot itself already has a flat
-        // fallback). Nothing can render — fail OPEN so we still navigate.
+        onReadyRef.current();
         fireOnce();
       }
     })();
@@ -434,46 +383,18 @@ export function HarlequinExit({ onDone }: { onDone: () => void }) {
     return () => {
       disposed = true;
       if (selfTimer !== null) clearTimeout(selfTimer);
-      if (holdTimer !== null) clearTimeout(holdTimer);
       cleanup?.();
     };
   }, []);
 
-  if (reduced) {
-    // Reduced motion: a brief dark fade-in over the board, then navigate.
-    return (
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-[125]"
-        style={{
-          background: BASE,
-          opacity: 1,
-          transition: `opacity ${REDUCED_MS}ms ease`,
-        }}
-      />
-    );
-  }
+  if (reduced) return null;
 
   return (
-    <>
-      {/* Dark base behind the canvas: the dissolving snapshot erodes into this
-          dark void (#0e0c12) — never revealing the live board — and it stays put
-          through the dark hold + navigate. Gated on `ready` so the live board
-          never flashes black before the (identical) intact snapshot is painted
-          over it. */}
-      {ready && (
-        <div
-          aria-hidden
-          className="pointer-events-none fixed inset-0 z-[125]"
-          style={{ background: BASE }}
-        />
-      )}
-      <canvas
-        ref={canvasRef}
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-[130] block h-full w-full"
-        style={{ opacity: 0 }}
-      />
-    </>
+    <canvas
+      ref={canvasRef}
+      aria-hidden
+      className="pointer-events-none fixed inset-0 z-[130] block h-full w-full"
+      style={{ opacity: 0 }}
+    />
   );
 }

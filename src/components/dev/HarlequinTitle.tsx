@@ -13,15 +13,24 @@ const marquee = Limelight({ weight: '400', subsets: ['latin'], display: 'swap' }
  * four hues once on load, then settles to champagne. The leading diamond is a
  * hidden back affordance: on hover it crossfades into a red arrow home.
  */
-export function HarlequinTitle({ onBack }: { onBack?: () => void }) {
+export function HarlequinTitle({
+  onBack,
+  onBackHover,
+}: {
+  onBack?: () => void;
+  onBackHover?: () => void;
+}) {
   return (
     <h1 className="flex items-center gap-2 select-none">
       {/* The back-diamond plays the diamond-ash exit (which then navigates to
           `/`); the session is kept. The leading diamond crossfades to a red
-          arrow home on hover. */}
+          arrow home on hover. Hovering also refreshes the eager board snapshot
+          so the disintegration cover is instant on click. */}
       <button
         type="button"
         onClick={onBack}
+        onMouseEnter={onBackHover}
+        onFocus={onBackHover}
         aria-label="Back to mikeveson.com"
         className="group relative grid h-6 w-6 cursor-pointer place-items-center"
       >
