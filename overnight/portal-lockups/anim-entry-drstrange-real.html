@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Entry — Spark Portal Reveal · THE HARLEQUIN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0e0c12;
+    --bg-2: #14111a;
+    --champ: #e7e2d4;
+    --champ-dim: rgba(231, 226, 212, 0.55);
+    --champ-faint: rgba(231, 226, 212, 0.14);
+    --line: rgba(231, 226, 212, 0.10);
+    --argyle-red: #B3122B;
+    --argyle-champ: #EDE6D6;
+    --p-crit: #e06b6b;
+    --p-high: #e0b15a;
+    --p-med:  #6fb8e0;
+    --p-low:  #5fc08a;
+
+    /* ---- the single driving values, written by rAF ---- */
+    --r: 0px;          /* current portal radius */
+    --band: 90px;      /* thickness of the spark rim band */
+    --reveal: 0;       /* 0..1 argyle->board crossfade progress */
+    --rim-glow: 0;     /* 0..1 champagne rim glow opacity */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: #050407;
+    color: var(--champ);
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  .stage {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    isolation: isolate; /* contain blend modes */
+    background: #050407;
+  }
+
+  /* ====================================================================
+     LAYER 0 — black void (pre-portal). The world is masked into the
+     growing circle so outside the portal stays dark until it's covered.
+     ==================================================================== */
+
+  /* ---------------- DESTINATION: THE HARLEQUIN BOARD ---------------- */
+  .board {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: min(880px, 92vw);
+    height: min(560px, 86vh);
+    background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 40px 120px -40px rgba(0,0,0,0.8);
+    padding: 26px 30px;
+    display: flex;
+    flex-direction: column;
+    z-index: 3;
+    /* crossfades in over the argyle as the portal finishes */
+    opacity: var(--reveal);
+    transform: scale(calc(1.02 - 0.02 * var(--reveal)));
+  }
+
+  .titlebar {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .wordmark {
+    font-family: "Limelight", serif;
+    font-weight: 400;
+    font-size: clamp(20px, 3.2vw, 30px);
+    letter-spacing: 0.08em;
+    color: var(--champ);
+  }
+  .board-sub {
+    font-family: "Space Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--champ-dim);
+  }
+
+  .col-h {
+    display: grid;
+    grid-template-columns: 18px 1fr 64px 48px;
+    gap: 14px;
+    align-items: center;
+    font-family: "Space Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--champ-dim);
+    padding: 16px 4px 10px;
+  }
+
+  .rows { display: flex; flex-direction: column; flex: 1; }
+
+  .row {
+    display: grid;
+    grid-template-columns: 18px 1fr 64px 48px;
+    gap: 14px;
+    align-items: center;
+    padding: 15px 4px;
+    border-top: 1px solid var(--line);
+  }
+  .row:last-child { border-bottom: 1px solid var(--line); }
+
+  .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    box-shadow: 0 0 10px -1px currentColor;
+  }
+  .dot.crit { background: var(--p-crit); color: var(--p-crit); }
+  .dot.high { background: var(--p-high); color: var(--p-high); }
+  .dot.med  { background: var(--p-med);  color: var(--p-med); }
+  .dot.low  { background: var(--p-low);  color: var(--p-low); }
+
+  .row .title { font-size: 14px; color: var(--champ); letter-spacing: 0.01em; }
+  .row .pri {
+    font-family: "Space Mono", monospace;
+    font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .pri.crit { color: var(--p-crit); }
+  .pri.high { color: var(--p-high); }
+  .pri.med  { color: var(--p-med); }
+  .pri.low  { color: var(--p-low); }
+  .row .id {
+    font-family: "Space Mono", monospace;
+    font-size: 10px; color: var(--champ-dim); text-align: right;
+  }
+
+  /* ---------------- ARGYLE FIELD (first thing revealed) ---------------- */
+  /* red / champagne diamonds on the dark bg. Sits under the board and
+     crossfades OUT (1 - reveal) as the board crossfades in. Both the argyle
+     and board are masked into the growing circle by .world-mask. */
+  .argyle {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background-color: var(--bg);
+    background-image:
+      /* diamond lattice via two crossed repeating gradients + overlay grid */
+      repeating-linear-gradient( 45deg,
+        var(--argyle-red) 0, var(--argyle-red) 2px,
+        transparent 2px, transparent 56px),
+      repeating-linear-gradient( -45deg,
+        var(--argyle-red) 0, var(--argyle-red) 2px,
+        transparent 2px, transparent 56px),
+      repeating-linear-gradient( 45deg,
+        rgba(237,230,214,0.85) 0, rgba(237,230,214,0.85) 1px,
+        transparent 1px, transparent 56px),
+      repeating-linear-gradient( -45deg,
+        rgba(237,230,214,0.85) 0, rgba(237,230,214,0.85) 1px,
+        transparent 1px, transparent 56px),
+      /* filled diamonds: solid red blocks on a diagonal checker */
+      repeating-conic-gradient(
+        from 45deg at 50% 50%,
+        rgba(179,18,43,0.55) 0deg 90deg,
+        transparent 90deg 180deg);
+    background-size: 56px 56px, 56px 56px, 56px 56px, 56px 56px, 79px 79px;
+    background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+    opacity: calc(1 - var(--reveal));
+  }
+  /* subtle vignette so argyle reads framed, not flat wallpaper */
+  .argyle::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(120% 120% at 50% 50%, transparent 40%, rgba(5,4,7,0.7) 100%);
+  }
+
+  /* world-mask confines BOTH the argyle and board to the growing circle.
+     Outside --r the world is invisible (black void shows through). */
+  .world-mask {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    -webkit-mask-image: radial-gradient(
+      circle at 50% 50%,
+      #000 0,
+      #000 calc(var(--r) - 2px),
+      transparent var(--r));
+    mask-image: radial-gradient(
+      circle at 50% 50%,
+      #000 0,
+      #000 calc(var(--r) - 2px),
+      transparent var(--r));
+  }
+
+  /* ====================================================================
+     SPARK RIM — the hero. Real footage confined to an annulus at --r.
+     ==================================================================== */
+  .spark-rim {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    pointer-events: none;
+    /* annulus mask: transparent inside, OPAQUE in the band around --r,
+       transparent outside. Tracks the growing radius -> sparks ride the rim. */
+    -webkit-mask-image: radial-gradient(
+      circle at 50% 50%,
+      transparent 0,
+      transparent calc(var(--r) - var(--band)),
+      #000 calc(var(--r) - var(--band) * 0.45),
+      #000 calc(var(--r) + var(--band) * 0.25),
+      transparent calc(var(--r) + var(--band) * 0.75));
+    mask-image: radial-gradient(
+      circle at 50% 50%,
+      transparent 0,
+      transparent calc(var(--r) - var(--band)),
+      #000 calc(var(--r) - var(--band) * 0.45),
+      #000 calc(var(--r) + var(--band) * 0.25),
+      transparent calc(var(--r) + var(--band) * 0.75));
+  }
+  .spark-rim video {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 130%; height: 130%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    /* screen drops the black bg of the footage -> only sparks remain */
+    mix-blend-mode: screen;
+    /* warm champagne/gold tint — NOT marvel orange */
+    filter: sepia(0.5) saturate(1.35) hue-rotate(-12deg) brightness(1.15) contrast(1.1);
+    will-change: transform;
+  }
+  /* a second, larger-scaled instance so the rim flickers denser + varied */
+  .spark-rim video.s2 {
+    width: 165%; height: 165%;
+    transform: translate(-50%, -50%) rotate(180deg);
+    filter: sepia(0.6) saturate(1.2) hue-rotate(-16deg) brightness(0.95) contrast(1.05);
+    opacity: 0.85;
+    mix-blend-mode: screen;
+  }
+
+  /* champagne glow smeared along the rim — confined to the same annulus,
+     gives the mandala warmth behind the literal sparks. */
+  .rim-glow {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    opacity: var(--rim-glow);
+    background: radial-gradient(
+      circle at 50% 50%,
+      transparent calc(var(--r) - var(--band) * 1.3),
+      rgba(231, 209, 150, 0.55) calc(var(--r) - var(--band) * 0.3),
+      rgba(231, 226, 212, 0.25) var(--r),
+      transparent calc(var(--r) + var(--band) * 0.6));
+    mix-blend-mode: screen;
+    filter: blur(6px);
+  }
+
+  /* faint second rotating ring for the mandala feel (sigil rim) */
+  .sigil-ring {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: calc(var(--r) * 2);
+    height: calc(var(--r) * 2);
+    margin-left: calc(var(--r) * -1);
+    margin-top: calc(var(--r) * -1);
+    border-radius: 50%;
+    z-index: 4;
+    pointer-events: none;
+    opacity: var(--rim-glow);
+    border: 1px solid rgba(231, 209, 150, 0.35);
+    box-shadow:
+      0 0 18px rgba(231, 209, 150, 0.3),
+      inset 0 0 22px rgba(231, 209, 150, 0.18);
+    background:
+      conic-gradient(from 0deg,
+        transparent 0deg,
+        rgba(231,209,150,0.18) 18deg,
+        transparent 36deg) border-box;
+    -webkit-mask:
+      radial-gradient(circle at 50% 50%, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    mask:
+      radial-gradient(circle at 50% 50%, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    animation: spinSigil 6s linear infinite;
+  }
+  @keyframes spinSigil { to { transform: rotate(360deg); } }
+
+  /* the seed: bright point/ring at center before expansion begins */
+  .seed {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 14px; height: 14px;
+    margin: -7px 0 0 -7px;
+    border-radius: 50%;
+    z-index: 7;
+    pointer-events: none;
+    background: radial-gradient(circle, #fff7e6 0%, #f3d79a 45%, rgba(231,209,150,0) 72%);
+    box-shadow: 0 0 26px 8px rgba(243, 215, 154, 0.8);
+    opacity: var(--seed, 0);
+  }
+
+  /* ---------------- CONTROLS ---------------- */
+  .controls {
+    position: absolute;
+    left: 50%; bottom: 26px;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .replay {
+    font-family: "Space Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--champ);
+    background: rgba(231, 226, 212, 0.06);
+    border: 1px solid var(--champ-faint);
+    border-radius: 8px;
+    padding: 11px 22px;
+    cursor: pointer;
+    transition: transform 180ms cubic-bezier(0.34,1.56,0.64,1), background 180ms ease, border-color 180ms ease;
+  }
+  .replay:hover { transform: translateY(-2px) scale(1.03); background: rgba(231,226,212,0.12); border-color: rgba(231,226,212,0.3); }
+  .replay:active { transform: translateY(0) scale(0.98); }
+  .replay:focus-visible { outline: 2px solid var(--p-med); outline-offset: 3px; }
+
+  .caption {
+    font-family: "Space Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    color: var(--champ-dim);
+    text-transform: uppercase;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sigil-ring { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+
+    <!-- WORLD (argyle, then board) — both masked into the growing circle -->
+    <div class="world-mask">
+      <!-- ARGYLE revealed first -->
+      <div class="argyle" aria-hidden="true"></div>
+
+      <!-- DESTINATION BOARD crossfades in over the argyle -->
+      <section class="board" aria-label="THE HARLEQUIN board">
+        <div class="titlebar">
+          <span class="wordmark">THE HARLEQUIN</span>
+          <span class="board-sub">Dev Board · 4 open</span>
+        </div>
+        <div class="col-h">
+          <span></span><span>Ticket</span><span>Priority</span><span>ID</span>
+        </div>
+        <div class="rows">
+          <div class="row">
+            <span class="dot crit"></span>
+            <span class="title">Portal login flickers on cold load</span>
+            <span class="pri crit">Critical</span>
+            <span class="id">#102</span>
+          </div>
+          <div class="row">
+            <span class="dot high"></span>
+            <span class="title">Spark portal entry — real footage rim</span>
+            <span class="pri high">High</span>
+            <span class="id">#100</span>
+          </div>
+          <div class="row">
+            <span class="dot med"></span>
+            <span class="title">Champagne duotone pass on /dev</span>
+            <span class="pri med">Medium</span>
+            <span class="id">#84</span>
+          </div>
+          <div class="row">
+            <span class="dot low"></span>
+            <span class="title">Limelight wordmark kerning</span>
+            <span class="pri low">Low</span>
+            <span class="id">#71</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- faint rotating sigil ring (mandala feel) -->
+    <div class="sigil-ring" aria-hidden="true"></div>
+
+    <!-- champagne rim glow (behind the literal sparks) -->
+    <div class="rim-glow" aria-hidden="true"></div>
+
+    <!-- SPARK RIM: real footage, screen-blended, masked to the annulus at --r -->
+    <div class="spark-rim" aria-hidden="true">
+      <video class="s1" src="./vfx/sparks.mp4" muted autoplay playsinline loop preload="auto"></video>
+      <video class="s2" src="./vfx/sparks.mp4" muted autoplay playsinline loop preload="auto"></video>
+    </div>
+
+    <!-- seed point at center -->
+    <div class="seed" id="seed" aria-hidden="true"></div>
+
+    <div class="controls">
+      <button class="replay" id="replay" type="button">Replay</button>
+      <span class="caption">Spark portal opens — argyle resolves into the board</span>
+    </div>
+  </div>
+
+<script>
+  (function () {
+    const stage  = document.getElementById("stage");
+    const root   = document.documentElement;
+    const videos = Array.from(document.querySelectorAll(".spark-rim video"));
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let rafId = null;
+    let timers = [];
+
+    const DURATION = prefersReduced ? 1 : 1750; // ~1.75s, one continuous expansion
+
+    function clearTimers() {
+      timers.forEach((t) => clearTimeout(t));
+      timers = [];
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    }
+
+    // easeInOutCubic on the radius
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+    function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+    function maxRadius() {
+      // cover the whole screen: distance from center to a corner
+      const w = window.innerWidth, h = window.innerHeight;
+      return Math.hypot(w, h) / 2 + 80; // +pad so the rim clears the corners
+    }
+
+    function setVars(r, reveal, rimGlow, seed) {
+      root.style.setProperty("--r", r + "px");
+      root.style.setProperty("--reveal", reveal);
+      root.style.setProperty("--rim-glow", rimGlow);
+      root.style.setProperty("--seed", seed);
+    }
+
+    function resetVars() {
+      // start: tiny bright seed, nothing revealed
+      setVars(0, 0, 0, 1);
+    }
+
+    function seekVideos() {
+      // offset the two layers so the rim flickers vary
+      const offsets = [0.0, 0.9];
+      videos.forEach((v, i) => {
+        try { v.currentTime = offsets[i] % (v.duration || 3) || 0; } catch (_) {}
+        const p = v.play();
+        if (p && p.catch) p.catch(() => {});
+      });
+    }
+
+    function reset() {
+      clearTimers();
+      resetVars();
+      void stage.offsetWidth; // flush
+    }
+
+    function frame(start, R) {
+      const now = performance.now();
+      const t = clamp01((now - start) / DURATION);
+      const e = easeInOutCubic(t);
+
+      const r = e * R;
+
+      // seed: bright at the very start, gone once the ring has grown
+      const seed = clamp01(1 - t / 0.12);
+
+      // rim glow / sigil: fade in early, fade out as portal completes
+      let rimGlow;
+      if (t < 0.12)      rimGlow = t / 0.12;          // ramp in
+      else if (t < 0.82) rimGlow = 1;                 // burning
+      else               rimGlow = clamp01(1 - (t - 0.82) / 0.18); // settle
+
+      // argyle reveals with the ring; board crossfade starts in the back third
+      // reveal=0 -> pure argyle ; reveal=1 -> pure board
+      const reveal = clamp01((t - 0.58) / 0.42);
+
+      setVars(r, reveal, rimGlow, seed);
+
+      if (t < 1) {
+        rafId = requestAnimationFrame(() => frame(start, R));
+      } else {
+        // settle: full board, rim gone, ensure mask fully open
+        setVars(R, 1, 0, 0);
+        rafId = null;
+      }
+    }
+
+    function play() {
+      reset();
+      seekVideos();
+      const R = maxRadius();
+      if (prefersReduced) { setVars(R, 1, 0, 0); return; }
+      // first paint the seed, then expand on the next frame
+      requestAnimationFrame(() => {
+        const start = performance.now();
+        rafId = requestAnimationFrame(() => frame(start, R));
+      });
+    }
+
+    document.getElementById("replay").addEventListener("click", play);
+    window.addEventListener("resize", () => {
+      // keep the final state covering the screen if we've settled
+      if (!rafId) {
+        const R = maxRadius();
+        const reveal = parseFloat(getComputedStyle(root).getPropertyValue("--reveal")) || 0;
+        if (reveal >= 1) setVars(R, 1, 0, 0);
+      }
+    });
+
+    // autoplay once footage is ready (fallback for slow file:// canplay)
+    let started = false;
+    function kick() {
+      if (started) return;
+      started = true;
+      play();
+    }
+    videos.forEach((v) => v.addEventListener("canplay", kick, { once: true }));
+    timers.push(setTimeout(kick, 600));
+
+    resetVars();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Exit · Disintegrate (WebGL dissolve)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --void: #0e0c12;
+    --champagne: #e7e2d4;
+    --ember: #f0a830;
+    --red: #B3122B;
+    --cream: #f4f1ea;
+    --card: #fbfaf7;
+    --ink: #1a1714;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #060509;
+    color: var(--champagne);
+    font-family: "Inter", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 22px;
+    padding: 32px 16px;
+    overflow: hidden;
+  }
+
+  /* ---- Stage ---- */
+  #stage {
+    position: relative;
+    width: min(92vw, 940px);
+    aspect-ratio: 16 / 10;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow:
+      0 40px 120px -40px rgba(0,0,0,0.9),
+      0 0 0 1px rgba(231,226,212,0.08) inset;
+    background: var(--void);
+  }
+  /* Homepage reveal layer (behind the WebGL plane) */
+  #stage .layer { position: absolute; inset: 0; }
+  #gl { position: absolute; inset: 0; display: block; z-index: 2; }
+
+  /* ---- Mock homepage (the reveal target) ---- */
+  .home {
+    background:
+      radial-gradient(120% 90% at 80% -10%, #ffffff 0%, var(--cream) 45%, #eae5da 100%);
+    color: var(--ink);
+    padding: 6.5% 6%;
+    display: flex;
+    flex-direction: column;
+    gap: 5%;
+    z-index: 1;
+  }
+  .home-top { display: flex; align-items: baseline; justify-content: space-between; }
+  .home-brand { font-family: "Limelight", serif; font-size: clamp(20px, 3.2vw, 34px); color: var(--ink); letter-spacing: 0.5px; }
+  .home-nav { font-size: clamp(10px, 1.3vw, 14px); color: #6b6258; display: flex; gap: 18px; font-weight: 500; }
+  .home-hero { font-size: clamp(22px, 4.2vw, 48px); font-weight: 700; line-height: 1.05; max-width: 16ch; letter-spacing: -0.02em; }
+  .home-hero em { font-style: normal; color: var(--red); }
+  .home-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3.5%; margin-top: auto; }
+  .home-card {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 6% 6% 7%;
+    box-shadow: 0 18px 40px -28px rgba(99,102,241,0.55), 0 0 0 1px rgba(20,23,40,0.05) inset;
+    display: flex; flex-direction: column; gap: 8px;
+    min-height: 0;
+  }
+  .home-card .tag { font-family: "JetBrains Mono", monospace; font-size: clamp(8px, 1.05vw, 11px); color: #6366f1; letter-spacing: 0.06em; text-transform: uppercase; }
+  .home-card h3 { font-size: clamp(13px, 1.7vw, 19px); font-weight: 600; letter-spacing: -0.01em; }
+  .home-card p { font-size: clamp(9px, 1.25vw, 13px); color: #6b6258; line-height: 1.45; }
+
+  /* ---- Controls ---- */
+  .controls { display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 3; }
+  #replay {
+    appearance: none; cursor: pointer;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--void);
+    background: linear-gradient(180deg, #f6c869, var(--ember));
+    border: none; border-radius: 999px;
+    padding: 11px 26px;
+    box-shadow: 0 10px 30px -10px rgba(240,168,48,0.6), 0 0 0 1px rgba(240,168,48,0.4);
+    transition: transform 200ms cubic-bezier(.34,1.56,.64,1), box-shadow 200ms ease, opacity 200ms ease;
+  }
+  #replay:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 16px 40px -10px rgba(240,168,48,0.75); }
+  #replay:active { transform: translateY(0) scale(0.98); }
+  #replay:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+  #replay[disabled] { opacity: 0.45; cursor: default; transform: none; }
+  .caption { font-family: "JetBrains Mono", monospace; font-size: 11px; color: #7a7466; letter-spacing: 0.04em; text-align: center; max-width: 56ch; line-height: 1.5; }
+  .caption b { color: var(--ember); font-weight: 500; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #replay { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div id="stage">
+    <!-- Reveal target: mock homepage -->
+    <div class="layer home" aria-hidden="true">
+      <div class="home-top">
+        <div class="home-brand">Mike Veson</div>
+        <div class="home-nav"><span>Work</span><span>The Web</span><span>Iris</span></div>
+      </div>
+      <div class="home-hero">Building tools that think <em>with</em> you.</div>
+      <div class="home-cards">
+        <div class="home-card"><span class="tag">AI · Assistant</span><h3>Iris</h3><p>Streaming Claude assistant grounded in a hand-built knowledge base.</p></div>
+        <div class="home-card"><span class="tag">Writing</span><h3>The Web</h3><p>Essays on ethics, technology, and human flourishing.</p></div>
+        <div class="home-card"><span class="tag">iOS · Swift</span><h3>Apollo</h3><p>A native vault for capturing and processing your day.</p></div>
+      </div>
+    </div>
+    <!-- WebGL dissolve plane (samples the rasterized board) -->
+    <canvas id="gl"></canvas>
+  </div>
+
+  <div class="controls">
+    <button id="replay" type="button">Replay</button>
+    <p class="caption">The board's own pixels burn at an <b>ember front</b> sweeping left to right, displacing into ash before revealing the homepage. WebGL fbm-noise dissolve.</p>
+  </div>
+
+  <script type="importmap">
+  { "imports": { "three": "https://unpkg.com/three@0.169.0/build/three.module.js" } }
+  </script>
+
+  <script type="module">
+  import * as THREE from "three";
+
+  /* =========================================================================
+     1) RASTERIZE A MOCK "THE HARLEQUIN" BOARD ONTO A 2D CANVAS
+        This canvas becomes the source texture the dissolve shader erodes.
+     ========================================================================= */
+  const TEX_W = 1280, TEX_H = 800;
+  const board = document.createElement("canvas");
+  board.width = TEX_W; board.height = TEX_H;
+  const bx = board.getContext("2d");
+
+  function drawBoard() {
+    // base
+    bx.fillStyle = "#0e0c12";
+    bx.fillRect(0, 0, TEX_W, TEX_H);
+
+    // faint argyle (champagne diamonds)
+    bx.save();
+    bx.globalAlpha = 0.05;
+    bx.strokeStyle = "#e7e2d4";
+    bx.lineWidth = 1;
+    const d = 96;
+    bx.translate(0, 0);
+    for (let y = -d; y < TEX_H + d; y += d) {
+      for (let x = -d; x < TEX_W + d; x += d) {
+        bx.beginPath();
+        bx.moveTo(x + d / 2, y);
+        bx.lineTo(x + d, y + d / 2);
+        bx.lineTo(x + d / 2, y + d);
+        bx.lineTo(x, y + d / 2);
+        bx.closePath();
+        bx.stroke();
+      }
+    }
+    bx.restore();
+
+    // top vignette / gradient sheen
+    const g = bx.createLinearGradient(0, 0, 0, TEX_H);
+    g.addColorStop(0, "rgba(231,226,212,0.04)");
+    g.addColorStop(1, "rgba(0,0,0,0.18)");
+    bx.fillStyle = g;
+    bx.fillRect(0, 0, TEX_W, TEX_H);
+
+    // ---- Title bar ----
+    bx.fillStyle = "rgba(231,226,212,0.04)";
+    bx.fillRect(48, 44, TEX_W - 96, 96);
+    bx.strokeStyle = "rgba(231,226,212,0.12)";
+    bx.lineWidth = 1;
+    bx.strokeRect(48, 44, TEX_W - 96, 96);
+
+    bx.fillStyle = "#e7e2d4";
+    bx.font = '54px "Limelight", serif';
+    bx.textBaseline = "middle";
+    bx.fillText("THE HARLEQUIN", 80, 96);
+
+    // status chip
+    bx.fillStyle = "rgba(240,168,48,0.16)";
+    roundRect(bx, TEX_W - 290, 70, 200, 44, 22);
+    bx.fill();
+    bx.fillStyle = "#f0a830";
+    bx.font = '500 22px "JetBrains Mono", monospace';
+    bx.textBaseline = "middle";
+    bx.fillText("12 OPEN", TEX_W - 268, 93);
+
+    // ---- Ticket rows ----
+    const rows = [
+      { dot: "#B3122B", label: "Portal login crumbles on Safari iOS",      meta: "P0 · exit-anim · #91", w: 0.72 },
+      { dot: "#f0a830", label: "Dissolve shader — seed ash from texture",  meta: "P1 · vfx · #88",        w: 0.84 },
+      { dot: "#4ade80", label: "Argyle backdrop too loud in deep mode",    meta: "P2 · theme · #76",       w: 0.58 },
+      { dot: "#63A6FF", label: "Limelight title baseline drift on resize", meta: "P2 · type · #69",        w: 0.66 },
+    ];
+    const rowTop = 192, rowH = 124, gap = 18;
+    rows.forEach((r, i) => {
+      const y = rowTop + i * (rowH + gap);
+      // card
+      bx.fillStyle = "rgba(231,226,212,0.045)";
+      roundRect(bx, 48, y, TEX_W - 96, rowH, 12);
+      bx.fill();
+      bx.strokeStyle = "rgba(231,226,212,0.10)";
+      bx.lineWidth = 1;
+      roundRect(bx, 48, y, TEX_W - 96, rowH, 12);
+      bx.stroke();
+
+      // priority dot (glowing)
+      const cx = 96, cy = y + rowH / 2;
+      bx.save();
+      bx.shadowColor = r.dot;
+      bx.shadowBlur = 26;
+      bx.fillStyle = r.dot;
+      bx.beginPath();
+      bx.arc(cx, cy, 13, 0, Math.PI * 2);
+      bx.fill();
+      bx.restore();
+
+      // label
+      bx.fillStyle = "#e7e2d4";
+      bx.font = '600 32px "Inter", sans-serif';
+      bx.textBaseline = "alphabetic";
+      bx.fillText(r.label, 140, cy - 6);
+
+      // meta
+      bx.fillStyle = "rgba(231,226,212,0.45)";
+      bx.font = '400 21px "JetBrains Mono", monospace';
+      bx.fillText(r.meta, 140, cy + 30);
+
+      // progress bar
+      const barX = 140, barY = cy + 46, barW = TEX_W - 96 - 140 - 60;
+      bx.fillStyle = "rgba(231,226,212,0.10)";
+      roundRect(bx, barX, barY, barW, 6, 3); bx.fill();
+      bx.fillStyle = r.dot;
+      roundRect(bx, barX, barY, barW * r.w, 6, 3); bx.fill();
+    });
+
+    boardTexture.needsUpdate = true;
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  const boardTexture = new THREE.CanvasTexture(board);
+  boardTexture.colorSpace = THREE.SRGBColorSpace;
+  boardTexture.minFilter = THREE.LinearFilter;
+  boardTexture.magFilter = THREE.LinearFilter;
+
+  // Fonts may load after first paint — redraw when ready so Limelight shows.
+  drawBoard();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(drawBoard);
+  }
+
+  /* =========================================================================
+     2) WEBGL SCENE — full-screen plane with the dissolve ShaderMaterial
+     ========================================================================= */
+  const stage = document.getElementById("stage");
+  const canvas = document.getElementById("gl");
+
+  let renderer, scene, camera, plane, material, points, pointsMat, rafId;
+  let startTime = 0, playing = false;
+  const DURATION = 1.35; // seconds
+
+  const VERT = /* glsl */`
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = vec4(position.xy, 0.0, 1.0);
+    }
+  `;
+
+  // Fragment shader: fbm noise + L→R progress = moving dissolve front.
+  // Ahead of front: intact board. At front: displace + burn ember. Past: gone.
+  const FRAG = /* glsl */`
+    precision highp float;
+    varying vec2 vUv;
+    uniform sampler2D uTex;
+    uniform float uProgress;   // 0..1 sweep
+    uniform float uTime;
+    uniform vec2  uRes;        // plane aspect helper
+    uniform vec3  uEmber;
+    uniform vec3  uAsh;
+    uniform vec3  uRed;
+
+    // --- hash / simplex-ish value noise + fbm -----------------------------
+    vec2 hash2(vec2 p){
+      p = vec2(dot(p, vec2(127.1,311.7)), dot(p, vec2(269.5,183.3)));
+      return -1.0 + 2.0*fract(sin(p)*43758.5453123);
+    }
+    float noise(vec2 p){
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      vec2 u = f*f*(3.0-2.0*f);
+      return mix(mix(dot(hash2(i+vec2(0,0)), f-vec2(0,0)),
+                     dot(hash2(i+vec2(1,0)), f-vec2(1,0)), u.x),
+                 mix(dot(hash2(i+vec2(0,1)), f-vec2(0,1)),
+                     dot(hash2(i+vec2(1,1)), f-vec2(1,1)), u.x), u.y);
+    }
+    float fbm(vec2 p){
+      float v = 0.0, a = 0.5;
+      for(int i=0;i<5;i++){ v += a*noise(p); p *= 2.03; a *= 0.5; }
+      return v;
+    }
+
+    void main(){
+      vec2 uv = vUv;
+
+      // Per-texel noise threshold so the front frays instead of being a line.
+      float grain = fbm(uv * vec2(9.0, 6.0) + vec2(0.0, uTime*0.05));
+      float fine  = fbm(uv * 38.0);
+      float thresh = grain * 0.5 + fine * 0.18; // -ish range
+
+      // Dissolve front position (with noisy edge). Band width = transition zone.
+      float front = uProgress * 1.18 - 0.09;     // ensures full clear at p=1
+      float edge  = (uv.x + thresh * 0.16);       // texel's effective x
+      float band  = 0.13;                          // burn band thickness
+
+      // burn = 1 right at the front, 0 well ahead, also 0 behind (gone)
+      float past  = smoothstep(front + 0.01, front - band, edge); // 1 behind->0 ahead
+      float burn  = smoothstep(front - band, front, edge) *
+                    (1.0 - smoothstep(front, front + band*0.55, edge));
+
+      // Displacement near the front: lift up + drift out along noise.
+      float lift = burn;
+      vec2 disp = vec2(0.0);
+      disp.y += lift * (0.05 + 0.10 * fine);                 // upward
+      disp.x += lift * (fbm(uv*18.0 + uTime) * 0.06);         // sideways flutter
+      vec2 suv = uv - disp;
+
+      vec4 tex = texture2D(uTex, suv);
+
+      // Has the texel been consumed? (past the front => transparent)
+      float consumed = smoothstep(front - band*0.35, front - band, edge);
+      // consumed ~1 well behind front, ~0 at/ahead. Invert for keep.
+      float keep = 1.0 - smoothstep(front - band, front - band*0.35, edge);
+
+      // Ember coloring at the burn band: push toward ember, with red flecks
+      // where the source pixel is reddish (the harlequin P0 dot).
+      float redness = clamp((tex.r - max(tex.g, tex.b)) * 3.0, 0.0, 1.0);
+      vec3 emberCol = mix(uEmber, uRed, redness * 0.85);
+      vec3 col = mix(tex.rgb, mix(emberCol, uAsh, fine*0.4 + 0.15), burn);
+
+      // Glowing ember edge ridge right on the leading dissolve line.
+      float ridge = burn * smoothstep(0.45, 1.0, burn);
+      col += emberCol * ridge * 1.6;
+
+      // Alpha: intact ahead, glowing at burn, gone behind.
+      float alpha = keep;
+      alpha = max(alpha, burn * (0.85 - fine*0.3)); // burning embers stay visible briefly
+      alpha *= (1.0 - past*0.0);                      // (past already folded in via keep)
+
+      // Texels with no source content (transparent board bg) shouldn't glow.
+      alpha *= tex.a;
+
+      if (alpha < 0.004) discard;
+      gl_FragColor = vec4(col, alpha);
+    }
+  `;
+
+  // GPU particle layer: a sparse grid of points seeded FROM the board texture.
+  // Each lifts off as the front passes its column → drifting ash of real pixels.
+  const PVERT = /* glsl */`
+    precision highp float;
+    attribute vec2 aUv;     // source uv in the board
+    attribute float aSeed;  // per-particle random
+    uniform float uProgress;
+    uniform float uTime;
+    uniform sampler2D uTex;
+    uniform float uPixel;
+    varying vec3 vCol;
+    varying float vAlpha;
+
+    void main(){
+      vec4 src = texture2D(uTex, aUv);
+      // local-ish front (matches frag): activate as sweep passes column
+      float front = uProgress * 1.18 - 0.09;
+      float n = fract(sin(dot(aUv, vec2(91.7, 47.3))) * 7841.3);
+      float edge = aUv.x + (n - 0.5) * 0.10;
+      float life = clamp((front - edge) / 0.32, 0.0, 1.0); // 0 before, ->1 after passed
+
+      // base position in clip space (-1..1)
+      vec2 pos = aUv * 2.0 - 1.0;
+      pos.y = -pos.y; // texture origin top-left -> clip
+
+      // rise + drift, accelerating with life; flutter via time+seed
+      pos.y += life * (0.18 + 0.5*aSeed) ;
+      pos.x += (sin(uTime*2.0 + aSeed*30.0) * 0.04 + (aSeed-0.5)*0.10) * life;
+
+      // only show particles that have content and are within their active window
+      float window = life * (1.0 - smoothstep(0.55, 1.0, life)); // born then fade
+      // weight by luminance so visible board elements (text/dots/bars) throw
+      // the most ash; the dark argyle field contributes only a faint dust.
+      float lum = dot(src.rgb, vec3(0.299, 0.587, 0.114));
+      float weight = 0.08 + 0.92 * smoothstep(0.06, 0.45, lum);
+      vAlpha = window * weight;
+
+      vCol = src.rgb;
+      gl_Position = vec4(pos, 0.0, 1.0);
+      gl_PointSize = uPixel * (1.0 + life * 1.4) * (0.6 + aSeed);
+    }
+  `;
+  const PFRAG = /* glsl */`
+    precision highp float;
+    varying vec3 vCol;
+    varying float vAlpha;
+    uniform vec3 uEmber;
+    uniform vec3 uChampagne;
+    void main(){
+      vec2 uv = gl_PointCoord;
+      // Harlequin DIAMOND (argyle rhombus): L1 distance from center.
+      // dia = 0 at center, 0.5 at the four diamond tips. >0.5 is outside.
+      float dia = abs(uv.x - 0.5) + abs(uv.y - 0.5);
+      if (dia > 0.5) discard;
+
+      // Soft anti-aliased rhombus edge so it isn't jagged.
+      float aa = fwidth(dia) + 0.02;
+      float soft = smoothstep(0.5, 0.5 - aa - 0.10, dia);
+
+      // Faint champagne rim near the diamond's edge — a leaded-glass glint.
+      float rim = smoothstep(0.5 - aa - 0.14, 0.5 - aa, dia)
+                * (1.0 - smoothstep(0.5 - aa, 0.5, dia));
+
+      // tint ash toward ember as it cools, then add the champagne rim.
+      vec3 col = mix(vCol, uEmber, 0.45);
+      col = mix(col, uChampagne, rim * 0.55);
+
+      gl_FragColor = vec4(col, soft * vAlpha);
+    }
+  `;
+
+  // Iris/Cere palette: the dissolve burns FOREST GREEN at the hot front and cools
+  // into NAVY BLUE (was a yellow/gold ember + warm-grey ash).
+  const EMBER = new THREE.Color("#27b06f"); // forest green — the hot burn front
+  const ASH   = new THREE.Color("#143a6b"); // navy blue — cooling ash/diamonds
+  const RED    = new THREE.Color("#B3122B");
+  // diamond rim glint — was beige/champagne, now an Iris blue so the whole
+  // dissolve reads green->blue (no beige).
+  const CHAMPAGNE = new THREE.Color("#5aa6e6");
+
+  function init() {
+    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, premultipliedAlpha: false });
+    renderer.setClearColor(0x000000, 0);
+    scene = new THREE.Scene();
+    camera = new THREE.Camera(); // we output clip space directly from the vertex shader
+
+    // shared texture must re-upload to the freshly created context on replay
+    boardTexture.needsUpdate = true;
+
+    // --- dissolve plane ---
+    const geo = new THREE.PlaneGeometry(2, 2);
+    material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      uniforms: {
+        uTex: { value: boardTexture },
+        uProgress: { value: 0 },
+        uTime: { value: 0 },
+        uRes: { value: new THREE.Vector2(1, 1) },
+        uEmber: { value: EMBER },
+        uAsh: { value: ASH },
+        uRed: { value: RED },
+      },
+    });
+    plane = new THREE.Mesh(geo, material);
+    scene.add(plane);
+
+    // --- particle layer seeded from texture grid ---
+    const COLS = 200, ROWS = 125;            // 25k points
+    const count = COLS * ROWS;
+    const uvs = new Float32Array(count * 2);
+    const seeds = new Float32Array(count);
+    let k = 0;
+    for (let j = 0; j < ROWS; j++) {
+      for (let i = 0; i < COLS; i++) {
+        uvs[k * 2]     = (i + 0.5) / COLS;
+        uvs[k * 2 + 1] = (j + 0.5) / ROWS;
+        seeds[k] = Math.random();
+        k++;
+      }
+    }
+    const pgeo = new THREE.BufferGeometry();
+    // position attr required by three; actual position computed in shader.
+    pgeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+    pgeo.setAttribute("aUv", new THREE.BufferAttribute(uvs, 2));
+    pgeo.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 1));
+
+    pointsMat = new THREE.ShaderMaterial({
+      vertexShader: PVERT,
+      fragmentShader: PFRAG,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTex: { value: boardTexture },
+        uProgress: { value: 0 },
+        uTime: { value: 0 },
+        uPixel: { value: 3 },
+        uEmber: { value: EMBER },
+        uChampagne: { value: CHAMPAGNE },
+      },
+    });
+    points = new THREE.Points(pgeo, pointsMat);
+    scene.add(points);
+
+    resize();
+    window.addEventListener("resize", resize);
+  }
+
+  function resize() {
+    const rect = stage.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(dpr);
+    renderer.setSize(rect.width, rect.height, false);
+    if (material) material.uniforms.uRes.value.set(rect.width, rect.height);
+    if (pointsMat) pointsMat.uniforms.uPixel.value = 3.1 * dpr; // a touch larger so the diamond silhouette reads
+  }
+
+  // easeInOutCubic
+  const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+  function frame(now) {
+    if (!playing) return;
+    const t = (now - startTime) / 1000;
+    const tn = Math.min(t / DURATION, 1);
+    const p = ease(tn);
+
+    material.uniforms.uProgress.value = p;
+    material.uniforms.uTime.value = t;
+    pointsMat.uniforms.uProgress.value = p;
+    pointsMat.uniforms.uTime.value = t;
+
+    renderer.render(scene, camera);
+
+    if (tn >= 1) {
+      playing = false;
+      // fully revealed: hide plane so homepage is clean, re-enable replay
+      canvas.style.opacity = "0";
+      const btn = document.getElementById("replay");
+      btn.disabled = false;
+      return;
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  /* =========================================================================
+     3) PLAY / REPLAY with clean GPU resource lifecycle
+     ========================================================================= */
+  function disposeAll() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+    playing = false;
+    window.removeEventListener("resize", resize);
+    if (plane) { plane.geometry.dispose(); plane.material.dispose(); scene.remove(plane); }
+    if (points) { points.geometry.dispose(); points.material.dispose(); scene.remove(points); }
+    if (renderer) {
+      // dispose() frees all GPU programs/buffers/textures held by this
+      // renderer; we then build a fresh WebGLRenderer on the same canvas,
+      // which acquires a new context. (forceContextLoss is intentionally
+      // skipped — it can poison same-canvas reuse on replay.)
+      renderer.dispose();
+    }
+    renderer = scene = camera = plane = material = points = pointsMat = null;
+  }
+
+  function play() {
+    // full teardown + rebuild so replays never leak GPU memory/contexts.
+    disposeAll();
+    init();
+    canvas.style.opacity = "1";
+    startTime = performance.now();
+    playing = true;
+    document.getElementById("replay").disabled = true;
+    rafId = requestAnimationFrame(frame);
+  }
+
+  const replayBtn = document.getElementById("replay");
+  replayBtn.addEventListener("click", play);
+
+  // initial run once fonts settle (so the rasterized title is correct)
+  function boot() { play(); }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(boot);
+    setTimeout(() => { if (!playing && !renderer) boot(); }, 1200); // fallback
+  } else {
+    boot();
+  }
+  </script>
+</body>
+</html>
