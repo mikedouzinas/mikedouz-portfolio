@@ -808,6 +808,7 @@ export function IssueList({
   onApprove,
   onSendBack,
   entrance,
+  loading = false,
 }: {
   issues: DevIssue[];
   repos: DevRepo[];
@@ -817,6 +818,7 @@ export function IssueList({
   onApprove: (i: DevIssue) => void | Promise<void>;
   onSendBack: (i: DevIssue, feedback: string) => void | Promise<void>;
   entrance?: { active: boolean; t: number };
+  loading?: boolean;
 }) {
   const [error, setError] = useState('');
 
@@ -842,7 +844,11 @@ export function IssueList({
     }
   }
 
-  if (issues.length === 0) {
+  // Only the LOADED-and-empty board shows the empty-state. During the entrance
+  // the board mounts while issues are still being fetched (issues = []); showing
+  // "No open items" then would be a false flash — render the empty lanes instead
+  // and let cards box→type in as they arrive.
+  if (issues.length === 0 && !loading) {
     return <p className="text-white/50">No open items. Hit ＋ Cere (⌘K) to file one.</p>;
   }
 
@@ -893,13 +899,10 @@ export function IssueList({
     const laneItems = STATUS_LANES.map((lane) =>
       sortIssues(issues.filter((i) => laneOf(i) === lane.key && !isAwaiting(i)), sort),
     );
-    // Indices after awaiting section: awaiting.length + per-lane top-to-bottom.
-    // Reading order: To Do (lane 0) top→bottom, In Progress (lane 1), Done (lane 2).
-    const laneStartIndices = laneItems.reduce<number[]>((acc, _, i) => {
-      const prev = acc.length === 0 ? awaiting.length : (acc[acc.length - 1] + laneItems[i - 1].length);
-      return [...acc, prev];
-    }, []);
-
+    // Entrance stagger uses each card's ROW index WITHIN its lane (not a global
+    // reading-order index), so the three columns reveal in parallel — row 0 of
+    // To Do / In Progress / Done all arrive together, then row 1, etc. (A global
+    // index made In Progress + Done arrive much too late.)
     return (
       <div>
         {error && <p className="mb-3 text-xs text-red-400">{error}</p>}
@@ -907,17 +910,18 @@ export function IssueList({
         <div className="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-3">
           {STATUS_LANES.map((lane, laneIdx) => {
             const items = laneItems[laneIdx];
-            const startIdx = laneStartIndices[laneIdx];
             return (
               <div key={lane.key}>
                 <LaneHeader color={lane.color} label={lane.label} count={items.length} entrance={entrance} />
                 <div className="flex flex-col gap-3">
                   {items.length === 0 ? (
-                    <p className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-xs text-white/25">
-                      Nothing here
-                    </p>
+                    loading ? null : (
+                      <p className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-xs text-white/25">
+                        Nothing here
+                      </p>
+                    )
                   ) : (
-                    items.map((issue, i) => card(issue, startIdx + i))
+                    items.map((issue, i) => card(issue, i))
                   )}
                 </div>
               </div>
@@ -943,21 +947,17 @@ export function IssueList({
     }))
     .filter((s) => s.items.length > 0);
 
-  // Pre-compute each section's entrance-index start (reading order: awaiting first, then repo-by-repo).
-  const sectionStartIndices = sections.reduce<number[]>((acc, _, i) => {
-    const prev = acc.length === 0 ? awaiting.length : (acc[acc.length - 1] + sections[i - 1].items.length);
-    return [...acc, prev];
-  }, []);
-
+  // Entrance stagger uses each card's row index within its section, so sections
+  // reveal in parallel rather than one-after-another.
   return (
     <div>
       {error && <p className="mb-3 text-xs text-red-400">{error}</p>}
       {awaitingSection}
-      {sections.map((sec, secIdx) => (
+      {sections.map((sec) => (
         <section key={sec.key} className="mb-6 last:mb-0">
           <LaneHeader color={sec.color} label={sec.label} count={sec.items.length} entrance={entrance} />
           <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {sec.items.map((issue, i) => card(issue, sectionStartIndices[secIdx] + i))}
+            {sec.items.map((issue, i) => card(issue, i))}
           </div>
         </section>
       ))}

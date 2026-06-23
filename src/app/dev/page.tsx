@@ -287,7 +287,13 @@ export default function DevConsolePage() {
             </div>
 
             {/* ── right: tall Cere trigger spanning both rows ── */}
-            <div className={entrance && t >= 0.34 ? 'hq-cere-jump' : undefined} style={entrance && t < 0.34 ? { opacity: 0 } : undefined}>
+            {/* self-stretch + flex so CerePortal still fills the header height
+                (its own self-stretch needs a flex parent); the entrance jump is a
+                transform/opacity layer that doesn't affect the layout box. */}
+            <div
+              className={`flex self-stretch ${entrance && t >= 0.34 ? 'hq-cere-jump' : ''}`}
+              style={entrance && t < 0.34 ? { opacity: 0 } : undefined}
+            >
               <CerePortal onClick={() => setComposerOpen(true)} />
             </div>
           </div>
@@ -327,6 +333,7 @@ export default function DevConsolePage() {
                 onApprove={onApprove}
                 onSendBack={onSendBack}
                 entrance={entrance ? { active: true, t } : undefined}
+                loading={loading}
               />
             )}
           </div>
