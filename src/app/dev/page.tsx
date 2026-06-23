@@ -312,9 +312,12 @@ export default function DevConsolePage() {
           frame happens to be live. `showLoader` keeps the loader mounted for
           the fade, then unmounts it.
         */}
-        <div className={`relative ${showLoader ? 'min-h-[180px]' : ''}`}>
-          <div className={`transition-opacity duration-300 ${loading ? 'opacity-0' : 'opacity-100'}`}>
-            {!loading && (
+        <div className={`relative ${showLoader && !entrance ? 'min-h-[180px]' : ''}`}>
+          {/* During entrance the board renders immediately at full opacity so
+              the banner/header/card animations have content to reveal from the
+              first frame. Non-entrance keeps the existing opacity-0→100 fade. */}
+          <div className={entrance ? '' : `transition-opacity duration-300 ${loading ? 'opacity-0' : 'opacity-100'}`}>
+            {(!loading || entrance) && (
               <IssueList
                 issues={issues}
                 repos={repos}
@@ -327,7 +330,10 @@ export default function DevConsolePage() {
               />
             )}
           </div>
-          {showLoader && (
+          {/* CereGameLoader is suppressed during entrance — the banner/Cere jump/
+              card reveal IS the loading visual. Normal (non-entrance) path keeps
+              the loader exactly as before. */}
+          {showLoader && !entrance && (
             <div
               className={`absolute inset-0 flex justify-center py-16 transition-opacity duration-300 ${
                 loading ? 'opacity-100' : 'pointer-events-none opacity-0'
