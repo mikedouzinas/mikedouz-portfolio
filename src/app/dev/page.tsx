@@ -13,6 +13,8 @@ import { CereGameLoader } from '@/components/dev/CereGameLoader';
 import { HarlequinReveal } from '@/components/dev/HarlequinReveal';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
+import { VirtualProjectBoard } from '@/components/dev/VirtualProjectBoard';
+import type { DevProjectWithItems, DevItemStatus } from '@/lib/dev/items';
 
 const SORT_OPTS: { value: SortBy; label: string }[] = [
   { value: 'priority', label: 'Priority' },
@@ -24,6 +26,7 @@ export default function DevConsolePage() {
   const [repos, setRepos] = useState<DevRepo[]>([]);
   const [hidden, setHidden] = useState<DevRepo[]>([]);
   const [issues, setIssues] = useState<DevIssue[]>([]);
+  const [projects, setProjects] = useState<DevProjectWithItems[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   // Keeps the loader mounted through its fade-out after `loading` flips false,
@@ -68,6 +71,26 @@ export default function DevConsolePage() {
 
   const refreshIssues = useCallback(() => loadIssues(true), [loadIssues]);
 
+  const loadProjects = useCallback(async () => {
+    const res = await fetch('/api/dev/projects', { cache: 'no-store' });
+    if (res.ok) {
+      const data = (await res.json()) as { projects: DevProjectWithItems[] };
+      setProjects(data.projects);
+    }
+  }, []);
+
+  const onItemStatusChange = useCallback(
+    async (itemId: string, status: DevItemStatus) => {
+      await fetch(`/api/dev/items/${itemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      await loadProjects();
+    },
+    [loadProjects],
+  );
+
   const patchIssue = useCallback(async (repo: string, number: number, patch: Record<string, unknown>) => {
     await fetch('/api/dev/issues', {
       method: 'PATCH',
@@ -109,6 +132,10 @@ export default function DevConsolePage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on selected-repo change, not derived state
     loadIssues();
   }, [loadIssues]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- on-mount data fetch, not derived state
+    loadProjects();
+  }, [loadProjects]);
 
   // Mount the loader immediately when loading starts (handled during render via
   // prev-tracking so it's never a frame late), then keep it mounted for one fade
@@ -240,6 +267,9 @@ export default function DevConsolePage() {
           frame happens to be live. `showLoader` keeps the loader mounted for
           the fade, then unmounts it.
         */}
+        {!loading && (
+          <VirtualProjectBoard projects={projects} onStatusChange={onItemStatusChange} />
+        )}
         <div className={`relative ${showLoader ? 'min-h-[180px]' : ''}`}>
           <div className={`transition-opacity duration-300 ${loading ? 'opacity-0' : 'opacity-100'}`}>
             {!loading && (
