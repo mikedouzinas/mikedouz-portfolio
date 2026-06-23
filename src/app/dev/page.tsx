@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import type { DevIssue, DevRepo } from '@/lib/dev/github';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { HarlequinTitle } from '@/components/dev/HarlequinTitle';
@@ -10,10 +11,17 @@ import { GearMenu } from '@/components/dev/GearMenu';
 import { CerePortal } from '@/components/dev/CerePortal';
 import { CerePanel } from '@/components/dev/CerePanel';
 import { CereGameLoader } from '@/components/dev/CereGameLoader';
-import { HarlequinReveal } from '@/components/dev/HarlequinReveal';
+import { requestHarlequinTransition } from '@/components/dev/transition/store';
+import { consumeEntrance } from '@/components/dev/transition/entranceSignal';
+import {
+  captureBoardSnapshot,
+  scheduleBoardSnapshot,
+} from '@/components/dev/transition/boardSnapshot';
 import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import { IssueList, type GroupBy, type SortBy } from '@/components/dev/IssueList';
 import type { DevItem, DevProjectWithItems } from '@/lib/dev/items';
+import { HomeFadeOverlay } from '@/components/dev/entrance/HomeFadeOverlay';
+import { useEntranceReveal, sub } from '@/components/dev/entrance/useEntranceReveal';
 
 const SORT_OPTS: { value: SortBy; label: string }[] = [
   { value: 'priority', label: 'Priority' },
@@ -57,6 +65,7 @@ function itemToIssue(it: DevItem): DevIssue {
 }
 
 export default function DevConsolePage() {
+  const router = useRouter();
   const [repos, setRepos] = useState<DevRepo[]>([]);
   const [hidden, setHidden] = useState<DevRepo[]>([]);
   const [issues, setIssues] = useState<DevIssue[]>([]);
@@ -71,6 +80,10 @@ export default function DevConsolePage() {
   const [groupBy, setGroupBy] = useState<GroupBy>('status');
   const [sort, setSort] = useState<SortBy>('priority');
   const [composerOpen, setComposerOpen] = useState(false);
+  const [entrance, setEntrance] = useState(false);
+  const [homeFaded, setHomeFaded] = useState(false);
+  const { t } = useEntranceReveal(entrance);
+  const easeWipe = (x: number) => 1 - Math.pow(1 - x, 3);
 
   // Latest projects, read inside loadIssues without making it a dependency (which
   // would re-trigger the loader on every projects refresh).
@@ -210,17 +223,36 @@ export default function DevConsolePage() {
   // the setState inside the loaders runs after the fetch resolves, not as
   // render-derived state. The rule can't see across the async loader boundary.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- on-mount data fetch, not derived state
+     
     loadRepos();
   }, [loadRepos]);
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on selected-repo change, not derived state
+    // Read-once: did we just unlock? If so, play the reveal.
+    if (consumeEntrance()) setEntrance(true);
+     
+  }, []);
+  useEffect(() => {
+     
     loadIssues();
   }, [loadIssues]);
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- on-mount data fetch, not derived state
+     
     loadProjects();
   }, [loadProjects]);
+
+  // Eagerly pre-capture the board once it has settled, so the disintegration
+  // EXIT cover is ready instantly on click (no html2canvas stall at click time —
+  // that delay was the main reason the old exit "felt wrong"). Debounced, so
+  // silent issue refreshes coalesce into one capture. Back-button hover refreshes
+  // it again for the freshest possible frame.
+  useEffect(() => {
+    if (loading) return;
+    scheduleBoardSnapshot(1200);
+    // Warm the exit overlay chunk ahead of the click so the cover appears
+    // instantly (not after a ~0.4s lazy-chunk fetch). Runtime import() keeps it
+    // a separate chunk — it never enters the homepage bundle.
+    void import('@/components/dev/HarlequinExit');
+  }, [loading, issues]);
 
   // Mount the loader immediately when loading starts (handled during render via
   // prev-tracking so it's never a frame late), then keep it mounted for one fade
@@ -235,6 +267,21 @@ export default function DevConsolePage() {
     const id = setTimeout(() => setShowLoader(false), 300);
     return () => clearTimeout(id);
   }, [loading]);
+
+  // Warm the exit's heavy deps the moment the board mounts. HarlequinExit lazy-
+  // imports three.js (~708KB) + html2canvas (~194KB); on a cold first exit that
+  // load alone outran the failsafe, so the disintegration never showed. Firing
+  // the SAME dynamic imports here caches them, so by the time the user hits
+  // back/logout the exit can snapshot + animate immediately. These imports stay
+  // out of the homepage bundle — they only run on /dev.
+  useEffect(() => {
+    void import('three');
+    void import('html2canvas');
+    // Warm the homepage RSC so the exit's reveal (which client-navigates to /)
+    // has it painted underneath almost immediately — keeps the dissolve's start
+    // snappy instead of holding the board cover while / loads.
+    router.prefetch('/');
+  }, [router]);
 
   // ⌘K (the main-site Iris is suppressed on /dev) opens Cere instead. Ignore
   // Shift so ⌘⇧K stays reserved for the portal twin and doesn't also open Cere.
@@ -271,19 +318,35 @@ export default function DevConsolePage() {
 
   async function logout() {
     setLoggingOut(true);
-    await fetch('/api/dev/auth', { method: 'DELETE' });
-    window.location.href = '/';
+    // Clear the session FIRST and await it, so the cookie is definitely gone
+    // before we leave. Running it in parallel with the exit animation raced the
+    // navigate — the page could reload to `/` before the DELETE's Set-Cookie
+    // applied, leaving the session intact (you'd still be "logged in", so /dev
+    // re-opened without a passcode). Clear, THEN play the exit → navigate.
+    try {
+      await fetch('/api/dev/auth', { method: 'DELETE' });
+    } catch {
+      /* leave anyway — being unable to reach the endpoint shouldn't trap you */
+    }
+    requestHarlequinTransition('exit');
   }
 
   const openCount = allIssues.filter((i) => i.state === 'open').length;
 
   return (
-    <div className="min-h-screen dev-workpad text-white">
-      <HarlequinReveal />
+    <div data-board-root className="min-h-screen dev-workpad text-white">
+      {entrance && !homeFaded && <HomeFadeOverlay onDone={() => setHomeFaded(true)} />}
+      {/* The diamond-ash disintegration EXIT is played by HarlequinTransitionHost
+          (root layout) so the WebGL overlay survives the /dev → home route change.
+          This page only tags its root [data-board-root] (the exit snapshots it).
+          The cursor-follow argyle bloom (HarlequinReveal) was removed — it popped
+          up under the cursor right as you reached for the back-diamond and
+          conflated with the exit. */}
       <header
         data-suppress-reveal
         data-has-contained-glow="true"
-        className="sticky top-0 z-40 border-b border-[#e7e2d4]/15 bg-[#0e0c12]/70 backdrop-blur-md"
+        className={`sticky top-0 z-40 border-b border-[#e7e2d4]/15 bg-[#0e0c12]/70 backdrop-blur-md ${entrance ? 'hq-banner-enter' : ''}`}
+        style={entrance ? ({ ['--hq-wipe' as string]: easeWipe(sub(t, 0.14, 0.42)) } as React.CSSProperties) : undefined}
       >
         {/* Contained champagne light within the header bar (self-clips). */}
         <ContainedMouseGlow color="231, 226, 212" intensity={0.12} size={260} />
@@ -299,7 +362,14 @@ export default function DevConsolePage() {
             <div className="flex flex-1 flex-col gap-3 min-w-0">
               {/* Row 1: title left, group-by right */}
               <div className="flex items-center justify-between gap-4">
-                <HarlequinTitle />
+                <HarlequinTitle
+                  onBack={() => requestHarlequinTransition('exit')}
+                  onBackHover={() => {
+                    void captureBoardSnapshot();
+                    void import('@/components/dev/HarlequinExit');
+                  }}
+                  entrance={entrance}
+                />
                 <div className="hidden md:block">
                   <GroupByToggle value={groupBy} onChange={setGroupBy} />
                 </div>
@@ -329,7 +399,15 @@ export default function DevConsolePage() {
             </div>
 
             {/* ── right: tall Cere trigger spanning both rows ── */}
-            <CerePortal onClick={() => setComposerOpen(true)} />
+            {/* self-stretch + flex so CerePortal still fills the header height
+                (its own self-stretch needs a flex parent); the entrance jump is a
+                transform/opacity layer that doesn't affect the layout box. */}
+            <div
+              className={`flex self-stretch ${entrance && t >= 0.34 ? 'hq-cere-jump' : ''}`}
+              style={entrance && t < 0.34 ? { opacity: 0 } : undefined}
+            >
+              <CerePortal onClick={() => setComposerOpen(true)} />
+            </div>
           </div>
 
           {managing && repos.length > 0 && (
@@ -352,9 +430,12 @@ export default function DevConsolePage() {
           frame happens to be live. `showLoader` keeps the loader mounted for
           the fade, then unmounts it.
         */}
-        <div className={`relative ${showLoader ? 'min-h-[180px]' : ''}`}>
-          <div className={`transition-opacity duration-300 ${loading ? 'opacity-0' : 'opacity-100'}`}>
-            {!loading && (
+        <div className={`relative ${showLoader && !entrance ? 'min-h-[180px]' : ''}`}>
+          {/* During entrance the board renders immediately at full opacity so
+              the banner/header/card animations have content to reveal from the
+              first frame. Non-entrance keeps the existing opacity-0→100 fade. */}
+          <div className={entrance ? '' : `transition-opacity duration-300 ${loading ? 'opacity-0' : 'opacity-100'}`}>
+            {(!loading || entrance) && (
               <IssueList
                 issues={allIssues}
                 repos={allRepos}
@@ -363,10 +444,15 @@ export default function DevConsolePage() {
                 onChanged={refreshBoard}
                 onApprove={onApprove}
                 onSendBack={onSendBack}
+                entrance={entrance ? { active: true, t } : undefined}
+                loading={loading}
               />
             )}
           </div>
-          {showLoader && (
+          {/* CereGameLoader is suppressed during entrance — the banner/Cere jump/
+              card reveal IS the loading visual. Normal (non-entrance) path keeps
+              the loader exactly as before. */}
+          {showLoader && !entrance && (
             <div
               className={`absolute inset-0 flex justify-center py-16 transition-opacity duration-300 ${
                 loading ? 'opacity-100' : 'pointer-events-none opacity-0'

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Entry — Real Smoke Reveal · THE HARLEQUIN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0e0c12;
+    --bg-2: #14111a;
+    --champ: #e7e2d4;
+    --champ-dim: rgba(231, 226, 212, 0.55);
+    --champ-faint: rgba(231, 226, 212, 0.14);
+    --line: rgba(231, 226, 212, 0.10);
+    --p-crit: #e06b6b;
+    --p-high: #e0b15a;
+    --p-med:  #6fb8e0;
+    --p-low:  #5fc08a;
+    --ease: cubic-bezier(0.65, 0, 0.35, 1); /* easeInOutCubic */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: radial-gradient(120% 120% at 50% 0%, #16121d 0%, var(--bg) 60%);
+    color: var(--champ);
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  .stage {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    isolation: isolate; /* contain blend modes to the stage */
+  }
+
+  /* ---------------- DESTINATION: THE HARLEQUIN BOARD ---------------- */
+  .board {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: min(880px, 92vw);
+    height: min(560px, 86vh);
+    background:
+      linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 40px 120px -40px rgba(0,0,0,0.8);
+    padding: 26px 30px;
+    display: flex;
+    flex-direction: column;
+    /* starts hidden / blurred — resolves as smoke clears */
+    filter: blur(14px);
+    opacity: 0.18;
+    transform: scale(1.03);
+    transition: none;
+  }
+
+  .titlebar {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .wordmark {
+    font-family: "Limelight", serif;
+    font-weight: 400;
+    font-size: clamp(20px, 3.2vw, 30px);
+    letter-spacing: 0.08em;
+    color: var(--champ);
+  }
+  .board-sub {
+    font-family: "Space Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--champ-dim);
+  }
+
+  .col-h {
+    display: grid;
+    grid-template-columns: 18px 1fr 64px 48px;
+    gap: 14px;
+    align-items: center;
+    font-family: "Space Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--champ-dim);
+    padding: 16px 4px 10px;
+  }
+
+  .rows { display: flex; flex-direction: column; flex: 1; }
+
+  .row {
+    display: grid;
+    grid-template-columns: 18px 1fr 64px 48px;
+    gap: 14px;
+    align-items: center;
+    padding: 15px 4px;
+    border-top: 1px solid var(--line);
+  }
+  .row:last-child { border-bottom: 1px solid var(--line); }
+
+  .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    box-shadow: 0 0 10px -1px currentColor;
+  }
+  .dot.crit { background: var(--p-crit); color: var(--p-crit); }
+  .dot.high { background: var(--p-high); color: var(--p-high); }
+  .dot.med  { background: var(--p-med);  color: var(--p-med); }
+  .dot.low  { background: var(--p-low);  color: var(--p-low); }
+
+  .row .title { font-size: 14px; color: var(--champ); letter-spacing: 0.01em; }
+  .row .pri {
+    font-family: "Space Mono", monospace;
+    font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .pri.crit { color: var(--p-crit); }
+  .pri.high { color: var(--p-high); }
+  .pri.med  { color: var(--p-med); }
+  .pri.low  { color: var(--p-low); }
+  .row .id {
+    font-family: "Space Mono", monospace;
+    font-size: 10px; color: var(--champ-dim); text-align: right;
+  }
+
+  /* ---------------- DIAMOND EMITTER ---------------- */
+  .diamond {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 52px; height: 52px;
+    transform: translate(-50%, -50%) rotate(45deg);
+    background:
+      repeating-linear-gradient(45deg, rgba(231,226,212,0.16) 0 6px, transparent 6px 12px),
+      repeating-linear-gradient(-45deg, rgba(231,226,212,0.16) 0 6px, transparent 6px 12px),
+      linear-gradient(135deg, rgba(231,226,212,0.12), rgba(231,226,212,0.03));
+    border: 1px solid rgba(231,226,212,0.5);
+    border-radius: 4px;
+    box-shadow: 0 0 24px -4px rgba(231,226,212,0.45), inset 0 0 18px rgba(231,226,212,0.10);
+    z-index: 6;
+    opacity: 1;
+  }
+  .diamond::after {
+    content: "";
+    position: absolute; inset: 30%;
+    background: rgba(231,226,212,0.9);
+    border-radius: 2px;
+    box-shadow: 0 0 16px 2px rgba(231,226,212,0.6);
+  }
+
+  /* ---------------- SMOKE LAYERS (real footage) ---------------- */
+  /* clip-path circle, centered on the diamond, expands the smoke from a tiny
+     region at the diamond out to full screen. */
+  .smoke-field {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    /* full-frame: smoke fills the whole viewport. The footage's black bg is
+       transparent (screen blend) so the video frame edges sit off-screen — no
+       rectangular or circular bound. The fill->clear is driven by OPACITY + the
+       footage's own billowing motion, NOT by scaling/clipping a small clip. */
+    opacity: 0;
+    transform-origin: 50% 50%;
+    /* warm champagne base so the screen-blended smoke reads tinted/organic */
+    background: radial-gradient(60% 60% at 50% 50%, rgba(231,226,212,0.05), transparent 70%);
+    mix-blend-mode: screen;
+  }
+
+  .smoke-field video {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 150%; height: 150%;
+    object-fit: cover;
+    /* screen drops the black bg of the footage, leaving only the smoke */
+    mix-blend-mode: screen;
+    will-change: transform, opacity;
+  }
+
+  /* three offset/rotated/scaled instances so it reads dense + organic */
+  .smoke-field .s1 {
+    transform: translate(-50%, -50%) scale(1.0) rotate(0deg);
+    opacity: 0.95;
+    filter: blur(1px) saturate(0.7) sepia(0.18) hue-rotate(-8deg) brightness(1.05);
+  }
+  .smoke-field .s2 {
+    transform: translate(-48%, -54%) scale(1.45) rotate(140deg);
+    opacity: 0.7;
+    filter: blur(3px) saturate(0.6) sepia(0.22) hue-rotate(-6deg) brightness(0.95);
+  }
+  .smoke-field .s3 {
+    transform: translate(-54%, -46%) scale(1.9) rotate(255deg);
+    opacity: 0.5;
+    filter: blur(6px) saturate(0.5) sepia(0.26) brightness(0.85);
+  }
+
+  /* warm tint pass blended over the smoke so it's champagne, not grey-white */
+  .smoke-tint {
+    position: absolute; inset: 0; z-index: 5;
+    pointer-events: none;
+    background: radial-gradient(70% 70% at 50% 50%, rgba(214,196,150,0.5), rgba(231,226,212,0.12) 60%, transparent 80%);
+    mix-blend-mode: overlay;
+    opacity: 0;
+  }
+
+  /* ---------------- ANIMATION KEYFRAMES ---------------- */
+  /* SMOKE: emit pinpoint at diamond -> grow to fill -> linger -> clear */
+  @keyframes smokeReveal {
+    /* full-frame smoke: fade in (fills) -> hold (peak) -> fade out (clears).
+       no scale/clip — nothing bounds the smoke but its own footage. */
+    0%   { opacity: 0; }
+    24%  { opacity: 1; }
+    58%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes tintReveal {
+    0%   { opacity: 0; }
+    24%  { opacity: 0.85; }
+    55%  { opacity: 0.9; }
+    100% { opacity: 0; }
+  }
+  /* per-layer drift so the three clips don't move as one flat sheet */
+  @keyframes drift1 { from { transform: translate(-50%,-50%) scale(1.0) rotate(0deg); }
+                      to   { transform: translate(-50%,-52%) scale(1.12) rotate(14deg); } }
+  @keyframes drift2 { from { transform: translate(-48%,-54%) scale(1.45) rotate(140deg); }
+                      to   { transform: translate(-52%,-50%) scale(1.62) rotate(118deg); } }
+  @keyframes drift3 { from { transform: translate(-54%,-46%) scale(1.9) rotate(255deg); }
+                      to   { transform: translate(-50%,-50%) scale(2.08) rotate(278deg); } }
+
+  /* DIAMOND: glow swells as it emits, then fades behind the smoke */
+  @keyframes diamondEmit {
+    0%   { opacity: 1; box-shadow: 0 0 24px -4px rgba(231,226,212,0.45); transform: translate(-50%,-50%) rotate(45deg) scale(1); }
+    14%  { opacity: 1; box-shadow: 0 0 60px 6px rgba(231,226,212,0.8); transform: translate(-50%,-50%) rotate(45deg) scale(1.18); }
+    40%  { opacity: 0.25; }
+    100% { opacity: 0; transform: translate(-50%,-50%) rotate(45deg) scale(0.7); }
+  }
+
+  /* BOARD: blurred+dim -> sharpens & brightens as smoke thins */
+  @keyframes boardResolve {
+    0%   { filter: blur(14px); opacity: 0.18; transform: scale(1.03); }
+    45%  { filter: blur(12px); opacity: 0.22; transform: scale(1.025); }
+    /* board only really emerges in the back half, as the smoke dissipates */
+    72%  { filter: blur(6px);  opacity: 0.7;  transform: scale(1.008); }
+    100% { filter: blur(0px);  opacity: 1;    transform: scale(1); }
+  }
+
+  /* state class drives every layer off one timeline */
+  .stage.playing .smoke-field { animation: smokeReveal 2200ms var(--ease) forwards; }
+  .stage.playing .smoke-tint  { animation: tintReveal 2200ms var(--ease) forwards; }
+  .stage.playing .smoke-field .s1 { animation: drift1 2200ms linear forwards; }
+  .stage.playing .smoke-field .s2 { animation: drift2 2200ms linear forwards; }
+  .stage.playing .smoke-field .s3 { animation: drift3 2200ms linear forwards; }
+  .stage.playing .diamond     { animation: diamondEmit 2200ms var(--ease) forwards; }
+  .stage.playing .board       { animation: boardResolve 2400ms var(--ease) forwards; }
+
+  /* ---------------- CONTROLS ---------------- */
+  .controls {
+    position: absolute;
+    left: 50%; bottom: 26px;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .replay {
+    font-family: "Space Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--champ);
+    background: rgba(231, 226, 212, 0.06);
+    border: 1px solid var(--champ-faint);
+    border-radius: 8px;
+    padding: 11px 22px;
+    cursor: pointer;
+    transition: transform 180ms cubic-bezier(0.34,1.56,0.64,1), background 180ms ease, border-color 180ms ease;
+  }
+  .replay:hover { transform: translateY(-2px) scale(1.03); background: rgba(231,226,212,0.12); border-color: rgba(231,226,212,0.3); }
+  .replay:active { transform: translateY(0) scale(0.98); }
+  .replay:focus-visible { outline: 2px solid var(--p-med); outline-offset: 3px; }
+
+  .caption {
+    font-family: "Space Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    color: var(--champ-dim);
+    text-transform: uppercase;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stage.playing .smoke-field,
+    .stage.playing .smoke-tint,
+    .stage.playing .smoke-field video,
+    .stage.playing .diamond,
+    .stage.playing .board {
+      animation-duration: 1ms !important;
+    }
+    .board { filter: none; opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+
+    <!-- DESTINATION BOARD (resolves underneath the smoke) -->
+    <section class="board" aria-label="THE HARLEQUIN board">
+      <div class="titlebar">
+        <span class="wordmark">THE HARLEQUIN</span>
+        <span class="board-sub">Dev Board · 4 open</span>
+      </div>
+      <div class="col-h">
+        <span></span><span>Ticket</span><span>Priority</span><span>ID</span>
+      </div>
+      <div class="rows">
+        <div class="row">
+          <span class="dot crit"></span>
+          <span class="title">Portal login flickers on cold load</span>
+          <span class="pri crit">Critical</span>
+          <span class="id">#102</span>
+        </div>
+        <div class="row">
+          <span class="dot high"></span>
+          <span class="title">Smoke entry transition — real footage</span>
+          <span class="pri high">High</span>
+          <span class="id">#99</span>
+        </div>
+        <div class="row">
+          <span class="dot med"></span>
+          <span class="title">Champagne duotone pass on /dev</span>
+          <span class="pri med">Medium</span>
+          <span class="id">#84</span>
+        </div>
+        <div class="row">
+          <span class="dot low"></span>
+          <span class="title">Limelight wordmark kerning</span>
+          <span class="pri low">Low</span>
+          <span class="id">#71</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SMOKE: real footage, screen-blended, clipped to expand from the diamond -->
+    <div class="smoke-field" id="smokeField" aria-hidden="true">
+      <video class="s1" src="./vfx/smoke-white.mp4" muted autoplay playsinline preload="auto"></video>
+      <video class="s2" src="./vfx/smoke-white.mp4" muted autoplay playsinline preload="auto"></video>
+      <video class="s3" src="./vfx/smoke-white.mp4" muted autoplay playsinline preload="auto"></video>
+    </div>
+    <div class="smoke-tint" id="smokeTint" aria-hidden="true"></div>
+
+    <!-- DIAMOND EMITTER -->
+    <div class="diamond" id="diamond" aria-hidden="true"></div>
+
+    <div class="controls">
+      <button class="replay" id="replay" type="button">Replay</button>
+      <span class="caption">Real smoke — emitted from the diamond, then cleared</span>
+    </div>
+  </div>
+
+<script>
+  (function () {
+    const stage  = document.getElementById("stage");
+    const field  = document.getElementById("smokeField");
+    const videos = Array.from(field.querySelectorAll("video"));
+    let timers = [];
+
+    function clearTimers() {
+      timers.forEach((t) => clearTimeout(t));
+      timers = [];
+    }
+
+    function seekVideos() {
+      // stagger the three layers so coverage is full + varied at the peak
+      const offsets = [0.0, 1.2, 2.4];
+      videos.forEach((v, i) => {
+        try {
+          v.currentTime = offsets[i] % (v.duration || 4) || 0;
+        } catch (_) {}
+        const p = v.play();
+        if (p && p.catch) p.catch(() => {});
+      });
+    }
+
+    function reset() {
+      clearTimers();
+      // tear down animations so a fresh run can re-trigger them
+      stage.classList.remove("playing");
+      // force reflow to flush the removed animation state
+      void stage.offsetWidth;
+    }
+
+    function play() {
+      reset();
+      seekVideos();
+      // start on next frame so the reflow + class add are distinct
+      requestAnimationFrame(() => {
+        stage.classList.add("playing");
+      });
+    }
+
+    document.getElementById("replay").addEventListener("click", play);
+
+    // autoplay once the footage is ready (or shortly after load as a fallback)
+    let started = false;
+    function kick() {
+      if (started) return;
+      started = true;
+      play();
+    }
+    videos.forEach((v) => v.addEventListener("canplay", kick, { once: true }));
+    timers.push(setTimeout(kick, 600)); // fallback if canplay is slow on file://
+  })();
+</script>
+</body>
+</html>

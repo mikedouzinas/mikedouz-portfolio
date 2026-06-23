@@ -1,0 +1,39 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - generic [ref=e7]:
+            - heading "Back to mikeveson.com THE HARLEQUIN" [level=1] [ref=e8]:
+              - link "Back to mikeveson.com" [ref=e9] [cursor=pointer]:
+                - /url: /
+                - generic [ref=e10]: ◆
+                - img [ref=e11]
+              - generic [ref=e13]: THE HARLEQUIN
+              - generic [ref=e14]: ◆
+            - generic [ref=e16]:
+              - generic [ref=e17]: group by
+              - generic [ref=e18]:
+                - button "Status" [ref=e19] [cursor=pointer]
+                - button "Repo" [ref=e20] [cursor=pointer]
+          - generic [ref=e21]:
+            - button "All" [ref=e23] [cursor=pointer]
+            - generic [ref=e24]:
+              - button "Sort" [ref=e26] [cursor=pointer]:
+                - generic [ref=e27]: Priority
+                - img [ref=e28]
+              - button "Board settings" [ref=e31] [cursor=pointer]:
+                - img [ref=e32]
+        - button "Open Cere" [ref=e35] [cursor=pointer]:
+          - generic [ref=e37]: Cere
+    - main [ref=e38]:
+      - paragraph
+      - generic [ref=e41]:
+        - generic "Cere is thinking" [ref=e42]:
+          - generic [ref=e43]:
+            - generic [ref=e45]: Cere
+            - generic [ref=e47]: You
+        - generic [ref=e48]: War
+  - button "Open Next.js Dev Tools" [ref=e54] [cursor=pointer]:
+    - img [ref=e55]
+  - alert [ref=e58]

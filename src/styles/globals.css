@@ -431,3 +431,35 @@ html {
     animation: none;
   }
 }
+
+/* ── HARLEQUIN board entrance reveal ───────────────────────────────────── */
+/* The banner wipes in from the FAR LEFT all the way to the RIGHT edge — a
+   deliberate full-width sweep (driven by --hq-wipe: 0→1). A thin champagne
+   leading edge rides the wipe front so the sweep reads clearly. */
+.hq-banner-enter {
+  clip-path: inset(0 calc((1 - var(--hq-wipe, 1)) * 100%) 0 0);
+  position: relative;
+}
+.hq-banner-enter::after {
+  content: "";
+  position: absolute; top: 0; bottom: 0;
+  left: calc(var(--hq-wipe, 1) * 100%);
+  width: 2px; transform: translateX(-2px);
+  background: linear-gradient(180deg, transparent, rgba(231,226,212,0.85), transparent);
+  opacity: calc((1 - var(--hq-wipe, 1)) * var(--hq-wipe, 1) * 4); /* 0 at ends, bright mid-sweep */
+  pointer-events: none;
+}
+/* Cere jumps into place: drop + scale with a slight overshoot. */
+@keyframes hq-cere-jump {
+  0%   { opacity: 0; transform: translateY(-22px) scale(0.3); }
+  70%  { opacity: 1; transform: translateY(3px) scale(1.06); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.hq-cere-jump { animation: hq-cere-jump 460ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+/* typing caret */
+.hq-caret { display:inline-block; width:0.5ch; margin-left:1px; color:#27b06f; }
+@media (prefers-reduced-motion: reduce) {
+  .hq-banner-enter { clip-path: none; }
+  .hq-banner-enter::after { display: none; }
+  .hq-cere-jump { animation: none; }
+}

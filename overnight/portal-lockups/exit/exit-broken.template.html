@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>THE HARLEQUIN · EXIT broken wind-up (A/B/C)</title>
+<style>
+  :root { --ink:#0d0b11; --champagne:#e7e2d4; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; background:#000; overflow:hidden;
+    font-family: ui-monospace, "Space Mono", monospace; color:var(--champagne); }
+  #stage{ position:fixed; inset:0; display:grid; place-items:center; background:#000; }
+  #gl{ width:min(100vw, calc(100vh * 1.6)); height:min(100vh, calc(100vw / 1.6));
+    display:block; box-shadow:0 0 120px rgba(0,0,0,0.8); }
+  #panel{ position:fixed; left:16px; bottom:14px; z-index:10;
+    background:rgba(13,11,17,0.82); border:1px solid rgba(231,226,212,0.22);
+    border-radius:10px; padding:12px 14px; backdrop-filter:blur(8px);
+    font-size:12px; letter-spacing:.04em; width:320px; }
+  #panel h1{ font-size:11px; margin:0 0 10px; letter-spacing:.18em; text-transform:uppercase;
+    color:#e7e2d4; font-weight:600; }
+  .row{ display:flex; align-items:center; gap:8px; margin:7px 0; }
+  .row label{ width:74px; color:#b8b3a4; }
+  .row input[type=range]{ flex:1; accent-color:#27b06f; }
+  .row .val{ width:40px; text-align:right; color:#e7e2d4; }
+  .seg{ display:flex; gap:4px; flex:1; }
+  .seg button{ flex:1; }
+  button{ background:#1a1720; color:#e7e2d4; border:1px solid rgba(231,226,212,0.25);
+    border-radius:7px; padding:7px 4px; font:inherit; font-size:11px; cursor:pointer; letter-spacing:.04em; }
+  button:hover{ border-color:#27b06f; color:#fff; }
+  button.primary{ background:#27b06f; color:#06130c; border-color:#27b06f; font-weight:700; }
+  .seg button.on{ background:#27b06f; color:#06130c; border-color:#27b06f; font-weight:700; }
+  .btns{ display:flex; gap:6px; margin-top:10px; }
+  #hint{ position:fixed; right:16px; bottom:14px; z-index:10; font-size:11px; color:#6f6a5e; letter-spacing:.06em; }
+</style>
+</head>
+<body>
+  <div id="stage"><canvas id="gl"></canvas></div>
+  <div id="panel">
+    <h1>EXIT · broken wind-up → disintegrate</h1>
+    <div class="row"><label>break</label>
+      <div class="seg">
+        <button id="mA" class="on">A · diamond fracture</button>
+        <button id="mB">B · de-rez</button>
+      </div></div>
+    <div class="row"><label>progress</label>
+      <input id="prog" type="range" min="0" max="1" step="0.001" value="0" />
+      <span class="val" id="progv">0.00</span></div>
+    <div class="row"><label>duration</label>
+      <input id="dur" type="range" min="1.2" max="4" step="0.1" value="2.4" />
+      <span class="val" id="durv">2.4s</span></div>
+    <div class="btns">
+      <button id="play" class="primary">▶ Play exit</button>
+      <button id="reset">Reset</button>
+    </div>
+  </div>
+  <div id="hint">space = play · drag progress to scrub · the first ~30% is the "break"</div>
+
+<script type="module">
+const BOARD_SRC = '__BOARD_DATA_URI__';
+const HOME_SRC  = '__HOME_DATA_URI__';
+const IMG_W = 1440, IMG_H = 900;
+const CELL = 14;
+
+const canvas = document.getElementById('gl');
+const gl = canvas.getContext('webgl2', { premultipliedAlpha:false, antialias:true });
+
+const VERT = `#version 300 es
+precision highp float;
+precision highp int;
+layout(location=0) in vec2 aCorner;
+layout(location=1) in vec2 aCell;
+layout(location=2) in float aSeed;
+uniform vec2 uImageRes; uniform float uProgress; uniform float uBreak;
+uniform float uTime; uniform float uBand; uniform float uCell; uniform vec2 uSweep;
+uniform int uMode;
+out vec2 vUV; out vec2 vQuad; out float vLocal; out float vSeed;
+float hash(vec2 p){ return fract(sin(dot(p, vec2(41.3,289.1)))*43758.5453); }
+void main(){
+  vec2 dir = normalize(uSweep);
+  float sMax = dot(dir, vec2(1.0,1.0));
+  vec2 cellUV = aCell / uImageRes;
+  float s = dot(dir, cellUV) / sMax;
+  s += (hash(aCell*0.013) - 0.5) * 0.14;
+  float front = uProgress * (1.0 + uBand + 0.16) - 0.08;
+  float local = clamp((front - s) / uBand, 0.0, 1.0);
+
+  vUV = (aCell + aCorner * uCell) / uImageRes;
+  vQuad = aCorner;
+  vLocal = local; vSeed = aSeed;
+
+  float e = local;
+  float dia = smoothstep(0.0, 0.22, local);
+  float angle = dia * 0.785398 + e*e * (aSeed - 0.5) * 4.0;
+  float scale = 1.0 - smoothstep(0.45, 1.0, e);
+  scale *= 1.0 + 0.06*e;
+
+  vec2 outward = normalize(vec2(aSeed-0.5, -(0.4+aSeed*0.6)));
+  float sway = sin(uTime*2.0 + aSeed*6.28) * 6.0 * e;
+  vec2 grav = vec2(0.0, e*e * 40.0);
+  vec2 offset = outward * (e*150.0) + vec2(0.0, -e*150.0) + vec2(sway,0.0) + grav;
+
+  vec2 corner = aCorner * uCell * scale;
+  corner.y *= mix(1.0, 1.32, dia);
+  float c = cos(angle), sN = sin(angle);
+  vec2 rc = vec2(corner.x*c - corner.y*sN, corner.x*sN + corner.y*c);
+  vec2 posPx = aCell + rc + offset;
+
+  // (The fracture/de-rez break is done in the fragment shader; the chip
+  //  geometry stays put during the wind-up so cracks read cleanly.)
+  vec2 clip = (posPx / uImageRes) * 2.0 - 1.0;
+  clip.y = -clip.y;
+  gl_Position = vec4(clip, 0.0, 1.0);
+}`;
+
+const FRAG = `#version 300 es
+precision highp float;
+precision highp int;
+in vec2 vUV; in vec2 vQuad; in float vLocal; in float vSeed;
+uniform sampler2D uBoard; uniform float uBreak; uniform float uTime; uniform int uMode;
+out vec4 frag;
+float hash(vec2 p){ return fract(sin(dot(p, vec2(12.99,78.23)))*43758.5453); }
+void main(){
+  float local = vLocal;
+  vec3 green = vec3(0.153,0.690,0.435);
+  vec3 navy  = vec3(0.078,0.227,0.420);
+  vec3 red   = vec3(0.702,0.071,0.169);
+  vec3 blue  = vec3(0.353,0.651,0.902);
+
+  vec2 uv = vUV;
+  vec3 board;
+
+  if (uMode == 1){
+    // ---- B · DE-REZ / glitch -------------------------------------------
+    float g = uBreak;
+    // blocky horizontal row displacement (datamosh tear)
+    float row = floor(uv.y * 90.0);
+    float jump = (hash(vec2(row, floor(uTime*18.0))) - 0.5);
+    float tear = step(0.6, hash(vec2(row, floor(uTime*9.0)+3.0)));
+    uv.x += jump * 0.06 * g * tear;
+    // RGB channel split
+    float sp = 0.004 * g + 0.002*g*sin(uTime*40.0);
+    float r = texture(uBoard, uv + vec2(sp,0.0)).r;
+    float gg= texture(uBoard, uv).g;
+    float b = texture(uBoard, uv - vec2(sp,0.0)).b;
+    board = vec3(r,gg,b);
+    // scanlines + flicker
+    board *= 1.0 - 0.25*g*step(0.5, fract(uv.y*220.0));
+    board += green * g * 0.05 * step(0.92, hash(vec2(floor(uTime*30.0), row)));
+  } else {
+    board = texture(uBoard, uv).rgb;
+  }
+
+  // tone-match the snapshot (matches the in-app exit)
+  board = pow(max(board, 0.0), vec3(1.3));
+
+  if (uMode == 0){
+    // ---- A · FRACTURE into HARLEQUIN DIAMONDS (argyle lattice) ----------
+    // rotate uv into a 45° lattice so the cells read as tall diamonds, then
+    // crack along the diamond edges — the board crazes into argyle shards.
+    vec2 luv = vUV * vec2(20.0, 13.0);
+    vec2 q = vec2(luv.x + luv.y, luv.x - luv.y) * 0.5;
+    vec2 fq = fract(q);
+    vec2 e2 = min(fq, 1.0 - fq);
+    float dEdge = min(e2.x, e2.y);                       // 0 at a diamond edge
+    float crackable = 0.5 + 0.5*hash(floor(q));          // some shards crack harder
+    float seam = (1.0 - smoothstep(0.0, 0.05, dEdge)) * uBreak * crackable;
+    board = mix(board, board*0.10, seam);                // dark crack seam
+    board += green * (1.0 - smoothstep(0.0, 0.02, dEdge)) * uBreak * crackable * 0.8; // hot rim
+    board *= 1.0 + (hash(floor(q)) - 0.5) * 0.14 * uBreak; // each shard reads distinct
+  }
+
+  // ---- DISINTEGRATION (shared) ---------------------------------------
+  float ignite = smoothstep(0.0,0.12,local) * (1.0 - smoothstep(0.12,0.5,local));
+  vec3 burn = mix(green, navy, smoothstep(0.1,0.6,local));
+  if (vSeed > 0.90) burn = red; else if (vSeed > 0.78) burn = blue;
+  vec3 col = mix(board, burn, ignite * 0.8);
+  float edgeF = (1.0 - smoothstep(0.0, 0.10, local)) * step(0.0006, local);
+  vec3 hot = mix(green, vec3(0.92,1.0,0.86), edgeF*edgeF);
+  col += hot * edgeF * 2.0;
+  col += burn * ignite * 0.5;
+
+  float a = (1.0 - smoothstep(0.5, 1.0, local));
+  if (a <= 0.003) discard;
+  frag = vec4(col, a);
+}`;
+
+const BG_VERT = `#version 300 es
+precision highp float;
+layout(location=0) in vec2 p; out vec2 vUV;
+void main(){ vUV = vec2((p.x+1.0)*0.5, 1.0-(p.y+1.0)*0.5); gl_Position=vec4(p,0.0,1.0); }`;
+const BG_FRAG = `#version 300 es
+precision highp float;
+in vec2 vUV; uniform sampler2D uHome; out vec4 frag;
+void main(){ frag = texture(uHome, vUV); }`;
+
+function compile(t,s){ const sh=gl.createShader(t); gl.shaderSource(sh,s); gl.compileShader(sh);
+  if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh)); return sh; }
+function program(v,f){ const p=gl.createProgram(); gl.attachShader(p,compile(gl.VERTEX_SHADER,v));
+  gl.attachShader(p,compile(gl.FRAGMENT_SHADER,f)); gl.linkProgram(p);
+  if(!gl.getProgramParameter(p,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); return p; }
+
+const prog = program(VERT, FRAG);
+const bgProg = program(BG_VERT, BG_FRAG);
+
+const quad = new Float32Array([-0.5,-0.5, 0.5,-0.5, 0.5,0.5, -0.5,-0.5, 0.5,0.5, -0.5,0.5]);
+const cols = Math.ceil(IMG_W/CELL), rows = Math.ceil(IMG_H/CELL), COUNT = cols*rows;
+const cells = new Float32Array(COUNT*2), seeds = new Float32Array(COUNT);
+let i=0;
+for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){ cells[i*2]=(c+0.5)*CELL; cells[i*2+1]=(r+0.5)*CELL;
+  seeds[i]=((Math.sin(c*12.9898+r*78.233)*43758.5453)%1+1)%1; i++; }
+
+const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
+const qb=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,qb); gl.bufferData(gl.ARRAY_BUFFER,quad,gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+const cb=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,cb); gl.bufferData(gl.ARRAY_BUFFER,cells,gl.STATIC_DRAW);
+gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1,2,gl.FLOAT,false,0,0); gl.vertexAttribDivisor(1,1);
+const sb=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,sb); gl.bufferData(gl.ARRAY_BUFFER,seeds,gl.STATIC_DRAW);
+gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2,1,gl.FLOAT,false,0,0); gl.vertexAttribDivisor(2,1);
+gl.bindVertexArray(null);
+
+const bgVao=gl.createVertexArray(); gl.bindVertexArray(bgVao);
+const bgb=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,bgb);
+gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,1,1,-1,-1,1,1,-1,1]),gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+gl.bindVertexArray(null);
+
+function loadTex(src){ return new Promise(res=>{ const img=new Image(); img.onload=()=>{
+  const t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE); res(t); }; img.src=src; }); }
+
+const U = {}; ['uImageRes','uProgress','uBreak','uTime','uBand','uCell','uSweep','uMode','uBoard']
+  .forEach(n=> U[n]=gl.getUniformLocation(prog,n));
+const BGU = { home: gl.getUniformLocation(bgProg,'uHome') };
+
+let boardTex, homeTex;
+const state = { progress:0, duration:2.4, mode:0, playing:false, t0:0, time:0 };
+
+function resize(){ const dpr=Math.min(window.devicePixelRatio||1,2); const r=canvas.getBoundingClientRect();
+  canvas.width=Math.round(r.width*dpr); canvas.height=Math.round(r.height*dpr); gl.viewport(0,0,canvas.width,canvas.height); }
+window.addEventListener('resize', resize);
+const ease=(t)=> t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+
+function render(){
+  gl.clearColor(0,0,0,1); gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.useProgram(bgProg); gl.bindVertexArray(bgVao);
+  gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, homeTex); gl.uniform1i(BGU.home,1);
+  gl.drawArrays(gl.TRIANGLES,0,6);
+
+  const t = state.progress;
+  const breakP = Math.min(1, t/0.32);
+  const dissP  = Math.max(0, (t-0.30)/0.70);
+
+  gl.useProgram(prog); gl.bindVertexArray(vao);
+  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, boardTex); gl.uniform1i(U.uBoard,0);
+  gl.uniform2f(U.uImageRes, IMG_W, IMG_H);
+  gl.uniform1f(U.uProgress, ease(dissP));
+  gl.uniform1f(U.uBreak, ease(breakP));
+  gl.uniform1f(U.uTime, state.time);
+  gl.uniform1f(U.uBand, 0.26);
+  gl.uniform1f(U.uCell, CELL);
+  gl.uniform2f(U.uSweep, 0.85, 1.0);
+  gl.uniform1i(U.uMode, state.mode);
+  gl.drawArraysInstanced(gl.TRIANGLES,0,6,COUNT);
+  gl.disable(gl.BLEND); gl.bindVertexArray(null);
+}
+
+const prog$=document.getElementById('prog'), progv=document.getElementById('progv');
+const dur$=document.getElementById('dur'), durv=document.getElementById('durv');
+function setProgress(p){ state.progress=p; prog$.value=p; progv.textContent=p.toFixed(2); }
+prog$.addEventListener('input',e=>{ state.playing=false; setProgress(parseFloat(e.target.value)); });
+dur$.addEventListener('input',e=>{ state.duration=parseFloat(e.target.value); durv.textContent=state.duration.toFixed(1)+'s'; });
+const mbtn={0:document.getElementById('mA'),1:document.getElementById('mB')};
+function setMode(m){ state.mode=m; for(const k in mbtn) mbtn[k].classList.toggle('on', +k===m); }
+mbtn[0].onclick=()=>setMode(0); mbtn[1].onclick=()=>setMode(1);
+function play(){ state.playing=true; state.t0=performance.now(); }
+document.getElementById('play').onclick=play;
+document.getElementById('reset').onclick=()=>{ state.playing=false; setProgress(0); };
+window.addEventListener('keydown',e=>{ if(e.code==='Space'){ e.preventDefault(); play(); } });
+window.__exit={ setProgress, setMode, render, state };
+
+function frame(now){ state.time=now/1000;
+  if(state.playing){ const t=(now-state.t0)/(state.duration*1000);
+    if(t>=1){ setProgress(1); state.playing=false; } else setProgress(t<0?0:t); }
+  render(); requestAnimationFrame(frame); }
+
+(async function(){ resize(); [boardTex,homeTex]=await Promise.all([loadTex(BOARD_SRC),loadTex(HOME_SRC)]);
+  window.__ready=true; requestAnimationFrame(frame); })();
+</script>
+</body>
+</html>

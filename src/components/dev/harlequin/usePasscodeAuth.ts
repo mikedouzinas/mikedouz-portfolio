@@ -1,6 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { requestHarlequinTransition } from '@/components/dev/transition/store';
+import { markEntrance } from '@/components/dev/transition/entranceSignal';
+import { captureHomeSnapshot } from '@/components/dev/transition/homeSnapshot';
 
 /**
  * Passcode entry + real server auth — extracted from `PortalCircle.tsx` (which
@@ -38,7 +41,10 @@ export function usePasscodeAuth() {
           body: JSON.stringify({ password: pw }),
         });
         if (res.ok) {
-          window.location.href = '/dev';
+          // Arm the sequential board reveal, then navigate to /dev.
+          void captureHomeSnapshot(); // best-effort; overlay no-ops if absent
+          markEntrance();
+          requestHarlequinTransition('enter');
           return;
         }
         setError(res.status === 429 ? 'Too many attempts. Try later.' : 'Nope.');

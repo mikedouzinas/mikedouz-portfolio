@@ -3,6 +3,7 @@
 import { Limelight } from 'next/font/google';
 import { ArrowLeft } from 'lucide-react';
 import { GOOGLE_COLORS } from '@/lib/dev/uiMeta';
+import { TypeIn } from '@/components/dev/entrance/TypeIn';
 
 // Art Deco / 1930s-marquee display face for the wordmark only.
 const marquee = Limelight({ weight: '400', subsets: ['latin'], display: 'swap' });
@@ -13,15 +14,28 @@ const marquee = Limelight({ weight: '400', subsets: ['latin'], display: 'swap' }
  * four hues once on load, then settles to champagne. The leading diamond is a
  * hidden back affordance: on hover it crossfades into a red arrow home.
  */
-export function HarlequinTitle() {
+export function HarlequinTitle({
+  onBack,
+  onBackHover,
+  entrance = false,
+}: {
+  onBack?: () => void;
+  onBackHover?: () => void;
+  entrance?: boolean;
+}) {
   return (
     <h1 className="flex items-center gap-2 select-none">
-      {/* Full navigation (not client-side) so home loads completely. */}
-      {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional full page load on leaving /dev, not a client-side route transition */}
-      <a
-        href="/"
+      {/* The back-diamond plays the diamond-ash exit (which then navigates to
+          `/`); the session is kept. The leading diamond crossfades to a red
+          arrow home on hover. Hovering also refreshes the eager board snapshot
+          so the disintegration cover is instant on click. */}
+      <button
+        type="button"
+        onClick={onBack}
+        onMouseEnter={onBackHover}
+        onFocus={onBackHover}
         aria-label="Back to mikeveson.com"
-        className="group relative grid h-6 w-6 place-items-center"
+        className="group relative grid h-6 w-6 cursor-pointer place-items-center"
       >
         <span
           aria-hidden
@@ -34,9 +48,9 @@ export function HarlequinTitle() {
           aria-hidden
           className="absolute h-5 w-5 text-red-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
         />
-      </a>
+      </button>
       <span className={`${marquee.className} text-3xl tracking-[0.18em] text-[#E7E2D4]`}>
-        THE HARLEQUIN
+        {entrance ? <TypeIn text="THE HARLEQUIN" active durationMs={520} startDelayMs={260} caret={false} /> : 'THE HARLEQUIN'}
       </span>
       <span aria-hidden className="harlequin-diamond-flicker text-base">
         ◆

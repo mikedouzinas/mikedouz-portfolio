@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Entry · Assemble (Mark-42 argyle)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --void: #0e0c12;
+    --champagne: #e7e2d4;
+    --champagne-edge: #ede6d6;
+    --ember: #f0a830;
+    --red: #b3122b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #060509;
+    color: var(--champagne);
+    font-family: "Inter", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 22px;
+    padding: 32px 16px;
+    overflow: hidden;
+  }
+
+  /* ---- Stage ---- */
+  #stage {
+    position: relative;
+    width: min(92vw, 940px);
+    aspect-ratio: 16 / 10;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow:
+      0 40px 120px -40px rgba(0,0,0,0.9),
+      0 0 0 1px rgba(231,226,212,0.08) inset;
+    background: var(--void);
+  }
+  #stage .layer { position: absolute; inset: 0; }
+  #gl { position: absolute; inset: 0; display: block; z-index: 2; }
+
+  /* ---- The REVEALED /dev board (the end state) ----
+     This is the REAL board: near-black, with only a FAINT hint of resting
+     argyle (the actual /dev background only blooms under the cursor — at rest
+     it is essentially dark). Title bar + priority-dot ticket rows. */
+  .board-argyle {
+    position: absolute; inset: 0; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpolygon points='14,1 27,14 14,27 1,14' fill='%23B3122B' stroke='%23EDE6D6' stroke-width='0.6'/%3E%3C/svg%3E");
+    background-size: 28px 28px;
+    /* faint hint only — NOT a full resting argyle field */
+    opacity: 0;
+    transition: opacity 520ms ease;
+  }
+  /* a soft, static champagne bloom hinting where a cursor might rest —
+     keeps the dark board from reading as a flat void without lighting a
+     full argyle field. */
+  .board-bloom {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(circle 200px at 62% 38%, rgba(231,226,212,0.05), transparent 70%);
+    opacity: 0;
+    transition: opacity 520ms ease;
+  }
+  .board {
+    z-index: 1;
+    color: var(--champagne);
+    padding: 5% 5.5%;
+    display: flex;
+    flex-direction: column;
+    gap: 3.4%;
+    opacity: 0;
+    transition: opacity 520ms ease;
+  }
+  /* The board reveals once the diamonds have dissolved away. */
+  #stage[data-revealed="true"] .board { opacity: 1; }
+  #stage[data-revealed="true"] .board-argyle { opacity: 0.10; }
+  #stage[data-revealed="true"] .board-bloom { opacity: 1; }
+
+  .board-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4% 2%;
+    border: 1px solid rgba(231,226,212,0.12);
+    border-radius: 12px;
+    background: rgba(14,12,18,0.55);
+    backdrop-filter: blur(2px);
+  }
+  .board-title {
+    font-family: "Limelight", serif;
+    font-size: clamp(20px, 3.4vw, 38px);
+    letter-spacing: 1px;
+    color: var(--champagne);
+    text-shadow: 0 0 24px rgba(231,226,212,0.18);
+  }
+  .board-chip {
+    font-family: "JetBrains Mono", monospace;
+    font-size: clamp(10px, 1.4vw, 14px);
+    color: var(--ember);
+    letter-spacing: 0.08em;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: rgba(240,168,48,0.14);
+    border: 1px solid rgba(240,168,48,0.3);
+  }
+  .ticket {
+    display: flex; align-items: center; gap: 3%;
+    padding: 2.2% 2.4%;
+    border: 1px solid rgba(231,226,212,0.10);
+    border-radius: 12px;
+    background: rgba(14,12,18,0.5);
+    backdrop-filter: blur(2px);
+  }
+  .dot { width: 13px; height: 13px; border-radius: 50%; flex: 0 0 auto; }
+  .ticket-body { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .ticket-label {
+    font-size: clamp(13px, 1.8vw, 19px);
+    font-weight: 600; color: var(--champagne);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ticket-meta {
+    font-family: "JetBrains Mono", monospace;
+    font-size: clamp(9px, 1.2vw, 12px);
+    color: rgba(231,226,212,0.45);
+    letter-spacing: 0.03em;
+  }
+
+  /* ---- Controls ---- */
+  .controls { display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 3; }
+  #replay {
+    appearance: none; cursor: pointer;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--void);
+    background: linear-gradient(180deg, #f6c869, var(--ember));
+    border: none; border-radius: 999px;
+    padding: 11px 26px;
+    box-shadow: 0 10px 30px -10px rgba(240,168,48,0.6), 0 0 0 1px rgba(240,168,48,0.4);
+    transition: transform 200ms cubic-bezier(.34,1.56,.64,1), box-shadow 200ms ease, opacity 200ms ease;
+  }
+  #replay:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 16px 40px -10px rgba(240,168,48,0.75); }
+  #replay:active { transform: translateY(0) scale(0.98); }
+  #replay:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+  #replay[disabled] { opacity: 0.45; cursor: default; transform: none; }
+  .caption { font-family: "JetBrains Mono", monospace; font-size: 11px; color: #7a7466; letter-spacing: 0.04em; text-align: center; max-width: 62ch; line-height: 1.5; }
+  .caption b { color: var(--ember); font-weight: 500; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #replay { transition: none; }
+    .board, .board-argyle, .board-bloom { transition: opacity 120ms ease; }
+  }
+</style>
+</head>
+<body>
+  <div id="stage" data-revealed="false">
+    <!-- The REVEALED target: the real near-black /dev board -->
+    <div class="layer board-argyle" aria-hidden="true"></div>
+    <div class="layer board-bloom" aria-hidden="true"></div>
+    <div class="layer board" aria-hidden="true">
+      <div class="board-bar">
+        <div class="board-title">THE HARLEQUIN</div>
+        <div class="board-chip">12 OPEN</div>
+      </div>
+      <div class="ticket"><span class="dot" style="background:#B3122B;box-shadow:0 0 14px #B3122B"></span><div class="ticket-body"><div class="ticket-label">Portal entry — diamonds fly in from everywhere</div><div class="ticket-meta">P0 · entry-anim · #92</div></div></div>
+      <div class="ticket"><span class="dot" style="background:#f0a830;box-shadow:0 0 14px #f0a830"></span><div class="ticket-body"><div class="ticket-label">Per-diamond depth + scatter, clean spring lock</div><div class="ticket-meta">P1 · vfx · #89</div></div></div>
+      <div class="ticket"><span class="dot" style="background:#4ade80;box-shadow:0 0 14px #4ade80"></span><div class="ticket-body"><div class="ticket-label">Dissolve the full field to reveal the dark board</div><div class="ticket-meta">P2 · theme · #77</div></div></div>
+      <div class="ticket"><span class="dot" style="background:#63A6FF;box-shadow:0 0 14px #63A6FF"></span><div class="ticket-body"><div class="ticket-label">Limelight title fades in on reveal</div><div class="ticket-meta">P2 · type · #70</div></div></div>
+    </div>
+    <!-- WebGL assembly plane (diamond instances fly in, then dissolve away) -->
+    <canvas id="gl"></canvas>
+  </div>
+
+  <div class="controls">
+    <button id="replay" type="button">Replay</button>
+    <p class="caption">A fine harlequin weave is <b>knit one diamond at a time</b> — each small diamond flies in from just nearby and locks, then the next, growing off the already-placed cluster along a wandering connected front. Once the weave is fully laid it <b>dissolves away</b> (green→navy) to reveal the real dark board. WebGL instanced, ~5s deliberate build.</p>
+  </div>
+
+  <script type="importmap">
+  { "imports": { "three": "https://unpkg.com/three@0.169.0/build/three.module.js" } }
+  </script>
+
+  <script type="module">
+  import * as THREE from "three";
+
+  /* =========================================================================
+     ENTRY · ASSEMBLE — a slow, deliberate piece-by-piece mosaic build.
+
+     RHYTHM (the whole point of this version): the weave is KNIT one diamond at
+     a time, not swarmed in at once. Diamonds are placed in a CONNECTED order:
+     a BFS flood-fill from a seed cell, with a lightly shuffled frontier, so
+     each newly-placed diamond grows off the already-laid cluster along a
+     wandering front. The eye can follow individual diamonds being set.
+
+     1) Each small argyle tile (28px — half the old 56px, a finer weave) is one
+        instanced diamond quad. A diamond's launch DELAY is its rank in the
+        connected placement order (not random scatter). Because consecutive
+        ranks launch a hair apart but each has a fixed short flight time, only
+        a small ROLLING ACTIVE SET (~1–4 diamonds) is ever in flight at once —
+        you perceive them arriving one after another in different spots.
+
+     2) Each diamond flies in from a small NEARBY offset (a short hop, slight
+        depth) and settles gently with a smooth ease — minimal/no jiggle.
+
+     3) The diamond geometry is the harlequin rhombus: fill #B3122B, champagne
+        #EDE6D6 thin edge, on #0e0c12.
+
+     4) The end is a REVEAL, not a settle. Once the weave is fully laid, the
+        field DISSOLVES away (an fbm-noise burn, green->navy like the exit) to
+        reveal the real /dev board underneath: near-black, only a faint hint of
+        resting argyle, the Limelight title bar + ticket rows.
+     ========================================================================= */
+
+  const stage = document.getElementById("stage");
+  const canvas = document.getElementById("gl");
+
+  // Finer weave than the 56px hover tile — this build ENDS by revealing the
+  // dark board, so the build diamonds are sized for "small + fine", not to
+  // match the resting argyle. 28px ≈ half the old size.
+  const TILE = 28;                                 // px per argyle cell (finer weave)
+  const RHOMBUS_INSET = 1 / 14;                    // ~1px gutter in a 14px half-cell
+  const RED        = new THREE.Color("#b3122b");   // diamond fill
+  const CHAMPAGNE  = new THREE.Color("#ede6d6");   // diamond edge / stroke
+  // dissolve palette (matches the exit's green->navy clearing)
+  const BURN = new THREE.Color("#27b06f");         // forest-green hot front
+  const NAVY = new THREE.Color("#143a6b");         // navy cooling ash
+
+  // SLOW & DELIBERATE: the connected weave is laid over ~5s, then revealed.
+  const DURATION_ASSEMBLE  = 5.0;    // seconds: diamonds knit in one-by-one to full coverage
+  const HOLD               = 0.30;   // brief full-coverage beat
+  const DURATION_DISSOLVE  = 1.10;   // seconds: field dissolves to reveal board
+
+  let renderer, scene, camera, mesh, material, rafId;
+  let startTime = 0, playing = false, revealFired = false;
+  let cols = 0, rows = 0, count = 0;
+  let spanValue = 0.08;          // per-diamond flight window (set in buildInstances)
+  let reduced = false;
+
+  reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- VERTEX: per-instance scatter origin + depth + spin + delay. ---- */
+  const VERT = /* glsl */`
+    precision highp float;
+    attribute vec2  aSlot;     // resting center, clip space (-1..1)
+    attribute vec2  aOrigin;   // nearby start center, clip space (short hop)
+    attribute float aDepth;    // start scale multiplier (slight; settles to 1)
+    attribute float aSpin;     // start rotation (radians, gentle)
+    attribute float aDelay;    // 0..1 launch delay = rank in CONNECTED order
+    attribute float aSeed;     // per-instance random
+
+    uniform float uProgress;   // 0..1 assembly progress
+    uniform float uDissolve;   // 0..1 dissolve progress (clears the field)
+    uniform float uSpan;       // per-diamond flight window (small -> tight rolling set)
+    uniform vec2  uTileClip;   // tile half-extent in clip space (x,y)
+
+    varying vec2  vLocal;      // -0.5..0.5 quad coord for diamond mask
+    varying float vFill;       // 0 before arrival -> 1 locked (brightness)
+    varying float vSeed;
+    varying vec2  vSlot;       // slot in 0..1 (for dissolve front)
+
+    // gentle settle ease: smooth easeOutCubic, NO overshoot / wobble. Each
+    // diamond glides into its slot and stops.
+    float settle(float t){
+      if (t <= 0.0) return 0.0;
+      if (t >= 1.0) return 1.0;
+      float inv = 1.0 - t;
+      return 1.0 - inv * inv * inv; // easeOutCubic
+    }
+
+    void main(){
+      vLocal = position.xy; // quad authored as -0.5..0.5
+      vSeed = aSeed;
+      vSlot = aSlot * 0.5 + 0.5; // -> 0..1
+
+      // Per-instance windowed progress. aDelay is the diamond's RANK in the
+      // connected placement order; the flight window uSpan is small so only a
+      // tiny rolling set is mid-flight at any instant (one-after-another feel).
+      float local = clamp((uProgress - aDelay * (1.0 - uSpan)) / uSpan, 0.0, 1.0);
+      float s = settle(local);
+
+      // Travel from this diamond's OWN nearby origin -> its slot (short hop).
+      vec2 center = mix(aOrigin, aSlot, s);
+
+      // Depth: starts slightly off (aDepth), resolves to 1.
+      float depth = mix(aDepth, 1.0, s);
+      // spin unwinds to 0 as it locks.
+      float ang   = aSpin * (1.0 - s);
+      float ca = cos(ang), sa = sin(ang);
+
+      // tile half-extent, scaled by depth, rotated by ang.
+      vec2 q = position.xy * uTileClip * 2.0 * depth;
+      vec2 rq = vec2(q.x * ca - q.y * sa, q.x * sa + q.y * ca);
+
+      vFill = s;
+
+      // During dissolve, each diamond drifts up + scatters slightly as it burns
+      // away (the per-fragment burn front does the actual clearing).
+      center.y += uDissolve * (0.04 + 0.10 * aSeed) * smoothstep(0.0, 1.0, uDissolve);
+      center.x += (aSeed - 0.5) * 0.05 * uDissolve;
+
+      gl_Position = vec4(center + rq, 0.0, 1.0);
+    }
+  `;
+
+  /* ---- FRAGMENT: exact argyle rhombus (52px inside 56px) + champagne stroke,
+     plus the dissolve burn (green->navy) that clears the field at the end. ---- */
+  const FRAG = /* glsl */`
+    precision highp float;
+    varying vec2  vLocal;   // -0.5..0.5 within the 56px cell
+    varying float vFill;
+    varying float vSeed;
+    varying vec2  vSlot;    // 0..1 slot position
+
+    uniform vec3  uRed;
+    uniform vec3  uChampagne;
+    uniform vec3  uBurn;
+    uniform vec3  uNavy;
+    uniform float uDissolve;   // 0..1 field-clearing progress
+    uniform float uInset;      // rhombus tip half-extent (e.g. 26/28)
+    uniform float uTime;
+
+    // value-noise fbm so the dissolve front frays (matches the exit's feel)
+    vec2 hash2(vec2 p){
+      p = vec2(dot(p, vec2(127.1,311.7)), dot(p, vec2(269.5,183.3)));
+      return -1.0 + 2.0*fract(sin(p)*43758.5453123);
+    }
+    float vnoise(vec2 p){
+      vec2 i = floor(p); vec2 f = fract(p);
+      vec2 u = f*f*(3.0-2.0*f);
+      return mix(mix(dot(hash2(i+vec2(0,0)), f-vec2(0,0)),
+                     dot(hash2(i+vec2(1,0)), f-vec2(1,0)), u.x),
+                 mix(dot(hash2(i+vec2(0,1)), f-vec2(0,1)),
+                     dot(hash2(i+vec2(1,1)), f-vec2(1,1)), u.x), u.y);
+    }
+    float fbm(vec2 p){ float v=0.0,a=0.5; for(int i=0;i<4;i++){v+=a*vnoise(p);p*=2.03;a*=0.5;} return v; }
+
+    void main(){
+      // L1 distance -> diamond. The rhombus tips sit at uInset (13/14), so the
+      // silhouette ends at 0.5 * uInset, leaving a ~1px argyle gutter.
+      float dia = abs(vLocal.x) + abs(vLocal.y);
+      float tip = 0.5 * uInset;          // rhombus tip distance (fine 28px cell)
+      if (dia > tip) discard;
+
+      float aa = fwidth(dia) + 0.006;
+
+      // champagne thin stroke band hugging the rhombus edge.
+      float strokeW = (1.0 / 28.0);      // ~1px in a 28px tile, in L1 units ~1:1
+      float rim = smoothstep(tip - aa - strokeW * 1.6, tip - aa, dia);
+      vec3 col = mix(uRed, uChampagne, rim);
+
+      // soft AA on the outer silhouette.
+      float soft = 1.0 - smoothstep(tip - aa, tip, dia);
+
+      // arrival flare: a brief champagne pop as each diamond locks.
+      float lockFlare = smoothstep(0.55, 0.92, vFill) * (1.0 - smoothstep(0.92, 1.0, vFill));
+      col = mix(col, uChampagne, lockFlare * 0.5);
+
+      float alpha = soft * smoothstep(0.0, 0.35, vFill);
+
+      // ---- DISSOLVE: an fbm-frayed front clears the field to reveal the board.
+      if (uDissolve > 0.0) {
+        // per-diamond + per-texel noise so the field frays apart, not a wipe.
+        float grain = fbm(vSlot * vec2(7.0, 5.0) + vec2(uTime * 0.05, 0.0));
+        float n = vSeed * 0.55 + grain * 0.30 + 0.15;
+        // burn from this diamond's own threshold; covers full range as uDissolve->1
+        float front = uDissolve * 1.35 - 0.20;
+        float band = 0.22;
+        float burn = smoothstep(front - band, front, n) *
+                     (1.0 - smoothstep(front, front + band, n));
+        float gone = smoothstep(front, front - band, n); // 1 once consumed -> 0 ahead
+
+        // hot front burns green, cools toward navy, then vanishes.
+        vec3 burnCol = mix(uBurn, uNavy, fbm(vSlot * 12.0) * 0.5 + 0.25);
+        col = mix(col, burnCol, burn);
+        col += uBurn * burn * 0.7;        // glowing ember ridge
+        alpha *= (1.0 - gone);             // consumed texels disappear (gone=1 → invisible)
+        alpha = max(alpha, burn * soft * 0.8); // burning edge stays briefly
+      }
+
+      if (alpha < 0.004) discard;
+      gl_FragColor = vec4(col, alpha);
+    }
+  `;
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  function buildInstances() {
+    const rect = stage.getBoundingClientRect();
+    const W = Math.max(rect.width, 1);
+    const H = Math.max(rect.height, 1);
+
+    cols = Math.ceil(W / TILE) + 1;
+    rows = Math.ceil(H / TILE) + 1;
+    count = cols * rows;
+
+    // half-tile extent in clip space per axis (full grid spans -1..1 over W/H px)
+    const tileClipX = (TILE / W);
+    const tileClipY = (TILE / H);
+
+    const aSlot   = new Float32Array(count * 2);
+    const aOrigin = new Float32Array(count * 2);
+    const aDepth  = new Float32Array(count);
+    const aSpin   = new Float32Array(count);
+    const aDelay  = new Float32Array(count);
+    const aSeed   = new Float32Array(count);
+
+    // ---- CONNECTED PLACEMENT ORDER (the heart of this version) ----
+    // A BFS flood-fill from a seed cell builds a "rank" for every cell so the
+    // weave grows OUTWARD off the already-placed cluster — each new diamond is
+    // adjacent to one already laid. We lightly shuffle each frontier wave so
+    // the front WANDERS organically instead of forming clean concentric rings.
+    const idx = (c, r) => r * cols + c;
+    const rank = new Int32Array(count).fill(-1);
+    // seed somewhere in the upper-left-ish quadrant for a readable sweep
+    const seedC = Math.floor(cols * rand(0.18, 0.38));
+    const seedR = Math.floor(rows * rand(0.18, 0.42));
+    let frontier = [idx(seedC, seedR)];
+    rank[frontier[0]] = 0;
+    let placed = 0;
+    rank[frontier[0]] = placed++;
+    const NB = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]];
+    while (frontier.length) {
+      // gather the next wave (all unranked neighbors of the current frontier)
+      const next = [];
+      const seen = new Set();
+      for (const cell of frontier) {
+        const cr = Math.floor(cell / cols);
+        const cc = cell - cr * cols;
+        for (const [dc, dr] of NB) {
+          const nc = cc + dc, nr = cr + dr;
+          if (nc < 0 || nc >= cols || nr < 0 || nr >= rows) continue;
+          const ni = idx(nc, nr);
+          if (rank[ni] !== -1 || seen.has(ni)) continue;
+          seen.add(ni);
+          next.push(ni);
+        }
+      }
+      // shuffle this wave so the growth front frays / wanders (Fisher–Yates)
+      for (let i = next.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [next[i], next[j]] = [next[j], next[i]];
+      }
+      for (const ni of next) rank[ni] = placed++;
+      frontier = next;
+    }
+    const denom = Math.max(placed - 1, 1);
+
+    let k = 0;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        // slot center: px -> clip space (-1..1), y flipped (top-left origin)
+        const px = (c + 0.5) * TILE;
+        const py = (r + 0.5) * TILE;
+        const sx = (px / W) * 2 - 1;
+        const sy = -((py / H) * 2 - 1);
+        aSlot[k * 2]     = sx;
+        aSlot[k * 2 + 1] = sy;
+
+        // ---- NEARBY ORIGIN: a short hop from a varied small offset/angle, so
+        // each diamond glides in from just beside its slot (no far swarm).
+        const a = rand(0, Math.PI * 2);
+        const d = rand(0.04, 0.16);          // small clip-space travel
+        aOrigin[k * 2]     = sx + Math.cos(a) * d;
+        aOrigin[k * 2 + 1] = sy + Math.sin(a) * d;
+
+        // ---- SLIGHT DEPTH: a gentle pop-from-near or settle-from-far, subtle.
+        aDepth[k] = rand(0.72, 1.28);
+
+        aSpin[k] = rand(-0.5, 0.5);          // small gentle spin, unwinds to 0
+        aSeed[k] = Math.random();
+
+        // ---- DELAY = connected rank, normalized. Earlier rank = placed first.
+        // A tiny jitter keeps strictly-equal ranks from launching in lockstep.
+        const rk = rank[k] < 0 ? denom : rank[k];
+        aDelay[k] = Math.min(1, rk / denom + (Math.random() - 0.5) * (0.6 / denom));
+
+        k++;
+      }
+    }
+
+    // ---- ROLLING ACTIVE FRONT via flight window (uSpan) ----
+    // Launches are spread across (1 - uSpan) of the ~5s timeline in CONNECTED
+    // rank order; each diamond is in flight for uSpan of the timeline. A full
+    // stage holds hundreds of cells, so a literal 1-at-a-time would never fill
+    // in 5s — instead we make each diamond's glide SHORT (a fixed ~0.12s hop)
+    // so that, at any instant, only a thin moving band along the connected
+    // front is mid-flight. The eye follows that band knitting outward; diamonds
+    // visibly arrive one-after-another in different spots, then lock and hold.
+    const FLIGHT_SECONDS = 0.12;                        // per-diamond glide time
+    spanValue = Math.min(0.5, Math.max(0.01, FLIGHT_SECONDS / DURATION_ASSEMBLE));
+
+    const base = new THREE.PlaneGeometry(1, 1); // -0.5..0.5
+    const geo = new THREE.InstancedBufferGeometry();
+    geo.index = base.index;
+    geo.attributes.position = base.attributes.position;
+    geo.setAttribute("aSlot",   new THREE.InstancedBufferAttribute(aSlot, 2));
+    geo.setAttribute("aOrigin", new THREE.InstancedBufferAttribute(aOrigin, 2));
+    geo.setAttribute("aDepth",  new THREE.InstancedBufferAttribute(aDepth, 1));
+    geo.setAttribute("aSpin",   new THREE.InstancedBufferAttribute(aSpin, 1));
+    geo.setAttribute("aDelay",  new THREE.InstancedBufferAttribute(aDelay, 1));
+    geo.setAttribute("aSeed",   new THREE.InstancedBufferAttribute(aSeed, 1));
+    geo.instanceCount = count;
+
+    material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      uniforms: {
+        uProgress:  { value: 0 },
+        uDissolve:  { value: 0 },
+        uSpan:      { value: spanValue },
+        uTileClip:  { value: new THREE.Vector2(tileClipX, tileClipY) },
+        uRed:       { value: RED },
+        uChampagne: { value: CHAMPAGNE },
+        uBurn:      { value: BURN },
+        uNavy:      { value: NAVY },
+        uInset:     { value: 1.0 - RHOMBUS_INSET }, // 26/28 -> tips at 52px in 56px
+        uTime:      { value: 0 },
+      },
+    });
+
+    mesh = new THREE.Mesh(geo, material);
+    mesh.frustumCulled = false;
+    scene.add(mesh);
+  }
+
+  function init() {
+    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, premultipliedAlpha: false });
+    renderer.setClearColor(0x000000, 0);
+    scene = new THREE.Scene();
+    camera = new THREE.Camera(); // clip-space output from vertex shader
+
+    buildInstances();
+    resize();
+    window.addEventListener("resize", resize);
+  }
+
+  function resize() {
+    const rect = stage.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(dpr);
+    renderer.setSize(rect.width, rect.height, false);
+    // grid dims depend on size; rebuild instances if the cell count changed.
+    const newCols = Math.ceil(rect.width / TILE) + 1;
+    const newRows = Math.ceil(rect.height / TILE) + 1;
+    if (mesh && (newCols !== cols || newRows !== rows)) {
+      const p = material ? material.uniforms.uProgress.value : 0;
+      const d = material ? material.uniforms.uDissolve.value : 0;
+      mesh.geometry.dispose(); mesh.material.dispose(); scene.remove(mesh);
+      buildInstances();
+      material.uniforms.uProgress.value = p;
+      material.uniforms.uDissolve.value = d;
+    }
+  }
+
+  const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+  const T_ASSEMBLE = DURATION_ASSEMBLE;
+  const T_HOLD     = DURATION_ASSEMBLE + HOLD;
+  const T_END      = DURATION_ASSEMBLE + HOLD + DURATION_DISSOLVE;
+
+  function frame(now) {
+    if (!playing) return;
+    const t = (now - startTime) / 1000;
+    material.uniforms.uTime.value = t;
+
+    if (t <= T_ASSEMBLE) {
+      // ----- ASSEMBLY: the connected weave is laid one diamond at a time.
+      // Progress advances ~LINEARLY so the placement marches at a steady,
+      // deliberate cadence (the per-diamond easeOutCubic does the soft glide).
+      const tn = Math.min(t / DURATION_ASSEMBLE, 1);
+      material.uniforms.uProgress.value = tn;
+      material.uniforms.uDissolve.value = 0;
+      renderer.render(scene, camera);
+      rafId = requestAnimationFrame(frame);
+      return;
+    }
+
+    material.uniforms.uProgress.value = 1.0;
+
+    if (t <= T_HOLD) {
+      // ----- HOLD: brief beat of full coverage
+      material.uniforms.uDissolve.value = 0;
+      renderer.render(scene, camera);
+      rafId = requestAnimationFrame(frame);
+      return;
+    }
+
+    // ----- DISSOLVE: the full field burns away (green->navy) to REVEAL the
+    // real dark board underneath. The board content fades in as it clears.
+    if (!revealFired) {
+      revealFired = true;
+      stage.setAttribute("data-revealed", "true"); // CSS fades the board in
+    }
+    const dn = Math.min((t - T_HOLD) / DURATION_DISSOLVE, 1);
+    material.uniforms.uDissolve.value = ease(dn);
+    renderer.render(scene, camera);
+
+    if (dn >= 1) {
+      playing = false;
+      canvas.style.opacity = "0";   // hand off entirely to the revealed board
+      document.getElementById("replay").disabled = false;
+      return;
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function disposeAll() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+    playing = false;
+    window.removeEventListener("resize", resize);
+    if (mesh) { mesh.geometry.dispose(); mesh.material.dispose(); scene.remove(mesh); }
+    if (renderer) renderer.dispose();
+    renderer = scene = camera = mesh = material = null;
+  }
+
+  function play() {
+    disposeAll();
+    revealFired = false;
+    stage.setAttribute("data-revealed", "false");
+    init();
+    canvas.style.opacity = "1";
+    document.getElementById("replay").disabled = true;
+
+    if (reduced) {
+      // Reduced motion: jump straight to the revealed dark board (no flight).
+      material.uniforms.uProgress.value = 1.0;
+      material.uniforms.uDissolve.value = 1.0;
+      revealFired = true;
+      stage.setAttribute("data-revealed", "true");
+      canvas.style.opacity = "0";
+      renderer.render(scene, camera);
+      playing = false;
+      document.getElementById("replay").disabled = false;
+      return;
+    }
+
+    startTime = performance.now();
+    playing = true;
+    rafId = requestAnimationFrame(frame);
+  }
+
+  document.getElementById("replay").addEventListener("click", play);
+
+  function boot() { play(); }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(boot);
+    setTimeout(() => { if (!playing && !renderer) boot(); }, 1200);
+  } else {
+    boot();
+  }
+  </script>
+</body>
+</html>

@@ -71,7 +71,10 @@ function HomeContent() {
   });
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    // data-home-root: the HARLEQUIN exit transition waits for this to appear in
+    // the DOM before disintegrating the board — proof the homepage has actually
+    // painted underneath, so the dissolve reveals home (not a board reflash).
+    <div data-home-root className="bg-gray-50 dark:bg-gray-900 min-h-screen">
       <MouseGlow />
       <DeepModeBorder />
 

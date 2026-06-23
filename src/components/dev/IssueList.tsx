@@ -23,6 +23,8 @@ import { parseReviewBlock } from '@/lib/dev/github';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Button } from '@/components/ui/Button';
 import { CopyForClaude } from './CopyForClaude';
+import { TypeIn } from '@/components/dev/entrance/TypeIn';
+import { ENTRANCE_PHASES, sub } from '@/components/dev/entrance/useEntranceReveal';
 
 export type GroupBy = 'status' | 'repo';
 export type SortBy = 'priority' | 'recent' | 'size';
@@ -142,11 +144,15 @@ function IssueCard({
   repoName,
   onPatch,
   inReview = false,
+  entrance,
+  entranceIndex = 0,
 }: {
   issue: DevIssue;
   repoName: string;
   onPatch: (issue: DevIssue, body: PatchBody) => void;
   inReview?: boolean;
+  entrance?: { active: boolean; t: number };
+  entranceIndex?: number;
 }) {
   const [open, setOpen] = useState(false); // true === detached + centered
   // The vacated-slot placeholder lives on its own flag so it can OUTLAST the
@@ -158,6 +164,10 @@ function IssueCard({
   // #63 — animation controls for the press-in beat on the inline card.
   const inlineControls = useAnimationControls();
   const prefersReducedMotion = useReducedMotion();
+  // Entrance reveal: this card "arrives" when t passes its per-index threshold.
+  // When entrance is not active, entranceArrived is always true (normal render).
+  const cardStartT = 0.56 + Math.min(entranceIndex * 0.03, 0.4);
+  const entranceArrived = entrance?.active ? (entrance.t >= cardStartT) : true;
   const [addText, setAddText] = useState('');
   const [copiedSub, setCopiedSub] = useState<number | null>(null);
   const [editing, setEditing] = useState(false);
@@ -348,7 +358,15 @@ function IssueCard({
               closed ? 'text-white/55 line-through' : 'text-white/90'
             } ${detached ? 'text-base' : 'line-clamp-2'}`}
           >
-            {issue.title}
+            {entrance?.active && !detached
+              ? <TypeIn
+                  text={issue.title}
+                  active={entranceArrived}
+                  durationMs={Math.min(700, 200 + issue.title.length * 12)}
+                  startDelayMs={120}
+                  caret
+                />
+              : issue.title}
           </p>
           {prog.total > 0 && (
             <p className="mt-1 text-[11px] text-white/35">
@@ -585,37 +603,55 @@ function IssueCard({
         // It renders after the placeholder in the DOM, so while collapsing it
         // animates home ON TOP of the still-visible placeholder, which only
         // unmounts once this card's layout animation lands.
+        //
+        // ENTRANCE: A non-layout wrapper handles the box-in animation so that the
+        // inner motion.div (which carries layoutId) is never touched. This keeps
+        // the shared-layout morph (expand/collapse) completely clean — the wrapper
+        // is invisible once t=1 / entrance=false and adds no DOM cost post-reveal.
         <motion.div
-          layoutId={layoutId}
-          data-suppress-reveal
-          data-has-contained-glow="true"
-          initial={false}
-          animate={inlineControls}
-          onLayoutAnimationComplete={() => {
-            // The card finished morphing. If we're collapsed, it has now
-            // contracted into its slot — drop the placeholder exactly here.
-            if (!open) setPlaceholderVisible(false);
-          }}
-          whileHover={{
-            scale: 1.02,
-            backgroundColor: tint.bg,
-            borderColor: tint.border,
-          }}
-          // #63 — layout transition: spring on collapse (expand is handled by the
-          // detached node's transition since it's the layout-driving node when open).
-          transition={prefersReducedMotion ? MORPH_TWEEN_REDUCED : MORPH_SPRING_COLLAPSE}
-          style={{
-            backgroundColor: 'rgba(12, 17, 24, 0.52)',
-            borderColor: 'rgba(255, 255, 255, 0.10)',
-          }}
-          className={`absolute inset-x-0 top-0 h-32 cursor-pointer overflow-hidden rounded-xl border backdrop-blur-md hover:shadow-2xl hover:shadow-black/60 ${
-            closed ? 'opacity-70' : ''
-          }`}
+          className="absolute inset-x-0 top-0 h-32"
+          {...(entrance?.active ? {
+            initial: { opacity: 0, x: 24, scale: 0.98 },
+            animate: entranceArrived
+              ? { opacity: 1, x: 0, scale: 1 }
+              : { opacity: 0, x: 24, scale: 0.98 },
+            transition: prefersReducedMotion
+              ? { duration: 0.2 }
+              : { type: 'spring', stiffness: 320, damping: 30, delay: entranceIndex * 0.07 },
+          } : {})}
         >
-          {/* Cursor-following light contained to the ticket — the harlequin's
-              confined "lighting up", distinct from the board's argyle reveal. */}
-          <ContainedMouseGlow color="231, 226, 212" intensity={0.16} size={220} />
-          {header(false)}
+          <motion.div
+            layoutId={layoutId}
+            data-suppress-reveal
+            data-has-contained-glow="true"
+            initial={false}
+            animate={inlineControls}
+            onLayoutAnimationComplete={() => {
+              // The card finished morphing. If we're collapsed, it has now
+              // contracted into its slot — drop the placeholder exactly here.
+              if (!open) setPlaceholderVisible(false);
+            }}
+            whileHover={{
+              scale: 1.02,
+              backgroundColor: tint.bg,
+              borderColor: tint.border,
+            }}
+            // #63 — layout transition: spring on collapse (expand is handled by the
+            // detached node's transition since it's the layout-driving node when open).
+            transition={prefersReducedMotion ? MORPH_TWEEN_REDUCED : MORPH_SPRING_COLLAPSE}
+            style={{
+              backgroundColor: 'rgba(12, 17, 24, 0.52)',
+              borderColor: 'rgba(255, 255, 255, 0.10)',
+            }}
+            className={`absolute inset-0 cursor-pointer overflow-hidden rounded-xl border backdrop-blur-md hover:shadow-2xl hover:shadow-black/60 ${
+              closed ? 'opacity-70' : ''
+            }`}
+          >
+            {/* Cursor-following light contained to the ticket — the harlequin's
+                confined "lighting up", distinct from the board's argyle reveal. */}
+            <ContainedMouseGlow color="231, 226, 212" intensity={0.16} size={220} />
+            {header(false)}
+          </motion.div>
         </motion.div>
       )}
 
@@ -714,12 +750,23 @@ function laneOf(i: DevIssue): string {
   return i.status ?? 'todo';
 }
 
-function LaneHeader({ color, label, count }: { color: string; label: string; count: number }) {
+function LaneHeader({ color, label, count, entrance }: { color: string; label: string; count: number; entrance?: { active: boolean; t: number } }) {
+  const headT = entrance?.active ? sub(entrance.t, ENTRANCE_PHASES.heads[0], ENTRANCE_PHASES.heads[1]) : 1;
+  const reveal = entrance?.active && headT > 0;
+  // During the entrance, the WHOLE header (dot, label, count) stays hidden until
+  // the heads phase begins — which is after the banner wipe — so nothing in the
+  // columns appears before the top bar.
+  const hidden = entrance?.active && !reveal;
   return (
     <div className="mb-2 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.15em] text-[#e7e2d4]/70">
-      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
-      {label}
-      <span className="text-[#e7e2d4]/40">· {count}</span>
+      <span
+        className="h-2 w-2 rounded-full"
+        style={{ backgroundColor: color, opacity: hidden ? 0 : entrance?.active ? Math.min(1, headT * 1.5) : 1 }}
+      />
+      {hidden ? null : entrance?.active ? <TypeIn text={label} active durationMs={360} caret={false} /> : label}
+      {hidden ? null : (
+        <span className="text-[#e7e2d4]/40">· {entrance?.active ? Math.round(headT * count) : count}</span>
+      )}
     </div>
   );
 }
@@ -777,6 +824,8 @@ export function IssueList({
   onChanged,
   onApprove,
   onSendBack,
+  entrance,
+  loading = false,
 }: {
   issues: DevIssue[];
   repos: DevRepo[];
@@ -785,6 +834,8 @@ export function IssueList({
   onChanged: () => void;
   onApprove: (i: DevIssue) => void | Promise<void>;
   onSendBack: (i: DevIssue, feedback: string) => void | Promise<void>;
+  entrance?: { active: boolean; t: number };
+  loading?: boolean;
 }) {
   const [error, setError] = useState('');
 
@@ -824,28 +875,36 @@ export function IssueList({
     }
   }
 
-  if (issues.length === 0) {
+  // Only the LOADED-and-empty board shows the empty-state. During the entrance
+  // the board mounts while issues are still being fetched (issues = []); showing
+  // "No open items" then would be a false flash — render the empty lanes instead
+  // and let cards box→type in as they arrive.
+  if (issues.length === 0 && !loading) {
     return <p className="text-white/50">No open items. Hit ＋ Cere (⌘K) to file one.</p>;
   }
 
-  const card = (issue: DevIssue) => (
+  // Helper: render a card with its entrance index (reading-order position).
+  const card = (issue: DevIssue, entranceIdx: number) => (
     <IssueCard
       key={issueKey(issue)}
       issue={issue}
       repoName={repoName(issue.repo)}
       onPatch={patch}
+      entrance={entrance}
+      entranceIndex={entranceIdx}
     />
   );
 
   // Pinned awaiting-review items — shown above BOTH grouping views so they never
   // appear in a lane or repo section (excluded below via !isAwaiting).
+  // Entrance index starts at 0 for the first awaiting-review card.
   const awaiting = sortIssues(issues.filter(isAwaiting), sort);
 
   const awaitingSection = awaiting.length > 0 ? (
     <div className="mb-5 rounded-xl border border-[#e7b34a]/30 bg-[#e7b34a]/[0.06] p-3">
-      <LaneHeader color="#E7B34A" label="Awaiting review" count={awaiting.length} />
+      <LaneHeader color="#E7B34A" label="Awaiting review" count={awaiting.length} entrance={entrance} />
       <div className="flex flex-col gap-3">
-        {awaiting.map((i) => (
+        {awaiting.map((i, idx) => (
           <div key={issueKey(i)}>
             <IssueCard
               key={issueKey(i)}
@@ -853,6 +912,8 @@ export function IssueList({
               repoName={repoName(i.repo)}
               onPatch={patch}
               inReview
+              entrance={entrance}
+              entranceIndex={idx}
             />
             <ReviewActions issue={i} onApprove={onApprove} onSendBack={onSendBack} />
           </div>
@@ -863,27 +924,35 @@ export function IssueList({
 
   // STATUS → a real Kanban: three columns, each a vertical stack.
   // Awaiting-review items are excluded — they live only in the pinned section.
+  // Entrance indices continue after the awaiting section (reading order).
   if (groupBy === 'status') {
+    // Pre-sort all lane items so we can compute indices in reading order.
+    const laneItems = STATUS_LANES.map((lane) =>
+      sortIssues(issues.filter((i) => laneOf(i) === lane.key && !isAwaiting(i)), sort),
+    );
+    // Entrance stagger uses each card's ROW index WITHIN its lane (not a global
+    // reading-order index), so the three columns reveal in parallel — row 0 of
+    // To Do / In Progress / Done all arrive together, then row 1, etc. (A global
+    // index made In Progress + Done arrive much too late.)
     return (
       <div>
         {error && <p className="mb-3 text-xs text-red-400">{error}</p>}
         {awaitingSection}
         <div className="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-3">
-          {STATUS_LANES.map((lane) => {
-            const items = sortIssues(
-              issues.filter((i) => laneOf(i) === lane.key && !isAwaiting(i)),
-              sort,
-            );
+          {STATUS_LANES.map((lane, laneIdx) => {
+            const items = laneItems[laneIdx];
             return (
               <div key={lane.key}>
-                <LaneHeader color={lane.color} label={lane.label} count={items.length} />
+                <LaneHeader color={lane.color} label={lane.label} count={items.length} entrance={entrance} />
                 <div className="flex flex-col gap-3">
                   {items.length === 0 ? (
-                    <p className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-xs text-white/25">
-                      Nothing here
-                    </p>
+                    loading ? null : (
+                      <p className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-xs text-white/25">
+                        Nothing here
+                      </p>
+                    )
                   ) : (
-                    items.map(card)
+                    items.map((issue, i) => card(issue, i))
                   )}
                 </div>
               </div>
@@ -898,25 +967,28 @@ export function IssueList({
   // only surface in the Status Kanban's Done lane, so filter to open here.
   // Awaiting-review items are excluded — they live only in the pinned section.
   // Within each section, the active sort (incl. Size) decides the order.
+  // Entrance indices continue after awaiting section, repo-by-repo top→bottom.
   const openItems = issues.filter((i) => i.state === 'open' && !isAwaiting(i));
   const sections = repos
     .map((r) => ({
       key: r.slug,
       label: r.name,
       color: `rgb(${r.accent})`,
-      items: openItems.filter((i) => i.repo === r.slug),
+      items: sortIssues(openItems.filter((i) => i.repo === r.slug), sort),
     }))
     .filter((s) => s.items.length > 0);
 
+  // Entrance stagger uses each card's row index within its section, so sections
+  // reveal in parallel rather than one-after-another.
   return (
     <div>
       {error && <p className="mb-3 text-xs text-red-400">{error}</p>}
       {awaitingSection}
       {sections.map((sec) => (
         <section key={sec.key} className="mb-6 last:mb-0">
-          <LaneHeader color={sec.color} label={sec.label} count={sec.items.length} />
+          <LaneHeader color={sec.color} label={sec.label} count={sec.items.length} entrance={entrance} />
           <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {sortIssues(sec.items, sort).map(card)}
+            {sec.items.map((issue, i) => card(issue, i))}
           </div>
         </section>
       ))}
