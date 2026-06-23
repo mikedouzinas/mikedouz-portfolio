@@ -43,10 +43,15 @@ export async function captureBoardSnapshot(): Promise<void> {
   capturing = true;
   try {
     const { default: html2canvas } = await import('html2canvas');
+    // The cover only ever shows the VISIBLE viewport. On mobile the board is a
+    // tall single column, so laying out its FULL scroll height at 2x cost ~1.4s
+    // — re-introducing the very "dead delay" the eager snapshot exists to kill.
+    // On small screens, cap the layout to one screen (windowHeight) and drop the
+    // scale; desktop keeps the full-document capture (already fast, leave it).
+    const mobile = window.innerWidth < 768;
     const canvas = await html2canvas(root, {
       backgroundColor: BASE,
-      // Crisp enough for the brief cover hold; eager capture hides the cost.
-      scale: Math.max(2, Math.min(window.devicePixelRatio || 1, 2)),
+      scale: mobile ? 1.5 : Math.max(2, Math.min(window.devicePixelRatio || 1, 2)),
       logging: false,
       useCORS: true,
       x: window.scrollX,
@@ -54,7 +59,7 @@ export async function captureBoardSnapshot(): Promise<void> {
       width: window.innerWidth,
       height: window.innerHeight,
       windowWidth: document.documentElement.scrollWidth,
-      windowHeight: document.documentElement.scrollHeight,
+      windowHeight: mobile ? window.innerHeight : document.documentElement.scrollHeight,
       // Skip <canvas> elements: html2canvas calls getContext('2d') on each, which
       // would poison any live WebGL canvas on the board with a 2D context.
       ignoreElements: (el: Element) => el.tagName === 'CANVAS',

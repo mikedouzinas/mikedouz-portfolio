@@ -73,7 +73,12 @@ export function CerePortal({ onClick }: { onClick: () => void }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => { setHovered(false); setGlowPos(null); }}
       onMouseMove={handleMouseMove}
-      className="relative grid shrink-0 cursor-pointer place-items-center self-stretch overflow-hidden rounded-full border-0 bg-transparent p-0"
+      // On mobile the header wraps to ~2 rows, and `self-stretch` would size the
+      // circle to that full height (≈115px — way too large). Cap it to a fixed
+      // touch-target circle on small screens; keep self-stretch on md+. The
+      // ResizeObserver below sets width = offsetHeight, so the circle stays round
+      // at whichever height wins.
+      className="relative grid h-12 w-12 shrink-0 cursor-pointer place-items-center self-center overflow-hidden rounded-full border-0 bg-transparent p-0 md:h-auto md:w-auto md:self-stretch"
       style={{
         transformOrigin: '50% 50%',
         width: diameter ? `${diameter}px` : undefined,
