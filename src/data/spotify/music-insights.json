@@ -1,6 +1,146 @@
 [
   {
-    "id": "60161e4870497d2bf3e32aa554baddf2",
+    "id": "d7453bf9fd107630ddb1f2d1dbac919f",
+    "trackName": "My Life",
+    "artist": "ZHU",
+    "album": "RINGOS DESERT",
+    "trackUri": "spotify:track:4y78bEIRTzNe2RbGAnX8zU",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0277077d99bb417d23d2f58afa",
+    "spotifyUrl": "https://open.spotify.com/track/4y78bEIRTzNe2RbGAnX8zU",
+    "dateRange": {
+      "start": "2026-06-20",
+      "end": "2026-06-26"
+    },
+    "playCount": 13,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-06-20",
+    "peakDayPlays": 6,
+    "hotDays": [
+      {
+        "date": "2026-06-20",
+        "plays": 6
+      },
+      {
+        "date": "2026-06-21",
+        "plays": 4
+      },
+      {
+        "date": "2026-06-26",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 121,
+      "uniqueTracksInWindow": 79,
+      "timeOfDayDistribution": {
+        "0": 2,
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 2,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 0,
+        "15": 0,
+        "16": 1,
+        "17": 1,
+        "18": 1,
+        "19": 2,
+        "20": 1,
+        "21": 0,
+        "22": 1,
+        "23": 0
+      },
+      "monthsActive": 1
+    }
+  },
+  {
+    "id": "e22218dc54e7c91497b063dfb9407796",
+    "trackName": "4 Chords of the Apocalypse",
+    "artist": "Julian Casablancas",
+    "album": "Phrazes For The Young",
+    "trackUri": "spotify:track:5MaoPqyBHklIhUld6C0Ytx",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02c7eae07761b35ca163d75ef0",
+    "spotifyUrl": "https://open.spotify.com/track/5MaoPqyBHklIhUld6C0Ytx",
+    "dateRange": {
+      "start": "2026-06-19",
+      "end": "2026-06-26"
+    },
+    "playCount": 12,
+    "weeksCount": 2,
+    "intensity": 3,
+    "maxState": 3,
+    "peakDay": "2026-06-22",
+    "peakDayPlays": 4,
+    "hotDays": [
+      {
+        "date": "2026-06-22",
+        "plays": 4
+      },
+      {
+        "date": "2026-06-20",
+        "plays": 3
+      },
+      {
+        "date": "2026-06-19",
+        "plays": 2
+      },
+      {
+        "date": "2026-06-23",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "one_and_done"
+    ],
+    "context": {
+      "totalPlaysInWindow": 157,
+      "uniqueTracksInWindow": 103,
+      "timeOfDayDistribution": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 3,
+        "6": 1,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 1,
+        "15": 1,
+        "16": 0,
+        "17": 1,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 2
+      },
+      "monthsActive": 1
+    }
+  },
+  {
+    "id": "340e4ae0e88651b12d09d4251a812f9a",
     "trackName": "Beverly Laurel",
     "artist": "Tame Impala",
     "album": "Lonerism B-Sides & Remixes",
@@ -9,10 +149,10 @@
     "spotifyUrl": "https://open.spotify.com/track/1JpcqmUlzNlK7lpFOkszzv",
     "dateRange": {
       "start": "2026-06-09",
-      "end": "2026-06-13"
+      "end": "2026-06-26"
     },
-    "playCount": 9,
-    "weeksCount": 1,
+    "playCount": 16,
+    "weeksCount": 3,
     "intensity": 3,
     "maxState": 3,
     "peakDay": "2026-06-09",
@@ -25,20 +165,25 @@
       {
         "date": "2026-06-13",
         "plays": 3
+      },
+      {
+        "date": "2026-06-21",
+        "plays": 2
       }
     ],
     "insightTypes": [
-      "burst"
+      "burst",
+      "one_and_done"
     ],
     "context": {
-      "totalPlaysInWindow": 118,
-      "uniqueTracksInWindow": 89,
+      "totalPlaysInWindow": 411,
+      "uniqueTracksInWindow": 253,
       "timeOfDayDistribution": {
         "0": 0,
         "1": 0,
         "2": 0,
         "3": 3,
-        "4": 0,
+        "4": 1,
         "5": 0,
         "6": 0,
         "7": 0,
@@ -49,11 +194,11 @@
         "12": 0,
         "13": 0,
         "14": 1,
-        "15": 5,
-        "16": 0,
+        "15": 6,
+        "16": 1,
         "17": 0,
-        "18": 0,
-        "19": 0,
+        "18": 1,
+        "19": 1,
         "20": 1,
         "21": 2,
         "22": 1,
@@ -63,7 +208,7 @@
     }
   },
   {
-    "id": "e1c12cb601da8ac37a1b09c4271c857d",
+    "id": "7efbea7e1a5a887c1d43cb75feef2e70",
     "trackName": "Retina Show - Unreleased Demo",
     "artist": "Tame Impala",
     "album": "Lonerism (10 Year Anniversary Edition / Unreleased Demos)",
@@ -72,9 +217,9 @@
     "spotifyUrl": "https://open.spotify.com/track/5uDdyVU0jDST7xmuOqpnC3",
     "dateRange": {
       "start": "2026-06-09",
-      "end": "2026-06-18"
+      "end": "2026-06-20"
     },
-    "playCount": 9,
+    "playCount": 10,
     "weeksCount": 2,
     "intensity": 3,
     "maxState": 3,
@@ -95,8 +240,8 @@
       "one_and_done"
     ],
     "context": {
-      "totalPlaysInWindow": 254,
-      "uniqueTracksInWindow": 167,
+      "totalPlaysInWindow": 313,
+      "uniqueTracksInWindow": 197,
       "timeOfDayDistribution": {
         "0": 0,
         "1": 0,
@@ -114,7 +259,7 @@
         "13": 0,
         "14": 1,
         "15": 1,
-        "16": 1,
+        "16": 2,
         "17": 0,
         "18": 0,
         "19": 0,
@@ -163,8 +308,7 @@
       }
     ],
     "insightTypes": [
-      "burst",
-      "one_and_done"
+      "burst"
     ],
     "context": {
       "totalPlaysInWindow": 309,
@@ -173,7 +317,7 @@
         "0": 0,
         "1": 0,
         "2": 0,
-        "3": 1,
+        "3": 2,
         "4": 1,
         "5": 1,
         "6": 0,
@@ -1409,13 +1553,13 @@
         "0": 10,
         "1": 7,
         "2": 9,
-        "3": 3,
+        "3": 4,
         "4": 4,
         "5": 0,
         "6": 0,
         "7": 1,
         "8": 0,
-        "9": 4,
+        "9": 5,
         "10": 5,
         "11": 4,
         "12": 6,
@@ -1431,7 +1575,7 @@
         "22": 8,
         "23": 9
       },
-      "monthsActive": 16
+      "monthsActive": 17
     }
   },
   {
@@ -5130,7 +5274,7 @@
         "1": 5,
         "2": 1,
         "3": 3,
-        "4": 4,
+        "4": 5,
         "5": 3,
         "6": 0,
         "7": 2,
@@ -5374,7 +5518,8 @@
     ],
     "insightTypes": [
       "burst",
-      "comeback"
+      "comeback",
+      "loyalty"
     ],
     "context": {
       "totalPlaysInWindow": 1165,
@@ -5385,8 +5530,8 @@
         "2": 3,
         "3": 2,
         "4": 0,
-        "5": 0,
-        "6": 0,
+        "5": 1,
+        "6": 1,
         "7": 2,
         "8": 0,
         "9": 0,
@@ -5405,7 +5550,7 @@
         "22": 1,
         "23": 6
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -6675,8 +6820,8 @@
     },
     "playCount": 6,
     "weeksCount": 1,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2025-11-24",
     "peakDayPlays": 2,
     "hotDays": [
@@ -6703,7 +6848,7 @@
         "3": 0,
         "4": 1,
         "5": 3,
-        "6": 1,
+        "6": 2,
         "7": 2,
         "8": 0,
         "9": 2,
@@ -6722,7 +6867,7 @@
         "22": 1,
         "23": 0
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -6865,8 +7010,8 @@
     },
     "playCount": 9,
     "weeksCount": 2,
-    "intensity": 3,
-    "maxState": 3,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2025-11-30",
     "peakDayPlays": 3,
     "hotDays": [
@@ -6894,7 +7039,7 @@
         "1": 1,
         "2": 0,
         "3": 0,
-        "4": 1,
+        "4": 2,
         "5": 0,
         "6": 1,
         "7": 0,
@@ -6906,7 +7051,7 @@
         "13": 0,
         "14": 1,
         "15": 1,
-        "16": 0,
+        "16": 1,
         "17": 1,
         "18": 3,
         "19": 1,
@@ -6915,7 +7060,7 @@
         "22": 1,
         "23": 1
       },
-      "monthsActive": 4
+      "monthsActive": 5
     }
   },
   {
@@ -6959,7 +7104,7 @@
         "2": 1,
         "3": 1,
         "4": 3,
-        "5": 1,
+        "5": 3,
         "6": 0,
         "7": 1,
         "8": 1,
@@ -6979,7 +7124,7 @@
         "22": 4,
         "23": 2
       },
-      "monthsActive": 14
+      "monthsActive": 15
     }
   },
   {
@@ -8250,9 +8395,9 @@
         "1": 0,
         "2": 0,
         "3": 0,
-        "4": 0,
+        "4": 1,
         "5": 0,
-        "6": 2,
+        "6": 3,
         "7": 0,
         "8": 2,
         "9": 1,
@@ -8271,7 +8416,7 @@
         "22": 1,
         "23": 2
       },
-      "monthsActive": 6
+      "monthsActive": 7
     }
   },
   {
@@ -8317,7 +8462,7 @@
         "2": 4,
         "3": 4,
         "4": 6,
-        "5": 1,
+        "5": 2,
         "6": 1,
         "7": 3,
         "8": 1,
@@ -8396,7 +8541,7 @@
         "12": 5,
         "13": 2,
         "14": 6,
-        "15": 3,
+        "15": 4,
         "16": 4,
         "17": 1,
         "18": 8,
@@ -8406,7 +8551,7 @@
         "22": 1,
         "23": 0
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -8580,7 +8725,7 @@
         "2": 0,
         "3": 2,
         "4": 1,
-        "5": 0,
+        "5": 1,
         "6": 0,
         "7": 0,
         "8": 0,
@@ -8600,7 +8745,7 @@
         "22": 0,
         "23": 2
       },
-      "monthsActive": 5
+      "monthsActive": 6
     }
   },
   {
@@ -8652,13 +8797,13 @@
         "0": 10,
         "1": 7,
         "2": 9,
-        "3": 3,
+        "3": 4,
         "4": 4,
         "5": 0,
         "6": 0,
         "7": 1,
         "8": 0,
-        "9": 4,
+        "9": 5,
         "10": 5,
         "11": 4,
         "12": 6,
@@ -8674,7 +8819,7 @@
         "22": 8,
         "23": 9
       },
-      "monthsActive": 16
+      "monthsActive": 17
     }
   },
   {
@@ -8848,7 +8993,7 @@
         "3": 3,
         "4": 0,
         "5": 2,
-        "6": 0,
+        "6": 1,
         "7": 1,
         "8": 4,
         "9": 3,
@@ -8867,7 +9012,7 @@
         "22": 0,
         "23": 2
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -9447,8 +9592,8 @@
     },
     "playCount": 6,
     "weeksCount": 2,
-    "intensity": 2,
-    "maxState": 2,
+    "intensity": 1,
+    "maxState": 1,
     "peakDay": "2025-09-10",
     "peakDayPlays": 3,
     "hotDays": [
@@ -9475,7 +9620,7 @@
         "3": 0,
         "4": 1,
         "5": 3,
-        "6": 1,
+        "6": 2,
         "7": 2,
         "8": 0,
         "9": 2,
@@ -9494,7 +9639,7 @@
         "22": 1,
         "23": 0
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -9547,7 +9692,7 @@
         "10": 0,
         "11": 0,
         "12": 2,
-        "13": 4,
+        "13": 5,
         "14": 4,
         "15": 5,
         "16": 4,
@@ -9559,7 +9704,7 @@
         "22": 1,
         "23": 2
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -9602,7 +9747,7 @@
         "3": 3,
         "4": 0,
         "5": 2,
-        "6": 0,
+        "6": 1,
         "7": 1,
         "8": 4,
         "9": 3,
@@ -9621,7 +9766,7 @@
         "22": 0,
         "23": 2
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -10836,7 +10981,7 @@
         "14": 1,
         "15": 6,
         "16": 5,
-        "17": 3,
+        "17": 4,
         "18": 3,
         "19": 1,
         "20": 2,
@@ -10896,13 +11041,13 @@
         "0": 10,
         "1": 7,
         "2": 9,
-        "3": 3,
+        "3": 4,
         "4": 4,
         "5": 0,
         "6": 0,
         "7": 1,
         "8": 0,
-        "9": 4,
+        "9": 5,
         "10": 5,
         "11": 4,
         "12": 6,
@@ -10918,7 +11063,7 @@
         "22": 8,
         "23": 9
       },
-      "monthsActive": 16
+      "monthsActive": 17
     }
   },
   {
@@ -11040,7 +11185,7 @@
         "12": 5,
         "13": 2,
         "14": 6,
-        "15": 3,
+        "15": 4,
         "16": 4,
         "17": 1,
         "18": 8,
@@ -11050,7 +11195,7 @@
         "22": 1,
         "23": 0
       },
-      "monthsActive": 12
+      "monthsActive": 13
     }
   },
   {
@@ -11106,7 +11251,7 @@
         "1": 4,
         "2": 1,
         "3": 4,
-        "4": 2,
+        "4": 3,
         "5": 1,
         "6": 0,
         "7": 5,
@@ -11721,7 +11866,7 @@
         "10": 0,
         "11": 0,
         "12": 2,
-        "13": 4,
+        "13": 5,
         "14": 4,
         "15": 5,
         "16": 4,
@@ -11733,7 +11878,7 @@
         "22": 1,
         "23": 2
       },
-      "monthsActive": 10
+      "monthsActive": 11
     }
   },
   {
@@ -11772,7 +11917,7 @@
         "2": 1,
         "3": 1,
         "4": 2,
-        "5": 2,
+        "5": 3,
         "6": 1,
         "7": 1,
         "8": 1,
@@ -11792,7 +11937,7 @@
         "22": 1,
         "23": 5
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -11849,7 +11994,7 @@
         "2": 3,
         "3": 2,
         "4": 1,
-        "5": 1,
+        "5": 2,
         "6": 1,
         "7": 1,
         "8": 1,
@@ -11902,7 +12047,8 @@
     ],
     "insightTypes": [
       "burst",
-      "comeback"
+      "comeback",
+      "loyalty"
     ],
     "context": {
       "totalPlaysInWindow": 1238,
@@ -11913,8 +12059,8 @@
         "2": 3,
         "3": 2,
         "4": 0,
-        "5": 0,
-        "6": 0,
+        "5": 1,
+        "6": 1,
         "7": 2,
         "8": 0,
         "9": 0,
@@ -11933,7 +12079,7 @@
         "22": 1,
         "23": 6
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -13140,7 +13286,7 @@
         "2": 4,
         "3": 4,
         "4": 6,
-        "5": 1,
+        "5": 2,
         "6": 1,
         "7": 3,
         "8": 1,
@@ -13373,7 +13519,7 @@
         "20": 1,
         "21": 0,
         "22": 0,
-        "23": 1
+        "23": 2
       },
       "monthsActive": 10
     }
@@ -13911,7 +14057,7 @@
         "1": 5,
         "2": 1,
         "3": 3,
-        "4": 4,
+        "4": 5,
         "5": 3,
         "6": 0,
         "7": 2,
@@ -14256,7 +14402,7 @@
         "0": 2,
         "1": 6,
         "2": 3,
-        "3": 3,
+        "3": 4,
         "4": 1,
         "5": 0,
         "6": 0,
@@ -14278,7 +14424,7 @@
         "22": 5,
         "23": 0
       },
-      "monthsActive": 11
+      "monthsActive": 12
     }
   },
   {
@@ -14884,6 +15030,69 @@
         "23": 0
       },
       "monthsActive": 11
+    }
+  },
+  {
+    "id": "86d33162c8efba925cb1153a99ce7fb8",
+    "trackName": "International Love (feat. Chris Brown)",
+    "artist": "Pitbull",
+    "album": "Planet Pit (Deluxe Version)",
+    "trackUri": "spotify:track:62zFEHfAYl5kdHYOivj4BC",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e021dc7483a9fcfce54822a2f19",
+    "spotifyUrl": "https://open.spotify.com/track/62zFEHfAYl5kdHYOivj4BC",
+    "dateRange": {
+      "start": "2025-04-21",
+      "end": "2025-04-25"
+    },
+    "playCount": 7,
+    "weeksCount": 1,
+    "intensity": 1,
+    "maxState": 1,
+    "peakDay": "2025-04-21",
+    "peakDayPlays": 3,
+    "hotDays": [
+      {
+        "date": "2025-04-21",
+        "plays": 3
+      },
+      {
+        "date": "2025-04-22",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst"
+    ],
+    "context": {
+      "totalPlaysInWindow": 311,
+      "uniqueTracksInWindow": 193,
+      "timeOfDayDistribution": {
+        "0": 4,
+        "1": 2,
+        "2": 3,
+        "3": 1,
+        "4": 4,
+        "5": 2,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 1,
+        "12": 1,
+        "13": 0,
+        "14": 1,
+        "15": 0,
+        "16": 1,
+        "17": 2,
+        "18": 0,
+        "19": 3,
+        "20": 4,
+        "21": 1,
+        "22": 0,
+        "23": 0
+      },
+      "monthsActive": 12
     }
   },
   {
@@ -23467,6 +23676,76 @@
     }
   },
   {
+    "id": "da35940da5bd6d7801fde1a65448ea6f",
+    "trackName": "No Pole",
+    "artist": "Don Toliver",
+    "album": "Love Sick",
+    "trackUri": "spotify:track:0eaVIYo2zeOaGJeqZ5TwYz",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02307323fa550564b0201b1d76",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/0eaVIYo2zeOaGJeqZ5TwYz",
+    "dateRange": {
+      "start": "2023-10-14",
+      "end": "2023-10-22"
+    },
+    "playCount": 9,
+    "weeksCount": 2,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-10-14",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-10-14",
+        "plays": 2
+      },
+      {
+        "date": "2023-10-19",
+        "plays": 2
+      },
+      {
+        "date": "2023-10-22",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "comeback",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 173,
+      "uniqueTracksInWindow": 103,
+      "timeOfDayDistribution": {
+        "0": 7,
+        "1": 8,
+        "2": 5,
+        "3": 6,
+        "4": 4,
+        "5": 4,
+        "6": 4,
+        "7": 2,
+        "8": 1,
+        "9": 1,
+        "10": 0,
+        "11": 3,
+        "12": 4,
+        "13": 2,
+        "14": 6,
+        "15": 3,
+        "16": 5,
+        "17": 5,
+        "18": 2,
+        "19": 5,
+        "20": 5,
+        "21": 11,
+        "22": 6,
+        "23": 2
+      },
+      "monthsActive": 28
+    }
+  },
+  {
     "id": "2d0a423e303cf233e31ef0b5eb5b83e8",
     "trackName": "Around Me (feat. Don Toliver)",
     "artist": "Metro Boomin",
@@ -23526,76 +23805,6 @@
         "23": 8
       },
       "monthsActive": 32
-    }
-  },
-  {
-    "id": "da35940da5bd6d7801fde1a65448ea6f",
-    "trackName": "No Pole",
-    "artist": "Don Toliver",
-    "album": "Love Sick",
-    "trackUri": "spotify:track:0eaVIYo2zeOaGJeqZ5TwYz",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e02307323fa550564b0201b1d76",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/0eaVIYo2zeOaGJeqZ5TwYz",
-    "dateRange": {
-      "start": "2023-10-14",
-      "end": "2023-10-22"
-    },
-    "playCount": 9,
-    "weeksCount": 2,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2023-10-14",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-10-14",
-        "plays": 2
-      },
-      {
-        "date": "2023-10-19",
-        "plays": 2
-      },
-      {
-        "date": "2023-10-22",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "comeback",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 173,
-      "uniqueTracksInWindow": 103,
-      "timeOfDayDistribution": {
-        "0": 7,
-        "1": 8,
-        "2": 5,
-        "3": 6,
-        "4": 4,
-        "5": 4,
-        "6": 4,
-        "7": 2,
-        "8": 1,
-        "9": 1,
-        "10": 0,
-        "11": 3,
-        "12": 4,
-        "13": 2,
-        "14": 6,
-        "15": 3,
-        "16": 5,
-        "17": 5,
-        "18": 2,
-        "19": 5,
-        "20": 5,
-        "21": 11,
-        "22": 6,
-        "23": 2
-      },
-      "monthsActive": 28
     }
   },
   {
@@ -24458,8 +24667,8 @@
     },
     "playCount": 13,
     "weeksCount": 4,
-    "intensity": 1,
-    "maxState": 1,
+    "intensity": 2,
+    "maxState": 2,
     "peakDay": "2023-09-14",
     "peakDayPlays": 2,
     "hotDays": [
@@ -26271,7 +26480,7 @@
         "3": 15,
         "4": 7,
         "5": 1,
-        "6": 2,
+        "6": 3,
         "7": 5,
         "8": 0,
         "9": 1,
@@ -26290,7 +26499,7 @@
         "22": 15,
         "23": 23
       },
-      "monthsActive": 35
+      "monthsActive": 36
     }
   },
   {
@@ -28456,7 +28665,7 @@
         "2": 10,
         "3": 5,
         "4": 0,
-        "5": 3,
+        "5": 4,
         "6": 0,
         "7": 0,
         "8": 1,
@@ -29537,7 +29746,7 @@
         "2": 12,
         "3": 12,
         "4": 4,
-        "5": 4,
+        "5": 5,
         "6": 3,
         "7": 2,
         "8": 0,
@@ -29604,7 +29813,7 @@
         "3": 15,
         "4": 7,
         "5": 1,
-        "6": 2,
+        "6": 3,
         "7": 5,
         "8": 0,
         "9": 1,
@@ -29623,7 +29832,7 @@
         "22": 15,
         "23": 23
       },
-      "monthsActive": 35
+      "monthsActive": 36
     }
   },
   {
@@ -31164,7 +31373,7 @@
         "2": 8,
         "3": 12,
         "4": 2,
-        "5": 3,
+        "5": 4,
         "6": 1,
         "7": 1,
         "8": 2,
@@ -31184,7 +31393,7 @@
         "22": 9,
         "23": 13
       },
-      "monthsActive": 31
+      "monthsActive": 32
     }
   },
   {
@@ -31666,6 +31875,71 @@
     }
   },
   {
+    "id": "6e77b4f2e6f1daa41ba1c5fb25b23a0a",
+    "trackName": "3005",
+    "artist": "Childish Gambino",
+    "album": "Because the Internet",
+    "trackUri": "spotify:track:5cc9Zbfp9u10sfJeKZ3h16",
+    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
+    "previewUrl": null,
+    "spotifyUrl": "https://open.spotify.com/track/2X6b7zLdIxCejd6GqVcQ9M",
+    "dateRange": {
+      "start": "2023-02-27",
+      "end": "2023-03-05"
+    },
+    "playCount": 6,
+    "weeksCount": 1,
+    "intensity": 2,
+    "maxState": 2,
+    "peakDay": "2023-02-28",
+    "peakDayPlays": 2,
+    "hotDays": [
+      {
+        "date": "2023-02-28",
+        "plays": 2
+      },
+      {
+        "date": "2023-03-03",
+        "plays": 2
+      }
+    ],
+    "insightTypes": [
+      "burst",
+      "loyalty"
+    ],
+    "context": {
+      "totalPlaysInWindow": 227,
+      "uniqueTracksInWindow": 98,
+      "timeOfDayDistribution": {
+        "0": 7,
+        "1": 2,
+        "2": 5,
+        "3": 3,
+        "4": 0,
+        "5": 3,
+        "6": 2,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 1,
+        "11": 0,
+        "12": 2,
+        "13": 6,
+        "14": 3,
+        "15": 1,
+        "16": 2,
+        "17": 3,
+        "18": 3,
+        "19": 2,
+        "20": 7,
+        "21": 7,
+        "22": 1,
+        "23": 4
+      },
+      "monthsActive": 26
+    }
+  },
+  {
     "id": "8e6e1cd44bc999f3abc3ea2958768fde",
     "trackName": "505",
     "artist": "Arctic Monkeys",
@@ -31733,71 +32007,6 @@
         "23": 9
       },
       "monthsActive": 34
-    }
-  },
-  {
-    "id": "6e77b4f2e6f1daa41ba1c5fb25b23a0a",
-    "trackName": "3005",
-    "artist": "Childish Gambino",
-    "album": "Because the Internet",
-    "trackUri": "spotify:track:5cc9Zbfp9u10sfJeKZ3h16",
-    "albumArtUrl": "https://i.scdn.co/image/ab67616d00001e0221b2b485aef32bcc96c1875c",
-    "previewUrl": null,
-    "spotifyUrl": "https://open.spotify.com/track/2X6b7zLdIxCejd6GqVcQ9M",
-    "dateRange": {
-      "start": "2023-02-27",
-      "end": "2023-03-05"
-    },
-    "playCount": 6,
-    "weeksCount": 1,
-    "intensity": 1,
-    "maxState": 1,
-    "peakDay": "2023-02-28",
-    "peakDayPlays": 2,
-    "hotDays": [
-      {
-        "date": "2023-02-28",
-        "plays": 2
-      },
-      {
-        "date": "2023-03-03",
-        "plays": 2
-      }
-    ],
-    "insightTypes": [
-      "burst",
-      "loyalty"
-    ],
-    "context": {
-      "totalPlaysInWindow": 227,
-      "uniqueTracksInWindow": 98,
-      "timeOfDayDistribution": {
-        "0": 7,
-        "1": 2,
-        "2": 5,
-        "3": 3,
-        "4": 0,
-        "5": 3,
-        "6": 2,
-        "7": 0,
-        "8": 0,
-        "9": 0,
-        "10": 1,
-        "11": 0,
-        "12": 2,
-        "13": 6,
-        "14": 3,
-        "15": 1,
-        "16": 2,
-        "17": 3,
-        "18": 3,
-        "19": 2,
-        "20": 7,
-        "21": 7,
-        "22": 1,
-        "23": 4
-      },
-      "monthsActive": 26
     }
   },
   {
@@ -32338,7 +32547,7 @@
         "2": 10,
         "3": 5,
         "4": 0,
-        "5": 3,
+        "5": 4,
         "6": 0,
         "7": 0,
         "8": 1,
@@ -32936,7 +33145,7 @@
         "3": 1,
         "4": 2,
         "5": 1,
-        "6": 0,
+        "6": 1,
         "7": 0,
         "8": 0,
         "9": 2,
@@ -32955,7 +33164,7 @@
         "22": 4,
         "23": 6
       },
-      "monthsActive": 18
+      "monthsActive": 19
     }
   },
   {
@@ -33464,7 +33673,7 @@
         "2": 8,
         "3": 12,
         "4": 2,
-        "5": 3,
+        "5": 4,
         "6": 1,
         "7": 1,
         "8": 2,
@@ -33484,7 +33693,7 @@
         "22": 9,
         "23": 13
       },
-      "monthsActive": 31
+      "monthsActive": 32
     }
   },
   {
@@ -34220,7 +34429,7 @@
         "3": 15,
         "4": 7,
         "5": 1,
-        "6": 2,
+        "6": 3,
         "7": 5,
         "8": 0,
         "9": 1,
@@ -34239,7 +34448,7 @@
         "22": 15,
         "23": 23
       },
-      "monthsActive": 35
+      "monthsActive": 36
     }
   },
   {
@@ -34827,7 +35036,7 @@
         "2": 10,
         "3": 5,
         "4": 0,
-        "5": 3,
+        "5": 4,
         "6": 0,
         "7": 0,
         "8": 1,
@@ -35250,7 +35459,7 @@
         "2": 12,
         "3": 12,
         "4": 4,
-        "5": 4,
+        "5": 5,
         "6": 3,
         "7": 2,
         "8": 0,
