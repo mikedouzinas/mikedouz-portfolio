@@ -6,51 +6,77 @@ import { SiGooglemeet } from 'react-icons/si';
 import PlaygroundButton from '../components/PlaygroundButton';
 import SpotifyBubble from '@/components/spotify/SpotifyBubble';
 
-// Hook to detect the currently active section using Intersection Observer
-const useActiveSection = (sectionIds: string[]): string => {
-    const [activeSection, setActiveSection] = useState('');
+const NAV_ITEMS = [
+    { id: 'about', label: 'About' },
+    { id: 'experience', label: 'Experience' },
+    { id: 'projects', label: 'Projects' },
+    { id: 'media', label: 'Media' },
+];
+const NAV_IDS = NAV_ITEMS.map((item) => item.id);
+
+/**
+ * Scroll-spy for the section nav (#84). The homepage scrolls inside <main>,
+ * not the window, so the old viewport-rooted IntersectionObserver (with a 60%
+ * threshold no tall section could ever reach) was unreliable. Instead, watch
+ * the real scroll container: the active section is the last one whose top has
+ * crossed a reading line 35% down the scrollport. A ResizeObserver re-computes
+ * when deep-mode toggles or late-loading images shift the layout.
+ */
+const useActiveSection = (
+    scrollRef: React.RefObject<HTMLElement | null>,
+): string => {
+    const [activeSection, setActiveSection] = useState(NAV_IDS[0]);
 
     useEffect(() => {
-        const observerOptions = {
-            root: null,
-            threshold: 0.6, // Section is considered active when 60% in view
-        };
+        const main = scrollRef.current;
+        if (!main) return;
 
-        const observerCallback: IntersectionObserverCallback = (entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    setActiveSection(entry.target.id);
-                }
-            });
-        };
-
-        const observer = new IntersectionObserver(observerCallback, observerOptions);
-        sectionIds.forEach((id) => {
-            const element = document.getElementById(id);
-            if (element) {
-                observer.observe(element);
+        let raf = 0;
+        const compute = () => {
+            raf = 0;
+            const line = main.getBoundingClientRect().top + main.clientHeight * 0.35;
+            let current = NAV_IDS[0];
+            for (const id of NAV_IDS) {
+                const el = document.getElementById(id);
+                if (el && el.getBoundingClientRect().top <= line) current = id;
             }
-        });
+            // Bottom clamp: a short final section may never cross the reading
+            // line — when the container is scrolled out, it's still the one.
+            if (main.scrollTop + main.clientHeight >= main.scrollHeight - 2) {
+                current = NAV_IDS[NAV_IDS.length - 1];
+            }
+            setActiveSection(current);
+        };
+        const schedule = () => {
+            if (!raf) raf = requestAnimationFrame(compute);
+        };
 
-        return () => observer.disconnect();
-    }, [sectionIds]);
+        compute();
+        main.addEventListener('scroll', schedule, { passive: true });
+        window.addEventListener('resize', schedule);
+        const ro = new ResizeObserver(schedule);
+        ro.observe(main);
+        for (const child of Array.from(main.children)) ro.observe(child);
+        return () => {
+            if (raf) cancelAnimationFrame(raf);
+            main.removeEventListener('scroll', schedule);
+            window.removeEventListener('resize', schedule);
+            ro.disconnect();
+        };
+    }, [scrollRef]);
 
     return activeSection;
 };
 
 interface SidebarHomeProps {
     scrollToTop: () => void;
+    scrollToSection: (id: string) => void;
+    scrollRef: React.RefObject<HTMLElement | null>;
 }
 
-const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
-    const navItems = [
-        { id: 'about', label: 'About' },
-        { id: 'experience', label: 'Experience' },
-        { id: 'projects', label: 'Projects' },
-        { id: 'media', label: 'Media' },
-    ];
-
-    const activeSection = useActiveSection(navItems.map((item) => item.id));
+const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop, scrollToSection, scrollRef }) => {
+    const navItems = NAV_ITEMS;
+    const activeSection = useActiveSection(scrollRef);
 
     // Smooth scrolling handler
     const handleNavClick = (id: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -58,10 +84,7 @@ const SidebarHome: React.FC<SidebarHomeProps> = ({ scrollToTop }) => {
         if (id === 'about') {
             scrollToTop();
         } else {
-            const element = document.getElementById(id);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-            }
+            scrollToSection(id);
         }
     };
 

@@ -38,6 +38,25 @@ function HomeContent() {
     }
   };
 
+  // #84 — accurate section jumps. <main> is the scroll container, so compute
+  // the target against it (scrollIntoView's container alignment gives no
+  // breathing room and can't recover from layout shift). After the smooth
+  // scroll settles, correct once instantly if late-loading images or a
+  // deep-mode toggle moved the target mid-flight.
+  const scrollToSection = (id: string) => {
+    const main = mainRef.current;
+    const el = document.getElementById(id);
+    if (!main || !el) return;
+    const PAD = 24;
+    const targetTop = () =>
+      el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - PAD;
+    main.scrollTo({ top: targetTop(), behavior: 'smooth' });
+    window.setTimeout(() => {
+      const drift = el.getBoundingClientRect().top - main.getBoundingClientRect().top - PAD;
+      if (Math.abs(drift) > 8) main.scrollTo({ top: targetTop(), behavior: 'auto' });
+    }, 700);
+  };
+
   const experienceCards = workExperiences.map((exp) => (
     <ExperienceCard key={exp.id} item={exp} />
   ));
@@ -87,7 +106,7 @@ function HomeContent() {
 
       <div className="flex">
         <aside onWheel={handleSidebarWheel} className="hidden md:block fixed inset-y-0 left-0 w-1/3">
-          <SidebarHome scrollToTop={scrollToTop} />
+          <SidebarHome scrollToTop={scrollToTop} scrollToSection={scrollToSection} scrollRef={mainRef} />
         </aside>
 
         <main ref={mainRef} className="ml-0 md:ml-[33.3333%] w-full px-4 md:px-8 pt-1 md:pt-8 pb-20 overflow-y-auto md:h-screen space-y-6 md:space-y-32">
