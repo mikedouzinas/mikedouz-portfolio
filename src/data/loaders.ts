@@ -32,6 +32,8 @@ export interface Blog {
 export interface Project {
   id: string;
   imageUrl?: string;
+  /** Full gallery (#7): primary first. Falls back to [imageUrl] when absent. */
+  images?: string[];
   title: string;
   shortTitle?: string;  // Optional condensed title for mobile/reduced screen layouts
   description: string;
@@ -229,19 +231,27 @@ export const blogs: Blog[] = blogsData.blog_posts.map((post, index) => ({
  * Uses the summary field for descriptions and maps the top 5 skills
  * Includes optional short_title for reduced screen layouts
  */
-export const projects: Project[] = projectsData.map((proj) => ({
-  id: proj.id,
-  imageUrl: proj.links.image,
-  title: proj.title,
-  // Use short_title if available in JSON (e.g., "Knight Life" for "BB&N's Knight Life")
-  shortTitle: (proj as { short_title?: string }).short_title,
-  description: proj.summary, // Using summary as requested, not specifics
-  githubLink: proj.links.github,
-  // Prefer app_store link, fall back to demo if available
-  projectLink: proj.links.app_store || proj.links.demo,
-  // Map skill IDs to display names, limited to top 5
-  skills: mapSkillIdsToNames(proj.skills, 5),
-}));
+export const projects: Project[] = projectsData.map((proj) => {
+  // #7 — optional gallery + context-varying copy (see ProjectBase in
+  // src/lib/iris/schema.ts). Read structurally like short_title: entries
+  // without the new fields fall back to links.image / summary.
+  const images = (proj as { images?: string[] }).images ?? [];
+  const cardCopy = (proj as { descriptions?: { card?: string } }).descriptions?.card;
+  return {
+    id: proj.id,
+    imageUrl: images[0] ?? proj.links.image,
+    images: images.length ? images : proj.links.image ? [proj.links.image] : [],
+    title: proj.title,
+    // Use short_title if available in JSON (e.g., "Knight Life" for "BB&N's Knight Life")
+    shortTitle: (proj as { short_title?: string }).short_title,
+    description: cardCopy ?? proj.summary, // card copy when present, else summary
+    githubLink: proj.links.github,
+    // Prefer app_store link, fall back to demo if available
+    projectLink: proj.links.app_store || proj.links.demo,
+    // Map skill IDs to display names, limited to top 5
+    skills: mapSkillIdsToNames(proj.skills, 5),
+  };
+});
 
 /**
  * Loads and transforms work experience data from experience.json

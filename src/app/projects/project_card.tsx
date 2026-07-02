@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { ExternalLink } from "lucide-react";
 import { Project } from "@/data/loaders";
@@ -12,6 +12,22 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
+  // #7 — gallery support: when a project carries several images, hovering the
+  // image cycles through them with a crossfade; a single image stays static.
+  const images =
+    project.images && project.images.length > 0
+      ? project.images
+      : project.imageUrl
+        ? [project.imageUrl]
+        : [];
+  const [imageIdx, setImageIdx] = useState(0);
+  const [imageHover, setImageHover] = useState(false);
+  useEffect(() => {
+    if (!imageHover || images.length < 2) return;
+    const id = setInterval(() => setImageIdx((i) => (i + 1) % images.length), 2500);
+    return () => clearInterval(id);
+  }, [imageHover, images.length]);
+
   return (
     <BaseCard 
       href={project.githubLink}
@@ -24,19 +40,44 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           gridTemplateColumns: "minmax(150px, 220px) minmax(265px, 1fr)",
         }}
       >
-        <div className="mt-6 md:mt-0">
-          {/* Professional comment: Image component updated for Next.js 16 compatibility */}
-          {/* Using explicit width/height as required by Next.js Image component */}
-          {/* The imageUrl comes from projects.json links.image field (e.g., /Portfolio.png) */}
-          {project.imageUrl ? (
-            <Image
-              src={project.imageUrl}
-              alt={project.title}
-              width={400}
-              height={300}
-              className="rounded-md object-cover w-[50%] md:w-full h-auto min-w-[150px]"
-              // Professional comment: Image optimization handled by Next.js 16 with configuration in next.config.ts
-            />
+        <div
+          className="mt-6 md:mt-0"
+          onMouseEnter={() => setImageHover(true)}
+          onMouseLeave={() => {
+            setImageHover(false);
+            setImageIdx(0);
+          }}
+        >
+          {/* Images come from projects.json: the images[] gallery (#7), falling
+              back to the single links.image. Explicit width/height as required
+              by the Next.js Image component. */}
+          {images.length > 0 ? (
+            <div className="relative">
+              {images.map((src, i) => (
+                <Image
+                  key={src}
+                  src={src}
+                  alt={project.title}
+                  width={400}
+                  height={300}
+                  className={`rounded-md object-cover w-[50%] md:w-full h-auto min-w-[150px] transition-opacity duration-500 ${
+                    i === imageIdx ? 'opacity-100' : 'opacity-0 absolute inset-0'
+                  }`}
+                />
+              ))}
+              {images.length > 1 && (
+                <div className="absolute bottom-1.5 left-1/2 flex -translate-x-1/2 gap-1">
+                  {images.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`h-1 w-1 rounded-full transition-colors ${
+                        i === imageIdx ? 'bg-white/90' : 'bg-white/40'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           ) : (
             <div className="w-full h-[300px] bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center">
               <span className="text-gray-500 dark:text-gray-400">No image available</span>

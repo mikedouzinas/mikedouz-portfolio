@@ -113,6 +113,17 @@ const ProjectBase = BaseContent.extend({
   tech_stack: z.array(z.string()).default([]),
   architecture: z.string().optional(),
   dates: DateRange, // Date range for when the project was worked on
+  // #7 — a project can carry a gallery (first image is the primary; falls back
+  // to links.image) and copy that adapts to where it's surfaced. All optional,
+  // so existing entries stay valid; summary remains the universal fallback.
+  images: z.array(z.string()).default([]),
+  descriptions: z
+    .object({
+      card: z.string().optional(),   // homepage project card
+      detail: z.string().optional(), // expanded / detail surfaces
+      iris: z.string().optional(),   // how Iris should frame it in answers
+    })
+    .default({}),
 })
 
 const ExperienceBase = z.object({
