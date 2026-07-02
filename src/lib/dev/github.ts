@@ -393,6 +393,86 @@ export async function updateIssue(
   if (!res.ok) throw new Error(`GitHub patch ${repo}#${number}: ${res.status}`);
 }
 
+// ---- TODO / FIXME / README scan (#15) ----
+
+export interface RepoTodo {
+  kind: 'TODO' | 'FIXME' | 'README';
+  file: string;
+  /** 1-based line, null for README checkboxes (they're identified by text). */
+  line: number | null;
+  text: string;
+}
+
+const TODO_LINE_RE = /\b(TODO|FIXME)\b[:\s-]*(.*)/;
+const README_CHECKBOX_RE = /^\s*[-*]\s+\[ \]\s+(.+)$/gm;
+const MAX_SCAN_FILES = 12;
+const MAX_TODOS_PER_FILE = 5;
+const MAX_TODOS_TOTAL = 40;
+
+async function searchCodePaths(repo: string, term: string): Promise<string[]> {
+  const res = await fetch(
+    `${GH}/search/code?q=${encodeURIComponent(`repo:${repo} ${term}`)}&per_page=10`,
+    { headers: ghHeaders() },
+  );
+  if (!res.ok) return []; // search is best-effort (rate limits, unindexed repos)
+  const data = (await res.json()) as { items?: { path: string }[] };
+  return (data.items ?? []).map((i) => i.path);
+}
+
+async function fetchRawFile(repo: string, path: string): Promise<string | null> {
+  const res = await fetch(`${GH}/repos/${repo}/contents/${path}`, {
+    headers: { ...ghHeaders(), Accept: 'application/vnd.github.raw+json' },
+  });
+  if (!res.ok) return null;
+  const text = await res.text();
+  return text.length > 200_000 ? null : text;
+}
+
+/**
+ * Best-effort sweep of a repo's scattered work markers: TODO / FIXME comments
+ * (via GitHub code search + a raw read of each hit) and the README's unchecked
+ * `- [ ]` boxes. Feeds Cere's import-as-tickets flow — every source fails soft
+ * so a rate-limited search still returns whatever else was found.
+ */
+export async function scanRepoTodos(repo: string): Promise<RepoTodo[]> {
+  const todos: RepoTodo[] = [];
+
+  const [todoPaths, fixmePaths] = await Promise.all([
+    searchCodePaths(repo, 'TODO'),
+    searchCodePaths(repo, 'FIXME'),
+  ]);
+  const paths = [...new Set([...todoPaths, ...fixmePaths])].slice(0, MAX_SCAN_FILES);
+
+  await Promise.all(
+    paths.map(async (path) => {
+      const content = await fetchRawFile(repo, path);
+      if (!content) return;
+      let perFile = 0;
+      const lines = content.split('\n');
+      for (let n = 0; n < lines.length && perFile < MAX_TODOS_PER_FILE; n++) {
+        const m = lines[n].match(TODO_LINE_RE);
+        if (!m) continue;
+        const text = (m[2] || lines[n]).trim();
+        if (!text) continue;
+        todos.push({ kind: m[1] as 'TODO' | 'FIXME', file: path, line: n + 1, text });
+        perFile++;
+      }
+    }),
+  );
+
+  const readmeRes = await fetch(`${GH}/repos/${repo}/readme`, {
+    headers: { ...ghHeaders(), Accept: 'application/vnd.github.raw+json' },
+  });
+  if (readmeRes.ok) {
+    const readme = await readmeRes.text();
+    for (const m of readme.matchAll(README_CHECKBOX_RE)) {
+      todos.push({ kind: 'README', file: 'README.md', line: null, text: m[1].trim() });
+    }
+  }
+
+  return todos.slice(0, MAX_TODOS_TOTAL);
+}
+
 // ---- PR / commit / timeline reads ----
 // Read-only views over repo activity, for ranking (#36), reconciliation (#49),
 // and digests (#57). Same auth/owned-repo model as the issue reads.

@@ -111,6 +111,19 @@ export const UPDATE_CONTEXT_TOOL: Anthropic.Tool = {
   },
 };
 
+export const SCAN_REPO_TODOS_TOOL: Anthropic.Tool = {
+  name: 'scan_repo_todos',
+  description:
+    "Scan a repo for scattered work markers: TODO / FIXME code comments and the README's unchecked `- [ ]` boxes. Call this FIRST (by itself) when Mike asks to import/collect a repo's TODOs as tickets; the results come back as a tool result, then propose create_issue calls for the items worth tracking.",
+  input_schema: {
+    type: 'object' as const,
+    required: ['repo'],
+    properties: {
+      repo: { type: 'string', description: 'Exact repo slug (owner/name) from the board context.' },
+    },
+  },
+};
+
 const CreateInput = z.object({
   repo: z.string(),
   title: z.string().min(1),
@@ -222,6 +235,8 @@ If the message is a pure question (not a filing request and nothing actionable i
 Sizing — every new ticket needs one: S = quick (<~1h), M = a feature / half-day, L = large or conversation-heavy / multi-day. Infer it from the work described.
 The "awaiting review" status is set exclusively by the handoff flow (board CLI or agent), not by you — never set status to "awaiting review" yourself.
 Subtasks: if the work has clear steps, pass them as subtasks; they render as a checklist in the body.
+
+Importing scattered work (#15): when Mike asks you to pull a repo's TODOs / FIXMEs / README checkboxes onto the board, call scan_repo_todos (alone, first). When the scan results come back, propose create_issue calls for what's worth tracking — group related markers into one coherent ticket rather than one per comment line, cite the file paths in the body, and SKIP anything that already matches an open ticket in the board context below.
 
 Your persistent context: you can update your own standing notes and repo aliases with update_cere_context — use it when Mike tells you to remember a convention, a filing preference, or a new informal name for a repo. It's a proposal like everything else; pass notes as the FULL replacement text.
 
