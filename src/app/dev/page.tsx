@@ -24,6 +24,7 @@ import { HomeFadeOverlay } from '@/components/dev/entrance/HomeFadeOverlay';
 import { useEntranceReveal, sub } from '@/components/dev/entrance/useEntranceReveal';
 
 const SORT_OPTS: { value: SortBy; label: string }[] = [
+  { value: 'smart', label: 'Smart' },
   { value: 'priority', label: 'Priority' },
   { value: 'recent', label: 'Recent' },
   { value: 'size', label: 'Size' },
@@ -79,7 +80,9 @@ export default function DevConsolePage() {
   const [loggingOut, setLoggingOut] = useState(false);
   const [managing, setManaging] = useState(false);
   const [groupBy, setGroupBy] = useState<GroupBy>('status');
-  const [sort, setSort] = useState<SortBy>('priority');
+  // "Smart" (composite score, #36) is the default; Priority/Recent/Size stay
+  // available as explicit choices in the dropdown.
+  const [sort, setSort] = useState<SortBy>('smart');
   const [composerOpen, setComposerOpen] = useState(false);
   const [entrance, setEntrance] = useState(false);
   const [homeFaded, setHomeFaded] = useState(false);

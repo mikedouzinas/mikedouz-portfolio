@@ -25,9 +25,10 @@ import { Button } from '@/components/ui/Button';
 import { CopyForClaude } from './CopyForClaude';
 import { TypeIn } from '@/components/dev/entrance/TypeIn';
 import { ENTRANCE_PHASES, sub } from '@/components/dev/entrance/useEntranceReveal';
+import { smartSort } from '@/lib/dev/smartSort';
 
 export type GroupBy = 'status' | 'repo';
-export type SortBy = 'priority' | 'recent' | 'size';
+export type SortBy = 'priority' | 'recent' | 'size' | 'smart';
 
 const emptySubscribe = () => () => {};
 
@@ -725,6 +726,7 @@ function byPriority(a: DevIssue, b: DevIssue): number {
 }
 
 function sortIssues(items: DevIssue[], sort: SortBy): DevIssue[] {
+  if (sort === 'smart') return smartSort(items);
   const arr = [...items];
   if (sort === 'recent') {
     arr.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
