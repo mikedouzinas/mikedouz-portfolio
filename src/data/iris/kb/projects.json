@@ -183,7 +183,11 @@
       "mikeveson.com",
       "the web",
       "Mike's blog",
-      "portfolio"
+      "portfolio",
+      "THE HARLEQUIN",
+      "the Harlequin",
+      "Harlequin board",
+      "Cere"
     ],
     "specifics": [
       "Iris AI Assistant: Named after the Greek messenger goddess. Powered by Claude Sonnet 4.6 with the full knowledge base passed in a prompt-cached system prompt \u2014 no embeddings or semantic search. Intent classification happens via a Claude tool call in a single API request. Config-driven quick actions suggest related items based on complexity, impact, and recency scores. Structured knowledge base with 851 skills, filters, and personal context. Iris now opens directly to the center console \u2014 no highlight-then-expand friction. Iris can also generate full summaries, TL;DRs, and draft comments or direct messages from any blog post.",
@@ -199,6 +203,7 @@
       "Interactive UI: Global mouse glow effects, contained card glows with per-section colors, hover cards with rich previews, dark mode throughout, mobile-responsive with sheet-based navigation.",
       "Production infrastructure: Redis caching (1hr TTL), IP-based rate limiting, Supabase PostgreSQL with RLS, Vercel deployment with cron jobs for Spotify data refresh, pre-computed importance rankings at build time.",
       "Includes a hidden, password-protected dev console (secret animated portal login with a server-enforced session) featuring a cross-repo GitHub Issues board that auto-discovers Mike's repos and tracks work with priority and status labels, plus one-click export of tasks to Claude Code.",
+      "THE HARLEQUIN (what it actually is): Mike's private mission-control board — the space behind the portal, living at the hidden /dev page. Under the theatrics it's plain GitHub Issues across his repos: priority, status, and size ride as labels, subtasks as markdown checklists, done means closed. It's tended by Cere, a Claude-powered filing assistant (said aloud it sounds like 'Siri' — which is 'Iris' backwards, her hidden twin behind the curtain). Mike talks to Cere in plain language and she proposes ticket changes he confirms before anything files; she can also sweep a repo's TODO comments and README checkboxes into proposed tickets. The board sorts itself with a composite 'smart' ranking (priority, recency, size), any ticket can be handed to Cere to work directly from its card, and tickets export one-click to Claude Code. In short: THE HARLEQUIN is the workshop under the stage — where mikeveson.com itself gets built.",
       "THE HARLEQUIN Portal (project card): The dev-console entrance now lives in the Projects list as a project card titled \"The Harlequin.\" Three champagne-duotone faces — a harlequin-argyle circle, a rotated argyle diamond, and a frosted-glass shop window — each hide a secret entrance. Spinning the cursor clockwise (~680°) over a face reveals a passcode field that authenticates to the dev console. The window face cycles Mike's personal vibe photos behind frosted glass with canvas-etched gold-leaf \"THE HARLEQUIN\" signage, and plays a soft iTunes preview clip on hover. Built as a reusable shape registry so any face can be rendered or chosen at random.",
       "HARLEQUIN Portal Transitions: After unlocking /dev, the board reveals itself in a sequential DOM animation — the homepage crossfades into the workpad backdrop, a full-width banner wipes in left-to-right, Cere jumps into place, lane headers and open-counts type in, then each ticket card animates box-first followed by its title typing in, staggered in reading order as issues load. On exit, the board disintegrates into harlequin diamond ash via WebGL2 instanced quads — each ~14px cell snaps to a 45° rhombus, tumbles, and fades while the live homepage is revealed beneath. Both transitions respect reduced motion."
     ],
