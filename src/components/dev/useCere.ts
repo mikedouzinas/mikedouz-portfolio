@@ -68,6 +68,7 @@ export function useCere(
   // updates/closes resolve theirs from the already-loaded board (ticket #66).
   const titleFor = useCallback((a: CereAction): string => {
     if (a.kind === 'create') return a.title;
+    if (a.kind === 'config') return "Cere's memory";
     const hit = issuesRef.current.find((i) => i.repo === a.repo && i.number === a.number);
     return hit?.title ?? `ticket #${a.number}`;
   }, []);
@@ -151,6 +152,20 @@ export function useCere(
           created.push(data.issue);
           lines.push(`#${data.issue.number} — ${title}: filed`);
           ok++;
+        } else if (a.kind === 'config') {
+          const body: Record<string, unknown> = {};
+          if (typeof a.notes === 'string') body.notes = a.notes;
+          if (a.addAliases.length > 0) {
+            body.addAliases = Object.fromEntries(a.addAliases.map((p) => [p.alias, p.repo]));
+          }
+          const res = await fetch('/api/dev/cere-config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          if (!res.ok) throw new Error(await readError(res));
+          lines.push(`${title}: updated`);
+          ok++;
         } else {
           const patch: Record<string, unknown> = { repo: a.repo, number: a.number };
           if (a.priority) patch.priority = a.priority;
@@ -169,9 +184,8 @@ export function useCere(
         }
       } catch (err) {
         const reason = (err as Error).message;
-        lines.push(
-          `#${a.kind === 'create' ? '?' : a.number} — ${title}: failed${reason ? ` (${reason})` : ''}`,
-        );
+        const ref = a.kind === 'update' ? `#${a.number}` : '#?';
+        lines.push(`${ref} — ${title}: failed${reason ? ` (${reason})` : ''}`);
         fail++;
       }
     }

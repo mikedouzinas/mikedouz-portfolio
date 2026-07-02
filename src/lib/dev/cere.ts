@@ -18,6 +18,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 import type { DevIssue, DevRepo, Priority, Size, Status } from './github';
+import { EMPTY_CERE_CONFIG, mergedAliases, type CereConfig } from './cereConfig';
 
 export const CERE_MODEL = 'claude-sonnet-4-6';
 
@@ -83,6 +84,33 @@ export const UPDATE_ISSUE_TOOL: Anthropic.Tool = {
   },
 };
 
+export const UPDATE_CONTEXT_TOOL: Anthropic.Tool = {
+  name: 'update_cere_context',
+  description:
+    'Propose updating your own persistent context: your standing notes (conventions, filing preferences, reminders Mike asks you to remember) and/or repo aliases (informal names → exact repo slug). Like every proposal, Mike confirms before it is saved. Pass `notes` as the COMPLETE replacement text — your current notes are shown in your system prompt.',
+  input_schema: {
+    type: 'object' as const,
+    properties: {
+      notes: {
+        type: 'string',
+        description: 'Full replacement for your standing notes (Markdown). Omit to leave notes unchanged.',
+      },
+      addAliases: {
+        type: 'array',
+        items: {
+          type: 'object',
+          required: ['alias', 'repo'],
+          properties: {
+            alias: { type: 'string', description: 'The informal name, e.g. "the web".' },
+            repo: { type: 'string', description: 'Exact repo slug (owner/name) it refers to.' },
+          },
+        },
+        description: 'New alias → repo mappings to remember. Existing aliases are kept.',
+      },
+    },
+  },
+};
+
 const CreateInput = z.object({
   repo: z.string(),
   title: z.string().min(1),
@@ -102,6 +130,11 @@ const UpdateInput = z.object({
   state: z.enum(['open', 'closed']).optional(),
   body: z.string().optional(),
   addSubtasks: z.array(z.string()).optional(),
+});
+
+const ContextInput = z.object({
+  notes: z.string().optional(),
+  addAliases: z.array(z.object({ alias: z.string().min(1), repo: z.string().min(1) })).optional(),
 });
 
 /** Normalized, client-facing proposed mutations. */
@@ -128,11 +161,34 @@ export type CereAction =
       body?: string;
       /** The ticket's current body, captured so the client can render a diff. */
       bodyBefore?: string;
+    }
+  | {
+      /** Update Cere's own persisted context (#73) — confirmed like any other action. */
+      kind: 'config';
+      notes?: string;
+      /** Current notes, captured so the client can render a diff. */
+      notesBefore?: string;
+      addAliases: { alias: string; repo: string }[];
     };
 
 /** System prompt: who Cere is + the live board context to ground its calls. */
-export function buildCereSystem(repos: DevRepo[], issues: DevIssue[]): string {
-  const repoLines = repos.map((r) => `- ${r.slug} (${r.name})`).join('\n');
+export function buildCereSystem(
+  repos: DevRepo[],
+  issues: DevIssue[],
+  config: CereConfig = EMPTY_CERE_CONFIG,
+): string {
+  // Fold aliases into each repo line so informal names resolve at the source.
+  const aliases = mergedAliases(config);
+  const aliasesBySlug = new Map<string, string[]>();
+  for (const [alias, slug] of Object.entries(aliases)) {
+    aliasesBySlug.set(slug, [...(aliasesBySlug.get(slug) ?? []), alias]);
+  }
+  const repoLines = repos
+    .map((r) => {
+      const aka = aliasesBySlug.get(r.slug);
+      return `- ${r.slug} (${r.name})${aka ? ` — aka: ${aka.join(', ')}` : ''}`;
+    })
+    .join('\n');
   const open = issues.filter((i) => i.state === 'open');
   const issueLines = open
     .map((i) => {
@@ -167,9 +223,11 @@ Sizing — every new ticket needs one: S = quick (<~1h), M = a feature / half-da
 The "awaiting review" status is set exclusively by the handoff flow (board CLI or agent), not by you — never set status to "awaiting review" yourself.
 Subtasks: if the work has clear steps, pass them as subtasks; they render as a checklist in the body.
 
-Repos you can file to (use the EXACT slug):
-${repoLines || '(none)'}
+Your persistent context: you can update your own standing notes and repo aliases with update_cere_context — use it when Mike tells you to remember a convention, a filing preference, or a new informal name for a repo. It's a proposal like everything else; pass notes as the FULL replacement text.
 
+Repos you can file to (use the EXACT slug; "aka" lists the informal names Mike uses for each):
+${repoLines || '(none)'}
+${config.notes.trim() ? `\nStanding notes (yours — maintained via update_cere_context):\n${config.notes.trim()}\n` : ''}
 Open tickets right now (reference by repo + number to modify or close):
 ${issueLines || '(none)'}
 
@@ -184,6 +242,7 @@ When Mike doesn't name a repo, default to ${repos[0]?.slug ?? '(none)'} (his por
 export function parseActions(
   content: Anthropic.ContentBlock[],
   issues: DevIssue[] = [],
+  currentNotes = '',
 ): {
   reply: string;
   actions: CereAction[];
@@ -264,6 +323,28 @@ export function parseActions(
       }
 
       actions.push(action);
+    } else if (block.type === 'tool_use' && block.name === 'update_cere_context') {
+      const parsed = ContextInput.safeParse(block.input);
+      if (!parsed.success) {
+        const fields = parsed.error.issues.map((i) => i.path.join('.') || 'input').join(', ');
+        warnings.push(`Couldn't propose a context update — invalid fields: ${fields}.`);
+        continue;
+      }
+      const { notes, addAliases } = parsed.data;
+      const notesChange = notes !== undefined && notes !== currentNotes;
+      if (!notesChange && (!addAliases || addAliases.length === 0)) {
+        warnings.push('No actual context change proposed — nothing to remember, so it was skipped.');
+        continue;
+      }
+      const action: Extract<CereAction, { kind: 'config' }> = {
+        kind: 'config',
+        addAliases: addAliases ?? [],
+      };
+      if (notesChange) {
+        action.notes = notes;
+        action.notesBefore = currentNotes;
+      }
+      actions.push(action);
     }
   }
 
@@ -321,11 +402,14 @@ export function reconcileReply(
 
 /**
  * Resolve each action's `repo` to a real owned slug (Claude sometimes uses the
- * short name). Drops actions whose repo can't be matched, with a warning.
+ * short name, or one of Mike's informal aliases — #73). Drops actions whose
+ * repo can't be matched, with a warning. Config actions carry no repo and pass
+ * straight through.
  */
 export function resolveActionRepos(
   actions: CereAction[],
   repos: DevRepo[],
+  aliases: Record<string, string> = {},
 ): { actions: CereAction[]; warnings: string[] } {
   const slugs = new Set(repos.map((r) => r.slug));
   const byName = new Map(repos.map((r) => [r.name.toLowerCase(), r.slug]));
@@ -333,10 +417,15 @@ export function resolveActionRepos(
   const out: CereAction[] = [];
 
   for (const a of actions) {
+    if (a.kind === 'config') {
+      out.push(a);
+      continue;
+    }
     let repo = a.repo;
     if (!slugs.has(repo)) {
-      const resolved = byName.get(repo.toLowerCase());
-      if (!resolved) {
+      const key = repo.toLowerCase();
+      const resolved = byName.get(key) ?? aliases[key];
+      if (!resolved || !slugs.has(resolved)) {
         warnings.push(`Couldn't match repo "${a.repo}" — it's not on your board, so that change was skipped.`);
         continue;
       }

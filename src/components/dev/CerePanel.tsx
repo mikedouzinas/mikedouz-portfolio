@@ -23,6 +23,25 @@ const MAX_HEIGHT = 420;
 const BUBBLE_INSET = 42; // 40 padding + 2 border
 
 function ActionRow({ action, title }: { action: CereAction; title: string }) {
+  if (action.kind === 'config') {
+    // Cere updating her own memory (#73) — champagne, to match her mark.
+    return (
+      <li className="rounded-lg border border-[rgba(231,226,212,0.25)] bg-white/[0.05] p-2.5 text-sm">
+        <div className="mb-1 flex items-center gap-2 text-[11px] text-white/55">
+          <span className="rounded bg-white/15 px-1.5 py-0.5 text-white/80">Memory</span>
+        </div>
+        {action.addAliases.length > 0 && (
+          <p className="text-white/90">
+            {action.addAliases.map((p) => `“${p.alias}” → ${p.repo.split('/')[1] ?? p.repo}`).join(' · ')}
+          </p>
+        )}
+        {typeof action.notes === 'string' && (
+          <BodyDiff before={action.notesBefore ?? ''} after={action.notes} />
+        )}
+      </li>
+    );
+  }
+
   const repoName = action.repo.split('/')[1] ?? action.repo;
 
   if (action.kind === 'create') {
@@ -96,6 +115,7 @@ export function CerePanel({
   // updates/closes resolve theirs from the already-loaded board (ticket #66).
   const titleFor = (a: CereAction): string => {
     if (a.kind === 'create') return a.title;
+    if (a.kind === 'config') return "Cere's memory";
     const hit = issues.find((i) => i.repo === a.repo && i.number === a.number);
     return hit?.title ?? `ticket #${a.number}`;
   };

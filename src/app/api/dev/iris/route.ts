@@ -6,12 +6,14 @@ import { getHiddenRepos } from '@/lib/dev/hidden';
 import {
   CREATE_ISSUE_TOOL,
   UPDATE_ISSUE_TOOL,
+  UPDATE_CONTEXT_TOOL,
   CERE_MODEL,
   buildCereSystem,
   parseActions,
   resolveActionRepos,
   reconcileReply,
 } from '@/lib/dev/cere';
+import { getCereConfig, mergedAliases } from '@/lib/dev/cereConfig';
 
 // Claude tool-calling can outlast Vercel's default timeout; match the other
 // Iris routes. Middleware already gates /api/dev/* behind the session cookie.
@@ -35,7 +37,11 @@ export async function POST(req: NextRequest) {
   const { message, history } = parsed.data;
 
   try {
-    const [allRepos, hidden] = await Promise.all([listRepos(), getHiddenRepos()]);
+    const [allRepos, hidden, config] = await Promise.all([
+      listRepos(),
+      getHiddenRepos(),
+      getCereConfig(),
+    ]);
     const hiddenSet = new Set(hidden);
     const repos = allRepos.filter((r) => !hiddenSet.has(r.slug));
     const issues = await listBoardIssues(repos.map((r) => r.slug));
@@ -44,23 +50,29 @@ export async function POST(req: NextRequest) {
       model: CERE_MODEL,
       max_tokens: 1500,
       system: [
-        { type: 'text', text: buildCereSystem(repos, issues), cache_control: { type: 'ephemeral' } },
+        {
+          type: 'text',
+          text: buildCereSystem(repos, issues, config),
+          cache_control: { type: 'ephemeral' },
+        },
       ],
-      tools: [CREATE_ISSUE_TOOL, UPDATE_ISSUE_TOOL],
+      tools: [CREATE_ISSUE_TOOL, UPDATE_ISSUE_TOOL, UPDATE_CONTEXT_TOOL],
       messages: [
         ...history.map((h) => ({ role: h.role, content: h.content })),
         { role: 'user' as const, content: message },
       ],
     });
 
-    const parsedOut = parseActions(res.content, issues);
-    const resolved = resolveActionRepos(parsedOut.actions, repos);
+    const parsedOut = parseActions(res.content, issues, config.notes);
+    const resolved = resolveActionRepos(parsedOut.actions, repos, mergedAliases(config));
 
     // A tool call was emitted but dropped if the model produced any create/update
     // tool_use block yet the final, resolved action list is empty. Drives the
     // honest "couldn't apply that" wording instead of a silent "no changes".
     const toolBlocks = res.content.filter(
-      (b) => b.type === 'tool_use' && (b.name === 'create_issue' || b.name === 'update_issue'),
+      (b) =>
+        b.type === 'tool_use' &&
+        (b.name === 'create_issue' || b.name === 'update_issue' || b.name === 'update_cere_context'),
     ).length;
     const dropped = toolBlocks > 0 && resolved.actions.length === 0;
 
