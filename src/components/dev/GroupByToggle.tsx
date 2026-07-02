@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/Button';
 import type { GroupBy } from './IssueList';
 
 const OPTS: { value: GroupBy; label: string }[] = [
@@ -20,7 +21,9 @@ export function GroupByToggle({
       <span className="mr-1 uppercase tracking-[0.15em] text-white/30">group by</span>
       <div className="inline-flex rounded-lg border border-white/10 bg-white/[0.03] p-0.5">
         {OPTS.map((o) => (
-          <button
+          <Button
+            variant="bare"
+            glowColor="231, 226, 212"
             key={o.value}
             onClick={() => onChange(o.value)}
             className={`rounded-md px-2.5 py-1 transition-colors ${
@@ -30,7 +33,7 @@ export function GroupByToggle({
             }`}
           >
             {o.label}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

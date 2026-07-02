@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ArrowRight, MessageSquare, ExternalLink, Mail, Send, X, BookOpen } from 'lucide-react';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
 import { getRandomLoadingConfig, getAnimationConfig, getRandomLoadingMessage, type LoadingConfig } from '@/lib/iris/loadingMessages';
+import { Button } from '@/components/ui/Button';
 
 export interface QuickAction {
   type: 'affirmative' | 'custom_input' | 'specific' | 'contact_link' | 'message_mike';
@@ -518,7 +519,9 @@ export default function QuickActions({
             <span className="break-words">{selectedAction.label}</span>
           </button>
           {/* X button to cancel and show all actions again */}
-          <button
+          <Button
+            variant="bare"
+            glowColor="147, 197, 253"
             type="button"
             onClick={handleCancel}
             disabled={disabled}
@@ -526,7 +529,7 @@ export default function QuickActions({
             title="Show all actions"
           >
             <X className="w-3 h-3" />
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -581,7 +584,9 @@ export default function QuickActions({
               <span className="break-words">Ask a follow up...</span>
             </button>
             {/* X button to cancel and show all actions again */}
-            <button
+            <Button
+              variant="bare"
+              glowColor="147, 197, 253"
               type="button"
               onClick={handleCancel}
               disabled={disabled}
@@ -589,7 +594,7 @@ export default function QuickActions({
               title="Show all actions"
             >
               <X className="w-3 h-3" />
-            </button>
+            </Button>
           </div>
           {/* Input field with submit button */}
           <div className="flex gap-2">
@@ -609,14 +614,16 @@ export default function QuickActions({
               maxLength={500}
               className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none disabled:opacity-50 text-sm"
             />
-            <button
+            <Button
+              variant="bare"
+              glowColor="147, 197, 253"
               type="button"
               onClick={handleCustomSubmit}
               disabled={disabled || !customQuery.trim()}
               className="flex-shrink-0 flex items-center justify-center rounded-full w-9 h-9 bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600 text-white shadow-md border border-white/20 transition-all duration-200 ease-out hover:shadow-lg hover:scale-105 hover:from-blue-500 hover:via-emerald-400 hover:to-blue-500 backdrop-blur-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
             >
               <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-            </button>
+            </Button>
           </div>
         </div>
       ) : !submittedFollowUp ? (
@@ -653,7 +660,9 @@ export default function QuickActions({
             const gradientDirection = action.type === 'custom_input' ? 'bg-gradient-to-br' : 'bg-gradient-to-r';
             
             return (
-              <button
+              <Button
+                variant="bare"
+                glowColor="147, 197, 253"
                 key={index}
                 type="button"
                 onClick={() => handleActionClick(action)}
@@ -662,7 +671,7 @@ export default function QuickActions({
               >
                 <span className="flex-shrink-0">{getActionIcon(action)}</span>
                 <span className="break-words">{action.label}</span>
-              </button>
+              </Button>
             );
           })}
         </div>

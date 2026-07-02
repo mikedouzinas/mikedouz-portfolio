@@ -1,7 +1,7 @@
 'use client';
 
-import ContainedMouseGlow from '@/components/ContainedMouseGlow';
 import { trackBlogSummarizeClick } from '@/lib/analytics/gtag';
+import { Button } from '@/components/ui/Button';
 
 interface SummarizeButtonProps {
   slug: string;
@@ -15,10 +15,12 @@ export default function SummarizeButton({ slug, postTitle }: SummarizeButtonProp
   };
 
   return (
-    <button
+    <Button
+      variant="bare"
+      glowColor="52, 211, 153"
+      glowIntensity={0.25}
       onClick={handleClick}
       data-suppress-web="true"
-      data-has-contained-glow="true"
       className="relative isolate inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg overflow-hidden transition-transform duration-200 hover:scale-[1.05] text-[11px] font-semibold tracking-wide"
       style={{
         color: '#6ee7b7',
@@ -29,8 +31,6 @@ export default function SummarizeButton({ slug, postTitle }: SummarizeButtonProp
         boxShadow: '0 8px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08)',
       }}
     >
-      <ContainedMouseGlow color="52, 211, 153" intensity={0.25} />
-
       <span className="relative">summarize</span>
       <svg width="13" height="13" viewBox="0 0 23.2793 22.7815" fill="none" className="relative" aria-hidden>
         <path
@@ -42,6 +42,6 @@ export default function SummarizeButton({ slug, postTitle }: SummarizeButtonProp
           fill="currentColor"
         />
       </svg>
-    </button>
+    </Button>
   );
 }

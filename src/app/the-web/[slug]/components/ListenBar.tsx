@@ -3,6 +3,7 @@
 
 import { Play, Pause, ArrowDown, Loader2, X } from 'lucide-react';
 import type { UseAudioPlayerReturn } from '@/hooks/useAudioPlayer';
+import { Button } from '@/components/ui/Button';
 
 interface ListenBarProps {
   player: UseAudioPlayerReturn;
@@ -49,14 +50,16 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
       <div className="max-w-2xl mx-auto px-4 sm:px-6">
         {/* Desktop: single row */}
         <div className="hidden sm:flex items-center gap-3 py-2">
-          <button
+          <Button
+            variant="bare"
+            glowColor="45, 212, 191"
             onClick={isPlaying ? pause : play}
             disabled={isLoading}
             aria-label={isLoading ? 'Loading' : isPlaying ? 'Pause' : 'Play'}
             className="w-7 h-7 rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/35 flex items-center justify-center flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {renderPlayPauseIcon(12)}
-          </button>
+          </Button>
 
           <span className="text-xs text-gray-300 truncate flex-1 min-w-0">{postTitle}</span>
 
@@ -66,13 +69,15 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
             </span>
           )}
 
-          <button
+          <Button
+            variant="bare"
+            glowColor="45, 212, 191"
             onClick={cycleSpeed}
             aria-label={`Playback speed: ${speed}×. Click to change.`}
             className="text-xs text-gray-500 bg-gray-800 border border-gray-700 rounded-full px-2 py-0.5 hover:bg-gray-700 transition-colors flex-shrink-0"
           >
             {speed}×
-          </button>
+          </Button>
 
           <button
             onClick={jumpToActiveParagraph}
@@ -96,14 +101,16 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
         {/* Mobile: two rows — X always in top row so it's never off-screen */}
         <div className="flex sm:hidden flex-col py-2 gap-1.5">
           <div className="flex items-center gap-2.5">
-            <button
+            <Button
+              variant="bare"
+              glowColor="45, 212, 191"
               onClick={isPlaying ? pause : play}
               disabled={isLoading}
               aria-label={isLoading ? 'Loading' : isPlaying ? 'Pause' : 'Play'}
               className="w-9 h-9 rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/35 flex items-center justify-center flex-shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {renderPlayPauseIcon(14)}
-            </button>
+            </Button>
             <div className="flex-1 min-w-0">
               <div className="text-xs text-gray-300 truncate">{postTitle}</div>
               {duration > 0 && (
@@ -121,20 +128,24 @@ export default function ListenBar({ player, postTitle }: ListenBarProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant="bare"
+              glowColor="45, 212, 191"
               onClick={cycleSpeed}
               aria-label={`Playback speed: ${speed}×. Click to change.`}
               className="text-xs text-gray-500 bg-gray-800 border border-gray-700 rounded-full px-2.5 py-1 hover:bg-gray-700 transition-colors"
             >
               {speed}×
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="bare"
+              glowColor="45, 212, 191"
               onClick={jumpToActiveParagraph}
               className="text-xs text-gray-500 bg-gray-800 border border-gray-700 rounded-full px-2.5 py-1 hover:bg-gray-700 transition-colors flex items-center gap-1"
             >
               <ArrowDown size={11} />
               Jump to position
-            </button>
+            </Button>
           </div>
         </div>
       </div>

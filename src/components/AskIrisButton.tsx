@@ -3,6 +3,7 @@
 import React from 'react';
 import { Sparkles } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/gtag';
+import { Button } from '@/components/ui/Button';
 
 interface AskIrisButtonProps {
   item: {
@@ -46,14 +47,16 @@ export default function AskIrisButton({ item, type, className = '' }: AskIrisBut
   };
 
   return (
-    <button
+    <Button
+      variant="bare"
+      glowColor="147, 197, 253"
       onClick={handleClick}
       className={`
-        flex-shrink-0 inline-flex items-center gap-1 px-2 py-1 
+        flex-shrink-0 inline-flex items-center gap-1 px-2 py-1
         bg-gradient-to-br from-blue-600 via-emerald-500 to-blue-600
-        hover:scale-105 
-        text-white 
-        text-xs font-medium 
+        hover:scale-105
+        text-white
+        text-xs font-medium
         rounded-lg shadow-sm border border-white/20
         transition-all duration-200 ease-out hover:shadow-md
         hover:from-blue-500 hover:via-emerald-400 hover:to-blue-500
@@ -65,7 +68,7 @@ export default function AskIrisButton({ item, type, className = '' }: AskIrisBut
     >
       <Sparkles className="w-3 h-3" />
       <span>Ask Iris</span>
-    </button>
+    </Button>
   );
 }
 

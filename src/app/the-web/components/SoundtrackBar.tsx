@@ -6,6 +6,7 @@ import { Play, Pause, SkipBack, SkipForward, X } from 'lucide-react';
 import type { SoundtrackTrack } from '@/lib/blog';
 import { useSoundtrackPlayer } from '../hooks/useSoundtrackPlayer';
 import AlbumArtFallback from '@/components/spotify/AlbumArtFallback';
+import { Button } from '@/components/ui/Button';
 
 function formatTime(s: number): string {
   const m = Math.floor(s / 60);
@@ -83,7 +84,9 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
             )}
 
             {/* Play / Pause button */}
-            <button
+            <Button
+              variant="bare"
+              glowColor="45, 212, 191"
               onClick={togglePlay}
               className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full bg-[#2dd4bf]/20 hover:bg-[#2dd4bf]/30 transition-colors"
               aria-label={isPlaying ? 'Pause' : 'Play'}
@@ -95,7 +98,7 @@ export default function SoundtrackBar({ soundtrack }: SoundtrackBarProps) {
               ) : (
                 <Play className="w-3.5 h-3.5 text-[#2dd4bf] ml-0.5" fill="#2dd4bf" />
               )}
-            </button>
+            </Button>
 
             {/* Next button */}
             {trackCount > 1 && (

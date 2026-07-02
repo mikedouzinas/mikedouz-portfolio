@@ -7,6 +7,7 @@ import { parseReviewBlock } from '@/lib/dev/github';
 import { TypeIn } from '@/components/dev/entrance/TypeIn';
 import { ENTRANCE_PHASES, sub } from '@/components/dev/entrance/useEntranceReveal';
 import { smartSort } from '@/lib/dev/smartSort';
+import { Button } from '@/components/ui/Button';
 import { TicketCard, DONE_GREEN, type PatchBody } from './TicketCard';
 
 export type GroupBy = 'status' | 'repo';
@@ -95,23 +96,27 @@ function ReviewActions({
           <a href={review.preview} target="_blank" rel="noreferrer"
              className="rounded bg-white/10 px-2 py-1 hover:bg-white/20">Test ↗</a>
         )}
-        <button
+        <Button
+          variant="bare"
+          glowColor="231, 226, 212"
           disabled={busy}
           onClick={async () => { setBusy(true); await onApprove(issue); setBusy(false); }}
           className="rounded bg-emerald-600/80 px-2 py-1 hover:bg-emerald-600 disabled:opacity-40"
-        >Approve → Done</button>
-        <button onClick={() => setOpen((v) => !v)} className="rounded bg-white/10 px-2 py-1 hover:bg-white/20">Send back</button>
+        >Approve → Done</Button>
+        <Button variant="bare" glowColor="231, 226, 212" onClick={() => setOpen((v) => !v)} className="rounded bg-white/10 px-2 py-1 hover:bg-white/20">Send back</Button>
       </div>
       {open && (
         <div className="mt-2">
           <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2}
             placeholder="What needs fixing?"
             className="w-full rounded bg-black/30 p-2 text-white outline-none" />
-          <button
+          <Button
+            variant="bare"
+            glowColor="231, 226, 212"
             disabled={!text.trim() || busy}
             onClick={async () => { setBusy(true); await onSendBack(issue, text.trim()); setOpen(false); setText(''); setBusy(false); }}
             className="mt-1 rounded bg-amber-600/80 px-2 py-1 disabled:opacity-40"
-          >Send back to In progress</button>
+          >Send back to In progress</Button>
         </div>
       )}
     </div>

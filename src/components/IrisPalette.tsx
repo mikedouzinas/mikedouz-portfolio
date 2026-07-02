@@ -38,6 +38,7 @@ import MessageComposer from './iris/MessageComposer';
 import QuickActions, { type QuickAction } from './iris/QuickActions';
 import type { QueryFilter } from '@/lib/iris/answer-utils/types';
 import { getRandomLoadingConfig, getAnimationConfig, getRandomLoadingMessage } from '@/lib/iris/loadingMessages';
+import { Button } from '@/components/ui/Button';
 
 /**
  * Static suggestion configuration
@@ -1634,13 +1635,15 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
         {/* Mobile Header - sticky at top, hidden on desktop */}
         <div className="flex-none sticky top-0 z-20 grid grid-cols-[40px_1fr_40px] items-center px-4 py-3 bg-transparent md:hidden">
           {/* Left: Back Button */}
-          <button
+          <Button
+            variant="bare"
+            glowColor="147, 197, 253"
             onClick={() => handleOpenChange(false)}
             className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 backdrop-blur-md border border-black/10 dark:border-white/10 active:scale-95 transition-all duration-200"
             aria-label="Close Iris"
           >
             <ArrowLeft className="w-5 h-5 text-black/70 dark:text-white/70" />
-          </button>
+          </Button>
 
           {/* Center: Iris Title */}
           <div className="flex justify-center items-center">
@@ -1686,15 +1689,17 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
           
           {/* Right button - "Clear" in answer view, "Ask Iris" in suggestions view */}
           {viewMode === 'answer' ? (
-            <button
+            <Button
+              variant="bare"
+              glowColor="147, 197, 253"
               onClick={handleClear}
               className="
                 absolute right-2 top-1/2 -translate-y-1/2
                 inline-flex items-center justify-center
                 rounded-full w-9 h-9
                 text-xs font-medium
-                bg-black/5 dark:bg-white/10 
-                hover:bg-black/10 dark:hover:bg-white/15 
+                bg-black/5 dark:bg-white/10
+                hover:bg-black/10 dark:hover:bg-white/15
                 text-black/70 dark:text-white/70
                 border border-black/10 dark:border-white/10
                 transition-all duration-200
@@ -1704,9 +1709,11 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               aria-label="Clear search"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
+              variant="bare"
+              glowColor="147, 197, 253"
               onClick={handleAskIrisClick}
               disabled={isProcessingQuery}
               className={`
@@ -1730,7 +1737,7 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
               ) : (
                 <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               )}
-            </button>
+            </Button>
           )}
         </div>
 
@@ -2078,13 +2085,15 @@ export default function IrisPalette({ open: controlledOpen, onOpenChange }: Iris
 
               {/* Scroll to bottom button */}
               {showScrollToBottom && (
-                <button
+                <Button
+                  variant="bare"
+                  glowColor="147, 197, 253"
                   onClick={scrollToBottom}
                   className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/70 dark:bg-black/30 hover:bg-white/90 dark:hover:bg-black/50 backdrop-blur-xl border border-black/10 dark:border-white/20 flex items-center justify-center text-black/70 dark:text-white/70 transition-all duration-200 hover:scale-105 shadow-sm z-10"
                   title="Scroll to bottom"
                 >
                   <ChevronDown className="w-4 h-4" />
-                </button>
+                </Button>
               )}
             </div>
           </>

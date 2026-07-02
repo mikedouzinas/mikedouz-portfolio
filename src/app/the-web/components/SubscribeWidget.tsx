@@ -7,6 +7,7 @@ import {
   trackBlogSubscribeSubmit,
   trackBlogSubscribeSuccess,
 } from "@/lib/analytics/gtag";
+import { Button } from "@/components/ui/Button";
 
 function getBlogContext(): { slug?: string; source: "post" | "index" } {
   if (typeof window === "undefined") return { source: "index" };
@@ -198,13 +199,15 @@ export default function SubscribeWidget() {
                       autoFocus
                       className="w-28 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 text-center tracking-widest focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition-colors"
                     />
-                    <button
+                    <Button
+                      variant="bare"
+                      glowColor="45, 212, 191"
                       type="submit"
                       disabled={smsCode.length !== 6 || state === "confirming"}
                       className="bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
                     >
                       {state === "confirming" ? "..." : "confirm"}
-                    </button>
+                    </Button>
                   </div>
                 </motion.form>
               ) : (
@@ -222,13 +225,15 @@ export default function SubscribeWidget() {
                       autoFocus
                       className="flex-1 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition-colors"
                     />
-                    <button
+                    <Button
+                      variant="bare"
+                      glowColor="45, 212, 191"
                       type="submit"
                       disabled={state === "submitting"}
                       className="bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors"
                     >
                       {state === "submitting" ? "..." : "subscribe"}
-                    </button>
+                    </Button>
                   </form>
                   <p className="text-xs text-gray-500 mt-2">
                     new posts only. unsubscribe anytime super easily.

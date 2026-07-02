@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, FormEvent } from 'react';
 import { getRandomBlogLoadingMessage } from '../lib/loadingMessages';
+import { Button } from '@/components/ui/Button';
 
 interface BlogIrisDraftProps {
   draftType: 'comment' | 'message';
@@ -190,7 +191,9 @@ export default function BlogIrisDraft({
             Back
           </button>
         ) : <span />}
-        <button
+        <Button
+          variant="bare"
+          glowColor="45, 212, 191"
           type="submit"
           disabled={!canSubmit}
           className={`px-4 py-1.5 rounded-xl text-xs font-medium text-white transition-all duration-200 disabled:opacity-40 ${
@@ -205,7 +208,7 @@ export default function BlogIrisDraft({
           }
         >
           {isSubmitting ? 'Sending...' : isComment ? 'Post' : 'Send to Mike'}
-        </button>
+        </Button>
       </div>
     </form>
   );

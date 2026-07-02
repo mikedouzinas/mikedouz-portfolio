@@ -8,10 +8,18 @@ import ContainedMouseGlow from '@/components/ContainedMouseGlow';
  * (ContainedMouseGlow) contained within the button. Opt-in elsewhere via the
  * `data-has-contained-glow` contract so the global cursor halo yields to it.
  */
-type Variant = 'solid' | 'ghost' | 'hatch' | 'hatch-red' | 'hatch-google';
+type Variant = 'solid' | 'ghost' | 'hatch' | 'hatch-red' | 'hatch-google' | 'bare';
 
 const BASE =
   'relative isolate overflow-hidden inline-flex items-center justify-center gap-1.5 rounded-lg text-sm font-medium transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100';
+
+// `bare` (#28) exists so ANY already-styled button can adopt the shared
+// component without visual drift: it adds only structure + the glow/scale
+// interaction, and the caller's className keeps carrying the entire look
+// (padding, radius, colors). The other variants' decorative classes would
+// fight the caller's via unpredictable Tailwind stylesheet order.
+const BASE_BARE =
+  'relative isolate overflow-hidden transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100';
 
 const VARIANTS: Record<Variant, string> = {
   solid: 'border border-white/15 bg-white/[0.06] px-3 py-1.5 text-white/85',
@@ -19,6 +27,7 @@ const VARIANTS: Record<Variant, string> = {
   hatch: 'workpad-btn border border-white/15 px-3 py-1.5 text-white/80',
   'hatch-red': 'workpad-btn-red border border-white/15 px-3 py-1.5 text-white/80',
   'hatch-google': 'workpad-btn-google border border-white/15 px-3 py-1.5 text-white/80',
+  bare: '',
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -36,11 +45,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     <button
       ref={ref}
       data-has-contained-glow="true"
-      className={`${BASE} ${VARIANTS[variant]} ${className}`}
+      className={`${variant === 'bare' ? BASE_BARE : `${BASE} ${VARIANTS[variant]}`} ${className}`}
       {...rest}
     >
       <ContainedMouseGlow color={glowColor} intensity={glowIntensity} />
-      <span className="relative z-10 inline-flex items-center gap-1.5">{children}</span>
+      {variant === 'bare' ? (
+        // No wrapper span: many adopters' classNames are themselves flex
+        // layouts, and the absolutely-positioned glow doesn't disturb them.
+        children
+      ) : (
+        <span className="relative z-10 inline-flex items-center gap-1.5">{children}</span>
+      )}
     </button>
   );
 });

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import type { BlogComment } from '@/lib/comments';
+import { Button } from '@/components/ui/Button';
 
 interface CommentFormProps {
   postSlug: string;
@@ -178,13 +179,15 @@ export default function CommentForm({
             cancel
           </button>
         )}
-        <button
+        <Button
+          variant="bare"
+          glowColor="45, 212, 191"
           type="submit"
           disabled={!canSubmit || submitting}
           className="bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 border border-teal-500/30 rounded-lg px-4 py-2 text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {submitting ? 'posting...' : 'post comment'}
-        </button>
+        </Button>
       </div>
     </form>
   );

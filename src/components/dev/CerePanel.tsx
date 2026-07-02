@@ -249,7 +249,9 @@ export function CerePanel({
           <div className="mb-3 flex items-center justify-between rounded-lg bg-white/[0.06] px-2.5 py-2">
             <span className="text-[11px] text-white/55">Discard this conversation?</span>
             <div className="flex gap-1.5">
-              <button
+              <Button
+                variant="bare"
+                glowColor="231, 226, 212"
                 type="button"
                 onClick={() => {
                   setShowDiscard(false);
@@ -258,14 +260,16 @@ export function CerePanel({
                 className="rounded px-1.5 py-0.5 text-[11px] text-white/45 transition-colors hover:text-white/80"
               >
                 Keep
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="bare"
+                glowColor="231, 226, 212"
                 type="button"
                 onClick={onClose}
                 className="rounded px-1.5 py-0.5 text-[11px] text-red-400/80 transition-colors hover:text-red-400"
               >
                 Discard
-              </button>
+              </Button>
             </div>
           </div>
         )}

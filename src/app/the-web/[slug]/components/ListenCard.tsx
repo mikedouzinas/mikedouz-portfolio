@@ -4,6 +4,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, Loader2 } from 'lucide-react';
 import type { UseAudioPlayerReturn } from '@/hooks/useAudioPlayer';
+import { Button } from '@/components/ui/Button';
 
 interface ListenCardProps {
   player: UseAudioPlayerReturn;
@@ -77,7 +78,9 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
   return (
     <div className="rounded-xl bg-gradient-to-br from-teal-500/[0.08] to-teal-400/[0.04] border border-teal-500/20 p-3 mb-5">
       <div className="flex items-center gap-3 mb-2.5">
-        <button
+        <Button
+          variant="bare"
+          glowColor="45, 212, 191"
           onClick={isPlaying ? pause : play}
           disabled={isLoading}
           aria-label={isLoading ? 'Loading' : isPlaying ? 'Pause' : 'Play'}
@@ -90,7 +93,7 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
           ) : (
             <Play size={16} fill="#2dd4bf" className="text-[#2dd4bf] translate-x-px" />
           )}
-        </button>
+        </Button>
 
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium text-gray-200">Listen to this post</div>
@@ -98,12 +101,14 @@ export default function ListenCard({ player, readingTime }: ListenCardProps) {
         </div>
 
         {isReady && (
-          <button
+          <Button
+            variant="bare"
+            glowColor="45, 212, 191"
             onClick={cycleSpeed}
             className="text-xs text-gray-500 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-full px-2.5 py-1 transition-colors flex-shrink-0"
           >
             {speed}×
-          </button>
+          </Button>
         )}
       </div>
 

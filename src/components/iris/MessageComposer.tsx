@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Send, Loader2, Info } from 'lucide-react';
 import { generateNonce } from '@/lib/security';
-import ContainedMouseGlow from '../ContainedMouseGlow';
+import { Button } from '@/components/ui/Button';
 
 
 interface MessageComposerProps {
@@ -288,14 +288,16 @@ export default function MessageComposer({
         {message.length === 0 && (
           <div className="flex flex-wrap gap-1 mt-1 sm:mt-2">
             {HINT_CHIPS.map((hint, i) => (
-              <button
+              <Button
+                variant="bare"
+                glowColor="147, 197, 253"
                 key={i}
                 onClick={() => setMessage(hint)}
                 disabled={locked || isSubmitting}
                 className="text-xs px-2 py-0.5 rounded-xl bg-gradient-to-r from-blue-800/30 to-blue-900/20 hover:from-blue-700/40 hover:to-blue-800/30 text-white/60 hover:text-white/80 transition-all duration-150 transform hover:scale-105 hover:shadow-sm hover:shadow-blue-500/10 disabled:opacity-50 disabled:scale-100 disabled:shadow-none"
               >
                 {hint}
-              </button>
+              </Button>
             ))}
           </div>
         )}
@@ -323,7 +325,10 @@ export default function MessageComposer({
       {/* Action buttons */}
       <div className="flex gap-2">
         {/* Submit button */}
-        <button
+        <Button
+          variant="bare"
+          glowColor="147, 197, 253"
+          glowIntensity={0.3}
           onClick={handleSubmit}
           disabled={locked || isSubmitting || !message.trim()}
           className="flex-1 relative flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-xl text-white font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 overflow-hidden text-base"
@@ -331,7 +336,6 @@ export default function MessageComposer({
             background: 'linear-gradient(90deg, #6B4EFF 0%, #00A8FF 100%)',
           }}
         >
-          <ContainedMouseGlow color="147, 197, 253" intensity={0.3} size={200} />
           {isSubmitting ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -343,7 +347,7 @@ export default function MessageComposer({
               Send to Mike
             </>
           )}
-        </button>
+        </Button>
       </div>
       
       {/* Privacy note - hide on mobile to save space */}

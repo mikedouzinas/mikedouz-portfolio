@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Inbox, LogOut, Settings, SlidersHorizontal } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 /**
  * Overflow menu on the repo bar. Holds the rare actions — Manage repos, Inbox,
@@ -52,7 +53,9 @@ export function GearMenu({
       </button>
       {open && (
         <div className="absolute right-0 z-50 mt-1 min-w-[10rem] overflow-hidden rounded-lg border border-white/10 bg-[#0c1118] p-1 shadow-xl">
-          <button
+          <Button
+            variant="bare"
+            glowColor="231, 226, 212"
             type="button"
             onClick={() => {
               onManage();
@@ -62,8 +65,10 @@ export function GearMenu({
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
             Manage repos
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="bare"
+            glowColor="231, 226, 212"
             type="button"
             onClick={() => {
               onInbox();
@@ -73,8 +78,10 @@ export function GearMenu({
           >
             <Inbox className="h-3.5 w-3.5" />
             Inbox
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="bare"
+            glowColor="231, 226, 212"
             type="button"
             onClick={() => {
               onLogout();
@@ -85,7 +92,7 @@ export function GearMenu({
           >
             <LogOut className="h-3.5 w-3.5" />
             {loggingOut ? 'Logging out…' : 'Log out'}
-          </button>
+          </Button>
         </div>
       )}
     </div>

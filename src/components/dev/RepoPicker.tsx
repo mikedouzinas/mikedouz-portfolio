@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { DevRepo } from '@/lib/dev/github';
+import { Button } from '@/components/ui/Button';
 
 /** Repo filter chips for the board's sticky repo bar. `null` = All. */
 export function RepoChips({
@@ -15,7 +16,9 @@ export function RepoChips({
 }) {
   return (
     <div className="no-scrollbar flex flex-nowrap items-center gap-2 overflow-x-auto">
-      <button
+      <Button
+        variant="bare"
+        glowColor="231, 226, 212"
         onClick={() => onSelect(null)}
         className={`shrink-0 rounded-full border px-3 py-1 text-xs transition-colors ${
           selected === null
@@ -24,9 +27,11 @@ export function RepoChips({
         }`}
       >
         All
-      </button>
+      </Button>
       {repos.map((r) => (
-        <button
+        <Button
+          variant="bare"
+          glowColor="231, 226, 212"
           key={r.slug}
           onClick={() => onSelect(r.slug)}
           className={`shrink-0 rounded-full border px-3 py-1 text-xs transition-colors ${
@@ -40,7 +45,7 @@ export function RepoChips({
           }}
         >
           {r.name}
-        </button>
+        </Button>
       ))}
     </div>
   );

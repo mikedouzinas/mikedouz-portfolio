@@ -10,6 +10,7 @@ import {
   type Ref,
 } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Button } from '@/components/ui/Button';
 
 export interface IrisMessage {
   role: 'user' | 'assistant';
@@ -227,7 +228,9 @@ export function IrisChat({
               </span>
             </button>
           ) : (
-            <button
+            <Button
+              variant="bare"
+              glowColor="147, 197, 253"
               type="submit"
               disabled={!input.trim() || busy}
               className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 text-white transition-all duration-200 disabled:opacity-30"
@@ -238,7 +241,7 @@ export function IrisChat({
                 <polyline points="9 10 4 15 9 20" />
                 <path d="M20 4v7a4 4 0 0 1-4 4H4" />
               </svg>
-            </button>
+            </Button>
           )}
         </div>
       </form>
