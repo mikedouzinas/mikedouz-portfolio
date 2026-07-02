@@ -1,0 +1,121 @@
+# THE HARLEQUIN board agent (#70)
+#
+# A scheduled Claude Code run that picks ONE eligible ticket off the board
+# (this repo's GitHub Issues), does the work on an agent/ branch, and opens a
+# PR for Mike to review — mirroring Cere's propose-then-confirm model: the
+# agent proposes (a PR), Mike confirms (merge).
+#
+# Guardrails:
+#   - PRs only — the agent never pushes to main (prompt + branch protection).
+#   - One ticket per run; S/M sizes only; skips anything unclear (comments on
+#     the ticket instead of guessing).
+#   - The cron is OFF until the repo variable BOARD_AGENT_ENABLED is set to
+#     'true' (Settings → Secrets and variables → Actions → Variables).
+#   - Manual runs (workflow_dispatch) default to dry-run: the agent posts its
+#     plan as a ticket comment and touches nothing else.
+#
+# Requires: ANTHROPIC_API_KEY repo secret. Vercel's GitHub integration gives
+# every PR a preview deployment automatically (the ticket's live-preview step).
+
+name: Board agent
+
+on:
+  schedule:
+    - cron: '17 7 * * 1-5' # weekday mornings, 07:17 UTC (odd minute avoids the cron rush)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — plan only, no branches/PRs'
+        type: boolean
+        default: true
+      issue:
+        description: 'Work a specific issue number (optional)'
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: board-agent
+  cancel-in-progress: false
+
+jobs:
+  work-ticket:
+    # Scheduled runs are gated behind an explicit opt-in variable; manual
+    # dispatches always run (they default to dry-run anyway).
+    if: github.event_name == 'workflow_dispatch' || vars.BOARD_AGENT_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ github.event_name == 'schedule' && 'false' || inputs.dry_run }}
+          TARGET_ISSUE: ${{ inputs.issue }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --allowedTools "Bash,Edit,Write,Read,Glob,Grep"
+            --max-turns 80
+          prompt: |
+            You are the scheduled agent for THE HARLEQUIN — Mike's dev board,
+            which is this repo's GitHub Issues (priority = label p1..p5, status
+            = label "status: ...", size = label "size: S|M|L", subtasks = a
+            markdown checklist in the body). Read .claude/skills/harlequin-board/SKILL.md
+            first for the full conventions, and CLAUDE.md for the project rules.
+
+            ## Select ONE ticket
+            If $TARGET_ISSUE is non-empty, use that issue. Otherwise pick the
+            best candidate via `gh issue list --state open --json number,title,labels,body`:
+              - label "status: todo" (never "status: awaiting review")
+              - size S or M only (never L)
+              - highest priority first (p1 > p2 > ...), then smallest size
+              - it must have clear acceptance criteria (a concrete description
+                or checklist). If nothing qualifies, say so and stop.
+              - skip tickets whose body mentions blocking dependencies on other
+                open tickets, and skip pure-design/visual-taste tickets.
+            Also skip any ticket that already has an open PR referencing it
+            (`gh pr list --state open --search "<number> in:body"`).
+
+            ## Dry run
+            If $DRY_RUN is "true": comment your selection + a concise plan on
+            the ticket (via `gh issue comment`), prefixed "🤖 board-agent dry
+            run:". Do NOT create branches, commits, or PRs. Then stop.
+
+            ## Work it
+            1. `git checkout -b agent/issue-<number>` (NEVER commit to main).
+            2. Set the ticket in progress:
+               `gh issue edit <number> --add-label "status: in progress" --remove-label "status: todo"`.
+            3. Implement the ticket. Follow CLAUDE.md conventions (TypeScript
+               strict, no `any`; feature-scoped commits; update the
+               proj_portfolio KB entry + run `npm run verify:kb && npm run kb:rebuild`
+               if you ship a user-visible site feature).
+            4. Verify: `npx tsc --noEmit` and `npm run lint` must pass.
+            5. Commit (subject states the one thing done, reference the issue),
+               push the branch, and open a PR:
+               `gh pr create --title "..." --body "..."` — the body must
+               explain what changed, how to test it, and include "Closes #<number>".
+            6. Hand off on the board: add label "status: awaiting review"
+               (remove "status: in progress") and comment on the ticket with
+               the PR link + one line of what to test. Vercel will attach a
+               preview deployment to the PR automatically.
+
+            ## If blocked
+            If the ticket turns out to be ambiguous or bigger than its size
+            label, do NOT guess: leave a "🤖 board-agent blocked:" comment on
+            the ticket explaining exactly what decision or detail you need,
+            revert the status label to "status: todo", and stop cleanly.
