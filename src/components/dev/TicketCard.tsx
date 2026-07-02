@@ -67,16 +67,11 @@ export type PatchBody = {
 /** One green for everything "done" — the Done lane dot and the expand tint. */
 export const DONE_GREEN = '#1DB954';
 
-// Expanded-card tint keyed by status, so the lift colour tells you where a
-// ticket stands at a glance: blue = todo, amber = in progress, champagne = awaiting review,
-// and the original Spotify-panel green = done. Same dark-tint-of-the-accent recipe.
-// Translucent so the harlequin argyle whispers through the glass card.
-const STATUS_EXPAND: Record<Status | 'done', { bg: string; border: string }> = {
-  todo: { bg: 'rgba(11, 19, 34, 0.66)', border: 'rgba(66, 133, 244, 0.45)' }, // blue
-  'in progress': { bg: 'rgba(26, 22, 7, 0.66)', border: 'rgba(251, 188, 5, 0.45)' }, // amber
-  'awaiting review': { bg: 'rgba(26, 22, 7, 0.66)', border: 'rgba(231, 179, 74, 0.45)' }, // champagne-amber
-  done: { bg: 'rgba(10, 26, 19, 0.66)', border: 'rgba(29, 185, 84, 0.45)' }, // Spotify green
-};
+// #93 — Stark-hologram first pass: the card chrome is the .holo-panel
+// treatment (crisp light-blue edge fading inward to near-black) instead of the
+// old per-status dark tints. Where a ticket stands still reads from the status
+// dot + label in the header; the panel itself stays hologram-blue.
+const HOLO_GLOW = '147, 197, 253'; // light blue, matching the panel edge
 
 // #63 — Morph spring tokens. Expand overshoots slightly (springy/bouncy);
 // collapse is near-critical (decisive, no bounce on the way home).
@@ -186,8 +181,6 @@ export function TicketCard({
   const closed = issue.state === 'closed';
   // Closed items read as "Done" (green) regardless of their lingering status label.
   const st = closed ? { label: 'Done', color: DONE_GREEN } : STATUS_META[issue.status ?? 'todo'];
-  const expandKey: Status | 'done' = closed ? 'done' : issue.status ?? 'todo';
-  const tint = STATUS_EXPAND[expandKey];
   const subs = parseSubtasks(issue.body);
   const prog = subtaskProgress(issue.body);
   const prose = stripSubtasks(issue.body); // description without the checklist lines
@@ -621,14 +614,14 @@ export function TicketCard({
         // little "Be right back." note + a softly pulsing dot, so the gap reads
         // as intentional ("this ticket stepped out") rather than broken.
         // (#64 spotlight-pool treatment was reverted — sent back for a rethink.)
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e7e2d4]/20 bg-white/[0.015] text-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-sky-200/20 bg-white/[0.015] text-center">
           <motion.span
             aria-hidden
-            className="h-1.5 w-1.5 rounded-full bg-[#e7e2d4]/50"
+            className="h-1.5 w-1.5 rounded-full bg-sky-200/50"
             animate={{ opacity: [0.25, 0.9, 0.25], scale: [0.85, 1.15, 0.85] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <span className="text-[11px] italic text-[#e7e2d4]/45">Be right back.</span>
+          <span className="text-[11px] italic text-sky-200/45">Be right back.</span>
           <span className="text-[10px] text-white/25">
             {issue.source === 'virtual' ? repoName : `${repoName} #${issue.number}`}
           </span>
@@ -668,25 +661,18 @@ export function TicketCard({
               // contracted into its slot — drop the placeholder exactly here.
               if (!open) setPlaceholderVisible(false);
             }}
-            whileHover={{
-              scale: 1.02,
-              backgroundColor: tint.bg,
-              borderColor: tint.border,
-            }}
+            whileHover={{ scale: 1.02 }}
             // #63 — layout transition: spring on collapse (expand is handled by the
             // detached node's transition since it's the layout-driving node when open).
             transition={prefersReducedMotion ? MORPH_TWEEN_REDUCED : MORPH_SPRING_COLLAPSE}
-            style={{
-              backgroundColor: 'rgba(12, 17, 24, 0.52)',
-              borderColor: 'rgba(255, 255, 255, 0.10)',
-            }}
-            className={`absolute inset-0 cursor-pointer overflow-hidden rounded-xl border backdrop-blur-md hover:shadow-2xl hover:shadow-black/60 ${
+            // #93 — hover glow/edge changes live in .holo-panel's CSS :hover.
+            className={`holo-panel absolute inset-0 cursor-pointer overflow-hidden rounded-xl backdrop-blur-md ${
               closed ? 'opacity-70' : ''
             }`}
           >
-            {/* Cursor-following light contained to the ticket — the harlequin's
+            {/* Cursor-following light contained to the ticket — the hologram's
                 confined "lighting up", distinct from the board's argyle reveal. */}
-            <ContainedMouseGlow color="231, 226, 212" intensity={0.16} size={220} />
+            <ContainedMouseGlow color={HOLO_GLOW} intensity={0.16} size={220} />
             {header(false)}
           </motion.div>
         </motion.div>
@@ -723,16 +709,14 @@ export function TicketCard({
                     width: '100%',
                     maxWidth: DETACHED_WIDTH,
                     maxHeight: `${DETACHED_MAX_HEIGHT_VH}vh`,
-                    backgroundColor: tint.bg,
-                    borderColor: tint.border,
                   }}
                   // #63 — expand spring: slight overshoot gives the "grows up/out past
                   // target then settles" pop. Collapse spring (near-critical) applied on
                   // the inline node. Reduced-motion: plain short tween.
                   transition={prefersReducedMotion ? MORPH_TWEEN_REDUCED : MORPH_SPRING_EXPAND}
-                  className="relative z-10 my-auto overflow-y-auto rounded-2xl border shadow-[0_0_80px_40px_rgba(0,0,0,0.45),0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl"
+                  className="holo-panel holo-panel--elevated relative z-10 my-auto overflow-y-auto rounded-2xl backdrop-blur-xl"
                 >
-                  <ContainedMouseGlow color="231, 226, 212" intensity={0.16} size={320} />
+                  <ContainedMouseGlow color={HOLO_GLOW} intensity={0.16} size={320} />
                   {/* Explicit close affordance (Esc / scrim also work). */}
                   <button
                     type="button"
