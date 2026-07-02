@@ -26,6 +26,8 @@ export function DiamondFace({ passcode, spin, revealed, onLeave, onReveal }: Fac
     focusInput,
     onChange,
     submit,
+    visitorOffer,
+    enterAsVisitor,
   } = passcode;
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
@@ -119,6 +121,8 @@ export function DiamondFace({ passcode, spin, revealed, onLeave, onReveal }: Fac
             busy={busy}
             error={error}
             onChange={onChange}
+            visitorOffer={visitorOffer}
+            onEnterAsVisitor={enterAsVisitor}
           />
         </form>
       </div>

@@ -45,6 +45,8 @@ export function WindowFace({ passcode, spin, revealed, onLeave, onReveal }: Face
     focusInput,
     onChange,
     submit,
+    visitorOffer,
+    enterAsVisitor,
   } = passcode;
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const glassRef = useRef<HTMLDivElement | null>(null);
@@ -265,6 +267,8 @@ export function WindowFace({ passcode, spin, revealed, onLeave, onReveal }: Face
             busy={busy}
             error={error}
             onChange={onChange}
+            visitorOffer={visitorOffer}
+            onEnterAsVisitor={enterAsVisitor}
           />
         </form>
       </div>

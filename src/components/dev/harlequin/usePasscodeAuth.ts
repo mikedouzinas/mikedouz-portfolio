@@ -18,11 +18,15 @@ export function usePasscodeAuth() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  // #82 — after a wrong passcode, the portal offers a read-only visitor pass
+  // instead of a dead-end "Nope."
+  const [visitorOffer, setVisitorOffer] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const clear = useCallback(() => {
     setPassword('');
     setError('');
+    setVisitorOffer(false);
   }, []);
 
   const focusInput = useCallback(() => {
@@ -47,7 +51,13 @@ export function usePasscodeAuth() {
           requestHarlequinTransition('enter');
           return;
         }
-        setError(res.status === 429 ? 'Too many attempts. Try later.' : 'Nope.');
+        if (res.status === 429) {
+          setError('Too many attempts. Try later.');
+        } else {
+          // Wrong code → offer the look-don't-touch path (#82).
+          setError('Nope.');
+          setVisitorOffer(true);
+        }
         setPassword('');
       } catch {
         setError('Network error. Try again.');
@@ -58,6 +68,31 @@ export function usePasscodeAuth() {
     },
     [busy],
   );
+
+  // #82 — mint a read-only visitor session and enter through the same reveal.
+  const enterAsVisitor = useCallback(async () => {
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    try {
+      const res = await fetch('/api/dev/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visitor: true }),
+      });
+      if (res.ok) {
+        void captureHomeSnapshot();
+        markEntrance();
+        requestHarlequinTransition('enter');
+        return;
+      }
+      setError('Visitor pass unavailable.');
+    } catch {
+      setError('Network error. Try again.');
+    } finally {
+      setBusy(false);
+    }
+  }, [busy]);
 
   const onChange = useCallback((raw: string) => {
     // The real passcode is alphanumeric — accept letters AND numbers, cap at 6.
@@ -92,10 +127,12 @@ export function usePasscodeAuth() {
     error,
     busy,
     filledDots,
+    visitorOffer,
     inputRef,
     clear,
     focusInput,
     onChange,
     submit,
+    enterAsVisitor,
   };
 }

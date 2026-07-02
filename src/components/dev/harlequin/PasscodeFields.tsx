@@ -13,6 +13,9 @@ interface PasscodeFieldsProps {
   onChange: (raw: string) => void;
   /** Unique input id/name per shape (avoid duplicate ids when all render). */
   inputId: string;
+  /** #82 — wrong code: offer the read-only visitor path instead of a dead end. */
+  visitorOffer?: boolean;
+  onEnterAsVisitor?: () => void;
 }
 
 /**
@@ -31,7 +34,7 @@ interface PasscodeFieldsProps {
  */
 export const PasscodeFields = forwardRef<HTMLInputElement, PasscodeFieldsProps>(
   function PasscodeFields(
-    { filledDots, password, busy, error, onChange, inputId },
+    { filledDots, password, busy, error, onChange, inputId, visitorOffer = false, onEnterAsVisitor },
     ref,
   ) {
     return (
@@ -65,6 +68,20 @@ export const PasscodeFields = forwardRef<HTMLInputElement, PasscodeFieldsProps>(
         <div className={`passcode-label ${spaceMono.className}`}>
           {error ? error : 'enter code'}
         </div>
+        {/* #82 — a wrong code opens the side door: read-only visitor mode. */}
+        {visitorOffer && onEnterAsVisitor && (
+          <button
+            type="button"
+            className={`visitor-offer ${spaceMono.className}`}
+            disabled={busy}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEnterAsVisitor();
+            }}
+          >
+            look around anyway →
+          </button>
+        )}
         {/* visually hidden — screen-reader only; the word "Enter" must NOT be visible */}
         <button type="submit" className="hq-sr-only">
           Enter
@@ -100,6 +117,25 @@ export const PasscodeFields = forwardRef<HTMLInputElement, PasscodeFieldsProps>(
             color: rgba(231, 226, 212, 0.35);
             text-transform: uppercase;
             margin-top: 2px;
+          }
+          .visitor-offer {
+            font-size: 7px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: rgba(231, 226, 212, 0.6);
+            background: none;
+            border: none;
+            padding: 0;
+            margin-top: 3px;
+            cursor: pointer;
+            transition: color 150ms;
+          }
+          .visitor-offer:hover {
+            color: rgba(231, 226, 212, 0.95);
+          }
+          .visitor-offer:disabled {
+            opacity: 0.5;
+            cursor: default;
           }
           .hq-sr-only {
             position: absolute;
