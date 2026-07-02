@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { DevRepo } from '@/lib/dev/github';
 
 /** Repo filter chips for the board's sticky repo bar. `null` = All. */
@@ -45,6 +46,41 @@ export function RepoChips({
   );
 }
 
+/**
+ * Per-repo guest link (#6): mints a scoped, expiring share URL and puts it on
+ * the clipboard. Self-contained — the token API is admin-gated server-side.
+ */
+function ShareLinkButton({ repo }: { repo: string }) {
+  const [state, setState] = useState<'idle' | 'busy' | 'copied' | 'error'>('idle');
+  async function share() {
+    setState('busy');
+    try {
+      const res = await fetch('/api/dev/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repo }),
+      });
+      if (!res.ok) throw new Error();
+      const { url } = (await res.json()) as { url: string };
+      await navigator.clipboard.writeText(url);
+      setState('copied');
+    } catch {
+      setState('error');
+    }
+    setTimeout(() => setState('idle'), 2000);
+  }
+  return (
+    <button
+      onClick={share}
+      disabled={state === 'busy'}
+      className="text-xs text-sky-300/60 transition-colors hover:text-sky-300 disabled:opacity-50"
+      title="Copy a read-only guest link to this repo's board (expires in 14 days)"
+    >
+      {state === 'copied' ? 'Link copied' : state === 'error' ? 'Failed' : 'Share'}
+    </button>
+  );
+}
+
 /** Show/hide management for repos — drops out of the gear menu's "Manage repos". */
 export function RepoManagePanel({
   repos,
@@ -64,9 +100,12 @@ export function RepoManagePanel({
         {repos.map((r) => (
           <li key={r.slug} className="flex items-center justify-between">
             <span className="text-white/80">{r.name}</span>
-            <button onClick={() => onHide(r.slug)} className="text-xs text-white/50 hover:text-white">
-              Hide
-            </button>
+            <span className="flex items-center gap-3">
+              <ShareLinkButton repo={r.slug} />
+              <button onClick={() => onHide(r.slug)} className="text-xs text-white/50 hover:text-white">
+                Hide
+              </button>
+            </span>
           </li>
         ))}
       </ul>

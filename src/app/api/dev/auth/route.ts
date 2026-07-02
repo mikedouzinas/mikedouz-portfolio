@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyPassword } from '@/lib/dev/password';
 import {
   signSession,
-  hasValidDevSession,
+  getDevSession,
   DEV_SESSION_COOKIE,
   sessionCookieOptions,
 } from '@/lib/dev/session';
+import { validateShareToken } from '@/lib/dev/share';
 import {
   checkAuthRateLimit,
   checkGlobalLockout,
@@ -36,11 +37,46 @@ function tooManyAttempts(rl: RateLimitResult): NextResponse {
  * the httpOnly cookie. Never reveals the cookie value.
  */
 export async function GET(req: NextRequest) {
-  return NextResponse.json({ authed: await hasValidDevSession(req) });
+  const session = await getDevSession(req);
+  // `authed` stays admin-only: pre-role consumers (blog admin affordances,
+  // inbox) key on it, and a visitor session must not light those up.
+  return NextResponse.json({
+    authed: session?.role === 'admin',
+    role: session?.role ?? null,
+    repoScope: session?.repoScope ?? null,
+  });
 }
 
-/** POST { password } → sets session cookie on success. */
+/**
+ * POST { password } → full (admin) session.
+ * POST { visitor: true } → read-only visitor session (#82, wrong-password path).
+ * POST { shareToken } → read-only visitor session scoped to one repo (#6).
+ */
 export async function POST(req: NextRequest) {
+  const body = await req.json().catch(() => ({}));
+
+  // Guest share link (#6): a valid token mints a repo-scoped visitor session.
+  // No rate-limit interplay — the token itself is the credential.
+  if (typeof body?.shareToken === 'string') {
+    const repo = await validateShareToken(body.shareToken);
+    if (!repo) {
+      return NextResponse.json({ error: 'invalid or expired link' }, { status: 401 });
+    }
+    const token = await signSession(Date.now(), { role: 'visitor', repoScope: repo });
+    const res = NextResponse.json({ ok: true, role: 'visitor', repoScope: repo });
+    res.cookies.set(DEV_SESSION_COOKIE, token, sessionCookieOptions);
+    return res;
+  }
+
+  // Visitor mode (#82): the wrong-password path offers a look-don't-touch view
+  // of the whole board. Read-only is enforced by the middleware + routes.
+  if (body?.visitor === true) {
+    const token = await signSession(Date.now(), { role: 'visitor' });
+    const res = NextResponse.json({ ok: true, role: 'visitor' });
+    res.cookies.set(DEV_SESSION_COOKIE, token, sessionCookieOptions);
+    return res;
+  }
+
   // Global lockout first: after N total failures across all IPs, every
   // attempt is rejected for a cooldown — independent of the per-IP limiter.
   const global = await checkGlobalLockout();
@@ -54,14 +90,14 @@ export async function POST(req: NextRequest) {
     return tooManyAttempts(rl);
   }
 
-  const body = await req.json().catch(() => ({}));
   const password = typeof body?.password === 'string' ? body.password : '';
   const hash = process.env.DEV_CONSOLE_PASSWORD_HASH || '';
 
   if (!password || !hash || !verifyPassword(password, hash)) {
-    // Count this failure toward the shared global lockout.
+    // Count this failure toward the shared global lockout, and let the client
+    // offer the read-only visitor path instead of a dead-end "Nope." (#82).
     await recordGlobalFailure();
-    return NextResponse.json({ error: 'invalid credentials' }, { status: 401 });
+    return NextResponse.json({ error: 'invalid credentials', visitorOffer: true }, { status: 401 });
   }
 
   // Successful login clears the failure counters so legitimate sign-ins — and
