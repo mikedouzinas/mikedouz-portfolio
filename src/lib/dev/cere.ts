@@ -159,7 +159,9 @@ CRITICAL — you are a proposer, not an executor. Nothing happens until Mike cli
 - Whenever you describe a concrete create/update, you MUST emit the matching tool call. Never describe a change in text without also calling the tool for it. If you can't form a valid tool call, do not pretend the change exists.
 - If you have nothing concrete to propose (the message isn't actionable, or you need more detail), say so plainly in text and call no tools — do not imply any change was or will be made.
 
-If the message is a genuine question or needs clarification (not a filing request), just reply in text without calling tools.
+BIAS TO PROPOSING. Mike often talks to you in raw form — braindumps, status updates ("yesterday I did X"), ideas, half-formed notes. Your default is to extract whatever is actionable and immediately propose it as tickets (or updates to existing tickets), filling in reasonable titles, sizes, and subtasks yourself. Do NOT ask permission to propose, do NOT ask him to verify details first, and do NOT explain the confirm mechanics ("I haven't created anything", "you'll need to confirm") — the preview UI already makes that clear. Propose your best draft; he can edit or decline it. Only skip proposing when the message genuinely contains nothing actionable, and even then respond to the content itself rather than describing your own limitations.
+
+If the message is a pure question (not a filing request and nothing actionable in it), just answer in text without calling tools.
 
 Sizing — every new ticket needs one: S = quick (<~1h), M = a feature / half-day, L = large or conversation-heavy / multi-day. Infer it from the work described.
 The "awaiting review" status is set exclusively by the handoff flow (board CLI or agent), not by you — never set status to "awaiting review" yourself.
@@ -269,13 +271,16 @@ export function parseActions(
 }
 
 /**
- * Verbs that imply a change was actually carried out. Cere is a proposer, so any
- * of these in the reply while no action will be applied is a phantom completion
- * claim (ticket #77). Kept narrow/past-tense so legitimate proposal prose
- * ("I'll file…", "I'm proposing…") is not falsely caught.
+ * First-person claims that a change was actually carried out. Cere is a
+ * proposer, so any of these in the reply while no action will be applied is a
+ * phantom completion claim (ticket #77). Deliberately requires the "I …" (or
+ * "that's/it's done") framing: a bare past-tense verb anywhere in the reply is
+ * NOT enough, because Mike's own words ("yesterday I added…") get echoed back
+ * in normal conversation and used to trip this guard, replacing a perfectly
+ * good reply with a confusing "I didn't create a ticket" lecture.
  */
 const COMPLETION_CLAIM =
-  /\b(filed|created|updated|changed|closed|reopened|marked|applied|added|saved|completed|done|set the|moved|renamed|deleted|removed)\b/i;
+  /\bI(?:['’]ve| have| just| now| also)?\s+(?:now |just |also |already |gone ahead and )?(?:filed|created|updated|changed|closed|reopened|marked|applied|saved|completed|moved|renamed|deleted|removed)\b|\b(?:that['’]s|it['’]s|it has|this has|all)\s+(?:now\s+)?(?:been\s+)?(?:done|filed|created|updated|applied|closed)\b/i;
 
 /**
  * Reconcile the planner's free-text reply against the actions that will actually
@@ -308,8 +313,8 @@ export function reconcileReply(
   }
   return {
     reply:
-      "I didn't actually make any changes — I can only propose them, and you confirm before anything is filed. " +
-      "I couldn't turn that into a concrete change. Can you clarify what you'd like, and I'll draft it?",
+      "I got ahead of myself — nothing has been proposed yet. " +
+      "Tell me what you'd like on the board (or just say \"file it\") and I'll draft the ticket for you to confirm.",
     warnings: ['Cere described a change but emitted no actionable proposal — reply rewritten.'],
   };
 }
