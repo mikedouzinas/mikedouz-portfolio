@@ -86,6 +86,24 @@ export default function DevConsolePage() {
   // "Smart" (composite score, #36) is the default; Priority/Recent/Size stay
   // available as explicit choices in the dropdown.
   const [sort, setSort] = useState<SortBy>('smart');
+  // Session role (#53/#82/#6): visitor sessions render the read-only board —
+  // no Cere, no gear, no mutating card affordances. Defaults to admin so
+  // Mike's board never flashes into read-only while the role fetch resolves;
+  // a visitor briefly seeing edit chrome is harmless (the API rejects writes).
+  const [role, setRole] = useState<'admin' | 'visitor'>('admin');
+  const readOnly = role === 'visitor';
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch('/api/dev/auth');
+        if (!res.ok) return;
+        const data = (await res.json()) as { role: 'admin' | 'visitor' | null };
+        if (data.role === 'visitor') setRole('visitor');
+      } catch {
+        /* stay admin-shaped; the API is still the enforcement layer */
+      }
+    })();
+  }, []);
   const [composerOpen, setComposerOpen] = useState(false);
   // #88 — rapid-tap guard. Poof keeps the closing panel mounted for its ~340ms
   // exit animation; re-opening during that window mounts a SECOND panel next to
@@ -306,6 +324,7 @@ export default function DevConsolePage() {
   // ⌘K (the main-site Iris is suppressed on /dev) opens Cere instead. Ignore
   // Shift so ⌘⇧K stays reserved for the portal twin and doesn't also open Cere.
   useEffect(() => {
+    if (readOnly) return; // no Cere in visitor mode
     function onKey(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -322,7 +341,7 @@ export default function DevConsolePage() {
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [readOnly]);
 
   async function hide(slug: string) {
     await fetch('/api/dev/repos', {
@@ -416,12 +435,18 @@ export default function DevConsolePage() {
                     options={SORT_OPTS}
                     onChange={(v) => setSort(v as SortBy)}
                   />
-                  <GearMenu
-                    onManage={() => setManaging((m) => !m)}
-                    onInbox={() => { window.location.href = '/admin/inbox'; }}
-                    onLogout={logout}
-                    loggingOut={loggingOut}
-                  />
+                  {readOnly ? (
+                    <span className="rounded-full border border-[#e7e2d4]/25 bg-[#e7e2d4]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.15em] text-[#e7e2d4]/70">
+                      read-only
+                    </span>
+                  ) : (
+                    <GearMenu
+                      onManage={() => setManaging((m) => !m)}
+                      onInbox={() => { window.location.href = '/admin/inbox'; }}
+                      onLogout={logout}
+                      loggingOut={loggingOut}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -430,15 +455,17 @@ export default function DevConsolePage() {
             {/* self-stretch + flex so CerePortal still fills the header height
                 (its own self-stretch needs a flex parent); the entrance jump is a
                 transform/opacity layer that doesn't affect the layout box. */}
-            <div
-              className={`flex self-stretch ${entrance && t >= 0.34 ? 'hq-cere-jump' : ''}`}
-              style={entrance && t < 0.34 ? { opacity: 0 } : undefined}
-            >
-              <CerePortal onClick={openComposer} />
-            </div>
+            {!readOnly && (
+              <div
+                className={`flex self-stretch ${entrance && t >= 0.34 ? 'hq-cere-jump' : ''}`}
+                style={entrance && t < 0.34 ? { opacity: 0 } : undefined}
+              >
+                <CerePortal onClick={openComposer} />
+              </div>
+            )}
           </div>
 
-          {managing && repos.length > 0 && (
+          {!readOnly && managing && repos.length > 0 && (
             <RepoManagePanel repos={repos} hidden={hidden} onHide={hide} onUnhide={unhide} />
           )}
         </div>
@@ -474,6 +501,7 @@ export default function DevConsolePage() {
                 onSendBack={onSendBack}
                 entrance={entrance ? { active: true, t } : undefined}
                 loading={loading}
+                editable={!readOnly}
               />
             )}
           </div>
@@ -492,12 +520,14 @@ export default function DevConsolePage() {
         </div>
       </main>
 
-      <CerePanel
-        open={composerOpen}
-        onClose={closeComposer}
-        onApplied={onCereApplied}
-        issues={issues}
-      />
+      {!readOnly && (
+        <CerePanel
+          open={composerOpen}
+          onClose={closeComposer}
+          onApplied={onCereApplied}
+          issues={issues}
+        />
+      )}
     </div>
   );
 }

@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { listIssues, listBoardIssues, createIssue, updateIssue, listRepos, isOwnedRepo, postComment, upsertReviewBlock } from '@/lib/dev/github';
 import { getHiddenRepos } from '@/lib/dev/hidden';
+import { getDevSession } from '@/lib/dev/session';
 
 export const runtime = 'nodejs';
+
+/** 403 unless the caller is admin — mutations are never visitor-reachable (#53). */
+async function assertAdmin(req: NextRequest): Promise<NextResponse | null> {
+  const session = await getDevSession(req);
+  return session?.role === 'admin'
+    ? null
+    : NextResponse.json({ error: 'read-only' }, { status: 403 });
+}
 
 const PRIORITY = z.enum(['p1', 'p2', 'p3', 'p4', 'p5']);
 const STATUS = z.enum(['todo', 'in progress', 'awaiting review']);
@@ -23,8 +32,13 @@ export async function GET(req: NextRequest) {
   const repoParam = req.nextUrl.searchParams.get('repo');
 
   try {
+    // A repo-scoped visitor session (guest link, #6) only ever sees its repo,
+    // regardless of what the query asks for.
+    const scope = (await getDevSession(req))?.repoScope;
     let repos: string[];
-    if (repoParam) {
+    if (scope) {
+      repos = [scope];
+    } else if (repoParam) {
       if (!(await isOwnedRepo(repoParam))) {
         return NextResponse.json({ error: 'repo not allowed' }, { status: 400 });
       }
@@ -53,6 +67,8 @@ const CreateSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const denied = await assertAdmin(req);
+  if (denied) return denied;
   const parsed = CreateSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'invalid body' }, { status: 400 });
   if (!(await isOwnedRepo(parsed.data.repo))) {
@@ -86,6 +102,8 @@ const PatchSchema = z.object({
 });
 
 export async function PATCH(req: NextRequest) {
+  const denied = await assertAdmin(req);
+  if (denied) return denied;
   const parsed = PatchSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'invalid body' }, { status: 400 });
   if (!(await isOwnedRepo(parsed.data.repo))) {

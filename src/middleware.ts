@@ -21,8 +21,12 @@ export const config = {
 };
 
 export async function middleware(req: NextRequest) {
-  // The auth endpoint must be reachable while unauthenticated (login/logout).
-  if (req.nextUrl.pathname === '/api/dev/auth') {
+  const { pathname } = req.nextUrl;
+
+  // The auth endpoint must be reachable while unauthenticated (login/logout),
+  // and /dev/guest/<token> is the guest-link landing page — it exchanges its
+  // token for a visitor session, so it can't require one (#6).
+  if (pathname === '/api/dev/auth' || pathname.startsWith('/dev/guest/')) {
     return NextResponse.next();
   }
 
@@ -30,11 +34,27 @@ export async function middleware(req: NextRequest) {
   const result = token ? await verifySession(token, Date.now()) : { valid: false as const };
 
   if (!result.valid) {
-    if (req.nextUrl.pathname.startsWith('/api/')) {
+    if (pathname.startsWith('/api/')) {
       return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
     }
     // Don't admit the page exists.
     return new NextResponse(null, { status: 404 });
+  }
+
+  // Visitor sessions (#82/#6) are strictly read-only and scoped to the board:
+  // no mutating methods, and none of the other admin surfaces that ride this
+  // cookie (inbox, comment moderation). Enforced here at the edge — the routes
+  // also re-check, but this is the boundary that guarantees look-don't-touch.
+  if (result.role === 'visitor') {
+    const boardSurface = pathname === '/dev' || pathname.startsWith('/dev/') || pathname.startsWith('/api/dev/');
+    if (!boardSurface) {
+      return pathname.startsWith('/api/')
+        ? NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+        : new NextResponse(null, { status: 404 });
+    }
+    if (pathname.startsWith('/api/') && req.method !== 'GET' && req.method !== 'HEAD') {
+      return NextResponse.json({ error: 'read-only' }, { status: 403 });
+    }
   }
 
   const res = NextResponse.next();

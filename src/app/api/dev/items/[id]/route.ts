@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getItem, updateItem, updateItemSchema } from '@/lib/dev/items';
 import { upsertReviewBlock } from '@/lib/dev/github';
+import { getDevSession } from '@/lib/dev/session';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +18,12 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  // Middleware blocks visitor non-GETs; re-assert so vault mutations can never
+  // ride anything less than an admin session (#53).
+  const session = await getDevSession(req);
+  if (session?.role !== 'admin') {
+    return NextResponse.json({ error: 'read-only' }, { status: 403 });
+  }
   const { id } = await params;
   let json: unknown;
   try {
