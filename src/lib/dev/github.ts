@@ -66,6 +66,7 @@ export interface DevIssue {
   size: Size | null;
   state: 'open' | 'closed';
   url: string;
+  createdAt: string;
   updatedAt: string;
   // Set for Supabase-backed virtual-project items so the board can route their
   // mutations to /api/dev/items/[itemId] instead of GitHub. Undefined === a real
@@ -106,6 +107,7 @@ interface GhIssue {
   labels: GhLabel[];
   state: 'open' | 'closed';
   html_url: string;
+  created_at: string;
   updated_at: string;
   pull_request?: unknown;
 }
@@ -289,6 +291,7 @@ export async function listIssues(
           size: sizeOf(i.labels ?? []),
           state: i.state,
           url: i.html_url,
+          createdAt: i.created_at,
           updatedAt: i.updated_at,
         }));
     }),
@@ -347,6 +350,7 @@ export async function createIssue(
     size,
     state: i.state,
     url: i.html_url,
+    createdAt: i.created_at,
     updatedAt: i.updated_at,
   };
 }
@@ -387,4 +391,157 @@ export async function updateIssue(
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error(`GitHub patch ${repo}#${number}: ${res.status}`);
+}
+
+// ---- PR / commit / timeline reads ----
+// Read-only views over repo activity, for ranking (#36), reconciliation (#49),
+// and digests (#57). Same auth/owned-repo model as the issue reads.
+
+export interface DevCommit {
+  repo: string;
+  sha: string;
+  /** First line of the commit message. */
+  message: string;
+  /** GitHub login when linked, else the raw commit author name. */
+  author: string | null;
+  date: string;
+  url: string;
+}
+
+export interface DevPull {
+  repo: string;
+  number: number;
+  title: string;
+  state: 'open' | 'closed';
+  draft: boolean;
+  merged: boolean;
+  headRef: string;
+  baseRef: string;
+  url: string;
+  createdAt: string;
+  updatedAt: string;
+  mergedAt: string | null;
+}
+
+export interface DevTimelineEvent {
+  /** GitHub timeline event name: commented, labeled, closed, cross-referenced, committed, … */
+  event: string;
+  actor: string | null;
+  createdAt: string | null;
+  /** Compact event-specific context: label name, commit headline, comment excerpt, cross-ref. */
+  detail?: string;
+}
+
+interface GhCommit {
+  sha: string;
+  html_url: string;
+  commit: { message: string; committer: { date: string } | null; author: { name?: string } | null };
+  author: { login: string } | null;
+}
+
+interface GhPull {
+  number: number;
+  title: string;
+  state: 'open' | 'closed';
+  draft: boolean;
+  html_url: string;
+  head: { ref: string };
+  base: { ref: string };
+  created_at: string;
+  updated_at: string;
+  merged_at: string | null;
+}
+
+interface GhTimelineEvent {
+  event?: string;
+  actor?: { login: string } | null;
+  created_at?: string;
+  label?: { name: string };
+  body?: string;
+  sha?: string;
+  message?: string;
+  author?: { name?: string } | null;
+  source?: { issue?: { number: number; title: string; pull_request?: unknown } };
+}
+
+/** Recent commits on the default branch, newest first. Empty repos yield []. */
+export async function listCommits(
+  repo: string,
+  opts: { since?: string; perPage?: number } = {},
+): Promise<DevCommit[]> {
+  const params = new URLSearchParams({ per_page: String(opts.perPage ?? 30) });
+  if (opts.since) params.set('since', opts.since);
+  const res = await fetch(`${GH}/repos/${repo}/commits?${params}`, { headers: ghHeaders() });
+  if (res.status === 409) return []; // GitHub's "Git Repository is empty"
+  if (!res.ok) throw new Error(`GitHub commits ${repo}: ${res.status}`);
+  const arr = (await res.json()) as GhCommit[];
+  return arr.map((c) => ({
+    repo,
+    sha: c.sha,
+    message: (c.commit.message ?? '').split('\n', 1)[0],
+    author: c.author?.login ?? c.commit.author?.name ?? null,
+    date: c.commit.committer?.date ?? '',
+    url: c.html_url,
+  }));
+}
+
+/** Pull requests for a repo, most recently updated first. */
+export async function listPulls(
+  repo: string,
+  state: 'open' | 'closed' | 'all' = 'open',
+  perPage = 30,
+): Promise<DevPull[]> {
+  const res = await fetch(
+    `${GH}/repos/${repo}/pulls?state=${state}&per_page=${perPage}&sort=updated&direction=desc`,
+    { headers: ghHeaders() },
+  );
+  if (!res.ok) throw new Error(`GitHub pulls ${repo}: ${res.status}`);
+  const arr = (await res.json()) as GhPull[];
+  return arr.map((p) => ({
+    repo,
+    number: p.number,
+    title: p.title,
+    state: p.state,
+    draft: p.draft,
+    merged: p.merged_at !== null,
+    headRef: p.head.ref,
+    baseRef: p.base.ref,
+    url: p.html_url,
+    createdAt: p.created_at,
+    updatedAt: p.updated_at,
+    mergedAt: p.merged_at,
+  }));
+}
+
+/**
+ * An issue's timeline (comments, label changes, close/reopen, cross-references,
+ * linked commits), oldest first, mapped to a compact event list.
+ */
+export async function listIssueTimeline(
+  repo: string,
+  number: number,
+  perPage = 100,
+): Promise<DevTimelineEvent[]> {
+  const res = await fetch(
+    `${GH}/repos/${repo}/issues/${number}/timeline?per_page=${perPage}`,
+    { headers: ghHeaders() },
+  );
+  if (!res.ok) throw new Error(`GitHub timeline ${repo}#${number}: ${res.status}`);
+  const arr = (await res.json()) as GhTimelineEvent[];
+  return arr.map((e) => {
+    let detail: string | undefined;
+    if (e.label?.name) detail = e.label.name;
+    else if (e.event === 'committed') detail = (e.message ?? '').split('\n', 1)[0] || e.sha;
+    else if (e.event === 'commented' && e.body) detail = e.body.length > 140 ? `${e.body.slice(0, 140)}…` : e.body;
+    else if (e.event === 'cross-referenced' && e.source?.issue) {
+      const kind = e.source.issue.pull_request ? 'PR' : 'issue';
+      detail = `${kind} #${e.source.issue.number}: ${e.source.issue.title}`;
+    }
+    return {
+      event: e.event ?? 'unknown',
+      actor: e.actor?.login ?? e.author?.name ?? null,
+      createdAt: e.created_at ?? null,
+      detail,
+    };
+  });
 }

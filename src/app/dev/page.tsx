@@ -58,6 +58,7 @@ function itemToIssue(it: DevItem): DevIssue {
     size: it.size,
     state: it.state,
     url: '',
+    createdAt: it.createdAt,
     updatedAt: it.updatedAt,
     source: 'virtual',
     itemId: it.id,
