@@ -23,6 +23,9 @@ import type { DevItem, DevProjectWithItems } from '@/lib/dev/items';
 import { HomeFadeOverlay } from '@/components/dev/entrance/HomeFadeOverlay';
 import { useEntranceReveal, sub } from '@/components/dev/entrance/useEntranceReveal';
 
+/** How long Cere's exit poof keeps the closing panel mounted (see #88 guard). */
+const COMPOSER_EXIT_MS = 400;
+
 const SORT_OPTS: { value: SortBy; label: string }[] = [
   { value: 'smart', label: 'Smart' },
   { value: 'priority', label: 'Priority' },
@@ -84,6 +87,19 @@ export default function DevConsolePage() {
   // available as explicit choices in the dropdown.
   const [sort, setSort] = useState<SortBy>('smart');
   const [composerOpen, setComposerOpen] = useState(false);
+  // #88 — rapid-tap guard. Poof keeps the closing panel mounted for its ~340ms
+  // exit animation; re-opening during that window mounts a SECOND panel next to
+  // the exiting one (the hyper-clear ghost duplicate). Lock re-opens until the
+  // exit has fully played.
+  const composerClosedAtRef = useRef(0);
+  const openComposer = useCallback(() => {
+    if (Date.now() - composerClosedAtRef.current < COMPOSER_EXIT_MS) return;
+    setComposerOpen(true);
+  }, []);
+  const closeComposer = useCallback(() => {
+    composerClosedAtRef.current = Date.now();
+    setComposerOpen(false);
+  }, []);
   const [entrance, setEntrance] = useState(false);
   const [homeFaded, setHomeFaded] = useState(false);
   const { t } = useEntranceReveal(entrance);
@@ -293,7 +309,15 @@ export default function DevConsolePage() {
     function onKey(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setComposerOpen((o) => !o);
+        // Same rapid-toggle guard as the portal button (#88): closing stamps the
+        // clock; re-opening waits out the exit animation.
+        setComposerOpen((o) => {
+          if (o) {
+            composerClosedAtRef.current = Date.now();
+            return false;
+          }
+          return Date.now() - composerClosedAtRef.current < COMPOSER_EXIT_MS ? o : true;
+        });
       }
     }
     window.addEventListener('keydown', onKey);
@@ -410,7 +434,7 @@ export default function DevConsolePage() {
               className={`flex self-stretch ${entrance && t >= 0.34 ? 'hq-cere-jump' : ''}`}
               style={entrance && t < 0.34 ? { opacity: 0 } : undefined}
             >
-              <CerePortal onClick={() => setComposerOpen(true)} />
+              <CerePortal onClick={openComposer} />
             </div>
           </div>
 
@@ -470,7 +494,7 @@ export default function DevConsolePage() {
 
       <CerePanel
         open={composerOpen}
-        onClose={() => setComposerOpen(false)}
+        onClose={closeComposer}
         onApplied={onCereApplied}
         issues={issues}
       />
