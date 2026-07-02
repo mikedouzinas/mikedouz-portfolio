@@ -105,6 +105,8 @@ export default function DevConsolePage() {
     })();
   }, []);
   const [composerOpen, setComposerOpen] = useState(false);
+  // #97 — "Work with Cere" from a ticket card: auto-sent when the panel opens.
+  const [cereSeed, setCereSeed] = useState<string | null>(null);
   // #88 — rapid-tap guard. Poof keeps the closing panel mounted for its ~340ms
   // exit animation; re-opening during that window mounts a SECOND panel next to
   // the exiting one (the hyper-clear ghost duplicate). Lock re-opens until the
@@ -236,6 +238,20 @@ export default function DevConsolePage() {
       void loadIssues(true);
     },
     [loadIssues],
+  );
+
+  // #97 — hand a ticket to Cere: open the panel with a scoped opener that Cere
+  // answers with a plan + any proposed ticket changes (she has the full board,
+  // including this ticket's body, in her system prompt).
+  const onWorkWith = useCallback(
+    (i: DevIssue) => {
+      const ref = i.source === 'virtual' ? `"${i.title}"` : `${i.repo}#${i.number} ("${i.title}")`;
+      setCereSeed(
+        `Let's work ticket ${ref}. Give me a quick plan of attack, flag anything unclear or missing from the ticket, and propose any updates worth making (subtasks, size, priority).`,
+      );
+      openComposer();
+    },
+    [openComposer],
   );
 
   // Virtual projects → board repos + issues, merged with the GitHub board.
@@ -502,6 +518,7 @@ export default function DevConsolePage() {
                 entrance={entrance ? { active: true, t } : undefined}
                 loading={loading}
                 editable={!readOnly}
+                onWorkWith={readOnly ? undefined : onWorkWith}
               />
             )}
           </div>
@@ -526,6 +543,8 @@ export default function DevConsolePage() {
           onClose={closeComposer}
           onApplied={onCereApplied}
           issues={issues}
+          seed={cereSeed}
+          onSeedConsumed={() => setCereSeed(null)}
         />
       )}
     </div>

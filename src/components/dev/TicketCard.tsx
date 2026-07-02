@@ -145,6 +145,7 @@ export function TicketCard({
   onPatch,
   inReview = false,
   editable = true,
+  onWorkWith,
   entrance,
   entranceIndex = 0,
 }: {
@@ -154,6 +155,8 @@ export function TicketCard({
   inReview?: boolean;
   /** False = read-only: no mutating affordances render (#53). */
   editable?: boolean;
+  /** #97 — open Cere scoped to this ticket ("work this with Claude"). */
+  onWorkWith?: (issue: DevIssue) => void;
   entrance?: { active: boolean; t: number };
   entranceIndex?: number;
 }) {
@@ -555,6 +558,22 @@ export function TicketCard({
                     options={SIZE_OPTS}
                     onChange={(v) => onPatch(issue, { size: v as Size })}
                   />
+                  {onWorkWith && (
+                    // #97 — the low-friction entry point: hand this ticket to
+                    // Cere in place (collapse first so the panel isn't buried
+                    // under the detached card's z-60 overlay).
+                    <Button
+                      variant="ghost"
+                      glowColor="231, 226, 212"
+                      onClick={() => {
+                        collapse();
+                        onWorkWith(issue);
+                      }}
+                      className="text-xs text-[#e7e2d4]/85"
+                    >
+                      ✦ Work with Cere
+                    </Button>
+                  )}
                   <CopyForClaude issue={issue} />
                   <Button
                     variant="ghost"

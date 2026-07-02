@@ -98,6 +98,8 @@ export function CerePanel({
   onClose,
   onApplied,
   issues = [],
+  seed,
+  onSeedConsumed,
 }: {
   open: boolean;
   onClose: () => void;
@@ -107,9 +109,22 @@ export function CerePanel({
   /** Live board issues — used to resolve ticket titles for the proposal preview
    *  (ticket #66). */
   issues?: DevIssue[];
+  /** #97 — a message auto-sent when the panel opens on a fresh conversation
+   *  (the "work this ticket with Cere" entry point from a card). */
+  seed?: string | null;
+  onSeedConsumed?: () => void;
 }) {
   const { messages, busy, applying, actions, warnings, send, confirm, discard, reset } =
     useCere(onApplied, issues);
+
+  // Fire the seed exactly once per open, and only into an empty conversation —
+  // a reopened panel mid-chat must never inject a stray ticket prompt.
+  useEffect(() => {
+    if (open && seed && messages.length === 0 && !busy) {
+      void send(seed);
+      onSeedConsumed?.();
+    }
+  }, [open, seed, messages.length, busy, send, onSeedConsumed]);
 
   // Resolve the display title for a proposed action: creates carry their own;
   // updates/closes resolve theirs from the already-loaded board (ticket #66).

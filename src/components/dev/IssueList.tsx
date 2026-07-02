@@ -129,6 +129,7 @@ export function IssueList({
   entrance,
   loading = false,
   editable = true,
+  onWorkWith,
 }: {
   issues: DevIssue[];
   repos: DevRepo[];
@@ -141,6 +142,8 @@ export function IssueList({
   loading?: boolean;
   /** False = read-only board (#53): cards render without mutating affordances. */
   editable?: boolean;
+  /** #97 — per-card "work this with Cere" entry point. */
+  onWorkWith?: (i: DevIssue) => void;
 }) {
   const [error, setError] = useState('');
 
@@ -201,6 +204,7 @@ export function IssueList({
       repoName={repoName(issue.repo)}
       onPatch={patch}
       editable={editable}
+      onWorkWith={onWorkWith}
       entrance={entrance}
       entranceIndex={entranceIdx}
     />
@@ -224,6 +228,7 @@ export function IssueList({
               onPatch={patch}
               inReview
               editable={editable}
+              onWorkWith={onWorkWith}
               entrance={entrance}
               entranceIndex={idx}
             />
